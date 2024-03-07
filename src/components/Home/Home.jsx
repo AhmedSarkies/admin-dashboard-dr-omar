@@ -12,7 +12,7 @@ import { IoIosDocument } from "react-icons/io";
 
 import { Header, Sidebar } from "../";
 
-import image from "../../assets/images/anonymous.png";
+import logo from "../../assets/images/logo.jpg";
 
 import { Outlet } from "react-router-dom";
 
@@ -87,7 +87,7 @@ const Home = () => {
         <Header menu={menu} toggleMenu={toggleMenu} />
         <Outlet />
       </div>
-      <Sidebar menu={menu} linkItems={linkItems} image={image} />
+      <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
     </div>
   );
 };

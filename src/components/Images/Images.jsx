@@ -199,7 +199,7 @@ const Images = () => {
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
+      cancelButtonColor: "#0d1d34",
       confirmButtonText: "نعم, احذفه!",
       cancelButtonText: "الغاء",
     }).then((result) => {
@@ -390,7 +390,9 @@ const Images = () => {
                     />
                   </div>
                   {formik.errors.image && formik.touched.image ? (
-                    <span className="error">{formik.errors.image}</span>
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
                   ) : null}
                 </Col>
                 <Col lg={7} className="mb-5">
@@ -975,11 +977,15 @@ const Images = () => {
                             />
                           </div>
                           {formik.errors.image && formik.touched.image ? (
-                            <span className="error">{formik.errors.image}</span>
+                            <span className="error text-center">
+                              {formik.errors.image}
+                            </span>
                           ) : null}
                         </Col>
                         {formik.errors.image && formik.touched.image ? (
-                          <span className="error">{formik.errors.image}</span>
+                          <span className="error text-center">
+                            {formik.errors.image}
+                          </span>
                         ) : null}
                       </Col>
                       <Col lg={7} className="mb-5">

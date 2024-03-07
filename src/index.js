@@ -15,7 +15,7 @@ import App from "./App";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
-import "@sweetalert2/theme-dark/dark.css";
+import "sweetalert2";
 import "./index.css";
 
 const root = createRoot(document.getElementById("root"));
@@ -29,7 +29,7 @@ root.render(
           pauseOnFocusLoss={false}
           draggable
           pauseOnHover={false}
-          theme="dark"
+          theme="light"
           autoClose={3000}
           hideProgressBar={false}
         />

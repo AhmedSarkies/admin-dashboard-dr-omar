@@ -120,7 +120,7 @@ const CategoriesAudio = () => {
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
-      cancelButtonColor: "#3085d6",
+      cancelButtonColor: "#0d1d34",
       confirmButtonText: "نعم, احذفه!",
       cancelButtonText: "الغاء",
     }).then((result) => {

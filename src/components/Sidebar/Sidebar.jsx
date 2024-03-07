@@ -1,11 +1,11 @@
 import React from "react";
 import { NavLink } from "react-router-dom";
 
-const Sidebar = ({ menu, linkItems, image }) => {
+const Sidebar = ({ menu, linkItems, logo }) => {
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
       <div className="sidebar-header d-flex justify-content-center align-items-center pt-4 pb-4">
-        <img src={image} alt="logo" />
+        <img src={logo} alt="logo" width={150} />
       </div>
       <div className="sidebar-body">
         <ul className="sidebar-list">

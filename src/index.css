@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Tajawal:wght@200;300;400;500;700;800;900&display=swap");
 :root {
-  --main-color: #f101fb;
+  --main-color: #0d1d34;
   --main-bg-color: #f5f5f5;
   --text-color: #1f1f31;
   --border-color: #1f1f31;
@@ -20,7 +20,7 @@ body {
 .login-container {
   min-width: 100%;
   min-height: 100vh;
-  background: linear-gradient(90.24deg, #f101fb 0.07%, #9057f8 99.96%);
+  background: linear-gradient(90.24deg, #11233b 0.07%, #0d1d33 99.96%);
 }
 .login-container .login {
   padding: 0.875rem;
@@ -56,7 +56,7 @@ body {
   font-size: 1rem;
   font-weight: 500;
   background: #fff;
-  color: #4c26e4;
+  color: #173f74;
   padding: 0 0.5rem;
   top: 50%;
   right: 10px;
@@ -73,7 +73,7 @@ body {
 }
 .form-group input:not(:placeholder-shown) + label.label-form,
 .form-group input:focus + label.label-form {
-  color: #c143fd;
+  color: #173f74;
   font-size: 0.8rem;
   top: 0;
   transform: translateY(-50%);
@@ -81,7 +81,7 @@ body {
 .form-group input:focus,
 .form-group input:hover,
 :has(.form-group input:focus) .form-group input:hover {
-  border-color: #c143fd;
+  border-color: #173f74;
   box-shadow: none;
 }
 .submit-btn {
@@ -113,7 +113,7 @@ body {
     border-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,
     color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms;
   color: #fff;
-  background-color: rgb(193, 67, 253);
+  background-color: rgb(11 28 48 / 93%);
   box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px,
     rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px;
 }
@@ -126,13 +126,13 @@ body {
 .submit-btn:hover {
   text-decoration: none;
   color: #fff;
-  background-color: rgb(135, 46, 177);
+  background-color: rgb(12 28 51);
   box-shadow: rgba(0, 0, 0, 0.2) 0px 2px 4px -1px,
     rgba(0, 0, 0, 0.14) 0px 4px 5px 0px, rgba(0, 0, 0, 0.12) 0px 1px 10px 0px;
 }
 .forget-password {
   width: fit-content !important;
-  color: #4c26e4;
+  color: #173f74;
   font-weight: 500;
   text-decoration: none;
 }
@@ -178,9 +178,7 @@ body {
   transform: scale(1);
 }
 .error {
-  color: #f44336;
   font-size: 0.8rem;
-  margin-top: -0.5rem;
   text-align: right;
   width: 100%;
 }
@@ -213,8 +211,9 @@ body {
   gap: 0.4rem;
   font-size: 0.875rem;
   font-weight: 600;
-  padding: 0.5rem 0.25rem;
-  color: #c143fd;
+  padding: 0.5rem;
+  outline: none;
+  color: #0d1d34;
 }
 .dashboard .dashboard-header .dashboard-header-btns button.lang-btn {
   padding: 0.5rem 1.6rem;
@@ -222,8 +221,10 @@ body {
 .dashboard .dashboard-header .dashboard-header-btns button svg {
   font-size: 1.3rem;
 }
+.dashboard .dashboard-header .dashboard-header-btns button:focus,
 .dashboard .dashboard-header .dashboard-header-btns button:hover {
-  background: #c143fd0f !important;
+  background: #0d1d3421 !important;
+  outline: none;
 }
 .dashboard .dashboard-header .dashboard-header-title {
   display: flex;
@@ -274,12 +275,12 @@ body {
   min-width: 20%;
   max-height: 100vh;
   background-color: #fff;
-  border-left: 1px solid #f101fb;
+  border-left: 1px solid #0c1c33;
   overflow-y: auto;
   transition: all 0.3s ease;
 }
 .sidebar .sidebar-body {
-  background: #c143fd;
+  background: #0c1c33;
   height: fit-content;
 }
 .sidebar .sidebar-body .sidebar-list {
@@ -298,11 +299,11 @@ body {
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link {
   list-style: none;
   display: flex;
-  justify-content: start;
+  justify-content: flex-start;
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  color: #c143fd;
+  color: #0c1c33;
   background: #fff;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
@@ -314,7 +315,7 @@ body {
 }
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link.active,
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link:hover {
-  background: #4c26e4;
+  background: #1f59ac;
   color: #fff;
 }
 /* Card */
