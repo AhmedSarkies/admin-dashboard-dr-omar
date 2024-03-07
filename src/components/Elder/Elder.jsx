@@ -216,6 +216,7 @@ const Elder = ({ dashboard }) => {
               title: `تم حذف ${scholar?.name}`,
               text: `تم حذف ${scholar?.name} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });

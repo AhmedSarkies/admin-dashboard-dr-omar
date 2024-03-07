@@ -310,6 +310,7 @@ const Audios = () => {
   //         title: `تم حذف ${audio?.title}`,
   //         text: `تم حذف ${audio?.title} بنجاح`,
   //         icon: "success",
+  // confirmButtonColor: "#0d1d34",
   //       });
   //     }
   //   });

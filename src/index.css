@@ -119,7 +119,7 @@ body {
 }
 .submit-btn:focus {
   color: #fff !important;
-  background-color: rgb(193, 67, 253) !important;
+  background-color: #0d1d34 !important;
   box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 1px -2px,
     rgba(0, 0, 0, 0.14) 0px 2px 2px 0px, rgba(0, 0, 0, 0.12) 0px 1px 5px 0px !important;
 }
@@ -177,9 +177,15 @@ body {
 .form-group.radio-group .radio input:checked + .radio-btn::after {
   transform: scale(1);
 }
-.error {
+.error-container {
+  text-align: right;
+  margin-top: -0.8rem;
+  width: 100%;
+}
+.error-container .error {
   font-size: 0.8rem;
   text-align: right;
+  margin-top: -0.8rem;
   width: 100%;
 }
 :has(form .error) .form-group input {
@@ -274,10 +280,13 @@ body {
   max-width: 290px;
   min-width: 20%;
   max-height: 100vh;
-  background-color: #fff;
+  background-color: #0d1d34;
   border-left: 1px solid #0c1c33;
   overflow-y: auto;
   transition: all 0.3s ease;
+}
+.sidebar .sidebar-header {
+  background: #fff;
 }
 .sidebar .sidebar-body {
   background: #0c1c33;
@@ -315,7 +324,7 @@ body {
 }
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link.active,
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link:hover {
-  background: #1f59ac;
+  background: #1e61bfe8;
   color: #fff;
 }
 /* Card */

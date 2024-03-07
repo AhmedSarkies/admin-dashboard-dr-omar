@@ -211,6 +211,7 @@ const Images = () => {
               title: `تم حذف ${picture?.title}`,
               text: `تم حذف ${picture?.title} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });

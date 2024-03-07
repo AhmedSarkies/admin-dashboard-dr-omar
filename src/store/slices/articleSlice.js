@@ -36,11 +36,13 @@ export const addArticleApi = createAsyncThunk(
         url: `/Articles/Insert`,
         data,
       }).then((response) => {
-        toast.success("تم إضافة المقال بنجاح");
+        // toast.success("تم إضافة المقال بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة المقال");
+      // toast.error("حدث خطأ أثناء إضافة المقال");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -56,11 +58,13 @@ export const updateArticleApi = createAsyncThunk(
         url: `/Articles/Update`,
         data,
       }).then((response) => {
-        toast.success("تم تحديث المقال بنجاح");
+        // toast.success("تم تحديث المقال بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث المقال");
+      // toast.error("حدث خطأ أثناء تحديث المقال");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -80,11 +84,13 @@ export const deleteArticleApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف المقال بنجاح");
+        // toast.success("تم حذف المقال بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف المقال");
+      // toast.error("حدث خطأ أثناء حذف المقال");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -122,11 +128,13 @@ export const addArticleCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم إضافة تصنيف المقالات بنجاح");
+        // toast.success("تم إضافة تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة تصنيف المقالات");
+      // toast.error("حدث خطأ أثناء إضافة تصنيف المقالات");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -144,11 +152,13 @@ export const updateArticleCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم تحديث تصنيف المقالات بنجاح");
+        // toast.success("تم تحديث تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث تصنيف المقالات");
+      // toast.error("حدث خطأ أثناء تحديث تصنيف المقالات");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -168,11 +178,13 @@ export const deleteArticleCategoryApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف تصنيف المقالات بنجاح");
+        // toast.success("تم حذف تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف تصنيف المقالات");
+      // toast.error("حدث خطأ أثناء حذف تصنيف المقالات");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }

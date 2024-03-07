@@ -40,11 +40,13 @@ export const addPictureApi = createAsyncThunk(
         url: `/Images/Insert`,
         data,
       }).then((response) => {
-        toast.success("تم إضافة الصورة بنجاح");
+        // toast.success("تم إضافة الصورة بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة الصورة");
+      // toast.error("حدث خطأ أثناء إضافة الصورة");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -60,11 +62,13 @@ export const updatePictureApi = createAsyncThunk(
         url: `/Images/Update`,
         data,
       }).then((response) => {
-        toast.success("تم تحديث الصورة بنجاح");
+        // toast.success("تم تحديث الصورة بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث الصورة");
+      // toast.error("حدث خطأ أثناء تحديث الصورة");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -84,11 +88,13 @@ export const deletePictureApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف الصورة بنجاح");
+        // toast.success("تم حذف الصورة بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف الصورة");
+      // toast.error("حدث خطأ أثناء حذف الصورة");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -124,11 +130,13 @@ export const addPictureCategoryApi = createAsyncThunk(
         url: `/ImagesCategories/Insert`,
         params: { ...data },
       }).then((response) => {
-        toast.success("تم إضافة تصنيف الصور بنجاح");
+        // toast.success("تم إضافة تصنيف الصور بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة تصنيف الصور");
+      // toast.error("حدث خطأ أثناء إضافة تصنيف الصور");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -144,11 +152,13 @@ export const updatePictureCategoryApi = createAsyncThunk(
         url: `/ImagesCategories/Update`,
         params: { ...data },
       }).then((response) => {
-        toast.success("تم تحديث تصنيف الصور بنجاح");
+        // toast.success("تم تحديث تصنيف الصور بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث تصنيف الصور");
+      // toast.error("حدث خطأ أثناء تحديث تصنيف الصور");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -168,11 +178,13 @@ export const deletePictureCategoryApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف تصنيف الصور بنجاح");
+        // toast.success("تم حذف تصنيف الصور بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف تصنيف الصور");
+      // toast.error("حدث خطأ أثناء حذف تصنيف الصور");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }

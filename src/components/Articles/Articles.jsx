@@ -257,6 +257,7 @@ const Articles = () => {
               title: `تم حذف ${article?.title}`,
               text: `تم حذف ${article?.title} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });

@@ -293,6 +293,7 @@ const Books = () => {
           title: `تم حذف ${book?.title}`,
           text: `تم حذف ${book?.title} بنجاح`,
           icon: "success",
+          confirmButtonColor: "#0d1d34",
         });
       }
     });

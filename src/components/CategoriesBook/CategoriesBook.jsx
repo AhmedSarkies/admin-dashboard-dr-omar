@@ -129,6 +129,7 @@ const CategoriesBook = () => {
               title: `تم حذف ${bookCategory?.title}`,
               text: `تم حذف ${bookCategory?.title} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });

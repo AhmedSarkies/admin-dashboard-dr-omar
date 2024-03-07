@@ -57,7 +57,7 @@ const linkItems = [
     path: "/dr-omar/sub-admins",
     icon: <IoPeople />,
   },
-  { title: "صفحات الحسابات" },
+  // { title: "صفحات الحسابات" },
   { title: "الملف الشخصي", path: "/dr-omar/profile", icon: <IoPerson /> },
   { title: "تسجيل الدخول", path: "/dr-omar/sign-in", icon: <FaSignInAlt /> },
   { title: "تسجيل حساب جديد", path: "/dr-omar/register", icon: <GoRocket /> },

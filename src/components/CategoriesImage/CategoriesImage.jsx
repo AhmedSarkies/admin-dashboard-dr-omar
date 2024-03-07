@@ -128,6 +128,7 @@ const CategoriesImages = () => {
               title: `تم حذف ${pictureCategory?.title}`,
               text: `تم حذف ${pictureCategory?.title} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });

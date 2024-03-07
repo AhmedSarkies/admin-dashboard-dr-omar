@@ -40,11 +40,13 @@ export const addAudioApi = createAsyncThunk(
         url: "/Audios/insert",
         data,
       }).then((response) => {
-        toast.success("تم إضافة الصوتية بنجاح");
+        // toast.success("تم إضافة الصوتية بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة الصوتية");
+      // toast.error("حدث خطأ أثناء إضافة الصوتية");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -60,11 +62,13 @@ export const updateAudioApi = createAsyncThunk(
         url: `/Audios/Update`,
         data,
       }).then((response) => {
-        toast.success("تم تحديث الصوتية بنجاح");
+        // toast.success("تم تحديث الصوتية بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث الصوتية");
+      // toast.error("حدث خطأ أثناء تحديث الصوتية");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -83,11 +87,13 @@ export const deleteAudioApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف الصوتية بنجاح");
+        // toast.success("تم حذف الصوتية بنجاح");
+        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف الصوتية");
+      // toast.error("حدث خطأ أثناء حذف الصوتية");
+      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }

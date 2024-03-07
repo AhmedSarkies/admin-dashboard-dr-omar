@@ -132,6 +132,7 @@ const CategoriesAudio = () => {
               title: `تم حذف ${audioCategory?.title}`,
               text: `تم حذف ${audioCategory?.title} بنجاح`,
               icon: "success",
+              confirmButtonColor: "#0d1d34",
             });
           }
         });
