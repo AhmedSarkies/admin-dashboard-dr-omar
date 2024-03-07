@@ -4,7 +4,7 @@ import { SiBookstack } from "react-icons/si";
 import { LiaFileAudioSolid } from "react-icons/lia";
 import { FaUser } from "react-icons/fa";
 
-// import { BarChart, Card, Elder } from "../";
+import {  Card, Elder } from "../";
 import { Col, Container, Row } from "reactstrap";
 import { UserData } from "../../data";
 
