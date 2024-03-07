@@ -1,5 +1,5 @@
 import React from "react";
-import { Link } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 
 const Sidebar = ({ menu, linkItems, image }) => {
   return (
@@ -11,10 +11,15 @@ const Sidebar = ({ menu, linkItems, image }) => {
         <ul className="sidebar-list">
           {linkItems.map((item, index) => (
             <li className="sidebar-item" key={index}>
-              <Link to={item.path} className="sidebar-link">
+              <NavLink
+                className={({ isActive }) =>
+                  isActive ? "sidebar-link active" : "sidebar-link"
+                }
+                to={item.path}
+              >
                 {item.icon}
                 {item.title}
-              </Link>
+              </NavLink>
             </li>
           ))}
         </ul>

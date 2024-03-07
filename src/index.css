@@ -312,6 +312,11 @@ body {
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link svg {
   font-size: 1.5rem;
 }
+.sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link.active,
+.sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link:hover {
+  background: #4c26e4;
+  color: #fff;
+}
 /* Card */
 .card {
   color: rgb(255, 255, 255);

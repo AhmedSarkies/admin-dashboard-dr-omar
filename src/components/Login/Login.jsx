@@ -5,6 +5,7 @@ import { useFormik } from "formik";
 import { object, string } from "yup";
 
 import image from "../../assets/images/anonymous.png";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -24,7 +25,14 @@ const Login = () => {
       //   userType: string().required("يجب اختيار نوع المستخدم"),
     }),
     onSubmit: (values) => {
-      navigate("/dr-omar/dashboard", { replace: true, state: values });
+      if (
+        values.email !== "admin@gmail.com" &&
+        values.password !== "admin123"
+      ) {
+        toast.error("الحساب غير موجود");
+      } else {
+        navigate("/dr-omar/dashboard", { replace: true, state: values });
+      }
     },
   });
   //   Handle Input Change using formik

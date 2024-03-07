@@ -6,6 +6,8 @@ import { Provider } from "react-redux";
 
 import store from "./store/store.js";
 
+import { ToastContainer } from "react-toastify";
+
 // eslint-disable-next-line no-unused-vars
 import { Chart as ChartJS } from "chart.js/auto";
 
@@ -21,6 +23,16 @@ root.render(
   <StrictMode>
     <Router>
       <Provider store={store}>
+        <ToastContainer
+          position="top-right"
+          closeOnClick
+          pauseOnFocusLoss={false}
+          draggable
+          pauseOnHover={false}
+          theme="dark"
+          autoClose={3000}
+          hideProgressBar={false}
+        />
         <App />
       </Provider>
     </Router>
