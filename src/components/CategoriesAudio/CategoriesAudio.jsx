@@ -80,7 +80,10 @@ const CategoriesAudio = () => {
         ).then((res) => {
           if (!res.error) {
             dispatch(updateAudioCategory(res.meta.arg));
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -88,7 +91,10 @@ const CategoriesAudio = () => {
         dispatch(addAudioCategoryApi(values)).then((res) => {
           if (!res.error) {
             dispatch(getAudiosCategoriesApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -238,8 +244,10 @@ const CategoriesAudio = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
-                        formik.handleReset();
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                       }}
                     >
                       الغاء
@@ -511,8 +519,10 @@ const CategoriesAudio = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
-                              formik.handleReset();
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                             }}
                           >
                             الغاء

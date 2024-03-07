@@ -13,6 +13,7 @@ import { IoIosDocument } from "react-icons/io";
 import { Header, Sidebar } from "../";
 
 import image from "../../assets/images/anonymous.png";
+
 import { Outlet } from "react-router-dom";
 
 const linkItems = [

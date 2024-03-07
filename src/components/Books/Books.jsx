@@ -170,7 +170,10 @@ const Books = () => {
         dispatch(updateBookApi(formData)).then((res) => {
           if (!res.error) {
             dispatch(getBooksApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -179,7 +182,10 @@ const Books = () => {
         dispatch(addBookApi(formData)).then((res) => {
           if (!res.error) {
             dispatch(getBooksApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -445,7 +451,10 @@ const Books = () => {
                             <button
                               className="delete-btn cancel-btn"
                               onClick={() => {
-                                setToggle(false);
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
                                 formik.setFieldValue("image", {
                                   file: "",
                                   preview: "",
@@ -749,7 +758,10 @@ const Books = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                         formik.handleReset();
                       }}
                     >
@@ -1190,7 +1202,10 @@ const Books = () => {
                                   <button
                                     className="delete-btn cancel-btn"
                                     onClick={() => {
-                                      setToggle(false);
+                                      setToggle({
+                                        ...toggle,
+                                        imagePreview: !toggle.imagePreview,
+                                      });
                                       formik.setFieldValue("image", {
                                         file: "",
                                         preview: "",
@@ -1514,7 +1529,10 @@ const Books = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                               formik.handleReset();
                             }}
                           >

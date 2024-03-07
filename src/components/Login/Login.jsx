@@ -1,9 +1,10 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { Col, Container, Row } from "reactstrap";
 
 import { useFormik } from "formik";
 import { object, string } from "yup";
+
+import image from "../../assets/images/anonymous.png";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -34,11 +35,7 @@ const Login = () => {
   return (
     <div className="login">
       <div className="login-header d-flex flex-column justify-content-center align-items-center gap-2">
-        <img
-          src="https://via.placeholder.com/150"
-          alt="logo"
-          className="login-logo mb-2"
-        />
+        <img src={image} alt="logo" className="login-logo mb-2" />
         <h6 className="login-title">تسجيل الدخول إلى انقل</h6>
       </div>
       <form

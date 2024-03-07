@@ -11,7 +11,7 @@ const LoginHome = () => {
           style={{ minHeight: "100vh", padding: "1rem" }}
         >
           <Col xl="6" lg="8" md="10" className="d-grid align-content-center">
-            <Outlet />
+            <Outlet />{" "}
           </Col>
         </Row>
       </Container>

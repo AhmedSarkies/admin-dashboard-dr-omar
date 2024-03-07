@@ -37,7 +37,7 @@ const CategoriesImages = () => {
     edit: false,
     activeColumn: false,
     toggleColumns: {
-      category: true,
+      title: true,
       control: true,
     },
     sortColumn: "",
@@ -47,7 +47,7 @@ const CategoriesImages = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 2, name: "category", label: "التصنيف" },
+    { id: 2, name: "title", label: "التصنيف" },
     { id: 6, name: "control", label: "التحكم" },
   ];
   const {
@@ -77,7 +77,10 @@ const CategoriesImages = () => {
         ).then((res) => {
           if (!res.error) {
             dispatch(updatePictureCategory(res.meta.arg));
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -85,7 +88,10 @@ const CategoriesImages = () => {
         dispatch(addPictureCategoryApi(values)).then((res) => {
           if (!res.error) {
             dispatch(addPictureCategory(res.meta.arg));
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -104,7 +110,6 @@ const CategoriesImages = () => {
 
   // Delete Picture Category
   const handleDelete = (pictureCategory) => {
-    console.log(pictureCategory);
     Swal.fire({
       title: `هل انت متأكد من حذف ${pictureCategory?.title}؟`,
       text: "لن تتمكن من التراجع عن هذا الاجراء!",
@@ -235,7 +240,10 @@ const CategoriesImages = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                         formik.handleReset();
                       }}
                     >
@@ -313,7 +321,7 @@ const CategoriesImages = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   التصنيف
                   {toggle.sortColumn === columns[0].name ? (
@@ -381,7 +389,7 @@ const CategoriesImages = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">لا يوجد بيانات</p>
                 </td>
               </tr>
@@ -393,7 +401,7 @@ const CategoriesImages = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="2">
                   <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>
@@ -404,7 +412,7 @@ const CategoriesImages = () => {
             <tbody>
               {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.category && (
+                  {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
                   )}
                   {toggle.toggleColumns.control && (
@@ -508,7 +516,10 @@ const CategoriesImages = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                               formik.handleReset();
                             }}
                           >

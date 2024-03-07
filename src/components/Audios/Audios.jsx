@@ -192,7 +192,10 @@ const Audios = () => {
         dispatch(updateAudioApi(formData)).then((res) => {
           if (!res.error) {
             dispatch(getAudiosApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -201,7 +204,10 @@ const Audios = () => {
         dispatch(addAudioApi(formData)).then((res) => {
           if (!res.error) {
             dispatch(getAudiosApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -467,7 +473,10 @@ const Audios = () => {
                               <button
                                 className="delete-btn cancel-btn"
                                 onClick={() => {
-                                  setToggle(false);
+                                  setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  });
                                   formik.setFieldValue("image", {
                                     file: "",
                                     preview: "",
@@ -767,7 +776,10 @@ const Audios = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                         formik.handleReset();
                       }}
                     >
@@ -1544,7 +1556,10 @@ const Audios = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                               formik.handleReset();
                             }}
                           >

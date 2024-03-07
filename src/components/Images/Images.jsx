@@ -135,7 +135,10 @@ const Images = () => {
                 status: values.status,
               })
             );
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -149,7 +152,10 @@ const Images = () => {
                 image: values.image.preview,
               })
             );
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -544,7 +550,10 @@ const Images = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                         formik.handleReset();
                       }}
                     >
@@ -1141,7 +1150,10 @@ const Images = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                               formik.handleReset();
                             }}
                           >

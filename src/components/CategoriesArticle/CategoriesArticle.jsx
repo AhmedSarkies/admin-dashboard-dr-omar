@@ -76,7 +76,10 @@ const CategoriesArticle = () => {
         ).then((res) => {
           if (!res.error) {
             dispatch(updateArticleCategory(res.meta.arg));
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -84,7 +87,10 @@ const CategoriesArticle = () => {
         dispatch(addArticleCategoryApi(values)).then((res) => {
           if (!res.error) {
             dispatch(getArticlesCategoriesApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -233,7 +239,10 @@ const CategoriesArticle = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                         formik.handleReset();
                       }}
                     >
@@ -506,7 +515,10 @@ const CategoriesArticle = () => {
                             type="button"
                             className="cancel-btn"
                             onClick={() => {
-                              setToggle(false);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
                               formik.handleReset();
                             }}
                           >

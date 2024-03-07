@@ -40,7 +40,7 @@ const CategoriesBook = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
-      category: true,
+      title: true,
       control: true,
     },
   });
@@ -48,7 +48,7 @@ const CategoriesBook = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 2, name: "category", label: "التصنيف" },
+    { id: 2, name: "title", label: "التصنيف" },
     { id: 6, name: "control", label: "التحكم" },
   ];
   const {
@@ -78,7 +78,10 @@ const CategoriesBook = () => {
         ).then((res) => {
           if (!res.error) {
             dispatch(updateBookCategory(res.meta.arg));
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
           }
         });
@@ -86,7 +89,10 @@ const CategoriesBook = () => {
         dispatch(addBookCategoryApi(values)).then((res) => {
           if (!res.error) {
             dispatch(getBooksCategoriesApi());
-            setToggle(false);
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
             formik.handleReset();
           }
         });
@@ -209,7 +215,7 @@ const CategoriesBook = () => {
                       id="title"
                       placeholder="عنوان التصنيف"
                       name="title"
-                      value={formik.values.title}
+                      value={formik.values?.title}
                       onChange={formik.handleChange}
                     />
                     {formik.errors.title && formik.touched.title ? (
@@ -235,8 +241,10 @@ const CategoriesBook = () => {
                       type="button"
                       className="cancel-btn"
                       onClick={() => {
-                        setToggle(false);
-                        formik.handleReset();
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                        });
                       }}
                     >
                       الغاء
@@ -313,7 +321,7 @@ const CategoriesBook = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns?.title && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
                   التصنيف
                   {toggle.sortColumn === columns[0].name ? (
@@ -495,7 +503,10 @@ const CategoriesBook = () => {
                               type="button"
                               className="cancel-btn"
                               onClick={() => {
-                                setToggle(false);
+                                setToggle({
+                                  ...toggle,
+                                  edit: !toggle.edit,
+                                });
                                 formik.handleReset();
                               }}
                             >

@@ -1,14 +1,12 @@
 import React from "react";
 
+import image from "../../assets/images/anonymous.png";
+
 const ForgetPassword = () => {
   return (
     <div className="login forget-password-page">
       <div className="login-header d-flex flex-column justify-content-center align-items-center gap-2">
-        <img
-          src="https://via.placeholder.com/150"
-          alt="logo"
-          className="login-logo mb-2"
-        />
+        <img src={image} alt="logo" className="login-logo mb-2" />
         <h6 className="login-title">
           أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور الخاصة بك
         </h6>
