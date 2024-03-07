@@ -243,7 +243,7 @@ const Dashboard = () => {
           </Row>
         </Container>
       </div>
-      <div className="dashboard-charts mb-3 p-4">
+      {/* <div className="dashboard-charts mb-3 p-4">
         <Row>
           <Col xl="12" className="chart-containerY">
             <div className="chart">
@@ -262,7 +262,7 @@ const Dashboard = () => {
             </div>
           </Col>
         </Row>
-      </div>
+      </div> */}
       <div className="dashboard-users mb-5 p-4">
         <Row>
           <Col xl="12">
