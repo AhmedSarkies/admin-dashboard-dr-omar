@@ -6,8 +6,8 @@ import { BiCategory } from "react-icons/bi";
 import { GiBookshelf, GiSoundWaves } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
 import { IoPerson, IoPeople } from "react-icons/io5";
-import { FaAssistiveListeningSystems, FaSignInAlt } from "react-icons/fa";
-import { GoRocket } from "react-icons/go";
+import { FaAssistiveListeningSystems } from "react-icons/fa";
+// import { GoRocket } from "react-icons/go";
 import { IoIosDocument } from "react-icons/io";
 
 import { Header, Sidebar } from "../";

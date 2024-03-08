@@ -6,12 +6,14 @@ const LoginHome = () => {
   return (
     <div className="login-container">
       <Container>
-        <Row
-          className="justify-content-center"
-          style={{ minHeight: "100vh", padding: "1rem" }}
-        >
-          <Col xl="6" lg="8" md="10" className="d-grid align-content-center">
-            <Outlet />{" "}
+        <Row className="justify-content-center" style={{ minHeight: "100vh" }}>
+          <Col
+            xl="6"
+            lg="8"
+            md="10"
+            className="d-flex justify-content-center align-items-center"
+          >
+            <Outlet />
           </Col>
         </Row>
       </Container>
