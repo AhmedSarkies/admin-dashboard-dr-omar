@@ -44,7 +44,7 @@ const Login = () => {
     <div className="login">
       <div className="login-header d-flex flex-column justify-content-center align-items-center gap-2">
         <img src={logo} alt="logo" className="login-logo mb-2" />
-        <h6 className="login-title">تسجيل الدخول إلى انقل</h6>
+        <h6 className="login-title">تسجيل الدخول إلى د.عمر كامل</h6>
       </div>
       <form
         className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
