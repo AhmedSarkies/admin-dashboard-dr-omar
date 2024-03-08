@@ -14,7 +14,7 @@ import { Header, Sidebar } from "../";
 
 import logo from "../../assets/images/logo.jpg";
 
-import { Outlet } from "react-router-dom";
+import { Outlet, useLocation } from "react-router-dom";
 
 const linkItems = [
   {
@@ -46,7 +46,11 @@ const linkItems = [
     path: "/dr-omar/categories-article",
     icon: <BiCategory />,
   },
-  { title: "المقالات", path: "/dr-omar/articles", icon: <IoIosDocument /> },
+  {
+    title: "المقالات",
+    path: "/dr-omar/articles",
+    icon: <IoIosDocument />,
+  },
   {
     title: "الاكثر استماع",
     path: "/dr-omar/most-listening",
@@ -65,6 +69,7 @@ const linkItems = [
 
 const Home = () => {
   const [menu, setMenu] = useState(false);
+  const location = useLocation();
   const toggleMenu = () => {
     setMenu(!menu);
   };
@@ -73,6 +78,9 @@ const Home = () => {
       setMenu(false);
     }
   };
+  useEffect(() => {
+    setMenu(false);
+  }, [location.pathname]);
   useEffect(() => {
     document.addEventListener("click", closeMenu);
     document.addEventListener("keydown", closeMenu);
