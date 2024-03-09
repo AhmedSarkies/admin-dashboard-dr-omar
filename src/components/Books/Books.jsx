@@ -137,6 +137,8 @@ const Books = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
 
   // Filtration, Sorting, Pagination

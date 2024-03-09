@@ -17,7 +17,12 @@ import {
   MdDeleteOutline,
   MdOutlineUnfoldMoreDouble,
 } from "react-icons/md";
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import {
+  TiArrowLeft,
+  TiArrowRight,
+  TiArrowSortedDown,
+  TiArrowSortedUp,
+} from "react-icons/ti";
 import { FaEdit } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";
@@ -110,20 +115,11 @@ const Articles = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
 
   // Filtration, Sorting, Pagination
-  const {
-    PaginationUI,
-    handleSort,
-    handleSearch,
-    handleToggleColumns,
-    results,
-  } = useFiltration({
-    rowData: articles,
-    toggle,
-    setToggle,
-  });
   // Columns
   const columns = [
     { id: 1, name: "image", label: "الصورة" },
@@ -131,8 +127,20 @@ const Articles = () => {
     { id: 3, name: "content", label: "المقال" },
     { id: 4, name: "readMore", label: "قراءة المزيد" },
     { id: 5, name: "status", label: "الحالة" },
-    { id: 6, name: "control", label: "التحكم" },
+    { id: 6, name: "control", label: "الإجراءات" },
   ];
+  const {
+    PaginationUI,
+    handleSort,
+    handleSearch,
+    handleToggleColumns,
+    results,
+    rowData,
+  } = useFiltration({
+    rowData: articles,
+    toggle,
+    setToggle,
+  });
 
   // Formik
   const formik = useFormik({
@@ -833,9 +841,9 @@ const Articles = () => {
                 </th>
               )}
               {toggle.toggleColumns.readMore && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
                   قراءة المزيد
-                  {toggle.sortColumn === columns[0].name ? (
+                  {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -857,9 +865,9 @@ const Articles = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  التحكم
-                  {toggle.sortColumn === columns[1].name ? (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  الإجراءات
+                  {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -874,7 +882,7 @@ const Articles = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? "حدث خطأ في الشبكة"
@@ -892,7 +900,7 @@ const Articles = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -909,10 +917,10 @@ const Articles = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results.length === 0 && error === null && !loading && (
+          {rowData.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">لا يوجد بيانات</p>
                 </td>
               </tr>
@@ -924,16 +932,16 @@ const Articles = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {results.length > 0 && error === null && loading === false && (
+          {rowData.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {rowData?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
@@ -984,7 +992,10 @@ const Articles = () => {
                     <td className="table-td read-more">
                       <MdOutlineUnfoldMoreDouble
                         onClick={() => {
-                          setToggle({ ...toggle, readMore: !toggle.readMore });
+                          setToggle({
+                            ...toggle,
+                            readMore: !toggle.readMore,
+                          });
                           handleEdit(result);
                         }}
                       />

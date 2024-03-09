@@ -29,6 +29,7 @@ import {
   getAudiosCategories,
   addAudioApi,
   updateAudioApi,
+  deleteAudioApi,
 } from "../../store/slices/audioSlice";
 
 import {
@@ -36,6 +37,7 @@ import {
   getApprovedScholars,
 } from "../../store/slices/scholarSlice";
 import useFiltration from "../../hooks/useFiltration";
+import Swal from "sweetalert2";
 
 const validationSchema = object().shape({
   title: string().required("يجب اختيار عنوان الصوتية"),
@@ -112,6 +114,8 @@ const Audios = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
 
   // Filtration, Sorting, Pagination
@@ -121,11 +125,13 @@ const Audios = () => {
     handleSearch,
     handleToggleColumns,
     results,
+    rowData,
   } = useFiltration({
     rowData: audios,
     toggle,
     setToggle,
   });
+
   // Columns
   const columns = [
     { id: 1, name: "imageElder", label: "صوؤة العالم" },
@@ -134,7 +140,7 @@ const Audios = () => {
     { id: 4, name: "title", label: "عنوان الصوتية" },
     { id: 5, name: "audio", label: "الصوتية" },
     { id: 6, name: "status", label: "الحالة" },
-    { id: 7, name: "control", label: "التحكم" },
+    { id: 7, name: "control", label: "الإجراءات" },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -289,32 +295,32 @@ const Audios = () => {
   };
 
   // Delete Audio
-  // const handleDelete = (audio) => {
-  //   Swal.fire({
-  //     title: `هل انت متأكد من حذف ${audio?.title}؟`,
-  //     text: "لن تتمكن من التراجع عن هذا الاجراء!",
-  //     icon: "warning",
-  //     showCancelButton: true,
-  //     confirmButtonColor: "#d33",
-  //     cancelButtonColor: "#0d1d34",
-  //     confirmButtonText: "نعم, احذفه!",
-  //     cancelButtonText: "الغاء",
-  //   }).then((result) => {
-  //     if (result.isConfirmed) {
-  //       dispatch(deleteAudioApi(audio.id)).then((res) => {
-  //         if (!res.error) {
-  //           dispatch(getAudiosApi());
-  //         }
-  //       });
-  //       Swal.fire({
-  //         title: `تم حذف ${audio?.title}`,
-  //         text: `تم حذف ${audio?.title} بنجاح`,
-  //         icon: "success",
-  // confirmButtonColor: "#0d1d34",
-  //       });
-  //     }
-  //   });
-  // };
+  const handleDelete = (audio) => {
+    Swal.fire({
+      title: `هل انت متأكد من حذف ${audio?.title}؟`,
+      text: "لن تتمكن من التراجع عن هذا الاجراء!",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#0d1d34",
+      confirmButtonText: "نعم, احذفه!",
+      cancelButtonText: "الغاء",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteAudioApi(audio.id)).then((res) => {
+          if (!res.error) {
+            dispatch(getAudiosApi());
+          }
+        });
+        Swal.fire({
+          title: `تم حذف ${audio?.title}`,
+          text: `تم حذف ${audio?.title} بنجاح`,
+          icon: "success",
+          confirmButtonColor: "#0d1d34",
+        });
+      }
+    });
+  };
 
   // get data from api
 
@@ -935,7 +941,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  التحكم
+                  الإجراءات
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -986,7 +992,7 @@ const Audios = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results.length === 0 && error === null && !loading && (
+          {rowData.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="7">
@@ -1008,9 +1014,9 @@ const Audios = () => {
             </tbody>
           )}
           {/* Data */}
-          {results.length > 0 && error === null && loading === false && (
+          {rowData.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {rowData?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.imageElder && (
                     <td className="table-td">
@@ -1087,7 +1093,7 @@ const Audios = () => {
                         />
                         <MdDeleteOutline
                           className="delete-btn"
-                          // onClick={() => handleDelete(result)}
+                          onClick={() => handleDelete(result)}
                         />
                       </span>
                     </td>

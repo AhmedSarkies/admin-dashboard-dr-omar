@@ -59,6 +59,8 @@ const Images = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
   const cate = pictureCategories?.map((category) => category);
 
@@ -69,6 +71,7 @@ const Images = () => {
     handleSearch,
     handleToggleColumns,
     results,
+    rowData,
   } = useFiltration({
     rowData: pictures,
     toggle,
@@ -725,7 +728,7 @@ const Images = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {rowData?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="4">
@@ -747,9 +750,9 @@ const Images = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {rowData?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {rowData?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
@@ -1177,7 +1180,7 @@ const Images = () => {
         </table>
       </div>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {rowData.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

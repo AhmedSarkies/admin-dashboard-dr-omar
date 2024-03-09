@@ -41,6 +41,8 @@ const CategoriesArticle = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
 
   // Filtration, Sorting, Pagination
@@ -50,6 +52,7 @@ const CategoriesArticle = () => {
     handleSearch,
     handleToggleColumns,
     results,
+    rowData,
   } = useFiltration({
     rowData: articleCategories,
     toggle,
@@ -386,7 +389,7 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {rowData?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -408,9 +411,9 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {rowData?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {rowData?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
@@ -536,7 +539,7 @@ const CategoriesArticle = () => {
         </table>
       </div>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {rowData.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

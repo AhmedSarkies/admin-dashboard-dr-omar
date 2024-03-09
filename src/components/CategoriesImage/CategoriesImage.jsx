@@ -42,13 +42,15 @@ const CategoriesImages = () => {
     },
     sortColumn: "",
     sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
 
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 2, name: "title", label: "التصنيف" },
-    { id: 6, name: "control", label: "التحكم" },
+    { id: 0, name: "title", label: "التصنيف" },
+    { id: 1, name: "control", label: "التحكم" },
   ];
   const {
     PaginationUI,
@@ -56,6 +58,7 @@ const CategoriesImages = () => {
     handleSearch,
     handleToggleColumns,
     results,
+    rowData,
   } = useFiltration({
     rowData: pictureCategories,
     toggle,
@@ -387,7 +390,7 @@ const CategoriesImages = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {rowData?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="2">
@@ -409,9 +412,9 @@ const CategoriesImages = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {rowData?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {rowData?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
@@ -537,7 +540,7 @@ const CategoriesImages = () => {
         </table>
       </div>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {rowData.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

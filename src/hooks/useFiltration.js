@@ -8,6 +8,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
   const endPoint = toggle.currentPage * toggle.rowsPerPage;
   const totalPages = Math.ceil(rowData.length / toggle.rowsPerPage);
   let results = rowData.slice(startPoint, endPoint);
+
   // UI Pagination
   const PaginationUI = () => (
     <div className="d-flex justify-content-between align-items-center p-3">
@@ -146,16 +147,18 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
   if (toggle.searchTerm !== "") {
     results = results.filter((dataRow) =>
       Object.values(dataRow).some((val) =>
-        String(val).toLowerCase().includes(toggle.searchTerm.toLowerCase())
+        String(val)?.toLowerCase().includes(toggle.searchTerm?.toLowerCase())
       )
     );
   }
+
   return {
     PaginationUI,
     handleSort,
     handleSearch,
     handleToggleColumns,
     results,
+    rowData,
   };
 };
 
