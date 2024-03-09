@@ -103,7 +103,7 @@ export const getBooksCategoriesApi = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/Books-Categories/Get",
+        url: "/Main-Categories-Books/Get",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -123,7 +123,7 @@ export const addBookCategoryApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Books-Categories/Insert`,
+        url: `/Main-Categories-Books/Insert`,
         params: {
           ...data,
         },
@@ -147,7 +147,7 @@ export const updateBookCategoryApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Books-Categories/Update`,
+        url: `/Main-Categories-Books/Update`,
         params: {
           ...data,
         },
@@ -171,7 +171,7 @@ export const deleteBookCategoryApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Books-Categories/Delete`,
+        url: `/Main-Categories-Books/Delete`,
         params: { id },
         headers: {
           "Content-Type": "application/json",

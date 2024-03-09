@@ -54,14 +54,28 @@ const validationSchema = object().shape({
       return true;
     }
   }),
-  book: mixed().test("fileSize", "يجب اختيار الكتاب", (value) => {
-    if (value.file) {
-      return value.file.size > 0;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
+  // book: mixed().test("fileSize", "يجب اختيار الكتاب", (value) => {
+  //   if (value.file) {
+  //     return value.file.size > 0;
+  //   }
+  //   if (typeof value === "string") {
+  //     return true;
+  //   }
+  // }),
+  book: mixed().required("required"),
+  // .test("fileFormat", "Only PDF files are allowed", (value) => {
+  //   if (value) {
+  //     const supportedFormats = ["pdf"];
+  //     return supportedFormats.includes(value.name?.split(".").pop());
+  //   }
+  //   return true;
+  // })
+  // .test("fileSize", "File size must be less than 3MB", (value) => {
+  //   if (value) {
+  //     return value.size > 0;
+  //   }
+  //   return true;
+  // }),
   elder: object().shape({
     name: string().required("يجب اختيار العالم"),
   }),
@@ -154,16 +168,16 @@ const Books = () => {
     validationSchema,
     onSubmit: (values) => {
       const formData = new FormData();
-      formData.append("title", values.title);
+      formData.append("name", values.title);
       formData.append("status", values.status);
-      formData.append("book", values.book.file);
+      formData.append("file", toggle.pdf.file);
       formData.append("elder_id", values.elder?.id);
-      formData.append("Book_category", values.bookCategory?.id);
+      formData.append("categories_id", values.bookCategory?.id);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
-      if (values.book.file !== "") {
-        formData.append("book", values.book.file);
+      if (toggle.pdf.file !== "") {
+        formData.append("file", toggle.pdf.file);
       }
       if (values.isEditing) {
         // Update Book
