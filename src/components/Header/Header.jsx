@@ -2,7 +2,7 @@ import React from "react";
 import { MdMenu, MdOutlineLogout } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
 
-const Header = ({ menu, toggleMenu }) => {
+const Header = ({ menu, toggleMenu, linkItems }) => {
   const navigate = useNavigate();
   // get the title page from router
   const location = useLocation();
@@ -23,25 +23,7 @@ const Header = ({ menu, toggleMenu }) => {
         </div>
         <div className="dashboard-header-title">
           <h6 className="login-title">
-            {location.pathname?.includes("elder")
-              ? "العلماء"
-              : location.pathname?.includes("images")
-              ? "الصور"
-              : location.pathname?.includes("articles")
-              ? "المقالات"
-              : location.pathname?.includes("books")
-              ? "الكتب"
-              : location.pathname?.includes("audios")
-              ? "الصوتيات"
-              : location.pathname?.includes("categories-book")
-              ? "تصنيفات الكتب"
-              : location.pathname?.includes("categories-audio")
-              ? "تصنيفات الصوتيات"
-              : location.pathname?.includes("categories-image")
-              ? "تصنيفات الصور"
-              : location.pathname?.includes("categories-article")
-              ? "تصنيفات المقالات"
-              : "الصفحة الرئيسية"}
+            {linkItems.find((item) => item.path === location.pathname)?.title}
           </h6>
           <button className="btn menu-btn" onClick={toggleMenu}>
             <MdMenu />

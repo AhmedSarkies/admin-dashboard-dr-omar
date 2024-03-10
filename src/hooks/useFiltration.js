@@ -7,7 +7,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
   const startPoint = (toggle.currentPage - 1) * toggle.rowsPerPage;
   const endPoint = toggle.currentPage * toggle.rowsPerPage;
   const totalPages = Math.ceil(rowData.length / toggle.rowsPerPage);
-  let results = rowData.slice(startPoint, endPoint);
+  const results = rowData.slice(startPoint, endPoint);
 
   // UI Pagination
   const PaginationUI = () => (
@@ -106,6 +106,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
       </div>
     </div>
   );
+
   // TODO: Sorting
   // Sorting
   results.sort((firstRow, otherRow) =>
@@ -116,6 +117,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
   if (toggle.sortOrder === "desc") {
     results.reverse();
   }
+
   // Handle Click on Column to Sort
   const handleSort = (column) => {
     setToggle({
@@ -133,6 +135,21 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
       searchTerm: e.target.value,
     });
   };
+
+  // if search term is not empty
+  const searchResults = () => {
+    if (toggle.searchTerm === "") {
+      return results;
+    } else {
+      return results?.filter((dataRow) =>
+        Object.values(dataRow).some((val) =>
+          String(val)?.toLowerCase().includes(toggle.searchTerm?.toLowerCase())
+        )
+      );
+    }
+  };
+  searchResults();
+
   // Filters Column
   const handleToggleColumns = (column) => {
     setToggle({
@@ -144,13 +161,6 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
       },
     });
   };
-  if (toggle.searchTerm !== "") {
-    results = results.filter((dataRow) =>
-      Object.values(dataRow).some((val) =>
-        String(val)?.toLowerCase().includes(toggle.searchTerm?.toLowerCase())
-      )
-    );
-  }
 
   return {
     PaginationUI,
@@ -158,7 +168,6 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
     handleSearch,
     handleToggleColumns,
     results,
-    rowData,
   };
 };
 

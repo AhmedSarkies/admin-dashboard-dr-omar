@@ -52,7 +52,6 @@ const CategoriesArticle = () => {
     handleSearch,
     handleToggleColumns,
     results,
-    rowData,
   } = useFiltration({
     rowData: articleCategories,
     toggle,
@@ -61,7 +60,7 @@ const CategoriesArticle = () => {
   // Columns
   const columns = [
     { id: 2, name: "category", label: "التصنيف" },
-    { id: 6, name: "control", label: "التحكم" },
+    { id: 6, name: "control", label: "الإجراءات" },
   ];
 
   // Formik
@@ -311,6 +310,7 @@ const CategoriesArticle = () => {
                   <span className="d-flex justify-content-start align-items-center gap-2">
                     <input
                       type="checkbox"
+                      className="checkbox-column"
                       checked={toggle.toggleColumns[column.name]}
                       readOnly
                     />
@@ -338,7 +338,7 @@ const CategoriesArticle = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  التحكم
+                  الإجراءات
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -389,7 +389,7 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* No Data */}
-          {rowData?.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -411,9 +411,9 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* Data */}
-          {rowData?.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {rowData?.map((result) => (
+              {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
@@ -539,7 +539,7 @@ const CategoriesArticle = () => {
         </table>
       </div>
       {/* Pagination */}
-      {rowData.length > 0 && error === null && loading === false && (
+      {results?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

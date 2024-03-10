@@ -135,7 +135,6 @@ const Articles = () => {
     handleSearch,
     handleToggleColumns,
     results,
-    rowData,
   } = useFiltration({
     rowData: articles,
     toggle,
@@ -790,6 +789,7 @@ const Articles = () => {
                   <span className="d-flex justify-content-start align-items-center gap-2">
                     <input
                       type="checkbox"
+                      className="checkbox-column"
                       checked={toggle.toggleColumns[column.name]}
                       readOnly
                     />
@@ -840,10 +840,10 @@ const Articles = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.readMore && (
-                <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  قراءة المزيد
-                  {toggle.sortColumn === columns[3].name ? (
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                  الحالة
+                  {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -852,10 +852,10 @@ const Articles = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
-                <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  الحالة
-                  {toggle.sortColumn === columns[4].name ? (
+              {toggle.toggleColumns.readMore && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                  قراءة المزيد
+                  {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -917,7 +917,7 @@ const Articles = () => {
             </tbody>
           )}
           {/* No Data */}
-          {rowData.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -939,9 +939,9 @@ const Articles = () => {
             </tbody>
           )}
           {/* Data */}
-          {rowData.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {rowData?.map((result) => (
+              {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
@@ -1502,7 +1502,7 @@ const Articles = () => {
                   <div className="read-more-container text-center">
                     <h3 className="text-center mb-3">{formik.values?.title}</h3>
                     <img
-                      src={formik.values?.image?.preview}
+                      src={formik.values?.image}
                       alt={formik.values?.title || "avatar"}
                       className="read-more-image mb-3"
                       style={{
@@ -1522,7 +1522,7 @@ const Articles = () => {
         </table>
       </div>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {results?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

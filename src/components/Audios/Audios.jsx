@@ -125,7 +125,6 @@ const Audios = () => {
     handleSearch,
     handleToggleColumns,
     results,
-    rowData,
   } = useFiltration({
     rowData: audios,
     toggle,
@@ -853,6 +852,7 @@ const Audios = () => {
                   <span className="d-flex justify-content-start align-items-center gap-2">
                     <input
                       type="checkbox"
+                      className="checkbox-column"
                       checked={toggle.toggleColumns[column.name]}
                       readOnly
                     />
@@ -992,7 +992,7 @@ const Audios = () => {
             </tbody>
           )}
           {/* No Data */}
-          {rowData.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="7">
@@ -1014,9 +1014,9 @@ const Audios = () => {
             </tbody>
           )}
           {/* Data */}
-          {rowData.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {rowData?.map((result) => (
+              {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.imageElder && (
                     <td className="table-td">

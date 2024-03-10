@@ -10,10 +10,15 @@ import {
   CategoriesImage,
   CategoriesAudio,
   CategoriesBook,
+  SubCategoriesBook,
   Articles,
   Audios,
   Books,
   Images,
+  Profile,
+  Messages,
+  SubAdmins,
+  MostListening,
 } from "./components";
 
 const App = () => {
@@ -47,11 +52,16 @@ const App = () => {
           <Route path="categories-article" element={<CategoriesArticle />} />
           <Route path="categories-image" element={<CategoriesImage />} />
           <Route path="categories-audio" element={<CategoriesAudio />} />
-          <Route path="categories-book" element={<CategoriesBook />} />
+          <Route path="main-categories-book" element={<CategoriesBook />} />
+          <Route path="sub-categories-book" element={<SubCategoriesBook />} />
           <Route path="articles" element={<Articles />} />
           <Route path="audios" element={<Audios />} />
           <Route path="books" element={<Books />} />
           <Route path="images" element={<Images />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="sub-admins" element={<SubAdmins />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="most-listening" element={<MostListening />} />
         </Route>
       </Routes>
     </div>

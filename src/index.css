@@ -330,6 +330,9 @@ body {
   background: #1e61bfe8;
   color: #fff;
 }
+.btn-close {
+  margin: 0 !important;
+}
 /* Card */
 .card {
   color: rgb(255, 255, 255);

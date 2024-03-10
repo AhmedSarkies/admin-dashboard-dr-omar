@@ -6,6 +6,7 @@ import { toast } from "react-toastify";
 const initialState = {
   books: [],
   bookCategories: [],
+  bookSubCategories: [],
   loading: false,
   error: null,
 };
@@ -98,7 +99,7 @@ export const deleteBookApi = createAsyncThunk(
 
 // Get Books Category using Axios and Redux Thunk
 export const getBooksCategoriesApi = createAsyncThunk(
-  "book/getBooksCategoryApi",
+  "book/getBooksCategoriesApi",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
@@ -190,6 +191,100 @@ export const deleteBookCategoryApi = createAsyncThunk(
   }
 );
 
+// Get Books Sub Category using Axios and Redux Thunk
+export const getBooksSubCategoriesApi = createAsyncThunk(
+  "book/getBooksSubCategoriesApi",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "GET",
+        url: "/Categories-Books/Get",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Add Book sub Category using Axios and Redux Thunk
+export const addBookSubCategoryApi = createAsyncThunk(
+  "book/addBookSubCategoryApi",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Categories-Books/Insert`,
+        params: {
+          ...data,
+        },
+      }).then((response) => {
+        // toast.success("تم إضافة تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
+        return response.data;
+      });
+    } catch (error) {
+      // toast.error("حدث خطأ أثناء إضافة تصنيف المقالات");
+      toast.info("قيد التطوير...");
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Update Book Sub Category using Axios and Redux Thunk
+export const updateBookSubCategoryApi = createAsyncThunk(
+  "book/updateBookSubCategoryApi",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Categories-Books/Update`,
+        params: {
+          ...data,
+        },
+      }).then((response) => {
+        // toast.success("تم تحديث تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
+        return response.data;
+      });
+    } catch (error) {
+      // toast.error("حدث خطأ أثناء تحديث تصنيف المقالات");
+      toast.info("قيد التطوير...");
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Delete Book Sub Category using Axios and Redux Thunk
+export const deleteBookSubCategoryApi = createAsyncThunk(
+  "book/deleteBookSubCategoryApi",
+  async (id, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Categories-Books/Delete`,
+        params: { id },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }).then((response) => {
+        // toast.success("تم حذف تصنيف المقالات بنجاح");
+        toast.info("قيد التطوير...");
+        return response.data;
+      });
+    } catch (error) {
+      // toast.error("حدث خطأ أثناء حذف تصنيف المقالات");
+      toast.info("قيد التطوير...");
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Books Slice
 const bookSlice = createSlice({
   name: "book",
@@ -235,6 +330,28 @@ const bookSlice = createSlice({
     deleteBookCategory: (state, action) => {
       state.bookCategories = state.bookCategories.filter(
         (category) => category.id !== action.payload
+      );
+    },
+    // Get Books Sub Category
+    getBooksSubCategories: (state, action) => {
+      state.bookSubCategories = action.payload;
+    },
+    // Add Book Sub Category
+    addBookSubCategory: (state, action) => {
+      state.bookSubCategories.push(action.payload);
+    },
+    // Update Book Sub Category
+    updateBookSubCategory: (state, action) => {
+      state.bookSubCategories = state.bookSubCategories.map((category) =>
+        category.id === action
+          ? { ...action.payload, isEditing: true }
+          : category
+      );
+    },
+    // Delete Book Sub Category
+    deleteBookSubCategory: (state, action) => {
+      state.bookSubCategories = state.bookSubCategories.filter(
+        (category) => category.id !== action
       );
     },
   },
@@ -353,6 +470,63 @@ const bookSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     });
+    // ======Get Books Sub Category======
+    // Pending
+    builder.addCase(getBooksSubCategoriesApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getBooksSubCategoriesApi.fulfilled, (state, action) => {
+      state.bookSubCategories = action.payload;
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(getBooksSubCategoriesApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Add Book Sub Category======
+    // Pending
+    builder.addCase(addBookSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(addBookSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(addBookSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Update Book Sub Category======
+    // Pending
+    builder.addCase(updateBookSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(updateBookSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(updateBookSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Delete Book Sub Category======
+    // Pending
+    builder.addCase(deleteBookSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(deleteBookSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(deleteBookSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   },
 });
 
@@ -365,5 +539,9 @@ export const {
   addBookCategory,
   updateBookCategory,
   deleteBookCategory,
+  getBooksSubCategories,
+  addBookSubCategory,
+  updateBookSubCategory,
+  deleteBookSubCategory,
 } = bookSlice.actions;
 export default bookSlice.reducer;

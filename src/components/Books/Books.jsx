@@ -62,7 +62,7 @@ const validationSchema = object().shape({
   //     return true;
   //   }
   // }),
-  book: mixed().required("required"),
+  Book: mixed().required("required"),
   // .test("fileFormat", "Only PDF files are allowed", (value) => {
   //   if (value) {
   //     const supportedFormats = ["pdf"];
@@ -160,8 +160,9 @@ const Books = () => {
     { id: 3, name: "image", label: "صورة الكتاب" },
     { id: 4, name: "title", label: "عنوان الكتاب" },
     { id: 5, name: "book", label: "الكتاب" },
-    { id: 6, name: "status", label: "الحالة" },
-    { id: 7, name: "control", label: "التحكم" },
+    { id: 6, name: "status", label: "عرض الكتاب" },
+    { id: 7, name: "status", label: "الحالة" },
+    { id: 8, name: "control", label: "الإجراءات" },
   ];
 
   // Formik
@@ -885,7 +886,7 @@ const Books = () => {
               )}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  صورة الصوتية
+                  صورة الكتاب
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -897,7 +898,7 @@ const Books = () => {
               )}
               {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  عنوان الصوتية
+                  عنوان الكتاب
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -907,9 +908,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.audio && (
+              {toggle.toggleColumns.book && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  الصوتية
+                  الكتاب
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -933,7 +934,7 @@ const Books = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  التحكم
+                  الإجراءات
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -1042,23 +1043,26 @@ const Books = () => {
                     </td>
                   )}
                   {toggle.toggleColumns.title && (
-                    <td className="table-td">{result?.title}</td>
+                    <td className="table-td">{result?.name}</td>
                   )}
                   {toggle.toggleColumns.book && (
                     <td className="table-td">
-                      عرض الكتاب
-                      <FaBookReader
+                      <span
+                        style={{
+                          cursor: "pointer",
+                          color: "blue",
+                        }}
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             readMore: !toggle.readMore,
                           });
-                          formik.setFieldValue("book", {
-                            file: result?.book,
-                            preview: result?.book,
-                          });
+                          formik.setValues(result);
                         }}
-                      />
+                      >
+                        عرض الكتاب
+                        <FaBookReader className="me-2" />
+                      </span>
                     </td>
                   )}
                   {toggle.toggleColumns.status && (
@@ -1586,22 +1590,15 @@ const Books = () => {
                       readMore: !toggle.readMore,
                     })
                   }
+                  className="d-flex justify-content-between align-items-center"
                   dir="rtl"
                 >
-                  {formik.values?.title}
-                  <IoMdClose
-                    onClick={() =>
-                      setToggle({
-                        ...toggle,
-                        readMore: !toggle.readMore,
-                      })
-                    }
-                  />
+                  {formik.values?.name}
                 </ModalHeader>
                 <ModalBody>
                   <iframe
-                    src={formik.values?.book?.preview}
-                    title={formik.values?.book?.file?.name}
+                    src={formik.values?.Book}
+                    title={formik.values?.name}
                     width="100%"
                     height="500px"
                   />

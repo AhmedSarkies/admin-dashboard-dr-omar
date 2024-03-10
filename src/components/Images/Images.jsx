@@ -71,7 +71,6 @@ const Images = () => {
     handleSearch,
     handleToggleColumns,
     results,
-    rowData,
   } = useFiltration({
     rowData: pictures,
     toggle,
@@ -82,7 +81,7 @@ const Images = () => {
     { id: 1, name: "image", label: "الصورة" },
     { id: 2, name: "category", label: "التصنيف" },
     { id: 3, name: "status", label: "الحالة" },
-    { id: 4, name: "control", label: "التحكم" },
+    { id: 4, name: "control", label: "الإجراءات" },
   ];
 
   // Formik
@@ -625,6 +624,7 @@ const Images = () => {
                   <span className="d-flex justify-content-start align-items-center gap-2">
                     <input
                       type="checkbox"
+                      className="checkbox-column"
                       checked={toggle.toggleColumns[column.name]}
                       readOnly
                     />
@@ -677,7 +677,7 @@ const Images = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  التحكم
+                  الإجراءات
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -728,7 +728,7 @@ const Images = () => {
             </tbody>
           )}
           {/* No Data */}
-          {rowData?.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="4">
@@ -750,9 +750,9 @@ const Images = () => {
             </tbody>
           )}
           {/* Data */}
-          {rowData?.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {rowData?.map((result) => (
+              {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
@@ -779,18 +779,18 @@ const Images = () => {
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.status === "Approve"
+                            result?.status === "Public"
                               ? "green"
-                              : result?.status === "Pending"
+                              : result?.status === "Private"
                               ? "red"
                               : "red",
                         }}
                       >
-                        {result?.status === "Approve"
-                          ? "مفعل"
-                          : result?.status === "Pending"
-                          ? "قيد الانتظار"
-                          : "قيد الانتظار"}
+                        {result?.status === "Public"
+                          ? "عام"
+                          : result?.status === "Private"
+                          ? "خاص"
+                          : "خاص"}
                       </span>
                     </td>
                   )}
@@ -1180,7 +1180,7 @@ const Images = () => {
         </table>
       </div>
       {/* Pagination */}
-      {rowData.length > 0 && error === null && loading === false && (
+      {results?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

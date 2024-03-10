@@ -7,8 +7,8 @@ import { GiBookshelf, GiSoundWaves } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
 import { IoPerson, IoPeople } from "react-icons/io5";
 import { FaAssistiveListeningSystems } from "react-icons/fa";
-// import { GoRocket } from "react-icons/go";
 import { IoIosDocument } from "react-icons/io";
+import { LuMessagesSquare } from "react-icons/lu";
 
 import { Header, Sidebar } from "../";
 
@@ -22,25 +22,61 @@ const linkItems = [
     title: "الصفحة الرئيسية",
     path: "/dr-omar/dashboard",
   },
-  { title: "العلماء", path: "/dr-omar/elder", icon: <SiGooglescholar /> },
   {
-    title: "تصنيفات الكتب",
-    path: "/dr-omar/categories-book",
+    title: "الملف الشخصي",
+    path: "/dr-omar/profile",
+    icon: <IoPerson />,
+  },
+  {
+    title: "المسؤولين الفرعيين",
+    path: "/dr-omar/sub-admins",
+    icon: <IoPeople />,
+  },
+  {
+    title: "الرسائل",
+    path: "/dr-omar/messages",
+    icon: <LuMessagesSquare />,
+  },
+  {
+    title: "العلماء",
+    path: "/dr-omar/elder",
+    icon: <SiGooglescholar />,
+  },
+  {
+    title: "تصنيفات الكتب الرئيسية",
+    path: "/dr-omar/main-categories-book",
     icon: <BiCategory />,
   },
-  { title: "الكتب", path: "/dr-omar/books", icon: <GiBookshelf /> },
+  {
+    title: "تصنيفات الكتب الفرعية",
+    path: "/dr-omar/sub-categories-book",
+    icon: <BiCategory />,
+  },
+  {
+    title: "الكتب",
+    path: "/dr-omar/books",
+    icon: <GiBookshelf />,
+  },
   {
     title: "تصنيفات الصوتيات",
     path: "/dr-omar/categories-audio",
     icon: <BiCategory />,
   },
-  { title: "الصوتيات", path: "/dr-omar/audios", icon: <GiSoundWaves /> },
+  {
+    title: "الصوتيات",
+    path: "/dr-omar/audios",
+    icon: <GiSoundWaves />,
+  },
   {
     title: "تصنيفات الصور",
     path: "/dr-omar/categories-image",
     icon: <BiCategory />,
   },
-  { title: "الصور", path: "/dr-omar/images", icon: <SlPicture /> },
+  {
+    title: "الصور",
+    path: "/dr-omar/images",
+    icon: <SlPicture />,
+  },
   {
     title: "تصنيفات المقالات",
     path: "/dr-omar/categories-article",
@@ -56,15 +92,6 @@ const linkItems = [
     path: "/dr-omar/most-listening",
     icon: <FaAssistiveListeningSystems />,
   },
-  {
-    title: "المسؤولين الفرعيين",
-    path: "/dr-omar/sub-admins",
-    icon: <IoPeople />,
-  },
-  // { title: "صفحات الحسابات" },
-  { title: "الملف الشخصي", path: "/dr-omar/profile", icon: <IoPerson /> },
-  // { title: "تسجيل الدخول", path: "/dr-omar/sign-in", icon: <FaSignInAlt /> },
-  // { title: "تسجيل حساب جديد", path: "/dr-omar/register", icon: <GoRocket /> },
 ];
 
 const Home = () => {
@@ -92,7 +119,7 @@ const Home = () => {
   return (
     <div className="dashboard-container">
       <div className="dashboard">
-        <Header menu={menu} toggleMenu={toggleMenu} />
+        <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
         <Outlet />
       </div>
       <Sidebar menu={menu} linkItems={linkItems} logo={logo} />

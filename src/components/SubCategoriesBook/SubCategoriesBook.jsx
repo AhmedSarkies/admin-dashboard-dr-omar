@@ -9,14 +9,14 @@ import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 
 import {
-  getAudiosCategoriesApi,
-  getAudiosCategories,
-  addAudioCategoryApi,
-  updateAudioCategoryApi,
-  deleteAudioCategoryApi,
-  updateAudioCategory,
-  deleteAudioCategory,
-} from "../../store/slices/audioSlice";
+  getBooksSubCategoriesApi,
+  getBooksSubCategories,
+  addBookSubCategoryApi,
+  updateBookSubCategoryApi,
+  deleteBookSubCategoryApi,
+  updateBookSubCategory,
+  deleteBookSubCategory,
+} from "../../store/slices/bookSlice";
 
 import { useFormik } from "formik";
 
@@ -26,10 +26,10 @@ import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import useFiltration from "../../hooks/useFiltration";
 
-const CategoriesAudio = () => {
+const SubCategoriesBook = () => {
   const dispatch = useDispatch();
-  const { audioCategories, loading, error } = useSelector(
-    (state) => state.audio
+  const { bookSubCategories, loading, error } = useSelector(
+    (state) => state.book
   );
   const [toggle, setToggle] = useState({
     add: false,
@@ -42,16 +42,16 @@ const CategoriesAudio = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
-      category: true,
+      title: true,
       control: true,
     },
   });
 
-  // Filtration, Pagination and Sorting
+  // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 2, name: "category", label: "التصنيف" },
-    { id: 6, name: "control", label: "الإجراءات" },
+    { id: 1, name: "title", label: "التصنيف" },
+    { id: 2, name: "control", label: "الإجراءات" },
   ];
   const {
     PaginationUI,
@@ -60,7 +60,7 @@ const CategoriesAudio = () => {
     handleToggleColumns,
     results,
   } = useFiltration({
-    rowData: audioCategories,
+    rowData: bookSubCategories,
     toggle,
     setToggle,
   });
@@ -76,10 +76,13 @@ const CategoriesAudio = () => {
     onSubmit: (values) => {
       if (values.isEditing) {
         dispatch(
-          updateAudioCategoryApi({ id: values.id, title: values.title })
+          updateBookSubCategoryApi({
+            category_id: values.id,
+            title: values.title,
+          })
         ).then((res) => {
           if (!res.error) {
-            dispatch(updateAudioCategory(res.meta.arg));
+            dispatch(updateBookSubCategory(res.meta.arg));
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -88,9 +91,9 @@ const CategoriesAudio = () => {
           }
         });
       } else {
-        dispatch(addAudioCategoryApi(values)).then((res) => {
+        dispatch(addBookSubCategoryApi(values)).then((res) => {
           if (!res.error) {
-            dispatch(getAudiosCategoriesApi());
+            dispatch(getBooksSubCategoriesApi());
             setToggle({
               ...toggle,
               add: !toggle.add,
@@ -102,20 +105,19 @@ const CategoriesAudio = () => {
     },
   });
 
-  // Handle Edit Audio Category
-  const handleEdit = (audioCategory) => {
-    formik.setValues({ ...audioCategory, isEditing: true });
+  // Handle Edit Book Category
+  const handleEdit = (bookCategory) => {
+    formik.setValues({ ...bookCategory, isEditing: true });
     setToggle({
       ...toggle,
       edit: !toggle.edit,
     });
   };
 
-  // Delete Audio Category
-  const handleDelete = (audioCategory) => {
-    console.log(audioCategory);
+  // Delete Book Category
+  const handleDelete = (bookCategory) => {
     Swal.fire({
-      title: `هل انت متأكد من حذف ${audioCategory?.title}؟`,
+      title: `هل انت متأكد من حذف ${bookCategory?.title}؟`,
       text: "لن تتمكن من التراجع عن هذا الاجراء!",
       icon: "warning",
       showCancelButton: true,
@@ -125,12 +127,12 @@ const CategoriesAudio = () => {
       cancelButtonText: "الغاء",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteAudioCategoryApi(audioCategory?.id)).then((res) => {
+        dispatch(deleteBookSubCategoryApi(bookCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteAudioCategory(audioCategory?.id));
+            dispatch(deleteBookSubCategory(bookCategory?.id));
             Swal.fire({
-              title: `تم حذف ${audioCategory?.title}`,
-              text: `تم حذف ${audioCategory?.title} بنجاح`,
+              title: `تم حذف ${bookCategory?.title}`,
+              text: `تم حذف ${bookCategory?.title} بنجاح`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
             });
@@ -143,9 +145,9 @@ const CategoriesAudio = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getAudiosCategoriesApi()).then((res) => {
+      dispatch(getBooksSubCategoriesApi()).then((res) => {
         if (!res.error) {
-          dispatch(getAudiosCategories(res.payload));
+          dispatch(getBooksSubCategories(res.payload));
         }
       });
     } catch (error) {
@@ -168,7 +170,7 @@ const CategoriesAudio = () => {
           <MdAdd />
           إضافة تصنيف
         </button>
-        {/* Add Audio Category */}
+        {/* Add Book Category */}
         <Modal
           isOpen={toggle.add}
           toggle={() => {
@@ -219,7 +221,7 @@ const CategoriesAudio = () => {
                       id="title"
                       placeholder="عنوان التصنيف"
                       name="title"
-                      value={formik.values.title}
+                      value={formik.values?.title}
                       onChange={formik.handleChange}
                     />
                     {formik.errors.title && formik.touched.title ? (
@@ -326,7 +328,7 @@ const CategoriesAudio = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns?.title && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   التصنيف
                   {toggle.sortColumn === columns[0].name ? (
@@ -340,7 +342,7 @@ const CategoriesAudio = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  الإجراءات
+                  الاجراءات
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -400,49 +402,29 @@ const CategoriesAudio = () => {
               </tr>
             </tbody>
           )}
-          {/* There is no any columns */}
-          {Object.values(toggle.toggleColumns).every(
-            (column) => column === false
-          ) && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
-                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
           {/* Data */}
           {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.category && (
-                    <td className="table-td name">{result?.title}</td>
-                  )}
-                  {toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              edit: !toggle.edit,
-                            });
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
+              {results?.map((bookCategory) => (
+                <tr key={bookCategory?.id + new Date().getDate()}>
+                  <td className="table-td name">{bookCategory?.title}</td>
+                  <td className="table-td">
+                    <span className="table-btn-container">
+                      <FaEdit
+                        className="edit-btn"
+                        onClick={() => {
+                          handleEdit(bookCategory);
+                        }}
+                      />
+                      <MdDeleteOutline
+                        className="delete-btn"
+                        onClick={() => handleDelete(bookCategory)}
+                      />
+                    </span>
+                  </td>
                 </tr>
               ))}
-              {/* Edit Audio Category */}
+              {/* Edit Book Category */}
               <Modal
                 isOpen={toggle.edit}
                 toggle={() => {
@@ -525,6 +507,7 @@ const CategoriesAudio = () => {
                                 ...toggle,
                                 edit: !toggle.edit,
                               });
+                              formik.handleReset();
                             }}
                           >
                             الغاء
@@ -547,4 +530,4 @@ const CategoriesAudio = () => {
   );
 };
 
-export default CategoriesAudio;
+export default SubCategoriesBook;

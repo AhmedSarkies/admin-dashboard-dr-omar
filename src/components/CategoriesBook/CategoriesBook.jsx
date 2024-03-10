@@ -48,8 +48,8 @@ const CategoriesBook = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 2, name: "title", label: "التصنيف" },
-    { id: 6, name: "control", label: "التحكم" },
+    { id: 1, name: "title", label: "التصنيف" },
+    { id: 2, name: "control", label: "الإجراءات" },
   ];
   const {
     PaginationUI,
@@ -309,6 +309,7 @@ const CategoriesBook = () => {
                   <span className="d-flex justify-content-start align-items-center gap-2">
                     <input
                       type="checkbox"
+                      className="checkbox-column"
                       checked={toggle.toggleColumns[column.name]}
                       readOnly
                     />
@@ -323,7 +324,7 @@ const CategoriesBook = () => {
           <thead>
             <tr>
               {toggle.toggleColumns?.title && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                <th className="table-th" onClick={() => handleSort(columns[0])}>
                   التصنيف
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
@@ -335,8 +336,8 @@ const CategoriesBook = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  التحكم
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                  الاجراءات
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -387,7 +388,7 @@ const CategoriesBook = () => {
             </tbody>
           )}
           {/* No Data */}
-          {bookCategories?.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -397,32 +398,43 @@ const CategoriesBook = () => {
             </tbody>
           )}
           {/* Data */}
-          {bookCategories?.length > 0 &&
-            error === null &&
-            loading === false && (
-              <tbody>
-                {bookCategories?.map((bookCategory) => (
-                  <tr key={bookCategory?.id + new Date().getDate()}>
-                    <td className="table-td name">{bookCategory?.title}</td>
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(bookCategory);
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(bookCategory)}
-                        />
-                      </span>
-                    </td>
-                  </tr>
-                ))}
-                {/* Edit Book Category */}
-                <Modal
-                  isOpen={toggle.edit}
+          {results?.length > 0 && error === null && loading === false && (
+            <tbody>
+              {results?.map((bookCategory) => (
+                <tr key={bookCategory?.id + new Date().getDate()}>
+                  <td className="table-td name">{bookCategory?.title}</td>
+                  <td className="table-td">
+                    <span className="table-btn-container">
+                      <FaEdit
+                        className="edit-btn"
+                        onClick={() => {
+                          handleEdit(bookCategory);
+                        }}
+                      />
+                      <MdDeleteOutline
+                        className="delete-btn"
+                        onClick={() => handleDelete(bookCategory)}
+                      />
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {/* Edit Book Category */}
+              <Modal
+                isOpen={toggle.edit}
+                toggle={() => {
+                  setToggle({
+                    ...toggle,
+                    edit: !toggle.edit,
+                  });
+                  formik.handleReset();
+                }}
+                centered={true}
+                keyboard={true}
+                size={"md"}
+                contentClassName="modal-add-scholar"
+              >
+                <ModalHeader
                   toggle={() => {
                     setToggle({
                       ...toggle,
@@ -430,97 +442,79 @@ const CategoriesBook = () => {
                     });
                     formik.handleReset();
                   }}
-                  centered={true}
-                  keyboard={true}
-                  size={"md"}
-                  contentClassName="modal-add-scholar"
+                  dir="rtl"
                 >
-                  <ModalHeader
-                    toggle={() => {
+                  تعديل {formik.values?.title}
+                  <IoMdClose
+                    onClick={() => {
                       setToggle({
                         ...toggle,
                         edit: !toggle.edit,
                       });
                       formik.handleReset();
                     }}
-                    dir="rtl"
-                  >
-                    تعديل {formik.values?.title}
-                    <IoMdClose
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          edit: !toggle.edit,
-                        });
-                        formik.handleReset();
-                      }}
-                    />
-                  </ModalHeader>
-                  <ModalBody>
-                    <form
-                      className="overlay-form"
-                      onSubmit={formik.handleSubmit}
-                    >
-                      <Row className="d-flex justify-content-center align-items-center p-3">
-                        <Col lg={12} className="mb-5">
-                          <div
-                            className="form-group-container d-flex flex-column align-items-end mb-3"
-                            style={{ marginTop: "-4px" }}
+                  />
+                </ModalHeader>
+                <ModalBody>
+                  <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                    <Row className="d-flex justify-content-center align-items-center p-3">
+                      <Col lg={12} className="mb-5">
+                        <div
+                          className="form-group-container d-flex flex-column align-items-end mb-3"
+                          style={{ marginTop: "-4px" }}
+                        >
+                          <label htmlFor="title" className="form-label">
+                            عنوان التصنيف
+                          </label>
+                          <input
+                            type="text"
+                            className="form-input w-100"
+                            id="title"
+                            placeholder="عنوان التصنيف"
+                            name="title"
+                            value={formik.values?.title}
+                            onChange={formik.handleChange}
+                          />
+                          {formik.errors.title && formik.touched.title ? (
+                            <span className="error">{formik.errors.title}</span>
+                          ) : null}
+                        </div>
+                      </Col>
+                      <Col lg={12}>
+                        <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                          <button type="submit" className="add-btn">
+                            {/* loading */}
+                            {loading ? (
+                              <span
+                                className="spinner-border spinner-border-sm"
+                                role="status"
+                                aria-hidden="true"
+                              ></span>
+                            ) : (
+                              "حفظ"
+                            )}
+                          </button>
+                          <button
+                            type="button"
+                            className="cancel-btn"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
+                              formik.handleReset();
+                            }}
                           >
-                            <label htmlFor="title" className="form-label">
-                              عنوان التصنيف
-                            </label>
-                            <input
-                              type="text"
-                              className="form-input w-100"
-                              id="title"
-                              placeholder="عنوان التصنيف"
-                              name="title"
-                              value={formik.values?.title}
-                              onChange={formik.handleChange}
-                            />
-                            {formik.errors.title && formik.touched.title ? (
-                              <span className="error">
-                                {formik.errors.title}
-                              </span>
-                            ) : null}
-                          </div>
-                        </Col>
-                        <Col lg={12}>
-                          <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                            <button type="submit" className="add-btn">
-                              {/* loading */}
-                              {loading ? (
-                                <span
-                                  className="spinner-border spinner-border-sm"
-                                  role="status"
-                                  aria-hidden="true"
-                                ></span>
-                              ) : (
-                                "حفظ"
-                              )}
-                            </button>
-                            <button
-                              type="button"
-                              className="cancel-btn"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  edit: !toggle.edit,
-                                });
-                                formik.handleReset();
-                              }}
-                            >
-                              الغاء
-                            </button>
-                          </div>
-                        </Col>
-                      </Row>
-                    </form>
-                  </ModalBody>
-                </Modal>
-              </tbody>
-            )}
+                            الغاء
+                          </button>
+                        </div>
+                      </Col>
+                    </Row>
+                  </form>
+                </ModalBody>
+              </Modal>
+            </tbody>
+          )}
         </table>
       </div>
       {/* Pagination */}
