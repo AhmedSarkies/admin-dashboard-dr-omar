@@ -68,7 +68,7 @@ const initialValues = {
   status: "الحالة",
 };
 
-const Elder = ({ dashboard }) => {
+const Elder = () => {
   const dispatch = useDispatch();
   const { scholars, loading, error } = useSelector((state) => state.scholar);
   const [toggle, setToggle] = useState({
@@ -577,7 +577,7 @@ const Elder = ({ dashboard }) => {
             </form>
           </ModalBody>
         </Modal>
-        {dashboard && <h2>العلماء</h2>}
+        <h2>العلماء</h2>
       </div>
       <div className="scholar">
         <div className="table-header">

@@ -4,7 +4,7 @@ import { SiBookstack } from "react-icons/si";
 import { LiaFileAudioSolid } from "react-icons/lia";
 import { FaUser } from "react-icons/fa";
 
-import {  Card, Elder } from "../";
+import { Card, Elder, SubAdmins } from "../";
 import { Col, Container, Row } from "reactstrap";
 import { UserData } from "../../data";
 
@@ -265,6 +265,9 @@ const Dashboard = () => {
       </div> */}
       <div className="dashboard-users mb-5 p-4">
         <Row>
+          <Col xl="12">
+            <SubAdmins dashboard={true} />
+          </Col>
           <Col xl="12">
             <Elder dashboard={true} />
           </Col>

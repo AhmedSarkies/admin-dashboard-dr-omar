@@ -67,7 +67,7 @@ const initialValues = {
   status: "الحالة",
 };
 
-const SubAdmins = ({ dashboard }) => {
+const SubAdmins = () => {
   const dispatch = useDispatch();
   const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({
@@ -576,7 +576,7 @@ const SubAdmins = ({ dashboard }) => {
             </form>
           </ModalBody>
         </Modal>
-        {dashboard && <h2>العلماء</h2>}
+        <h2>المسؤولين الفرعيين</h2>
       </div>
       <div className="scholar">
         <div className="table-header">
