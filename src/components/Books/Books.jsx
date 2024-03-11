@@ -993,7 +993,7 @@ const Books = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>

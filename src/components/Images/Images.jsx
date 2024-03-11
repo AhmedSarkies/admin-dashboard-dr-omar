@@ -743,7 +743,7 @@ const Images = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="4">
                   <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>

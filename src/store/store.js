@@ -7,6 +7,7 @@ import audioSlice from "./slices/audioSlice.js";
 import articleSlice from "./slices/articleSlice.js";
 import subAdminSlice from "./slices/subAdminSlice.js";
 import messagesSlice from "./slices/messagesSlice.js";
+import mostListeningSlice from "./slices/mostListeningSlice.js";
 
 const store = configureStore({
   reducer: {
@@ -17,6 +18,7 @@ const store = configureStore({
     article: articleSlice,
     subAdmin: subAdminSlice,
     messages: messagesSlice,
+    mostListening: mostListeningSlice,
   },
 });
 

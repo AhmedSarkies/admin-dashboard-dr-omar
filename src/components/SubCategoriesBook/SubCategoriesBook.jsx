@@ -450,7 +450,7 @@ const SubCategoriesBook = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? "حدث خطأ في الشبكة"
@@ -488,8 +488,20 @@ const SubCategoriesBook = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">لا يوجد بيانات</p>
+                </td>
+              </tr>
+            </tbody>
+          )}
+          {/* There is no any columns */}
+          {Object.values(toggle.toggleColumns).every(
+            (column) => column === false
+          ) && (
+            <tbody>
+              <tr className="no-data-container">
+                <td className="table-td" colSpan="2">
+                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>
             </tbody>

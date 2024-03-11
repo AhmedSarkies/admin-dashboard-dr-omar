@@ -355,7 +355,7 @@ const CategoriesImages = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? "حدث خطأ في الشبكة"

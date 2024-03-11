@@ -18,8 +18,6 @@ import {
   MdOutlineUnfoldMoreDouble,
 } from "react-icons/md";
 import {
-  TiArrowLeft,
-  TiArrowRight,
   TiArrowSortedDown,
   TiArrowSortedUp,
 } from "react-icons/ti";

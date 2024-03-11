@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
-import { toast } from "react-toastify";
 
 // Initial State
 const initialState = {
@@ -40,7 +39,7 @@ const messagesSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
-    // ======Get SubAdmin======
+    // ======Get Messages======
     // Pending
     builder.addCase(getMessagesApi.pending, (state, action) => {
       state.loading = true;

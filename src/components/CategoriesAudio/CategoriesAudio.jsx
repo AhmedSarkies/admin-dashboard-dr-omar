@@ -356,7 +356,7 @@ const CategoriesAudio = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? "حدث خطأ في الشبكة"
@@ -394,7 +394,7 @@ const CategoriesAudio = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data mb-0">لا يوجد بيانات</p>
                 </td>
               </tr>
@@ -406,7 +406,7 @@ const CategoriesAudio = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="2">
                   <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
                 </td>
               </tr>
