@@ -328,16 +328,16 @@ const Audios = () => {
       dispatch(getAudiosApi()).then((res) => {
         if (!res.error) {
           dispatch(getAudios(res.payload));
-        }
-      });
-      dispatch(getAudiosCategoriesApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getAudiosCategories(res.payload));
-        }
-      });
-      dispatch(getApprovedScholarsApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getApprovedScholars(res.payload));
+          dispatch(getAudiosCategoriesApi()).then((res) => {
+            if (!res.error && res.payload.length > 0) {
+              dispatch(getAudiosCategories(res.payload));
+            }
+          });
+          dispatch(getApprovedScholarsApi()).then((res) => {
+            if (!res.error && res.payload.length > 0) {
+              dispatch(getApprovedScholars(res.payload));
+            }
+          });
         }
       });
     } catch (error) {

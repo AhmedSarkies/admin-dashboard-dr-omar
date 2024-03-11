@@ -8,13 +8,13 @@ import { SlPicture } from "react-icons/sl";
 import { IoPerson, IoPeople } from "react-icons/io5";
 import { FaAssistiveListeningSystems } from "react-icons/fa";
 import { IoIosDocument } from "react-icons/io";
-import { LuMessagesSquare } from "react-icons/lu";
 
 import { Header, Sidebar } from "../";
 
 import logo from "../../assets/images/logo.jpg";
 
 import { Outlet, useLocation } from "react-router-dom";
+import { MdOutlineMarkunread } from "react-icons/md";
 
 const linkItems = [
   {
@@ -35,7 +35,7 @@ const linkItems = [
   {
     title: "الرسائل",
     path: "/dr-omar/messages",
-    icon: <LuMessagesSquare />,
+    icon: <MdOutlineMarkunread />,
   },
   {
     title: "العلماء",

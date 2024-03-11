@@ -129,13 +129,11 @@ export const addBookCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        // toast.success("تم إضافة تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
+        toast.success("تم إضافة التصنيف الرئيسي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء إضافة تصنيف المقالات");
-      toast.info("قيد التطوير...");
+      toast.error("حدث خطأ أثناء إضافة التصنيف الرئيسي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -153,13 +151,11 @@ export const updateBookCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        // toast.success("تم تحديث تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
+        toast.success("تم تحديث التصنيف الرئيسي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء تحديث تصنيف المقالات");
-      toast.info("قيد التطوير...");
+      toast.error("حدث خطأ أثناء تحديث التصنيف الرئيسي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -223,13 +219,11 @@ export const addBookSubCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        // toast.success("تم إضافة تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
+        toast.success("تم إضافة التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء إضافة تصنيف المقالات");
-      toast.info("قيد التطوير...");
+      toast.error("حدث خطأ أثناء إضافة التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -247,13 +241,11 @@ export const updateBookSubCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        // toast.success("تم تحديث تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
+        toast.success("تم تحديث التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء تحديث تصنيف المقالات");
-      toast.info("قيد التطوير...");
+      toast.error("حدث خطأ أثناء تحديث التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -262,24 +254,22 @@ export const updateBookSubCategoryApi = createAsyncThunk(
 // Delete Book Sub Category using Axios and Redux Thunk
 export const deleteBookSubCategoryApi = createAsyncThunk(
   "book/deleteBookSubCategoryApi",
-  async (id, { rejectWithValue }) => {
+  async (category_id, { rejectWithValue }) => {
     try {
       await Http({
         method: "POST",
         url: `/Categories-Books/Delete`,
-        params: { id },
+        params: { category_id },
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
         },
       }).then((response) => {
-        // toast.success("تم حذف تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
+        toast.success("تم حذف التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء حذف تصنيف المقالات");
-      toast.info("قيد التطوير...");
+      toast.error("حدث خطأ أثناء حذف التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -300,8 +290,8 @@ const bookSlice = createSlice({
     },
     // Update Book
     updateBook: (state, action) => {
-      state.books = state.books.map((picture) =>
-        picture.id === action.payload.id ? action.payload : picture
+      state.books = state.books.map((books) =>
+        books.id === action.payload.id ? action.payload : books
       );
     },
     // Delete Book
@@ -321,9 +311,7 @@ const bookSlice = createSlice({
     // Update Book Category
     updateBookCategory: (state, action) => {
       state.bookCategories = state.bookCategories.map((category) =>
-        category.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : category
+        category.id === action.payload.id ? action.payload : category
       );
     },
     // Delete Book Category
@@ -343,15 +331,13 @@ const bookSlice = createSlice({
     // Update Book Sub Category
     updateBookSubCategory: (state, action) => {
       state.bookSubCategories = state.bookSubCategories.map((category) =>
-        category.id === action
-          ? { ...action.payload, isEditing: true }
-          : category
+        category.id === action.payload.id ? action.payload : category
       );
     },
     // Delete Book Sub Category
     deleteBookSubCategory: (state, action) => {
       state.bookSubCategories = state.bookSubCategories.filter(
-        (category) => category.id !== action
+        (category) => category.id !== action.payload
       );
     },
   },

@@ -16,6 +16,8 @@ import {
   deleteBookSubCategoryApi,
   updateBookSubCategory,
   deleteBookSubCategory,
+  getBooksCategories,
+  getBooksCategoriesApi,
 } from "../../store/slices/bookSlice";
 
 import { useFormik } from "formik";
@@ -28,12 +30,13 @@ import useFiltration from "../../hooks/useFiltration";
 
 const SubCategoriesBook = () => {
   const dispatch = useDispatch();
-  const { bookSubCategories, loading, error } = useSelector(
+  const { bookSubCategories, bookCategories, loading, error } = useSelector(
     (state) => state.book
   );
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
+    isBookCategories: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -69,34 +72,51 @@ const SubCategoriesBook = () => {
   const formik = useFormik({
     initialValues: {
       title: "",
+      bookCategory: {
+        title: "",
+        ID_Main_Category: "",
+      },
     },
     validationSchema: object().shape({
-      title: string().required("يجب ادخال عنوان التصنيف"),
+      title: string().required("يجب ادخال عنوان التصنيف الفرعي"),
+      bookCategory: object().shape({
+        title: string().required("يجب اختيار التصنيف الرئيسي"),
+      }),
     }),
     onSubmit: (values) => {
       if (values.isEditing) {
         dispatch(
           updateBookSubCategoryApi({
-            category_id: values.id,
+            category_id: values.bookCategory.id,
             title: values.title,
           })
         ).then((res) => {
-          if (!res.error) {
-            dispatch(updateBookSubCategory(res.meta.arg));
+          if (res.error === undefined) {
+            dispatch(
+              updateBookSubCategory({
+                id: values.id,
+                title: values.title,
+              })
+            );
             setToggle({
               ...toggle,
-              edit: !toggle.edit,
+              edit: false,
             });
             formik.handleReset();
           }
         });
       } else {
-        dispatch(addBookSubCategoryApi(values)).then((res) => {
+        dispatch(
+          addBookSubCategoryApi({
+            title: values.title,
+            ID_Main_Category: values.bookCategory.id,
+          })
+        ).then((res) => {
           if (!res.error) {
             dispatch(getBooksSubCategoriesApi());
             setToggle({
               ...toggle,
-              add: !toggle.add,
+              add: false,
             });
             formik.handleReset();
           }
@@ -106,8 +126,8 @@ const SubCategoriesBook = () => {
   });
 
   // Handle Edit Book Category
-  const handleEdit = (bookCategory) => {
-    formik.setValues({ ...bookCategory, isEditing: true });
+  const handleEdit = (bookSubCategory) => {
+    formik.setValues({ ...bookSubCategory, isEditing: true });
     setToggle({
       ...toggle,
       edit: !toggle.edit,
@@ -115,9 +135,9 @@ const SubCategoriesBook = () => {
   };
 
   // Delete Book Category
-  const handleDelete = (bookCategory) => {
+  const handleDelete = (bookSubCategory) => {
     Swal.fire({
-      title: `هل انت متأكد من حذف ${bookCategory?.title}؟`,
+      title: `هل انت متأكد من حذف ${bookSubCategory?.title}؟`,
       text: "لن تتمكن من التراجع عن هذا الاجراء!",
       icon: "warning",
       showCancelButton: true,
@@ -127,12 +147,12 @@ const SubCategoriesBook = () => {
       cancelButtonText: "الغاء",
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteBookSubCategoryApi(bookCategory?.id)).then((res) => {
+        dispatch(deleteBookSubCategoryApi(bookSubCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteBookSubCategory(bookCategory?.id));
+            dispatch(deleteBookSubCategory(bookSubCategory?.id));
             Swal.fire({
-              title: `تم حذف ${bookCategory?.title}`,
-              text: `تم حذف ${bookCategory?.title} بنجاح`,
+              title: `تم حذف ${bookSubCategory?.title}`,
+              text: `تم حذف ${bookSubCategory?.title} بنجاح`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
             });
@@ -148,6 +168,11 @@ const SubCategoriesBook = () => {
       dispatch(getBooksSubCategoriesApi()).then((res) => {
         if (!res.error) {
           dispatch(getBooksSubCategories(res.payload));
+          dispatch(getBooksCategoriesApi()).then((res) => {
+            if (!res.error && res.payload.length > 0) {
+              dispatch(getBooksCategories(res.payload));
+            }
+          });
         }
       });
     } catch (error) {
@@ -226,6 +251,73 @@ const SubCategoriesBook = () => {
                     />
                     {formik.errors.title && formik.touched.title ? (
                       <span className="error">{formik.errors.title}</span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={12} className="mb-5">
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="bookCategories" className="form-label">
+                      التصنيف
+                    </label>
+                    <div
+                      className={`dropdown form-input ${
+                        toggle.isBookCategories ? "active" : ""
+                      }`}
+                    >
+                      <div
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            isBookCategories: !toggle.isBookCategories,
+                          });
+                        }}
+                        className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                      >
+                        {formik.values.bookCategory?.title
+                          ? formik.values.bookCategory?.title
+                          : "اختر التصنيف"}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.isBookCategories ? "active" : ""
+                          }`}
+                        />
+                      </div>
+                      <div
+                        className={`dropdown-content ${
+                          toggle.isBookCategories ? "active" : ""
+                        }`}
+                      >
+                        {bookCategories?.map((category) => (
+                          <div
+                            key={category?.id}
+                            className={`item ${
+                              formik.values.bookCategory?.id === category?.id
+                                ? "active"
+                                : ""
+                            }`}
+                            value={category?.id}
+                            name="bookCategory"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                isBookCategories: !toggle.isBookCategories,
+                              });
+                              formik.setFieldValue("bookCategory", {
+                                title: category.title,
+                                id: category?.id,
+                              });
+                            }}
+                          >
+                            {category.title}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                    {formik.errors.bookCategory?.title &&
+                    formik.touched.bookCategory?.title ? (
+                      <span className="error">
+                        {formik.errors.bookCategory?.title}
+                      </span>
                     ) : null}
                   </div>
                 </Col>
@@ -482,6 +574,78 @@ const SubCategoriesBook = () => {
                           />
                           {formik.errors.title && formik.touched.title ? (
                             <span className="error">{formik.errors.title}</span>
+                          ) : null}
+                        </div>
+                      </Col>
+                      <Col lg={12} className="mb-5">
+                        <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                          <label
+                            htmlFor="bookCategories"
+                            className="form-label"
+                          >
+                            التصنيف الرئيسي
+                          </label>
+                          <div
+                            className={`dropdown form-input ${
+                              toggle.isBookCategories ? "active" : ""
+                            }`}
+                          >
+                            <div
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  isBookCategories: !toggle.isBookCategories,
+                                });
+                              }}
+                              className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                            >
+                              {formik.values.bookCategory?.title
+                                ? formik.values.bookCategory?.title
+                                : "اختر التصنيف"}
+                              <TiArrowSortedUp
+                                className={`dropdown-icon ${
+                                  toggle.isBookCategories ? "active" : ""
+                                }`}
+                              />
+                            </div>
+                            <div
+                              className={`dropdown-content ${
+                                toggle.isBookCategories ? "active" : ""
+                              }`}
+                            >
+                              {bookCategories?.map((category) => (
+                                <div
+                                  key={category?.id}
+                                  className={`item ${
+                                    formik.values.bookCategory?.id ===
+                                    category?.id
+                                      ? "active"
+                                      : ""
+                                  }`}
+                                  value={category?.id}
+                                  name="bookCategory"
+                                  onClick={() => {
+                                    setToggle({
+                                      ...toggle,
+                                      isBookCategories:
+                                        !toggle.isBookCategories,
+                                    });
+                                    formik.setFieldValue("bookCategory", {
+                                      title: category.title,
+                                      id: category?.id,
+                                    });
+                                  }}
+                                >
+                                  {category.title}
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                          {formik.errors.bookCategory?.title &&
+                          formik.touched.bookCategory?.title ? (
+                            <span className="error">
+                              {formik.errors.bookCategory?.title}
+                            </span>
                           ) : null}
                         </div>
                       </Col>

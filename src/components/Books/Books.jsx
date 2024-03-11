@@ -54,27 +54,14 @@ const validationSchema = object().shape({
       return true;
     }
   }),
-  // book: mixed().test("fileSize", "يجب اختيار الكتاب", (value) => {
+  Book: mixed().notRequired("required"),
+  // .test("fileSize", "يجب اختيار الكتاب", (value) => {
   //   if (value.file) {
   //     return value.file.size > 0;
   //   }
   //   if (typeof value === "string") {
   //     return true;
   //   }
-  // }),
-  Book: mixed().required("required"),
-  // .test("fileFormat", "Only PDF files are allowed", (value) => {
-  //   if (value) {
-  //     const supportedFormats = ["pdf"];
-  //     return supportedFormats.includes(value.name?.split(".").pop());
-  //   }
-  //   return true;
-  // })
-  // .test("fileSize", "File size must be less than 3MB", (value) => {
-  //   if (value) {
-  //     return value.size > 0;
-  //   }
-  //   return true;
   // }),
   elder: object().shape({
     name: string().required("يجب اختيار العالم"),
@@ -174,7 +161,6 @@ const Books = () => {
       formData.append("name", values.title);
       formData.append("status", values.status);
       formData.append("file", toggle.pdf.file);
-      formData.append("elder_id", values.elder?.id);
       formData.append("categories_id", values.bookCategory?.id);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
@@ -214,13 +200,15 @@ const Books = () => {
   const handlePDFChange = (e) => {
     try {
       const file = e.target.files[0];
-      setToggle({
-        ...toggle,
-        pdf: {
-          file: file,
-          preview: URL.createObjectURL(file),
-        },
-      });
+      if (file) {
+        setToggle({
+          ...toggle,
+          pdf: {
+            file: file,
+            preview: URL.createObjectURL(file),
+          },
+        });
+      }
       // // Get Number Of Pages From PDF
       // const getNumberOfPages = (pdfUrl, callback) => {
       //   // Fetch the PDF file
@@ -255,12 +243,16 @@ const Books = () => {
 
   // Handle Image Change
   const handleImageChange = (e) => {
-    const file = e.currentTarget.files[0];
-    if (file) {
-      formik.setFieldValue("image", {
-        file: file,
-        preview: URL.createObjectURL(file),
-      });
+    try {
+      const file = e.currentTarget.files[0];
+      if (file) {
+        formik.setFieldValue("image", {
+          file: file,
+          preview: URL.createObjectURL(file),
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -534,6 +526,7 @@ const Books = () => {
                       type="file"
                       accept="application/pdf"
                       className="form-input form-img-input"
+                      name="book"
                       id="book"
                       onChange={handlePDFChange}
                     />
