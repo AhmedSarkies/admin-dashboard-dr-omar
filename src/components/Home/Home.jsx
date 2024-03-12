@@ -23,7 +23,7 @@ const linkItems = [
     path: "/dr-omar/dashboard",
   },
   {
-    title: "الملف الشخصي",
+    title: "الصفحة الشخصية",
     path: "/dr-omar/profile",
     icon: <IoPerson />,
   },
