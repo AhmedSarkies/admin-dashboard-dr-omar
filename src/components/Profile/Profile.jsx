@@ -39,7 +39,7 @@ const Profile = () => {
   const editProfileFormik = useFormik({
     initialValues: {
       name: "احمد",
-      email: "ahmed@gmail.com",
+      email: "admin@gmail.com",
       phone: "01012349575",
       image: "",
     },
