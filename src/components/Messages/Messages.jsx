@@ -212,12 +212,12 @@ const Messages = () => {
                 <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
-                      ? t("message.networkError")
+                      ? t("networkError")
                       : error === "Request failed with status code 404"
-                      ? t("message.noData")
+                      ? t("noData")
                       : error === "Request failed with status code 500"
-                      ? t("message.serverError")
-                      : t("message.someError")}
+                      ? t("serverError")
+                      : t("someError")}
                   </p>
                 </td>
               </tr>
@@ -248,7 +248,7 @@ const Messages = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="5">
-                  <p className="no-data mb-0">{t("message.noData")}</p>
+                  <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
             </tbody>
@@ -261,7 +261,7 @@ const Messages = () => {
               <tr className="no-data-container">
                 <td className="table-td" colSpan="5">
                   <p className="no-data no-columns mb-0">
-                    {t("message.noColumns")}
+                    {t("noColumns")}
                   </p>
                 </td>
               </tr>
