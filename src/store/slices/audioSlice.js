@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
-import { toast } from "react-toastify";
 
 // Initial State
 const initialState = {
@@ -40,13 +39,9 @@ export const addAudioApi = createAsyncThunk(
         url: "/Audios/insert",
         data,
       }).then((response) => {
-        // toast.success("تم إضافة الصوتية بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء إضافة الصوتية");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -62,13 +57,9 @@ export const updateAudioApi = createAsyncThunk(
         url: `/Audios/Update`,
         data,
       }).then((response) => {
-        // toast.success("تم تحديث الصوتية بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء تحديث الصوتية");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -87,13 +78,9 @@ export const deleteAudioApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        // toast.success("تم حذف الصوتية بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء حذف الصوتية");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -129,11 +116,9 @@ export const addAudioCategoryApi = createAsyncThunk(
         url: `/Audios-Categories/Insert?title=${data}`,
         data,
       }).then((response) => {
-        toast.success("تم إضافة تصنيف الصوتية بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة تصنيف الصوتية");
       return rejectWithValue(error.message);
     }
   }
@@ -149,11 +134,9 @@ export const updateAudioCategoryApi = createAsyncThunk(
         url: `/ImagesCategories/Update`,
         params: { ...data },
       }).then((response) => {
-        toast.success("تم تحديث تصنيف الصوتية بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث تصنيف الصوتية");
       return rejectWithValue(error.message);
     }
   }
@@ -172,11 +155,9 @@ export const deleteAudioCategoryApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف تصنيف الصوتية بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف تصنيف الصوتية");
       return rejectWithValue(error.message);
     }
   }

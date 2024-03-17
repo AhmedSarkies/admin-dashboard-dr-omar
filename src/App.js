@@ -1,4 +1,8 @@
 import { Navigate, Route, Routes } from "react-router-dom";
+import i18n from "i18next";
+import { initReactI18next } from "react-i18next";
+import LanguageDetector from "i18next-browser-languagedetector";
+import HttpApi from "i18next-http-backend";
 import {
   Login,
   Dashboard,
@@ -20,6 +24,29 @@ import {
   SubAdmins,
   MostListening,
 } from "./components";
+
+i18n
+  .use(initReactI18next)
+  .use(LanguageDetector)
+  .use(HttpApi)
+  .init({
+    fallbackLng: "en",
+    detection: {
+      order: [
+        "cookie",
+        "htmlTag",
+        "path",
+        "localStorage",
+        "sessionStorage",
+        "navigator",
+        "subdomain",
+      ],
+      caches: ["cookie"],
+    },
+    backend: {
+      loadPath: "/locale/{{lng}}/translation.json",
+    },
+  });
 
 const App = () => {
   return (

@@ -11,7 +11,9 @@ import {
 
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import useFiltration from "../../hooks/useFiltration";
+import { useTranslation } from "react-i18next";
 const MostListening = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { mostListening, loading, error } = useSelector(
     (state) => state.mostListening
@@ -40,13 +42,16 @@ const MostListening = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 1, name: "imageElder", label: "صوؤة العالم" },
-    { id: 2, name: "nameElder", label: "اسم العالم" },
-    { id: 3, name: "image", label: "صورة الصوتية" },
-    { id: 4, name: "title", label: "عنوان الصوتية" },
-    { id: 5, name: "audio", label: "الصوتية" },
-    { id: 6, name: "status", label: "الحالة" },
-    { id: 7, name: "control", label: "الإجراءات" },
+    {
+      id: 1,
+      name: "imageElder",
+      label: t("mostListening.columns.elder.image"),
+    },
+    { id: 2, name: "nameElder", label: t("mostListening.columns.elder.name") },
+    { id: 3, name: "image", label: t("mostListening.columns.audio.image") },
+    { id: 4, name: "title", label: t("mostListening.columns.audio.title") },
+    { id: 5, name: "audio", label: t("mostListening.columns.audio.audio") },
+    { id: 6, name: "status", label: t("status") },
   ];
   const {
     PaginationUI,
@@ -82,7 +87,7 @@ const MostListening = () => {
             <input
               type="text"
               className="form-input"
-              placeholder="بحث"
+              placeholder={t("search")}
               onChange={handleSearch}
             />
           </div>
@@ -101,7 +106,7 @@ const MostListening = () => {
                 width: "180px",
               }}
             >
-              <span>الاعمدة</span>
+              <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
                 className={`dropdown-icon ${
                   toggle.activeColumn ? "active" : ""
@@ -144,7 +149,7 @@ const MostListening = () => {
               {/* Show and Hide Columns */}
               {toggle.toggleColumns.imageElder && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  صورة العالم
+                  {t("mostListening.columns.elder.image")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -156,7 +161,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.nameElder && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  اسم العالم
+                  {t("mostListening.columns.elder.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -168,7 +173,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  صورة الصوتية
+                  {t("mostListening.columns.audio.image")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -180,7 +185,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  عنوان الصوتية
+                  {t("mostListening.columns.audio.title")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -192,7 +197,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.audio && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  الصوتية
+                  {t("mostListening.columns.audio.audio")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -204,7 +209,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  الحالة
+                  {t("status")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -223,12 +228,12 @@ const MostListening = () => {
                 <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">
                     {error === "Network Error"
-                      ? "حدث خطأ في الشبكة"
+                      ? t("networkError")
                       : error === "Request failed with status code 404"
-                      ? "لا يوجد بيانات"
+                      ? t("noData")
                       : error === "Request failed with status code 500"
-                      ? "حدث خطأ في الخادم"
-                      : "حدث خطأ ما"}
+                      ? t("serverError")
+                      : t("someError")}
                   </p>
                 </td>
               </tr>
@@ -259,7 +264,7 @@ const MostListening = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
-                  <p className="no-data mb-0">لا يوجد بيانات</p>
+                  <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
             </tbody>
@@ -271,7 +276,7 @@ const MostListening = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
-                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
+                  <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>

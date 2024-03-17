@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
-import { toast } from "react-toastify";
 
 // Initial State
 const initialState = {
@@ -39,11 +38,9 @@ export const addSubAdminApi = createAsyncThunk(
         url: `/SubAdmin/Insert`,
         data,
       }).then((response) => {
-        toast.success("تم إضافة مسؤول فرعي جديد بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة مسؤول فرعي جديد");
       return rejectWithValue(error.message);
     }
   }
@@ -59,11 +56,9 @@ export const updateSubAdminApi = createAsyncThunk(
         url: `/SubAdmin/Update`,
         data,
       }).then((response) => {
-        toast.success("تم تحديث المسؤول الفرعي بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث المسؤول الفرعي");
       return rejectWithValue(error.message);
     }
   }
@@ -83,11 +78,9 @@ export const deleteSubAdminApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف المسؤول الفرعي بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف المسؤول الفرعي");
       return rejectWithValue(error.message);
     }
   }

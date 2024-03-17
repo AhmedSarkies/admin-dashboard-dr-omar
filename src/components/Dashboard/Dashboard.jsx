@@ -7,121 +7,122 @@ import { FaUser } from "react-icons/fa";
 import { Card, Elder, SubAdmins } from "../";
 import { Col, Container, Row } from "reactstrap";
 import { UserData } from "../../data";
-
-const cardItems = [
-  {
-    id: 1,
-    title: "المستخدمين",
-    icon: <HiUsers />,
-    path: "/users",
-    count: 10,
-    color: "linear-gradient(45deg, rgb(249, 177, 21), rgb(246, 150, 11))",
-  },
-  {
-    id: 2,
-    title: "الكتب",
-    icon: <SiBookstack />,
-    path: "/books",
-    count: 20,
-    color: "linear-gradient(45deg, rgb(50, 31, 219), rgb(31, 20, 152))",
-  },
-  {
-    id: 3,
-    title: "الصوتيات",
-    icon: <LiaFileAudioSolid />,
-    path: "/audios",
-    count: 30,
-    color: "linear-gradient(45deg, rgb(203, 93, 255), rgb(128, 12, 184))",
-  },
-  {
-    id: 4,
-    title: "العلماء",
-    icon: <FaUser />,
-    path: "/elder",
-    count: 40,
-    color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
-  },
-  {
-    id: 5,
-    title: "المقالات",
-    icon: <SiBookstack />,
-    path: "/articles",
-    count: 50,
-    color: "linear-gradient(45deg, rgb(255, 51, 51), rgb(204, 0, 0))",
-  },
-  {
-    id: 6,
-    title: "الصور",
-    icon: <SiBookstack />,
-    path: "/pictures",
-    count: 60,
-    color: "linear-gradient(45deg, rgb(255, 153, 51), rgb(204, 102, 0))",
-  },
-  {
-    id: 7,
-    title: "التحميل",
-    icon: <SiBookstack />,
-    path: "/downloads",
-    count: 70,
-    color: "linear-gradient(45deg, rgb(0, 204, 204), rgb(0, 153, 153))",
-  },
-  {
-    id: 8,
-    title: "المفضلة",
-    icon: <SiBookstack />,
-    path: "/favorites",
-    count: 80,
-    color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
-  },
-  {
-    id: 9,
-    title: "المشاركة",
-    icon: <SiBookstack />,
-    path: "/shares",
-    count: 90,
-    color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
-  },
-  {
-    id: 10,
-    title: "المستخدمين المنضمين حديثاً",
-    icon: <SiBookstack />,
-    path: "/new-users",
-    count: 100,
-    color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
-  },
-  {
-    id: 11,
-    title: "المستخدمين النشطين",
-    icon: <SiBookstack />,
-    path: "/active-users",
-    count: 110,
-    color: "linear-gradient(45deg, rgb(0, 204, 153), rgb(0, 153, 102))",
-  },
-  {
-    id: 12,
-    title: "المستخدمين الغير نشطين",
-    icon: <SiBookstack />,
-    path: "/inactive-users",
-    count: 120,
-    color: "linear-gradient(45deg, rgb(255, 102, 102), rgb(204, 0, 0))",
-  },
-  {
-    id: 13,
-    title: "المستخدمين المحذوفين",
-    icon: <SiBookstack />,
-    path: "/deleted-users",
-    count: 130,
-    color: "linear-gradient(45deg, rgb(0, 204, 255), rgb(0, 153, 204))",
-  },
-];
+import { useTranslation } from "react-i18next";
 
 const Dashboard = () => {
+  const { t } = useTranslation();
+  const cardItems = [
+    {
+      id: 1,
+      title: t("dashboard.users"),
+      icon: <HiUsers />,
+      path: "/users",
+      count: 10,
+      color: "linear-gradient(45deg, rgb(249, 177, 21), rgb(246, 150, 11))",
+    },
+    {
+      id: 2,
+      title: t("dashboard.books"),
+      icon: <SiBookstack />,
+      path: "/books",
+      count: 20,
+      color: "linear-gradient(45deg, rgb(50, 31, 219), rgb(31, 20, 152))",
+    },
+    {
+      id: 3,
+      title: t("dashboard.audios"),
+      icon: <LiaFileAudioSolid />,
+      path: "/audios",
+      count: 30,
+      color: "linear-gradient(45deg, rgb(203, 93, 255), rgb(128, 12, 184))",
+    },
+    {
+      id: 4,
+      title: t("dashboard.scholars"),
+      icon: <FaUser />,
+      path: "/elder",
+      count: 40,
+      color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
+    },
+    {
+      id: 5,
+      title: t("dashboard.articles"),
+      icon: <SiBookstack />,
+      path: "/articles",
+      count: 50,
+      color: "linear-gradient(45deg, rgb(255, 51, 51), rgb(204, 0, 0))",
+    },
+    {
+      id: 6,
+      title: t("dashboard.pictures"),
+      icon: <SiBookstack />,
+      path: "/pictures",
+      count: 60,
+      color: "linear-gradient(45deg, rgb(255, 153, 51), rgb(204, 102, 0))",
+    },
+    {
+      id: 7,
+      title: t("dashboard.downloads"),
+      icon: <SiBookstack />,
+      path: "/downloads",
+      count: 70,
+      color: "linear-gradient(45deg, rgb(0, 204, 204), rgb(0, 153, 153))",
+    },
+    {
+      id: 8,
+      title: t("dashboard.favorites"),
+      icon: <SiBookstack />,
+      path: "/favorites",
+      count: 80,
+      color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
+    },
+    {
+      id: 9,
+      title: t("dashboard.shares"),
+      icon: <SiBookstack />,
+      path: "/shares",
+      count: 90,
+      color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
+    },
+    {
+      id: 10,
+      title: t("dashboard.newUsers"),
+      icon: <SiBookstack />,
+      path: "/new-users",
+      count: 100,
+      color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
+    },
+    {
+      id: 11,
+      title: t("dashboard.activeUsers"),
+      icon: <SiBookstack />,
+      path: "/active-users",
+      count: 110,
+      color: "linear-gradient(45deg, rgb(0, 204, 153), rgb(0, 153, 102))",
+    },
+    {
+      id: 12,
+      title: t("dashboard.inactiveUsers"),
+      icon: <SiBookstack />,
+      path: "/inactive-users",
+      count: 120,
+      color: "linear-gradient(45deg, rgb(255, 102, 102), rgb(204, 0, 0))",
+    },
+    {
+      id: 13,
+      title: t("dashboard.deletedUsers"),
+      icon: <SiBookstack />,
+      path: "/deleted-users",
+      count: 130,
+      color: "linear-gradient(45deg, rgb(0, 204, 255), rgb(0, 153, 204))",
+    },
+  ];
   // eslint-disable-next-line no-unused-vars
   const [userData, setUserData] = useState({
     labels: UserData.map((item) => item.year),
     datasets: [
       {
-        label: "المستخدمين",
+        label: t("dashboard.users"),
         data: UserData.map((item) => item.userGain),
         backgroundColor: "rgba(75,192,192,0.2)",
         borderColor: "rgba(75,192,192,1)",
@@ -129,7 +130,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المقالات",
+        label: t("dashboard.articles"),
         data: UserData.map((item) => item.articleGain),
         backgroundColor: "rgba(255, 206, 86, 0.2)",
         borderColor: "rgba(255, 206, 86, 1)",
@@ -137,7 +138,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المقاطع",
+        label: t("dashboard.audios"),
         data: UserData.map((item) => item.audioGain),
         backgroundColor: "rgba(54, 162, 235, 0.2)",
         borderColor: "rgba(54, 162, 235, 1)",
@@ -145,7 +146,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "الصور",
+        label: t("dashboard.images"),
         data: UserData.map((item) => item.pictureGain),
         backgroundColor: "rgba(153, 102, 255, 0.2)",
         borderColor: "rgba(153, 102, 255, 1)",
@@ -153,7 +154,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "الكتب",
+        label: t("dashboard.books"),
         data: UserData.map((item) => item.bookGain),
         backgroundColor: "rgba(255, 99, 132, 0.2)",
         borderColor: "rgba(255, 99, 132, 1)",
@@ -161,7 +162,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "التحميل",
+        label: t("dashboard.downloads"),
         data: UserData.map((item) => item.downloadGain),
         backgroundColor: "rgba(255, 159, 64, 0.2)",
         borderColor: "rgba(255, 159, 64, 1)",
@@ -169,7 +170,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المفضلة",
+        label: t("dashboard.favorites"),
         data: UserData.map((item) => item.favoriteGain),
         backgroundColor: "rgba(75,45,62,0.2)",
         borderColor: "rgba(45,122,220,1)",
@@ -177,7 +178,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المشاركة",
+        label: t("dashboard.shares"),
         data: UserData.map((item) => item.shareGain),
         backgroundColor: "rgba(75,123,97,0.2)",
         borderColor: "rgba(75,86,45,1)",
@@ -185,7 +186,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "العلماء",
+        label: t("dashboard.elders"),
         data: UserData.map((item) => item.scholarGain),
         backgroundColor: "rgba(75,67,130,0.2)",
         borderColor: "rgba(75,140,67,1)",
@@ -193,7 +194,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المستخدمين المنضمين حديثاً",
+        label: t("dashboard.newUsers"),
         data: UserData.map((item) => item.newUserGain),
         backgroundColor: "rgba(75,158,192,0.2)",
         borderColor: "rgba(75,242,12,1)",
@@ -201,7 +202,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المستخدمين النشطين",
+        label: t("dashboard.activeUsers"),
         data: UserData.map((item) => item.activeUserGain),
         backgroundColor: "rgba(75,45,37,0.2)",
         borderColor: "rgba(75,97,59,1)",
@@ -209,7 +210,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المستخدمين الغير نشطين",
+        label: t("dashboard.inactiveUsers"),
         data: UserData.map((item) => item.inactiveUserGain),
         backgroundColor: "rgba(75,44,178,0.2)",
         borderColor: "rgba(75,224,71,1)",
@@ -217,7 +218,7 @@ const Dashboard = () => {
         weight: 1,
       },
       {
-        label: "المستخدمين المحذوفين",
+        label: t("dashboard.deletedUsers"),
         data: UserData.map((item) => item.deletedUserGain),
         backgroundColor: "rgba(75,77,241,0.2)",
         borderColor: "rgba(75,146,178,1)",

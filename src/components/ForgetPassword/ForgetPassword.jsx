@@ -4,8 +4,10 @@ import logo from "../../assets/images/logo.jpg";
 import { toast } from "react-toastify";
 import { object, string } from "yup";
 import { useFormik } from "formik";
+import { useTranslation } from "react-i18next";
 
 const ForgetPassword = () => {
+  const { t } = useTranslation();
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -34,9 +36,7 @@ const ForgetPassword = () => {
     <div className="login forget-password-page">
       <div className="login-header d-flex flex-column justify-content-center align-items-center gap-2">
         <img src={logo} alt="logo" className="login-logo mb-2" />
-        <h6 className="login-title">
-          أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور الخاصة بك
-        </h6>
+        <h6 className="login-title">{t("auth.forgetPassword.title")}</h6>
       </div>
       <form
         className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
@@ -48,16 +48,16 @@ const ForgetPassword = () => {
             className="form-control"
             id="email"
             name="email"
-            placeholder="البريد الالكتروني"
+            placeholder={t("auth.forgetPassword.email")}
             value={formik.values.email}
             onChange={handleInputChange}
           />
           <label htmlFor="email" className="label-form">
-            البريد الالكتروني
+            {t("auth.forgetPassword.email")}
           </label>
         </div>
         <button type="submit" className="btn submit-btn w-100">
-          إرسال
+          {t("auth.forgetPassword.submit")}
         </button>
       </form>
     </div>

@@ -11,7 +11,9 @@ import { getMessagesApi, getMessages } from "../../store/slices/messagesSlice";
 
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import useFiltration from "../../hooks/useFiltration";
+import { useTranslation } from "react-i18next";
 const Messages = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.messages);
   const [toggle, setToggle] = useState({
@@ -42,11 +44,11 @@ const Messages = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "first_name", label: "الاسم" },
-    { id: 2, name: "phone", label: "الهاتف" },
-    { id: 2, name: "email", label: "البريد الإلكتروني" },
-    { id: 3, name: "subject", label: "الرسالة" },
-    { id: 4, name: "readMessage", label: "قراءة الرسالة" },
+    { id: 0, name: "first_name", label: t("message.columns.name") },
+    { id: 2, name: "phone", label: t("message.columns.phone") },
+    { id: 2, name: "email", label: t("message.columns.email") },
+    { id: 3, name: "subject", label: t("message.columns.content") },
+    { id: 4, name: "readMessage", label: t("message.columns.read") },
   ];
   const {
     PaginationUI,
@@ -82,7 +84,7 @@ const Messages = () => {
             <input
               type="text"
               className="form-input"
-              placeholder="بحث"
+              placeholder={t("search")}
               onChange={handleSearch}
             />
           </div>
@@ -101,7 +103,7 @@ const Messages = () => {
                 width: "180px",
               }}
             >
-              <span>الاعمدة</span>
+              <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
                 className={`dropdown-icon ${
                   toggle.activeColumn ? "active" : ""
@@ -143,7 +145,7 @@ const Messages = () => {
             <tr>
               {toggle.toggleColumns?.first_name && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  الاسم
+                  {t("message.columns.name")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -155,7 +157,7 @@ const Messages = () => {
               )}
               {toggle.toggleColumns?.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  الهاتف
+                  {t("message.columns.phone")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -167,7 +169,7 @@ const Messages = () => {
               )}
               {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  البريد الإلكتروني
+                  {t("message.columns.email")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -179,7 +181,7 @@ const Messages = () => {
               )}
               {toggle.toggleColumns?.subject && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  الرسالة
+                  {t("message.columns.content")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -191,7 +193,7 @@ const Messages = () => {
               )}
               {toggle.toggleColumns?.readMessage && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  قراءة الرسالة
+                  {t("message.columns.read")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -210,12 +212,12 @@ const Messages = () => {
                 <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
-                      ? "حدث خطأ في الشبكة"
+                      ? t("message.networkError")
                       : error === "Request failed with status code 404"
-                      ? "لا يوجد بيانات"
+                      ? t("message.noData")
                       : error === "Request failed with status code 500"
-                      ? "حدث خطأ في الخادم"
-                      : "حدث خطأ ما"}
+                      ? t("message.serverError")
+                      : t("message.someError")}
                   </p>
                 </td>
               </tr>
@@ -246,7 +248,7 @@ const Messages = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="5">
-                  <p className="no-data mb-0">لا يوجد بيانات</p>
+                  <p className="no-data mb-0">{t("message.noData")}</p>
                 </td>
               </tr>
             </tbody>
@@ -258,7 +260,9 @@ const Messages = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="5">
-                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
+                  <p className="no-data no-columns mb-0">
+                    {t("message.noColumns")}
+                  </p>
                 </td>
               </tr>
             </tbody>
@@ -275,7 +279,11 @@ const Messages = () => {
                   <td className="table-td email">
                     <a href={`mailto:${result?.email}`}>{result?.email}</a>
                   </td>
-                  <td className="table-td subject">{result?.subject}</td>
+                  <td className="table-td subject">
+                    {result?.subject.length > 20
+                      ? result?.subject.slice(0, 20) + "..."
+                      : result?.subject}
+                  </td>
                   <td className="table-td read-more">
                     <MdRemoveRedEye
                       onClick={() =>

@@ -1,0 +1,274 @@
+{
+  "headerLogout": "Logout",
+  "titleDeleteAlert": "Are you sure to delete ",
+  "textDeleteAlert": "You will not be able to undo this action!",
+  "confirmButtonText": "Yes, delete it!",
+  "titleDeletedSuccess": "Deleted",
+  "textDeletedSuccess": "successfully",
+  "doneDeletedSuccess": "OK",
+  "noChange": "No Changes",
+  "emailExisted": "Email Already Existed",
+  "phoneExisted": "Phone Already Existed",
+  "cancel": "Cancel",
+  "add": "Add",
+  "edit": "Edit",
+  "save": "Save",
+  "delete": "Delete",
+  "update": "Update",
+  "chooseElder": "Choose Elder",
+  "chooseBook": "Choose Book",
+  "chooseImageBook": "Choose Image Book",
+  "chooseAudio": "Choose Audio",
+  "chooseImageAudio": "Choose Image Audio",
+  "elder": "Elder",
+  "action": "Actions",
+  "chooseImage": "Choose Image",
+  "status": "Status",
+  "approve": "Approve",
+  "pending": "Pending",
+  "private": "Private",
+  "public": "Public",
+  "active": "Active",
+  "inactive": "Inactive",
+  "chooseCategory": "Choose Category",
+  "columnsFilter": "Columns",
+  "search": "Search",
+  "noData": "No Data",
+  "noColumns": "No Columns",
+  "networkError": "Network Error",
+  "serverError": "Server Error",
+  "someError": "Some Error",
+  "dashboard": {
+    "users": "Users",
+    "articles": "Articles",
+    "audios": "Audios",
+    "images": "Images",
+    "books": "Books",
+    "downloads": "Downloads",
+    "favorites": "Favorites",
+    "shares": "Shares",
+    "elders": "Elders",
+    "newUsers": "New Users",
+    "activeUsers": "Active Users",
+    "inactiveUsers": "Inactive Users",
+    "deletedUsers": "Deleted Users"
+  },
+  "linkItems": {
+    "home": "Home",
+    "profile": "Profile",
+    "subAdmins": "Sub Admins",
+    "messages": "Messages",
+    "elder": "Elders",
+    "users": "Users",
+    "mainCategoriesBooks": "Main Categories Books",
+    "subCategoriesBooks": "Sub Categories Books",
+    "books": "Books",
+    "categoriesAudio": "Categories Audio",
+    "audios": "Audios",
+    "categoriesImage": "Categories Image",
+    "images": "Images",
+    "categoriesArticle": "Categories Article",
+    "articles": "Articles",
+    "mostListening": "Most Listening"
+  },
+  "subAdmin": {
+    "title": "Sub Admins",
+    "addTitle": "Add Sub Admin",
+    "editTitle": "Edit Sub Admin",
+    "columns": {
+      "image": "Image",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone"
+    }
+  },
+  "message": {
+    "columns": {
+      "name": "Name",
+      "content": "Message",
+      "email": "Email",
+      "phone": "Phone",
+      "read": "Read"
+    }
+  },
+  "elders": {
+    "title": "Elders",
+    "addTitle": "Add Elder",
+    "editTitle": "Edit Elder",
+    "columns": {
+      "image": "Image",
+      "name": "Elder",
+      "email": "Email",
+      "phone": "Phone"
+    }
+  },
+  "mainCategoriesBooks": {
+    "addTitle": "Add Main Category Book",
+    "editTitle": "Edit Main Category Book",
+    "columns": {
+      "category": "Category"
+    }
+  },
+  "subCategoriesBooks": {
+    "addTitle": "Add Sub Category Book",
+    "editTitle": "Edit Sub Category Book",
+    "columns": {
+      "category": "Category",
+      "mainCategory": "Main Category"
+    }
+  },
+  "books": {
+    "addTitle": "Add Book",
+    "editTitle": "Edit Book",
+    "columns": {
+      "elder": {
+        "image": "Image Elder",
+        "name": "Name Elder"
+      },
+      "book": {
+        "image": "Image Book",
+        "title": "Title Book",
+        "book": "Book"
+      }
+    }
+  },
+  "categories": {
+    "addTitle": "Add Category",
+    "editTitle": "Edit Category",
+    "columns": {
+      "category": "Category"
+    }
+  },
+  "audios": {
+    "addTitle": "Add Audio",
+    "editTitle": "Edit Audio",
+    "columns": {
+      "elder": {
+        "image": "Image Elder",
+        "name": "Name Elder"
+      },
+      "audio": {
+        "image": "Image Audio",
+        "title": "Title Audio",
+        "audio": "Audio",
+        "category": "Category"
+      }
+    }
+  },
+  "mostListening": {
+    "columns": {
+      "elder": {
+        "image": "Image Elder",
+        "name": "Name Elder"
+      },
+      "audio": {
+        "image": "Image Audio",
+        "title": "Title Audio",
+        "audio": "Audio"
+      }
+    }
+  },
+  "images": {
+    "addTitle": "Add Image",
+    "editTitle": "Edit Image",
+    "columns": {
+      "image": "Image",
+      "category": "Category"
+    }
+  },
+  "articles": {
+    "addTitle": "Add Article",
+    "editTitle": "Edit Article",
+    "columns": {
+      "elder": {
+        "image": "Image Elder",
+        "name": "Name Elder"
+      },
+      "image": "Image",
+      "title": "Title",
+      "article": "Article",
+      "category": "Category"
+    }
+  },
+  "profile": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "changePassword": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password"
+  },
+  "auth": {
+    "login": {
+      "title": "Login to Dr.Omar Kamel",
+      "email": "email",
+      "password": "password",
+      "submit": "Login",
+      "forgetPassword": "Forgot Password?"
+    },
+    "forgetPassword": {
+      "title": "Enter your email to reset your password",
+      "email": "email",
+      "submit": "Send"
+    }
+  },
+  "toast": {
+    "subAdmin": {
+      "addSuccess": "Sub Admin added successfully",
+      "addError": "An error occurred while adding sub admin",
+      "editSuccess": "Sub Admin edited successfully",
+      "editError": "An error occurred while editing sub admin",
+      "deleteSuccess": "Sub Admin deleted successfully",
+      "deleteError": "An error occurred while deleting sub admin"
+    },
+    "elder": {
+      "addSuccess": "Elder added successfully",
+      "addError": "An error occurred while adding elder",
+      "editSuccess": "Elder edited successfully",
+      "editError": "An error occurred while editing elder",
+      "deleteSuccess": "Elder deleted successfully",
+      "deleteError": "An error occurred while deleting elder"
+    },
+    "article": {
+      "addSuccess": "The article has been added successfully",
+      "addError": "An error occurred while adding the article",
+      "editSuccess": "The article has been edited successfully",
+      "editError": "An error occurred while editing the article",
+      "deleteSuccess": "The article has been deleted successfully",
+      "deleteError": "An error occurred while deleting the article"
+    },
+    "audio": {
+      "addSuccess": "Audio added successfully",
+      "addError": "An error occurred while adding audio",
+      "editSuccess": "Audio edited successfully",
+      "editError": "An error occurred while editing audio",
+      "deleteSuccess": "Audio deleted successfully",
+      "deleteError": "An error occurred while deleting audio"
+    },
+    "image": {
+      "addSuccess": "Image added successfully",
+      "addError": "An error occurred while adding image",
+      "editSuccess": "Image edited successfully",
+      "editError": "An error occurred while editing image",
+      "deleteSuccess": "Image deleted successfully",
+      "deleteError": "An error occurred while deleting image"
+    },
+    "book": {
+      "addSuccess": "Book added successfully",
+      "addError": "An error occurred while adding book",
+      "editSuccess": "Book edited successfully",
+      "editError": "An error occurred while editing book",
+      "deleteSuccess": "Book deleted successfully",
+      "deleteError": "An error occurred while deleting book"
+    },
+    "category": {
+      "addSuccess": "Category added successfully",
+      "addError": "An error occurred while adding category",
+      "editSuccess": "Category edited successfully",
+      "editError": "An error occurred while editing category",
+      "deleteSuccess": "Category deleted successfully",
+      "deleteError": "An error occurred while deleting category"
+    }
+  }
+}

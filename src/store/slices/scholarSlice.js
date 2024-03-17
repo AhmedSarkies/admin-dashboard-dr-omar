@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
-import { toast } from "react-toastify";
 
 // Initial State
 const initialState = {
@@ -36,11 +35,9 @@ export const addScholarApi = createAsyncThunk(
         url: "/Elders/Insert",
         data,
       }).then((response) => {
-        toast.success("تم إضافة العالم بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة العالم");
       return rejectWithValue(error.message);
     }
   }
@@ -56,11 +53,9 @@ export const updateScholarApi = createAsyncThunk(
         url: "/Elders/update_elder",
         data,
       }).then((response) => {
-        toast.success("تم تحديث العالم بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث العالم");
       return rejectWithValue(error.message);
     }
   }
@@ -76,11 +71,9 @@ export const deleteScholarApi = createAsyncThunk(
         url: "/Elders/Delete",
         params: { id },
       }).then((response) => {
-        toast.success("تم حذف العالم بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف العالم");
       return rejectWithValue(error.message);
     }
   }

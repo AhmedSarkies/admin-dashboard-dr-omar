@@ -6,8 +6,10 @@ import { object, string } from "yup";
 
 import logo from "../../assets/images/logo.jpg";
 import { toast } from "react-toastify";
+import { useTranslation } from "react-i18next";
 
 const Login = () => {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -44,7 +46,7 @@ const Login = () => {
     <div className="login">
       <div className="login-header d-flex flex-column justify-content-center align-items-center gap-2">
         <img src={logo} alt="logo" className="login-logo mb-2" />
-        <h6 className="login-title">تسجيل الدخول إلى د.عمر كامل</h6>
+        <h6 className="login-title">{t("auth.login.title")}</h6>
       </div>
       <form
         className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
@@ -56,12 +58,12 @@ const Login = () => {
             className="form-control"
             id="email"
             name="email"
-            placeholder="البريد الالكتروني"
+            placeholder={t("auth.login.email")}
             value={formik.values.email}
             onChange={handleInputChange}
           />
           <label htmlFor="email" className="label-form">
-            البريد الالكتروني
+            {t("auth.login.email")}
           </label>
         </div>
         <div className="error-container">
@@ -80,7 +82,7 @@ const Login = () => {
             onChange={handleInputChange}
           />
           <label htmlFor="password" className="label-form">
-            كلمه المرور
+            {t("auth.login.password")}
           </label>
         </div>
         <div className="error-container">
@@ -115,11 +117,11 @@ const Login = () => {
                   </label>
                 </div> */}
         <button type="submit" className="btn submit-btn w-100">
-          تسجيل الدخول
+          {t("auth.login.submit")}
         </button>
       </form>
       <Link to="/dr-omar/forget-password" className="forget-password">
-        هل نسيت كلمة المرور؟
+        {t("auth.login.forgetPassword")}
       </Link>
     </div>
   );

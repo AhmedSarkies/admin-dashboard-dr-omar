@@ -37,6 +37,7 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 
 import useFiltration from "../../hooks/useFiltration";
+import { useTranslation } from "react-i18next";
 
 const validationSchema = object().shape({
   name: string().required("يجب ادخال اسم مسؤول الفرع"),
@@ -64,10 +65,11 @@ const initialValues = {
   name: "",
   email: "",
   phone: "",
-  status: "الحالة",
+  status: "",
 };
 
-const SubAdmins = () => {
+const SubAdmins = ({ dashboard }) => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({
@@ -106,11 +108,11 @@ const SubAdmins = () => {
           (scholar) => scholar.phone === formik.values.phone
         );
         if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error("البريد الالكتروني موجود مسبقا");
+          toast.error(t("emailExisted"));
           return;
         }
         if (phoneExist && phoneExist.id !== formik.values.id) {
-          toast.error("رقم الهاتف موجود مسبقا");
+          toast.error(t("phoneExisted"));
           return;
         }
       }
@@ -120,11 +122,11 @@ const SubAdmins = () => {
       formData.append("phone", formik.values.phone);
       formData.append(
         "status",
-        formik.values.status === "Pending"
-          ? "Pending"
-          : formik.values.status === "Approve"
-          ? "Approve"
-          : "Pending"
+        formik.values.status === "Inactive"
+          ? "Inactive"
+          : formik.values.status === "Active"
+          ? "Active"
+          : "Inactive"
       );
       if (values.id) {
         // if the scholar don't change anything even the image
@@ -140,7 +142,7 @@ const SubAdmins = () => {
             ...toggle,
             edit: !toggle.edit,
           });
-          toast.error("لم تقم بتغيير اي شيء");
+          toast.error(t("noChange"));
           return;
         } else {
           formData.append("id", values.id);
@@ -155,6 +157,9 @@ const SubAdmins = () => {
                 ...toggle,
                 edit: !toggle.edit,
               });
+              toast.success(t("toast.subAdmin.editSuccess"));
+            } else {
+              toast.error(t("toast.subAdmin.editError"));
             }
           });
         }
@@ -163,11 +168,14 @@ const SubAdmins = () => {
         dispatch(addSubAdminApi(formData)).then((res) => {
           dispatch(getSubAdminsApi());
           if (!res.error) {
+            toast.success(t("toast.subAdmin.addSuccess"));
             formik.handleReset();
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
+          } else {
+            toast.error(t("toast.subAdmin.addError"));
           }
         });
       }
@@ -216,7 +224,9 @@ const SubAdmins = () => {
               text: `تم حذف ${subAdmin?.name} بنجاح`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
-            });
+            }).then(() => toast.success(t("toast.subAdmin.deleteSuccess")));
+          } else {
+            toast.error(t("toast.subAdmin.deleteError"));
           }
         });
       }
@@ -226,12 +236,12 @@ const SubAdmins = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 1, name: "image", label: "الصورة" },
-    { id: 2, name: "name", label: "المسؤول" },
-    { id: 3, name: "email", label: "البريد الالكتروني" },
-    { id: 4, name: "phone", label: "الهاتف" },
-    { id: 5, name: "status", label: "الحالة" },
-    { id: 6, name: "control", label: "الإجراءات" },
+    { id: 1, name: "image", label: t("subAdmin.columns.image") },
+    { id: 2, name: "name", label: t("subAdmin.columns.name") },
+    { id: 3, name: "email", label: t("subAdmin.columns.email") },
+    { id: 4, name: "phone", label: t("subAdmin.columns.phone") },
+    { id: 5, name: "status", label: t("status") },
+    { id: 6, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -271,312 +281,9 @@ const SubAdmins = () => {
           }
         >
           <MdAdd />
-          إضافة مسؤول فرعي
+          {t("subAdmin.addTitle")}
         </button>
-        {/* Add Scholar */}
-        <Modal
-          isOpen={toggle.add}
-          toggle={() => {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          }}
-          centered={true}
-          keyboard={true}
-          size={"md"}
-          contentClassName="modal-add-scholar"
-        >
-          <ModalHeader
-            toggle={() => {
-              formik.handleReset();
-              setToggle({
-                ...toggle,
-                add: !toggle.add,
-              });
-            }}
-            dir="rtl"
-          >
-            إضافة مسؤول فرعي
-            <IoMdClose
-              onClick={() => {
-                formik.handleReset();
-                setToggle({
-                  ...toggle,
-                  add: !toggle.add,
-                });
-              }}
-            />
-          </ModalHeader>
-          <ModalBody>
-            <form className="overlay-form" onSubmit={formik.handleSubmit}>
-              <Row className="d-flex justify-content-center align-items-center p-3">
-                <Col
-                  lg={5}
-                  className="d-flex flex-column justify-content-center align-items-center"
-                >
-                  <div className="image-preview-container d-flex justify-content-center align-items-center">
-                    <label
-                      htmlFor={formik.values.image.preview ? "" : "image"}
-                      className="form-label d-flex justify-content-center align-items-center"
-                    >
-                      <img
-                        src={
-                          formik.values.image && formik.values.image.preview
-                            ? formik.values.image.preview
-                            : anonymous
-                        }
-                        alt="avatar"
-                        className="image-preview"
-                        onClick={() =>
-                          formik.values.image && formik.values.image.preview
-                            ? setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            : ""
-                        }
-                      />
-                      <Modal
-                        isOpen={toggle.imagePreview}
-                        toggle={() =>
-                          setToggle({
-                            ...toggle,
-                            imagePreview: !toggle.imagePreview,
-                          })
-                        }
-                        centered={true}
-                        keyboard={true}
-                        size={"md"}
-                        contentClassName="modal-preview-image modal-add-scholar"
-                      >
-                        <ModalHeader
-                          toggle={() =>
-                            setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          }
-                        >
-                          <IoMdClose
-                            onClick={() =>
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            }
-                          />
-                        </ModalHeader>
-                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                          <img
-                            src={
-                              formik.values.image && formik.values.image.preview
-                                ? formik.values.image.preview
-                                : anonymous
-                            }
-                            alt="avatar"
-                            className="image-preview"
-                          />
-                        </ModalBody>
-                        <ModalFooter className="p-md-4 p-2">
-                          <div className="form-group-container d-flex justify-content-center align-items-center">
-                            <button
-                              className="delete-btn cancel-btn"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                });
-                                formik.setFieldValue("image", {
-                                  file: "",
-                                  preview: "",
-                                });
-                              }}
-                            >
-                              حذف
-                            </button>
-                          </div>
-                        </ModalFooter>
-                      </Modal>
-                    </label>
-                  </div>
-                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                    <label htmlFor="image" className="form-label">
-                      <ImUpload /> اختر صورة
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-input form-img-input"
-                      id="image"
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                  {formik.errors.image && formik.touched.image ? (
-                    <span className="error text-center">
-                      {formik.errors.image}
-                    </span>
-                  ) : null}
-                </Col>
-                <Col lg={7} className="mb-5">
-                  <div
-                    className="form-group-container d-flex flex-column align-items-end mb-3"
-                    style={{ marginTop: "-4px" }}
-                  >
-                    <label htmlFor="name" className="form-label">
-                      اسم مسؤول الفرع
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      id="name"
-                      placeholder="اسم مسؤول الفرع"
-                      name="name"
-                      value={formik.values.name}
-                      onChange={handleInput}
-                    />
-                    {formik.errors.name && formik.touched.name ? (
-                      <span className="error">{formik.errors.name}</span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                    <label htmlFor="email" className="form-label">
-                      البريد الالكتروني
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      id="email"
-                      placeholder="البريد الالكتروني"
-                      name="email"
-                      value={formik.values.email}
-                      onChange={handleInput}
-                    />
-                    {formik.errors.email && formik.touched.email ? (
-                      <span className="error">{formik.errors.email}</span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                    <label htmlFor="phone" className="form-label">
-                      رقم الهاتف
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      id="test"
-                      placeholder="رقم الهاتف"
-                      name="phone"
-                      value={formik.values.phone}
-                      onChange={handleInput}
-                    />
-                    {formik.errors.phone && formik.touched.phone ? (
-                      <span className="error">{formik.errors.phone}</span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                    <label htmlFor="status" className="form-label">
-                      الحالة
-                    </label>
-                    <div className="dropdown form-input">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                        }}
-                        className="dropdown-btn d-flex justify-content-between align-items-center"
-                      >
-                        {formik.values.status === "Pending"
-                          ? "قيد الانتظار"
-                          : formik.values.status === "Approve"
-                          ? "مفعل"
-                          : "الحالة"}
-                        <TiArrowSortedUp
-                          className={`dropdown-icon ${
-                            toggle.status ? "active" : ""
-                          }`}
-                        />
-                      </button>
-                      <div
-                        className={`dropdown-content ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      >
-                        <button
-                          type="button"
-                          className={`item ${
-                            formik.values.status === "Pending" ? "active" : ""
-                          }`}
-                          value="Pending"
-                          name="status"
-                          onClick={(e) => {
-                            setToggle({
-                              ...toggle,
-                              status: !toggle.status,
-                            });
-                            formik.setFieldValue("status", "Pending");
-                          }}
-                        >
-                          قيد الانتظار
-                        </button>
-                        <button
-                          type="button"
-                          className={`item ${
-                            formik.values.status === "Approve" ? "active" : ""
-                          }`}
-                          value="Approve"
-                          name="status"
-                          onClick={(e) => {
-                            setToggle({
-                              ...toggle,
-                              status: !toggle.status,
-                            });
-                            formik.setFieldValue("status", "Approve");
-                          }}
-                        >
-                          مفعل
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </Col>
-                <Col lg={12}>
-                  <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                    <button type="submit" className="add-btn">
-                      {/* loading */}
-                      {loading ? (
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                      ) : (
-                        "إضافة"
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      className="cancel-btn"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          add: !toggle.add,
-                        });
-                        formik.handleReset();
-                      }}
-                    >
-                      الغاء
-                    </button>
-                  </div>
-                </Col>
-              </Row>
-            </form>
-          </ModalBody>
-        </Modal>
-        <h2>المسؤولين الفرعيين</h2>
+        {dashboard && <h2>{t("subAdmin.title")}</h2>}
       </div>
       <div className="scholar">
         <div className="table-header">
@@ -585,7 +292,7 @@ const SubAdmins = () => {
             <input
               type="text"
               className="form-input"
-              placeholder="بحث"
+              placeholder={t("search")}
               onChange={handleSearch}
             />
           </div>
@@ -604,7 +311,7 @@ const SubAdmins = () => {
                 width: "180px",
               }}
             >
-              <span>الاعمدة</span>
+              <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
                 className={`dropdown-icon ${
                   toggle.activeColumn ? "active" : ""
@@ -647,7 +354,7 @@ const SubAdmins = () => {
               {/* Show and Hide Columns */}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  الصورة
+                  {t("subAdmin.columns.image")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -659,7 +366,7 @@ const SubAdmins = () => {
               )}
               {toggle.toggleColumns.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  المسؤول
+                  {t("subAdmin.columns.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -671,7 +378,7 @@ const SubAdmins = () => {
               )}
               {toggle.toggleColumns.email && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  البريد الالكتروني
+                  {t("subAdmin.columns.email")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -683,7 +390,7 @@ const SubAdmins = () => {
               )}
               {toggle.toggleColumns.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  الهاتف
+                  {t("subAdmin.columns.phone")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -693,9 +400,9 @@ const SubAdmins = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.status.title && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  الحالة
+                  {t("subAdmin.columns.status")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -707,7 +414,7 @@ const SubAdmins = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  الإجراءات
+                  {t("action")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -726,12 +433,12 @@ const SubAdmins = () => {
                 <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">
                     {error === "Network Error"
-                      ? "حدث خطأ في الشبكة"
+                      ? t("networkError")
                       : error === "Request failed with status code 404"
-                      ? "لا يوجد بيانات"
+                      ? t("noData")
                       : error === "Request failed with status code 500"
-                      ? "حدث خطأ في الخادم"
-                      : "حدث خطأ ما"}
+                      ? t("serverError")
+                      : t("someError")}
                   </p>
                 </td>
               </tr>
@@ -762,7 +469,7 @@ const SubAdmins = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
-                  <p className="no-data mb-0">لا يوجد بيانات</p>
+                  <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
             </tbody>
@@ -774,7 +481,7 @@ const SubAdmins = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
-                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
+                  <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
@@ -824,18 +531,18 @@ const SubAdmins = () => {
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.status === "Approve"
+                            result?.status === "Active"
                               ? "green"
-                              : result?.status === "Pending"
+                              : result?.status === "Inactive"
                               ? "red"
                               : "red",
                         }}
                       >
-                        {result?.status === "Approve"
-                          ? "مفعل"
-                          : result?.status === "Pending"
-                          ? "قيد الانتظار"
-                          : "قيد الانتظار"}
+                        {result?.status === "Active"
+                          ? t("subAdmin.columns.active")
+                          : result?.status === "Inactive"
+                          ? t("subAdmin.columns.inactive")
+                          : t("subAdmin.columns.inactive")}
                       </span>
                     </td>
                   )}
@@ -862,325 +569,6 @@ const SubAdmins = () => {
                   )}
                 </tr>
               ))}
-              {/* Edit Scholar */}
-              <Modal
-                isOpen={toggle.edit}
-                toggle={() => {
-                  formik.handleReset();
-                  setToggle({
-                    ...toggle,
-                    edit: !toggle.edit,
-                  });
-                }}
-                centered={true}
-                keyboard={true}
-                size={"md"}
-                contentClassName="modal-add-scholar"
-              >
-                <ModalHeader
-                  toggle={() => {
-                    formik.handleReset();
-                    setToggle({
-                      ...toggle,
-                      edit: !toggle.edit,
-                    });
-                  }}
-                  dir="rtl"
-                >
-                  تعديل {formik.values?.name}
-                  <IoMdClose
-                    onClick={() => {
-                      formik.handleReset();
-                      setToggle({
-                        ...toggle,
-                        edit: !toggle.edit,
-                      });
-                    }}
-                  />
-                </ModalHeader>
-                <ModalBody>
-                  <form className="overlay-form" onSubmit={formik.handleSubmit}>
-                    <Row className="d-flex justify-content-center align-items-center p-3">
-                      <Col
-                        lg={5}
-                        className="d-flex flex-column justify-content-center align-items-center"
-                      >
-                        <div className="image-preview-container d-flex justify-content-center align-items-center">
-                          <label
-                            htmlFor={
-                              formik.values?.image
-                                ? formik.values?.image.file === ""
-                                  ? "image"
-                                  : ""
-                                : "image"
-                            }
-                            className="form-label d-flex justify-content-center align-items-center"
-                          >
-                            <img
-                              src={
-                                formik.values?.image.file === undefined
-                                  ? formik.values?.image
-                                  : formik.values?.image.file === ""
-                                  ? anonymous
-                                  : formik.values?.image.preview
-                              }
-                              alt="avatar"
-                              className="image-preview"
-                              onClick={() =>
-                                formik.values?.image &&
-                                formik.values?.image.file === ""
-                                  ? ""
-                                  : setToggle({
-                                      ...toggle,
-                                      imagePreview: !toggle.imagePreview,
-                                    })
-                              }
-                            />
-                            <Modal
-                              isOpen={toggle.imagePreview}
-                              toggle={() =>
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                })
-                              }
-                              centered={true}
-                              keyboard={true}
-                              size={"md"}
-                              contentClassName="modal-preview-image modal-add-scholar"
-                            >
-                              <ModalHeader
-                                toggle={() =>
-                                  setToggle({
-                                    ...toggle,
-                                    imagePreview: !toggle.imagePreview,
-                                  })
-                                }
-                              >
-                                <IoMdClose
-                                  onClick={() =>
-                                    setToggle({
-                                      ...toggle,
-                                      imagePreview: !toggle.imagePreview,
-                                    })
-                                  }
-                                />
-                              </ModalHeader>
-                              <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                                <img
-                                  src={
-                                    formik.values?.image.file
-                                      ? formik.values?.image.preview
-                                      : formik.values?.image
-                                  }
-                                  alt="avatar"
-                                  className="image-preview"
-                                />
-                              </ModalBody>
-                              <ModalFooter className="p-md-4 p-2">
-                                <div className="form-group-container d-flex justify-content-center align-items-center">
-                                  <button
-                                    className="delete-btn cancel-btn"
-                                    onClick={() => {
-                                      setToggle({
-                                        ...toggle,
-                                        imagePreview: !toggle.imagePreview,
-                                      });
-                                      formik.setFieldValue("image", {
-                                        file: "",
-                                        preview: "",
-                                      });
-                                    }}
-                                  >
-                                    حذف
-                                  </button>
-                                </div>
-                              </ModalFooter>
-                            </Modal>
-                          </label>
-                        </div>
-                        <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                          <label htmlFor="image" className="form-label">
-                            <ImUpload /> اختر صورة
-                          </label>
-                          <input
-                            type="file"
-                            accept="image/*"
-                            className="form-input form-img-input"
-                            id="image"
-                            onChange={handleImageChange}
-                          />
-                        </div>
-                        {formik.values?.image?.file ? (
-                          formik.errors.image && formik.touched.image ? (
-                            <span className="error">{formik.errors.image}</span>
-                          ) : (
-                            formik.values.image.file === undefined &&
-                            formik.values?.image.includes("https")
-                          )
-                        ) : null}
-                      </Col>
-                      <Col lg={7} className="mb-5">
-                        <div
-                          className="form-group-container d-flex flex-column align-items-end mb-3"
-                          style={{ marginTop: "-4px" }}
-                        >
-                          <label htmlFor="name" className="form-label">
-                            اسم مسؤول الفرع
-                          </label>
-                          <input
-                            type="text"
-                            className="form-input"
-                            id="name"
-                            placeholder="اسم مسؤول الفرع"
-                            name="name"
-                            value={formik.values?.name}
-                            onChange={handleInput}
-                          />
-                          {formik.errors.name && formik.touched.name ? (
-                            <span className="error">{formik.errors.name}</span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                          <label htmlFor="email" className="form-label">
-                            البريد الالكتروني
-                          </label>
-                          <input
-                            type="text"
-                            className="form-input"
-                            id="email"
-                            placeholder="البريد الالكتروني"
-                            name="email"
-                            value={formik.values?.email}
-                            onChange={handleInput}
-                          />
-                          {formik.errors.email && formik.touched.email ? (
-                            <span className="error">{formik.errors.email}</span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                          <label htmlFor="phone" className="form-label">
-                            رقم الهاتف
-                          </label>
-                          <input
-                            type="text"
-                            className="form-input"
-                            id="phone"
-                            placeholder="رقم الهاتف"
-                            name="phone"
-                            value={formik.values?.phone}
-                            onChange={handleInput}
-                          />
-                          {formik.errors.phone && formik.touched.phone ? (
-                            <span className="error">{formik.errors.phone}</span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                          <label htmlFor="status" className="form-label">
-                            الحالة
-                          </label>
-                          <div className="dropdown form-input">
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  status: !toggle.status,
-                                });
-                              }}
-                              className="dropdown-btn d-flex justify-content-between align-items-center"
-                            >
-                              {formik.values?.status === "Pending"
-                                ? "قيد الانتظار"
-                                : formik.values?.status === "Approve"
-                                ? "مفعل"
-                                : "الحالة"}
-                              <TiArrowSortedUp
-                                className={`dropdown-icon ${
-                                  toggle.status ? "active" : ""
-                                }`}
-                              />
-                            </button>
-                            <div
-                              className={`dropdown-content ${
-                                toggle.status ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                type="button"
-                                className={`item ${
-                                  formik.values?.status === "Pending"
-                                    ? "active"
-                                    : ""
-                                }`}
-                                value="Pending"
-                                name="status"
-                                onClick={() => {
-                                  setToggle({
-                                    ...toggle,
-                                    status: !toggle.status,
-                                  });
-                                  formik.setFieldValue("status", "Pending");
-                                }}
-                              >
-                                قيد الانتظار
-                              </button>
-                              <button
-                                type="button"
-                                className={`item ${
-                                  formik.values?.status === "Approve"
-                                    ? "active"
-                                    : ""
-                                }`}
-                                value="Approve"
-                                name="status"
-                                onClick={() => {
-                                  setToggle({
-                                    ...toggle,
-                                    status: !toggle.status,
-                                  });
-                                  formik.setFieldValue("status", "Approve");
-                                }}
-                              >
-                                مفعل
-                              </button>
-                            </div>
-                          </div>
-                        </div>
-                      </Col>
-                      <Col lg={12}>
-                        <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                          <button type="submit" className="add-btn">
-                            {/* loading */}
-                            {loading ? (
-                              <span
-                                className="spinner-border spinner-border-sm"
-                                role="status"
-                                aria-hidden="true"
-                              ></span>
-                            ) : (
-                              "حفظ"
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            className="cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                edit: !toggle.edit,
-                              });
-                              formik.handleReset();
-                            }}
-                          >
-                            الغاء
-                          </button>
-                        </div>
-                      </Col>
-                    </Row>
-                  </form>
-                </ModalBody>
-              </Modal>
             </tbody>
           )}
         </table>
@@ -1189,6 +577,621 @@ const SubAdmins = () => {
       {results.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
+      {/* Edit Sub Admin */}
+      <Modal
+        isOpen={toggle.edit}
+        toggle={() => {
+          formik.handleReset();
+          setToggle({
+            ...toggle,
+            edit: !toggle.edit,
+          });
+        }}
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() => {
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+          }}
+        >
+          {t("subAdmin.editTitle")}
+          <IoMdClose
+            onClick={() => {
+              formik.handleReset();
+              setToggle({
+                ...toggle,
+                edit: !toggle.edit,
+              });
+            }}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
+              >
+                <div className="image-preview-container d-flex justify-content-center align-items-center">
+                  <label
+                    htmlFor={
+                      formik.values?.image
+                        ? formik.values?.image.file === ""
+                          ? "image"
+                          : ""
+                        : "image"
+                    }
+                    className="form-label d-flex justify-content-center align-items-center"
+                  >
+                    <img
+                      src={
+                        formik.values?.image.file === undefined
+                          ? formik.values?.image
+                          : formik.values?.image.file === ""
+                          ? anonymous
+                          : formik.values?.image.preview
+                      }
+                      alt="avatar"
+                      className="image-preview"
+                      onClick={() =>
+                        formik.values?.image && formik.values?.image.file === ""
+                          ? ""
+                          : setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                      }
+                    />
+                    <Modal
+                      isOpen={toggle.imagePreview}
+                      toggle={() =>
+                        setToggle({
+                          ...toggle,
+                          imagePreview: !toggle.imagePreview,
+                        })
+                      }
+                      centered={true}
+                      keyboard={true}
+                      size={"md"}
+                      contentClassName="modal-preview-image modal-add-scholar"
+                    >
+                      <ModalHeader
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                      >
+                        <IoMdClose
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        />
+                      </ModalHeader>
+                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                        <img
+                          src={
+                            formik.values?.image.file
+                              ? formik.values?.image.preview
+                              : formik.values?.image
+                          }
+                          alt="avatar"
+                          className="image-preview"
+                        />
+                      </ModalBody>
+                      <ModalFooter className="p-md-4 p-2">
+                        <div className="form-group-container d-flex justify-content-center align-items-center">
+                          <button
+                            className="delete-btn cancel-btn"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              });
+                              formik.setFieldValue("image", {
+                                file: "",
+                                preview: "",
+                              });
+                            }}
+                          >
+                            {t("delete")}
+                          </button>
+                        </div>
+                      </ModalFooter>
+                    </Modal>
+                  </label>
+                </div>
+                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                  <label htmlFor="image" className="form-label">
+                    <ImUpload /> {t("chooseImage")}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input form-img-input"
+                    id="image"
+                    onChange={handleImageChange}
+                  />
+                </div>
+                {formik.values?.image?.file ? (
+                  formik.errors.image && formik.touched.image ? (
+                    <span className="error">{formik.errors.image}</span>
+                  ) : (
+                    formik.values.image.file === undefined &&
+                    formik.values?.image.includes("https")
+                  )
+                ) : null}
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="name" className="form-label">
+                    {t("subAdmin.columns.name")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="name"
+                    placeholder={t("subAdmin.columns.name")}
+                    name="name"
+                    value={formik.values?.name}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.name && formik.touched.name ? (
+                    <span className="error">{formik.errors.name}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="email" className="form-label">
+                    {t("subAdmin.columns.email")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="email"
+                    placeholder={t("subAdmin.columns.email")}
+                    name="email"
+                    value={formik.values?.email}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.email && formik.touched.email ? (
+                    <span className="error">{formik.errors.email}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="phone" className="form-label">
+                    {t("subAdmin.columns.phone")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="phone"
+                    placeholder={t("subAdmin.columns.phone")}
+                    name="phone"
+                    value={formik.values?.phone}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.phone && formik.touched.phone ? (
+                    <span className="error">{formik.errors.phone}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values?.status === "Inactive"
+                        ? t("subAdmin.columns.inactive")
+                        : formik.values?.status === "Active"
+                        ? t("subAdmin.columns.active")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values?.status === "Inactive" ? "active" : ""
+                        }`}
+                        value="Inactive"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: !toggle.status,
+                          });
+                          formik.setFieldValue("status", "Inactive");
+                        }}
+                      >
+                        {t("subAdmin.columns.inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values?.status === "Active" ? "active" : ""
+                        }`}
+                        value="Active"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: !toggle.status,
+                          });
+                          formik.setFieldValue("status", "Active");
+                        }}
+                      >
+                        {t("subAdmin.columns.active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("save")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setToggle({
+                        ...toggle,
+                        edit: !toggle.edit,
+                      });
+                      formik.handleReset();
+                    }}
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
+        </ModalBody>
+      </Modal>
+      {/* Add Sub Admin */}
+      <Modal
+        isOpen={toggle.add}
+        toggle={() => {
+          formik.handleReset();
+          setToggle({
+            ...toggle,
+            add: !toggle.add,
+          });
+        }}
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() => {
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+          }}
+        >
+          {t("subAdmin.addTitle")}
+          <IoMdClose
+            onClick={() => {
+              formik.handleReset();
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+            }}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
+              >
+                <div className="image-preview-container d-flex justify-content-center align-items-center">
+                  <label
+                    htmlFor={formik.values.image.preview ? "" : "image"}
+                    className="form-label d-flex justify-content-center align-items-center"
+                  >
+                    <img
+                      src={
+                        formik.values.image && formik.values.image.preview
+                          ? formik.values.image.preview
+                          : anonymous
+                      }
+                      alt="avatar"
+                      className="image-preview"
+                      onClick={() =>
+                        formik.values.image && formik.values.image.preview
+                          ? setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          : ""
+                      }
+                    />
+                    <Modal
+                      isOpen={toggle.imagePreview}
+                      toggle={() =>
+                        setToggle({
+                          ...toggle,
+                          imagePreview: !toggle.imagePreview,
+                        })
+                      }
+                      centered={true}
+                      keyboard={true}
+                      size={"md"}
+                      contentClassName="modal-preview-image modal-add-scholar"
+                    >
+                      <ModalHeader
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                      >
+                        <IoMdClose
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        />
+                      </ModalHeader>
+                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                        <img
+                          src={
+                            formik.values.image && formik.values.image.preview
+                              ? formik.values.image.preview
+                              : anonymous
+                          }
+                          alt="avatar"
+                          className="image-preview"
+                        />
+                      </ModalBody>
+                      <ModalFooter className="p-md-4 p-2">
+                        <div className="form-group-container d-flex justify-content-center align-items-center">
+                          <button
+                            className="delete-btn cancel-btn"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              });
+                              formik.setFieldValue("image", {
+                                file: "",
+                                preview: "",
+                              });
+                            }}
+                          >
+                            {t("delete")}
+                          </button>
+                        </div>
+                      </ModalFooter>
+                    </Modal>
+                  </label>
+                </div>
+                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                  <label htmlFor="image" className="form-label">
+                    <ImUpload /> {t("chooseImage")}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input form-img-input"
+                    id="image"
+                    onChange={handleImageChange}
+                  />
+                </div>
+                {formik.errors.image && formik.touched.image ? (
+                  <span className="error text-center">
+                    {formik.errors.image}
+                  </span>
+                ) : null}
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="name" className="form-label">
+                    {t("subAdmin.columns.name")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="name"
+                    placeholder={t("subAdmin.columns.name")}
+                    name="name"
+                    value={formik.values.name}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.name && formik.touched.name ? (
+                    <span className="error">{formik.errors.name}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="email" className="form-label">
+                    {t("subAdmin.columns.email")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="email"
+                    placeholder={t("subAdmin.columns.email")}
+                    name="email"
+                    value={formik.values.email}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.email && formik.touched.email ? (
+                    <span className="error">{formik.errors.email}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="phone" className="form-label">
+                    {t("subAdmin.columns.phone")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="test"
+                    placeholder={t("subAdmin.columns.phone")}
+                    name="phone"
+                    value={formik.values.phone}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.phone && formik.touched.phone ? (
+                    <span className="error">{formik.errors.phone}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.status === "Inactive"
+                        ? t("inactive")
+                        : formik.values.status === "Active"
+                        ? t("active")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Inactive" ? "active" : ""
+                        }`}
+                        value="Inactive"
+                        name="status"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            status: !toggle.status,
+                          });
+                          formik.setFieldValue("status", "Inactive");
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Active" ? "active" : ""
+                        }`}
+                        value="Active"
+                        name="status"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            status: !toggle.status,
+                          });
+                          formik.setFieldValue("status", "Active");
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("add")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setToggle({
+                        ...toggle,
+                        add: !toggle.add,
+                      });
+                      formik.handleReset();
+                    }}
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
+        </ModalBody>
+      </Modal>
     </div>
   );
 };

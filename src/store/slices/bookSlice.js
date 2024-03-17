@@ -1,6 +1,5 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
-import { toast } from "react-toastify";
 
 // Initial State
 const initialState = {
@@ -37,13 +36,9 @@ export const addBookApi = createAsyncThunk(
         url: `/Books/Insert`,
         data,
       }).then((response) => {
-        // toast.success("تم إضافة الكتاب بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء إضافة الكتاب");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -59,13 +54,9 @@ export const updateBookApi = createAsyncThunk(
         url: `/Books/Update`,
         data,
       }).then((response) => {
-        // toast.success("تم تحديث الكتاب بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء تحديث الكتاب");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -85,13 +76,9 @@ export const deleteBookApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        // toast.success("تم حذف الكتاب بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء حذف الكتاب");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -129,11 +116,9 @@ export const addBookCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم إضافة التصنيف الرئيسي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة التصنيف الرئيسي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -151,11 +136,9 @@ export const updateBookCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم تحديث التصنيف الرئيسي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث التصنيف الرئيسي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -175,13 +158,9 @@ export const deleteBookCategoryApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        // toast.success("تم حذف تصنيف المقالات بنجاح");
-        toast.info("قيد التطوير...");
         return response.data;
       });
     } catch (error) {
-      // toast.error("حدث خطأ أثناء حذف تصنيف المقالات");
-      toast.info("قيد التطوير...");
       return rejectWithValue(error.message);
     }
   }
@@ -219,11 +198,9 @@ export const addBookSubCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم إضافة التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء إضافة التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -241,11 +218,9 @@ export const updateBookSubCategoryApi = createAsyncThunk(
           ...data,
         },
       }).then((response) => {
-        toast.success("تم تحديث التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء تحديث التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }
@@ -265,11 +240,9 @@ export const deleteBookSubCategoryApi = createAsyncThunk(
           Accept: "application/json",
         },
       }).then((response) => {
-        toast.success("تم حذف التصنيف الفرعي للكتاب بنجاح");
         return response.data;
       });
     } catch (error) {
-      toast.error("حدث خطأ أثناء حذف التصنيف الفرعي للكتاب");
       return rejectWithValue(error.message);
     }
   }

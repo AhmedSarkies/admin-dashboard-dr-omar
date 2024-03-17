@@ -6,8 +6,8 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
   // Logic Pagination
   const startPoint = (toggle.currentPage - 1) * toggle.rowsPerPage;
   const endPoint = toggle.currentPage * toggle.rowsPerPage;
-  const totalPages = Math.ceil(rowData.length / toggle.rowsPerPage);
-  const results = rowData.slice(startPoint, endPoint);
+  const totalPages = Math.ceil(rowData?.length / toggle.rowsPerPage);
+  const results = rowData?.slice(startPoint, endPoint);
 
   // UI Pagination
   const PaginationUI = () => (
@@ -98,7 +98,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
           }
           disabled={
             toggle.currentPage ===
-            Math.ceil(rowData.length / toggle.rowsPerPage)
+            Math.ceil(rowData?.length / toggle.rowsPerPage)
           }
         >
           <TiArrowRight />

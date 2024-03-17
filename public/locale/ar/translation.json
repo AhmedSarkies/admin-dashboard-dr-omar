@@ -1,0 +1,271 @@
+{
+  "headerLogout": "تسجيل الخروج",
+  "titleDeleteAlert": "هل انت متأكد من حذف ",
+  "textDeleteAlert": "لن تتمكن من التراجع عن هذا الاجراء!",
+  "confirmButtonText": "نعم, احذفه!",
+  "titleDeletedSuccess": "تم حذف",
+  "textDeletedSuccess": "بنجاح",
+  "doneDeletedSuccess": "تم",
+  "noChange": "لم يتم التغيير",
+  "emailExisted": "البريد الالكتروني موجود مسبقا",
+  "phoneExisted": "رقم الهاتف موجود مسبقا",
+  "cancel": "إلغاء",
+  "add": "إضافة",
+  "edit": "تعديل",
+  "save": "حفظ",
+  "delete": "حذف",
+  "update": "تحديث",
+  "chooseElder": "اختر العالم",
+  "chooseImage": "اختر صورة",
+  "chooseBook": "اختر الكتاب",
+  "chooseImageBook": "اختر صورة الكتاب",
+  "chooseAudio": "اختر الصوتية",
+  "chooseImageAudio": "اختر صورة الصوتية",
+  "chooseCategory": "اختر تصنيف",
+  "elder": "العالم",
+  "action": "الإجراءات",
+  "status": "الحالة",
+  "approve": "مفعل",
+  "pending": "قيد الانتظار",
+  "private": "خاص",
+  "public": "عام",
+  "active": "نشط",
+  "inactive": "غير نشط",
+  "columnsFilter": "الأعمدة",
+  "search": "بحث",
+  "noData": "لا توجد بيانات",
+  "noColumns": "لا توجد أعمدة",
+  "networkError": "خطأ في الشبكة",
+  "serverError": "خطأ في الخادم",
+  "someError": "حدث خطأ ما",
+  "dashboard": {
+    "users": "المستخدمين",
+    "articles": "المقالات",
+    "audios": "الصوتيات",
+    "images": "الصور",
+    "books": "الكتب",
+    "downloads": "التحميلات",
+    "favorites": "المفضلة",
+    "shares": "المشاركات",
+    "elders": "العلماء",
+    "newUsers": "مستخدمين جدد",
+    "activeUsers": "مستخدمين نشطين",
+    "inactiveUsers": "مستخدمين غير نشطين",
+    "deletedUsers": "مستخدمين محذوفين"
+  },
+  "linkItems": {
+    "home": "الصفحة الرئيسية",
+    "profile": "الصفحة الشخصية",
+    "subAdmins": "المسؤولين الفرعيين",
+    "messages": "الرسائل",
+    "elder": "العلماء",
+    "users": "المستخدمين",
+    "mainCategoriesBooks": "تصنيفات الكتب الرئيسية",
+    "subCategoriesBooks": "تصنيفات الكتب الفرعية",
+    "books": "الكتب",
+    "categoriesAudio": "تصنيفات الصوتيات",
+    "audios": "الصوتيات",
+    "categoriesImage": "تصنيفات الصور",
+    "images": "الصور",
+    "categoriesArticle": "تصنيفات المقالات",
+    "articles": "المقالات",
+    "mostListening": "الأكثر استماعا"
+  },
+  "subAdmin": {
+    "title": "المسؤولين الفرعيين",
+    "addTitle": "إضافة مسؤول فرعي",
+    "editTitle": "تعديل مسؤول فرعي",
+    "columns": {
+      "image": "الصورة",
+      "name": "المسؤول",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف"
+    }
+  },
+  "message": {
+    "columns": {
+      "name": "الاسم",
+      "content": "الرسالة",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "read": "قراءة"
+    }
+  },
+  "elders": {
+    "title": "العلماء",
+    "addTitle": "إضافة عالم",
+    "editTitle": "تعديل عالم",
+    "columns": {
+      "image": "الصورة",
+      "name": "العالم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف"
+    }
+  },
+  "mainCategoriesBooks": {
+    "addTitle": "إضافة تصنيف الكتاب الرئيسي",
+    "editTitle": "تعديل تصنيف الكتاب الرئيسي",
+    "columns": {
+      "category": "التصنيف"
+    }
+  },
+  "subCategoriesBooks": {
+    "addTitle": "إضافة تصنيف الكتاب الفرعي",
+    "editTitle": "تعديل تصنيف الكتاب الفرعي",
+    "columns": {
+      "category": "التصنيف"
+    }
+  },
+  "books": {
+    "addTitle": "إضافة كتاب",
+    "editTitle": "تعديل كتاب",
+    "columns": {
+      "elder": {
+        "image": "صورة العالم",
+        "name": "اسم العالم"
+      },
+      "book": {
+        "image": "صورة الكتاب",
+        "title": "عنوان الكتاب",
+        "book": "الكتاب"
+      }
+    }
+  },
+  "categories": {
+    "addTitle": "إضافة تصنيف",
+    "editTitle": "تعديل تصنيف",
+    "columns": {
+      "category": "التصنيف"
+    }
+  },
+  "audios": {
+    "addTitle": "إضافة صوتية",
+    "editTitle": "تعديل صوتية",
+    "columns": {
+      "elder": {
+        "image": "صورة العالم",
+        "name": "اسم العالم"
+      },
+      "audio": {
+        "image": "صورة الصوتية",
+        "title": "عنوان الصوتية",
+        "audio": "الصوتية",
+        "category": "التصنيف"
+      }
+    }
+  },
+  "mostListening": {
+    "columns": {
+      "elder": {
+        "image": "صورة العالم",
+        "name": "اسم العالم"
+      },
+      "audio": {
+        "image": "صورة الصوتية",
+        "title": "عنوان الصوتية",
+        "audio": "الصوتية"
+      }
+    }
+  },
+  "images": {
+    "addTitle": "إضافة صورة",
+    "editTitle": "تعديل صورة",
+    "columns": {
+      "image": "الصورة",
+      "category": "التصنيف"
+    }
+  },
+  "articles": {
+    "addTitle": "إضافة مقال",
+    "editTitle": "تعديل مقال",
+    "columns": {
+      "elder": {
+        "image": "صورة العالم",
+        "name": "اسم العالم"
+      },
+      "image": "الصورة",
+      "title": "العنوان",
+      "article": "المقال",
+      "category": "التصنيف"
+    }
+  },
+  "profile": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "changePassword": "تغيير كلمة المرور",
+    "oldPassword": "كلمة المرور القديمة",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور"
+  },
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول إلى د.عمر كامل",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "forgetPassword": "هل نسيت كلمة المرور؟"
+    },
+    "forgetPassword": {
+      "title": "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور الخاصة بك",
+      "email": "البريد الإلكتروني",
+      "submit": "إرسال"
+    }
+  },
+  "toast": {
+    "subAdmin": {
+      "addSuccess": "تم إضافة المسؤول الفرعي بنجاح",
+      "addError": "حدث خطأ أثناء إضافة المسؤول الفرعي",
+      "editSuccess": "تم تعديل المسؤول الفرعي بنجاح",
+      "editError": "حدث خطأ أثناء تعديل المسؤول الفرعي",
+      "deleteSuccess": "تم حذف المسؤول الفرعي بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف المسؤول الفرعي"
+    },
+    "elder": {
+      "addSuccess": "تم إضافة العالم بنجاح",
+      "addError": "حدث خطأ أثناء إضافة العالم",
+      "editSuccess": "تم تعديل العالم بنجاح",
+      "editError": "حدث خطأ أثناء تعديل العالم",
+      "deleteSuccess": "تم حذف العالم بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف العالم"
+    },
+    "article": {
+      "addSuccess": "تم إضافة المقال بنجاح",
+      "addError": "حدث خطأ أثناء إضافة المقال",
+      "editSuccess": "تم تعديل المقال بنجاح",
+      "editError": "حدث خطأ أثناء تعديل المقال",
+      "deleteSuccess": "تم حذف المقال بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف المقال"
+    },
+    "audio": {
+      "addSuccess": "تم إضافة الصوتية بنجاح",
+      "addError": "حدث خطأ أثناء إضافة الصوتية",
+      "editSuccess": "تم تعديل الصوتية بنجاح",
+      "editError": "حدث خطأ أثناء تعديل الصوتية"
+    },
+    "image": {
+      "addSuccess": "تم إضافة الصورة بنجاح",
+      "addError": "حدث خطأ أثناء إضافة الصورة",
+      "editSuccess": "تم تعديل الصورة بنجاح",
+      "editError": "حدث خطأ أثناء تعديل الصورة",
+      "deleteSuccess": "تم حذف الصورة بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف الصورة"
+    },
+    "book": {
+      "addSuccess": "تم إضافة الكتاب بنجاح",
+      "addError": "حدث خطأ أثناء إضافة الكتاب",
+      "editSuccess": "تم تعديل الكتاب بنجاح",
+      "editError": "حدث خطأ أثناء تعديل الكتاب",
+      "deleteSuccess": "تم حذف الكتاب بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف الكتاب"
+    },
+    "category": {
+      "addSuccess": "تم إضافة التصنيف بنجاح",
+      "addError": "حدث خطأ أثناء إضافة التصنيف",
+      "editSuccess": "تم تعديل التصنيف بنجاح",
+      "editError": "حدث خطأ أثناء تعديل التصنيف",
+      "deleteSuccess": "تم حذف التصنيف بنجاح",
+      "deleteError": "حدث خطأ أثناء حذف التصنيف"
+    }
+  }
+}

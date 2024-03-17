@@ -30,6 +30,7 @@ import {
   addAudioApi,
   updateAudioApi,
   deleteAudioApi,
+  deleteAudio,
 } from "../../store/slices/audioSlice";
 
 import {
@@ -38,6 +39,8 @@ import {
 } from "../../store/slices/scholarSlice";
 import useFiltration from "../../hooks/useFiltration";
 import Swal from "sweetalert2";
+import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 
 const validationSchema = object().shape({
   title: string().required("يجب اختيار عنوان الصوتية"),
@@ -88,6 +91,7 @@ const initialValues = {
 };
 
 const Audios = () => {
+  const { t } = useTranslation();
   const dispatch = useDispatch();
   const { audios, audioCategories, loading, error } = useSelector(
     (state) => state.audio
@@ -133,13 +137,13 @@ const Audios = () => {
 
   // Columns
   const columns = [
-    { id: 1, name: "imageElder", label: "صوؤة العالم" },
-    { id: 2, name: "nameElder", label: "اسم العالم" },
-    { id: 3, name: "image", label: "صورة الصوتية" },
-    { id: 4, name: "title", label: "عنوان الصوتية" },
-    { id: 5, name: "audio", label: "الصوتية" },
-    { id: 6, name: "status", label: "الحالة" },
-    { id: 7, name: "control", label: "الإجراءات" },
+    { id: 1, name: "imageElder", label: t("audios.columns.elder.image") },
+    { id: 2, name: "nameElder", label: t("audios.columns.elder.name") },
+    { id: 3, name: "image", label: t("audios.columns.audio.image") },
+    { id: 4, name: "title", label: t("audios.columns.audio.title") },
+    { id: 5, name: "audio", label: t("audios.columns.audio.audio") },
+    { id: 6, name: "status", label: t("status") },
+    { id: 7, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -202,6 +206,9 @@ const Audios = () => {
               edit: !toggle.edit,
             });
             formik.handleReset();
+            toast.success(t("toast.audio.updatedSuccess"));
+          } else {
+            toast.error(t("toast.audio.updatedError"));
           }
         });
       } else {
@@ -214,6 +221,9 @@ const Audios = () => {
               add: !toggle.add,
             });
             formik.handleReset();
+            toast.success(t("toast.audio.addedSuccess"));
+          } else {
+            toast.error(t("toast.audio.addedError"));
           }
         });
       }
@@ -296,26 +306,31 @@ const Audios = () => {
   // Delete Audio
   const handleDelete = (audio) => {
     Swal.fire({
-      title: `هل انت متأكد من حذف ${audio?.title}؟`,
-      text: "لن تتمكن من التراجع عن هذا الاجراء!",
+      title: t("titleDeleteAlert") + audio?.title + "?",
+      text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#0d1d34",
-      confirmButtonText: "نعم, احذفه!",
-      cancelButtonText: "الغاء",
+      confirmButtonText: t("confirmButtonText"),
+      cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteAudioApi(audio.id)).then((res) => {
+        dispatch(deleteAudioApi(audio?.id)).then((res) => {
           if (!res.error) {
-            dispatch(getAudiosApi());
+            dispatch(deleteAudio(audio?.id));
+            Swal.fire({
+              title: `${t("titleDeletedSuccess")} ${audio?.title}`,
+              text: `${t("titleDeletedSuccess")} ${audio?.title} ${t(
+                "textDeletedSuccess"
+              )}`,
+              icon: "success",
+              confirmButtonColor: "#0d1d34",
+              confirmButtonText: t("doneDeletedSuccess"),
+            }).then(() => toast.success(t("toast.audio.deletedSuccess")));
+          } else {
+            toast.error(t("toast.audio.deletedError"));
           }
-        });
-        Swal.fire({
-          title: `تم حذف ${audio?.title}`,
-          text: `تم حذف ${audio?.title} بنجاح`,
-          icon: "success",
-          confirmButtonColor: "#0d1d34",
         });
       }
     });
@@ -358,447 +373,8 @@ const Audios = () => {
           }
         >
           <MdAdd />
-          إضافة صوتية
+          {t("audios.addTitle")}
         </button>
-        {/* Add Audio */}
-        <Modal
-          isOpen={toggle.add}
-          toggle={() => {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          }}
-          centered={true}
-          keyboard={true}
-          size={"md"}
-          contentClassName="modal-add-audio modal-add-scholar"
-        >
-          <ModalHeader
-            toggle={() => {
-              setToggle({
-                ...toggle,
-                add: !toggle.add,
-              });
-              formik.handleReset();
-            }}
-            dir="rtl"
-          >
-            إضافة صوتية جديدة
-            <IoMdClose
-              onClick={() => {
-                setToggle({
-                  ...toggle,
-                  add: !toggle.add,
-                });
-              }}
-            />
-          </ModalHeader>
-          <ModalBody>
-            <form className="overlay-form" onSubmit={formik.handleSubmit}>
-              <Row className="d-flex justify-content-center align-items-center p-3">
-                <Col
-                  lg={5}
-                  className="d-flex flex-column justify-content-center align-items-center"
-                >
-                  <Col
-                    lg={12}
-                    className="d-flex flex-column justify-content-center align-items-center"
-                  >
-                    <div className="image-preview-container d-flex justify-content-center align-items-center">
-                      <label
-                        htmlFor={formik.values.image?.preview ? "" : "image"}
-                        className="form-label d-flex justify-content-center align-items-center"
-                      >
-                        <img
-                          src={
-                            formik.values?.image && formik.values.image?.preview
-                              ? formik.values.image?.preview
-                              : anonymous
-                          }
-                          alt="avatar"
-                          className="image-preview"
-                          style={{
-                            width: "90px",
-                            height: "90px",
-                            objectFit: "cover",
-                          }}
-                          onClick={() =>
-                            formik.values?.image && formik.values.image?.preview
-                              ? setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                })
-                              : ""
-                          }
-                        />
-                        <Modal
-                          isOpen={toggle.imagePreview}
-                          toggle={() =>
-                            setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          }
-                          centered={true}
-                          keyboard={true}
-                          size={"md"}
-                          contentClassName="modal-preview-image modal-add-scholar"
-                        >
-                          <ModalHeader
-                            toggle={() =>
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            }
-                          >
-                            <IoMdClose
-                              onClick={() =>
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                })
-                              }
-                            />
-                          </ModalHeader>
-                          <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                            <img
-                              src={
-                                formik.values?.image &&
-                                formik.values?.image?.preview
-                                  ? formik.values?.image?.preview
-                                  : anonymous
-                              }
-                              alt="avatar"
-                              className="image-preview"
-                            />
-                          </ModalBody>
-                          <ModalFooter className="p-md-4 p-2">
-                            <div className="form-group-container d-flex justify-content-center align-items-center">
-                              <button
-                                className="delete-btn cancel-btn"
-                                onClick={() => {
-                                  setToggle({
-                                    ...toggle,
-                                    imagePreview: !toggle.imagePreview,
-                                  });
-                                  formik.setFieldValue("image", {
-                                    file: "",
-                                    preview: "",
-                                  });
-                                }}
-                              >
-                                حذف
-                              </button>
-                            </div>
-                          </ModalFooter>
-                        </Modal>
-                      </label>
-                    </div>
-                    <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                      <label htmlFor="image" className="form-label">
-                        <ImUpload /> اختر صورة الصوتية
-                      </label>
-                      <input
-                        type="file"
-                        accept="image/*"
-                        className="form-input form-img-input"
-                        id="image"
-                        onChange={handleImageChange}
-                      />
-                    </div>
-                    {formik.errors.image && formik.touched.image ? (
-                      <span className="error text-center">
-                        {formik.errors.image}
-                      </span>
-                    ) : null}
-                  </Col>
-                  <Col
-                    lg={12}
-                    className="d-flex flex-column justify-content-center align-items-center mt-4"
-                  >
-                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                      <label
-                        htmlFor={
-                          formik.values.audio?.file !== "" &&
-                          formik.values.audio?.preview !== ""
-                            ? ""
-                            : "audio"
-                        }
-                        className="form-label mt-4"
-                      >
-                        <audio controls src={formik.values.audio?.preview} />
-                      </label>
-                    </div>
-                    <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                      <label htmlFor="audio" className="form-label">
-                        <FaFileUpload /> اختر الصوتية
-                      </label>
-                      <input
-                        type="file"
-                        accept="audio/*"
-                        className="form-input form-img-input"
-                        id="audio"
-                        onChange={handleDurationAudio}
-                      />
-                    </div>
-                    {formik.errors.audio && formik.touched.audio ? (
-                      <span className="error">{formik.errors.audio}</span>
-                    ) : null}
-                  </Col>
-                </Col>
-                <Col lg={7} className="mb-5">
-                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                    <label htmlFor="title" className="form-label">
-                      عنوان الصوتية
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input"
-                      id="title"
-                      placeholder="عنوان الصوتية"
-                      name="title"
-                      value={formik.values.title}
-                      onChange={handleInput}
-                    />
-                    {formik.errors.title && formik.touched.title ? (
-                      <span className="error">{formik.errors.title}</span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                    <label htmlFor="audioCategory" className="form-label">
-                      التصنيف
-                    </label>
-                    <div
-                      className={`dropdown form-input ${
-                        toggle.audioCategory ? "active" : ""
-                      }`}
-                    >
-                      <div
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            audioCategory: !toggle.audioCategory,
-                          });
-                        }}
-                        className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
-                      >
-                        {formik.values.audioCategory?.title
-                          ? formik.values.audioCategory?.title
-                          : "اختر التصنيف"}
-                        <TiArrowSortedUp
-                          className={`dropdown-icon ${
-                            toggle.audioCategory ? "active" : ""
-                          }`}
-                        />
-                      </div>
-                      <div
-                        className={`dropdown-content ${
-                          toggle.audioCategory ? "active" : ""
-                        }`}
-                      >
-                        {audioCategories?.map((category) => (
-                          <div
-                            key={category?.id}
-                            className={`item ${
-                              formik.values.audioCategory?.id === category?.id
-                                ? "active"
-                                : ""
-                            }`}
-                            value={category?.id}
-                            name="audioCategory"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                audioCategory: !toggle.audioCategory,
-                              });
-                              formik.setFieldValue("audioCategory", {
-                                title: category.title,
-                                id: category?.id,
-                              });
-                            }}
-                          >
-                            {category.title}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {formik.errors.audioCategory?.title &&
-                    formik.touched.audioCategory?.title ? (
-                      <span className="error">
-                        {formik.errors.audioCategory?.title}
-                      </span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                    <label htmlFor="status" className="form-label">
-                      الحالة
-                    </label>
-                    <div
-                      className={`dropdown form-input ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
-                      <div
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                        }}
-                        className="dropdown-btn d-flex justify-content-between align-items-center"
-                      >
-                        {formik.values.status === "Private"
-                          ? "خاص"
-                          : formik.values.status === "Public"
-                          ? "عام"
-                          : "الحالة"}
-                        <TiArrowSortedUp
-                          className={`dropdown-icon ${
-                            toggle.status ? "active" : ""
-                          }`}
-                        />
-                      </div>
-                      <div
-                        className={`dropdown-content ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      >
-                        <div
-                          className={`item ${
-                            formik.values.status === "Private" ? "active" : ""
-                          }`}
-                          value="Private"
-                          name="status"
-                          onClick={() => {
-                            setToggle({
-                              ...toggle,
-                              status: false,
-                            });
-                            formik.setFieldValue("status", "Private");
-                          }}
-                        >
-                          خاص
-                        </div>
-                        <div
-                          className={`item ${
-                            formik.values.status === "Public" ? "active" : ""
-                          }`}
-                          value="Public"
-                          name="status"
-                          onClick={() => {
-                            setToggle({
-                              ...toggle,
-                              status: false,
-                            });
-                            formik.setFieldValue("status", "Public");
-                          }}
-                        >
-                          عام
-                        </div>
-                      </div>
-                    </div>
-                    {formik.errors.status && formik.touched.status ? (
-                      <span className="error">{formik.errors.status}</span>
-                    ) : null}
-                  </div>
-                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                    <label htmlFor="elder" className="form-label">
-                      العالم
-                    </label>
-                    <div
-                      className={`dropdown form-input ${
-                        toggle.elders ? "active" : ""
-                      }`}
-                    >
-                      <div
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            elders: !toggle.elders,
-                          });
-                        }}
-                        className="dropdown-btn dropdown-btn-elder d-flex justify-content-between align-items-center"
-                      >
-                        {formik.values.elder?.name
-                          ? formik.values.elder?.name
-                          : "اختر عالم"}
-                        <TiArrowSortedUp
-                          className={`dropdown-icon ${
-                            toggle.elders ? "active" : ""
-                          }`}
-                        />
-                      </div>
-                      <div
-                        className={`dropdown-content ${
-                          toggle.elders ? "active" : ""
-                        }`}
-                      >
-                        {approvedScholars?.map((scholar) => (
-                          <div
-                            key={scholar?.id}
-                            className={`item ${
-                              formik.values.elder?.id === scholar?.id
-                                ? "active"
-                                : ""
-                            }`}
-                            value={scholar?.id}
-                            name="elder"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                elders: !toggle.elders,
-                              });
-                              formik.setFieldValue("elder", {
-                                name: scholar?.name,
-                                id: scholar?.id,
-                              });
-                            }}
-                          >
-                            {scholar?.name}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {formik.errors.elder?.name && formik.touched.elder?.name ? (
-                      <span className="error">{formik.errors.elder?.name}</span>
-                    ) : null}
-                  </div>
-                </Col>
-                <Col lg={12}>
-                  <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                    <button type="submit" className="add-btn">
-                      {/* loading */}
-                      {loading ? (
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                      ) : (
-                        "إضافة"
-                      )}
-                    </button>
-                    <button
-                      type="button"
-                      className="cancel-btn"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          add: !toggle.add,
-                        });
-                        formik.handleReset();
-                      }}
-                    >
-                      الغاء
-                    </button>
-                  </div>
-                </Col>
-              </Row>
-            </form>
-          </ModalBody>
-        </Modal>
       </div>
       <div className="audio scholar">
         <div className="table-header">
@@ -807,7 +383,7 @@ const Audios = () => {
             <input
               type="text"
               className="form-input"
-              placeholder="بحث"
+              placeholder={t("search")}
               onChange={handleSearch}
             />
           </div>
@@ -826,7 +402,7 @@ const Audios = () => {
                 width: "180px",
               }}
             >
-              <span>الاعمدة</span>
+              <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
                 className={`dropdown-icon ${
                   toggle.activeColumn ? "active" : ""
@@ -869,7 +445,7 @@ const Audios = () => {
               {/* Show and Hide Columns */}
               {toggle.toggleColumns.imageElder && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  صورة العالم
+                  {t("audios.columns.elder.image")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -881,7 +457,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.nameElder && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  اسم العالم
+                  {t("audios.columns.elder.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -893,7 +469,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  صورة الصوتية
+                  {t("audios.columns.audio.image")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -905,7 +481,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  عنوان الصوتية
+                  {t("audios.columns.audio.title")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -917,7 +493,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.audio && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  الصوتية
+                  {t("audios.columns.audio.audio")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -929,7 +505,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  الحالة
+                  {t("status")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -941,7 +517,7 @@ const Audios = () => {
               )}
               {toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  الإجراءات
+                  {t("action")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -960,12 +536,12 @@ const Audios = () => {
                 <td className="table-td" colSpan="7">
                   <p className="no-data mb-0">
                     {error === "Network Error"
-                      ? "حدث خطأ في الشبكة"
+                      ? t("networkError")
                       : error === "Request failed with status code 404"
-                      ? "لا يوجد بيانات"
+                      ? t("noData")
                       : error === "Request failed with status code 500"
-                      ? "حدث خطأ في الخادم"
-                      : "حدث خطأ ما"}
+                      ? t("serverError")
+                      : t("someError")}
                   </p>
                 </td>
               </tr>
@@ -996,7 +572,7 @@ const Audios = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="7">
-                  <p className="no-data mb-0">لا يوجد بيانات</p>
+                  <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
             </tbody>
@@ -1008,7 +584,7 @@ const Audios = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="7">
-                  <p className="no-data no-columns mb-0">لا يوجد اعمدة</p>
+                  <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
@@ -1100,33 +676,919 @@ const Audios = () => {
                   )}
                 </tr>
               ))}
-              {/* Edit audio */}
-              <Modal
-                isOpen={toggle.edit}
-                toggle={() => {
-                  setToggle({
-                    ...toggle,
-                    edit: !toggle.edit,
-                  });
-                  formik.handleReset();
-                }}
-                centered={true}
-                keyboard={true}
-                size={"md"}
-                contentClassName="modal-add-scholar modal-add-scholar"
+            </tbody>
+          )}
+        </table>
+      </div>
+      {/* Add Audio */}
+      <Modal
+        isOpen={toggle.add}
+        toggle={() => {
+          setToggle({
+            ...toggle,
+            add: !toggle.add,
+            elders: false,
+            audioCategory: false,
+            status: false,
+          });
+          formik.handleReset();
+        }}
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-add-audio modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() => {
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+            formik.handleReset();
+          }}
+        >
+          {t("audios.addTitle")}
+          <IoMdClose
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+            }}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
               >
-                <ModalHeader
-                  toggle={() => {
-                    setToggle({
-                      ...toggle,
-                      edit: !toggle.edit,
-                    });
-                    formik.handleReset();
-                  }}
-                  dir="rtl"
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
                 >
-                  تعديل {formik.values?.title}
-                  <IoMdClose
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image?.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values?.image && formik.values.image?.preview
+                            ? formik.values.image?.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values?.image && formik.values.image?.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image &&
+                              formik.values?.image?.preview
+                                ? formik.values?.image?.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImageAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center mt-4"
+                >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label
+                      htmlFor={
+                        formik.values.audio?.file !== "" &&
+                        formik.values.audio?.preview !== ""
+                          ? ""
+                          : "audio"
+                      }
+                      className="form-label mt-4"
+                    >
+                      <audio controls src={formik.values.audio?.preview} />
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="audio" className="form-label">
+                      <FaFileUpload /> {t("chooseAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="form-input form-img-input"
+                      id="audio"
+                      onChange={handleDurationAudio}
+                    />
+                  </div>
+                  {formik.errors.audio && formik.touched.audio ? (
+                    <span className="error">{formik.errors.audio}</span>
+                  ) : null}
+                </Col>
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title" className="form-label">
+                    {t("audios.columns.audio.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="title"
+                    placeholder={t("audios.columns.audio.title")}
+                    name="title"
+                    value={formik.values.title}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="audioCategory" className="form-label">
+                    {t("audios.columns.audio.category")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.audioCategory ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          audioCategory: !toggle.audioCategory,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.audioCategory?.title
+                        ? formik.values.audioCategory?.title
+                        : t("chooseCategory")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.audioCategory ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.audioCategory ? "active" : ""
+                      }`}
+                    >
+                      {audioCategories?.map((category) => (
+                        <button
+                          type="button"
+                          key={category?.id}
+                          className={`item ${
+                            formik.values.audioCategory?.id === category?.id
+                              ? "active"
+                              : ""
+                          }`}
+                          value={category?.id}
+                          name="audioCategory"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              audioCategory: !toggle.audioCategory,
+                            });
+                            formik.setFieldValue("audioCategory", {
+                              title: category.title,
+                              id: category?.id,
+                            });
+                          }}
+                        >
+                          {category.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.audioCategory?.title &&
+                  formik.touched.audioCategory?.title ? (
+                    <span className="error">
+                      {formik.errors.audioCategory?.title}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
+                    <div
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.status === "Private"
+                        ? t("private")
+                        : formik.values.status === "Public"
+                        ? t("public")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </div>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <div
+                        className={`item ${
+                          formik.values.status === "Private" ? "active" : ""
+                        }`}
+                        value="Private"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Private");
+                        }}
+                      >
+                        {t("private")}
+                      </div>
+                      <div
+                        className={`item ${
+                          formik.values.status === "Public" ? "active" : ""
+                        }`}
+                        value="Public"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Public");
+                        }}
+                      >
+                        {t("public")}
+                      </div>
+                    </div>
+                  </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="elder" className="form-label">
+                    {t("audios.columns.elder.name")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.elders ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          elders: !toggle.elders,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-elder d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.elder?.name
+                        ? formik.values.elder?.name
+                        : t("chooseElder")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.elders ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.elders ? "active" : ""
+                      }`}
+                    >
+                      {approvedScholars?.map((scholar) => (
+                        <button
+                          type="button"
+                          key={scholar?.id}
+                          className={`item ${
+                            formik.values.elder?.id === scholar?.id
+                              ? "active"
+                              : ""
+                          }`}
+                          value={scholar?.id}
+                          name="elder"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              elders: !toggle.elders,
+                            });
+                            formik.setFieldValue("elder", {
+                              name: scholar?.name,
+                              id: scholar?.id,
+                            });
+                          }}
+                        >
+                          {scholar?.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.elder?.name && formik.touched.elder?.name ? (
+                    <span className="error">{formik.errors.elder?.name}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("add")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setToggle({
+                        ...toggle,
+                        add: !toggle.add,
+                      });
+                      formik.handleReset();
+                    }}
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
+        </ModalBody>
+      </Modal>
+      {/* Edit audio */}
+      <Modal
+        isOpen={toggle.edit}
+        toggle={() => {
+          setToggle({
+            ...toggle,
+            edit: !toggle.edit,
+            audioCategory: false,
+            status: false,
+            elders: false,
+          });
+          formik.handleReset();
+        }}
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-add-scholar modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() => {
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            formik.handleReset();
+          }}
+        >
+          {t("audios.editTitle")}
+          <IoMdClose
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                edit: !toggle.edit,
+              });
+              formik.handleReset();
+            }}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
+              >
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={
+                        formik.values.image.file === undefined
+                          ? ""
+                          : formik.values.image.file === ""
+                          ? "image"
+                          : ""
+                      }
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values?.image?.preview
+                            ? formik.values.image?.preview
+                            : formik.values.image?.preview === undefined
+                            ? formik.values.image
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values.image.file
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : formik.values.image.file === ""
+                            ? ""
+                            : setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image
+                                ? formik.values.image?.preview
+                                  ? formik.values.image?.preview
+                                  : formik.values.image
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImageAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center mt-4"
+                >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label
+                      htmlFor={
+                        formik.values.audio?.file !== "" &&
+                        formik.values.audio?.preview !== ""
+                          ? ""
+                          : "audio"
+                      }
+                      className="form-label mt-4"
+                    >
+                      <audio
+                        controls
+                        src={
+                          formik.values.audio?.preview
+                            ? formik.values.audio?.preview
+                            : formik.values.audio
+                        }
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="audio" className="form-label">
+                      <FaFileUpload /> {t("chooseAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="form-input form-img-input"
+                      id="audio"
+                      onChange={handleDurationAudio}
+                    />
+                  </div>
+                  {formik.errors.audio && formik.touched.audio ? (
+                    <span className="error">{formik.errors.audio}</span>
+                  ) : null}
+                </Col>
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title" className="form-label">
+                    {t("audios.columns.audio.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="title"
+                    placeholder={t("audios.columns.audio.title")}
+                    name="title"
+                    value={formik.values?.title}
+                    onChange={handleInput}
+                  />
+                  {formik.errors?.title && formik.touched?.title ? (
+                    <span className="error">{formik.errors?.title}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="audioCategory" className="form-label">
+                    {t("audios.columns.audio.category")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.audioCategory ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          audioCategory: !toggle.audioCategory,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.audioCategory?.title
+                        ? formik.values.audioCategory?.title
+                        : t("chooseCategory")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.audioCategory ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.audioCategory ? "active" : ""
+                      }`}
+                    >
+                      {audioCategories?.map((category) => (
+                        <button
+                          type="button"
+                          key={category?.id}
+                          className={`item ${
+                            formik.values.audioCategory?.id === category?.id
+                              ? "active"
+                              : ""
+                          }`}
+                          value={category?.id}
+                          name="audioCategory"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              audioCategory: !toggle.audioCategory,
+                            });
+                            formik.setFieldValue("audioCategory", {
+                              title: category?.title,
+                              id: category?.id,
+                            });
+                          }}
+                        >
+                          {category?.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.audioCategory?.title &&
+                  formik.touched.audioCategory?.title ? (
+                    <span className="error">
+                      {formik.errors.audioCategory?.title}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.status === "Private" ||
+                      formik.values.status === "private"
+                        ? t("private")
+                        : formik.values.status === "Public" ||
+                          formik.values.status === "public"
+                        ? t("public")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Private" ||
+                          formik.values.status === "private"
+                            ? "active"
+                            : ""
+                        }`}
+                        value="Private"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Private");
+                        }}
+                      >
+                        {t("private")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Public" ||
+                          formik.values.status === "public"
+                            ? "active"
+                            : ""
+                        }`}
+                        value="Public"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Public");
+                        }}
+                      >
+                        {t("public")}
+                      </button>
+                    </div>
+                  </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="elder" className="form-label">
+                    {t("audios.columns.elder.name")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.elders ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          elders: !toggle.elders,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-elder d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.elder?.name
+                        ? formik.values.elder?.name
+                        : t("chooseElder")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.elders ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.elders ? "active" : ""
+                      }`}
+                    >
+                      {approvedScholars?.map((scholar) => (
+                        <button
+                          type="button"
+                          key={scholar?.id}
+                          className={`item ${
+                            formik.values.elder?.name === scholar?.name
+                              ? "active"
+                              : ""
+                          }`}
+                          value={scholar?.id}
+                          name="elder"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              elders: !toggle.elders,
+                            });
+                            formik.setFieldValue("elder", {
+                              name: scholar?.name,
+                              id: scholar?.id,
+                            });
+                          }}
+                        >
+                          {scholar?.name}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.elder && formik.touched.elder ? (
+                    <span className="error">{formik.errors.elder}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("save")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
                     onClick={() => {
                       setToggle({
                         ...toggle,
@@ -1134,458 +1596,15 @@ const Audios = () => {
                       });
                       formik.handleReset();
                     }}
-                  />
-                </ModalHeader>
-                <ModalBody>
-                  <form className="overlay-form" onSubmit={formik.handleSubmit}>
-                    <Row className="d-flex justify-content-center align-items-center p-3">
-                      <Col
-                        lg={5}
-                        className="d-flex flex-column justify-content-center align-items-center"
-                      >
-                        <Col
-                          lg={12}
-                          className="d-flex flex-column justify-content-center align-items-center"
-                        >
-                          <div className="image-preview-container d-flex justify-content-center align-items-center">
-                            <label
-                              htmlFor={
-                                formik.values.image.file === undefined
-                                  ? ""
-                                  : formik.values.image.file === ""
-                                  ? "image"
-                                  : ""
-                              }
-                              className="form-label d-flex justify-content-center align-items-center"
-                            >
-                              <img
-                                src={
-                                  formik.values?.image?.preview
-                                    ? formik.values.image?.preview
-                                    : formik.values.image?.preview === undefined
-                                    ? formik.values.image
-                                    : anonymous
-                                }
-                                alt="avatar"
-                                className="image-preview"
-                                style={{
-                                  width: "90px",
-                                  height: "90px",
-                                  objectFit: "cover",
-                                }}
-                                onClick={() =>
-                                  formik.values.image.file
-                                    ? setToggle({
-                                        ...toggle,
-                                        imagePreview: !toggle.imagePreview,
-                                      })
-                                    : formik.values.image.file === ""
-                                    ? ""
-                                    : setToggle({
-                                        ...toggle,
-                                        imagePreview: !toggle.imagePreview,
-                                      })
-                                }
-                              />
-                              <Modal
-                                isOpen={toggle.imagePreview}
-                                toggle={() =>
-                                  setToggle({
-                                    ...toggle,
-                                    imagePreview: !toggle.imagePreview,
-                                  })
-                                }
-                                centered={true}
-                                keyboard={true}
-                                size={"md"}
-                                contentClassName="modal-preview-image modal-add-scholar"
-                              >
-                                <ModalHeader
-                                  toggle={() =>
-                                    setToggle({
-                                      ...toggle,
-                                      imagePreview: !toggle.imagePreview,
-                                    })
-                                  }
-                                >
-                                  <IoMdClose
-                                    onClick={() =>
-                                      setToggle({
-                                        ...toggle,
-                                        imagePreview: !toggle.imagePreview,
-                                      })
-                                    }
-                                  />
-                                </ModalHeader>
-                                <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                                  <img
-                                    src={
-                                      formik.values?.image
-                                        ? formik.values.image?.preview
-                                          ? formik.values.image?.preview
-                                          : formik.values.image
-                                        : anonymous
-                                    }
-                                    alt="avatar"
-                                    className="image-preview"
-                                  />
-                                </ModalBody>
-                                <ModalFooter className="p-md-4 p-2">
-                                  <div className="form-group-container d-flex justify-content-center align-items-center">
-                                    <button
-                                      className="delete-btn cancel-btn"
-                                      onClick={() => {
-                                        setToggle({
-                                          ...toggle,
-                                          imagePreview: !toggle.imagePreview,
-                                        });
-                                        formik.setFieldValue("image", {
-                                          file: "",
-                                          preview: "",
-                                        });
-                                      }}
-                                    >
-                                      حذف
-                                    </button>
-                                  </div>
-                                </ModalFooter>
-                              </Modal>
-                            </label>
-                          </div>
-                          <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                            <label htmlFor="image" className="form-label">
-                              <ImUpload /> اختر صورة الصوتية
-                            </label>
-                            <input
-                              type="file"
-                              accept="image/*"
-                              className="form-input form-img-input"
-                              id="image"
-                              onChange={handleImageChange}
-                            />
-                          </div>
-                          {formik.errors.image && formik.touched.image ? (
-                            <span className="error text-center">
-                              {formik.errors.image}
-                            </span>
-                          ) : null}
-                        </Col>
-                        <Col
-                          lg={12}
-                          className="d-flex flex-column justify-content-center align-items-center mt-4"
-                        >
-                          <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                            <label
-                              htmlFor={
-                                formik.values.audio?.file !== "" &&
-                                formik.values.audio?.preview !== ""
-                                  ? ""
-                                  : "audio"
-                              }
-                              className="form-label mt-4"
-                            >
-                              <audio
-                                controls
-                                src={
-                                  formik.values.audio?.preview
-                                    ? formik.values.audio?.preview
-                                    : formik.values.audio
-                                }
-                              />
-                            </label>
-                          </div>
-                          <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                            <label htmlFor="audio" className="form-label">
-                              <FaFileUpload /> اختر الصوتية
-                            </label>
-                            <input
-                              type="file"
-                              accept="audio/*"
-                              className="form-input form-img-input"
-                              id="audio"
-                              onChange={handleDurationAudio}
-                            />
-                          </div>
-                          {formik.errors.audio && formik.touched.audio ? (
-                            <span className="error">{formik.errors.audio}</span>
-                          ) : null}
-                        </Col>
-                      </Col>
-                      <Col lg={7} className="mb-5">
-                        <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                          <label htmlFor="title" className="form-label">
-                            عنوان الصوتية
-                          </label>
-                          <input
-                            type="text"
-                            className="form-input"
-                            id="title"
-                            placeholder="عنوان الصوتية"
-                            name="title"
-                            value={formik.values?.title}
-                            onChange={handleInput}
-                          />
-                          {formik.errors?.title && formik.touched?.title ? (
-                            <span className="error">
-                              {formik.errors?.title}
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                          <label htmlFor="audioCategory" className="form-label">
-                            التصنيف
-                          </label>
-                          <div
-                            className={`dropdown form-input ${
-                              toggle.audioCategory ? "active" : ""
-                            }`}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  audioCategory: !toggle.audioCategory,
-                                });
-                              }}
-                              className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
-                            >
-                              {formik.values.audioCategory?.title
-                                ? formik.values.audioCategory?.title
-                                : "اختر التصنيف"}
-                              <TiArrowSortedUp
-                                className={`dropdown-icon ${
-                                  toggle.audioCategory ? "active" : ""
-                                }`}
-                              />
-                            </button>
-                            <div
-                              className={`dropdown-content ${
-                                toggle.audioCategory ? "active" : ""
-                              }`}
-                            >
-                              {audioCategories?.map((category) => (
-                                <button
-                                  type="button"
-                                  key={category?.id}
-                                  className={`item ${
-                                    formik.values.audioCategory?.id ===
-                                    category?.id
-                                      ? "active"
-                                      : ""
-                                  }`}
-                                  value={category?.id}
-                                  name="audioCategory"
-                                  onClick={() => {
-                                    setToggle({
-                                      ...toggle,
-                                      audioCategory: !toggle.audioCategory,
-                                    });
-                                    formik.setFieldValue("audioCategory", {
-                                      title: category?.title,
-                                      id: category?.id,
-                                    });
-                                  }}
-                                >
-                                  {category?.title}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                          {formik.errors.audioCategory?.title &&
-                          formik.touched.audioCategory?.title ? (
-                            <span className="error">
-                              {formik.errors.audioCategory?.title}
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                          <label htmlFor="status" className="form-label">
-                            الحالة
-                          </label>
-                          <div
-                            className={`dropdown form-input ${
-                              toggle.status ? "active" : ""
-                            }`}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  status: !toggle.status,
-                                });
-                              }}
-                              className="dropdown-btn d-flex justify-content-between align-items-center"
-                            >
-                              {formik.values.status === "Private" ||
-                              formik.values.status === "private"
-                                ? "خاص"
-                                : formik.values.status === "Public" ||
-                                  formik.values.status === "public"
-                                ? "عام"
-                                : "الحالة"}
-                              <TiArrowSortedUp
-                                className={`dropdown-icon ${
-                                  toggle.status ? "active" : ""
-                                }`}
-                              />
-                            </button>
-                            <div
-                              className={`dropdown-content ${
-                                toggle.status ? "active" : ""
-                              }`}
-                            >
-                              <button
-                                type="button"
-                                className={`item ${
-                                  formik.values.status === "Private" ||
-                                  formik.values.status === "private"
-                                    ? "active"
-                                    : ""
-                                }`}
-                                value="Private"
-                                name="status"
-                                onClick={() => {
-                                  setToggle({
-                                    ...toggle,
-                                    status: false,
-                                  });
-                                  formik.setFieldValue("status", "Private");
-                                }}
-                              >
-                                خاص
-                              </button>
-                              <button
-                                type="button"
-                                className={`item ${
-                                  formik.values.status === "Public" ||
-                                  formik.values.status === "public"
-                                    ? "active"
-                                    : ""
-                                }`}
-                                value="Public"
-                                name="status"
-                                onClick={() => {
-                                  setToggle({
-                                    ...toggle,
-                                    status: false,
-                                  });
-                                  formik.setFieldValue("status", "Public");
-                                }}
-                              >
-                                عام
-                              </button>
-                            </div>
-                          </div>
-                          {formik.errors.status && formik.touched.status ? (
-                            <span className="error">
-                              {formik.errors.status}
-                            </span>
-                          ) : null}
-                        </div>
-                        <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                          <label htmlFor="elder" className="form-label">
-                            العالم
-                          </label>
-                          <div
-                            className={`dropdown form-input ${
-                              toggle.elders ? "active" : ""
-                            }`}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  elders: !toggle.elders,
-                                });
-                              }}
-                              className="dropdown-btn dropdown-btn-elder d-flex justify-content-between align-items-center"
-                            >
-                              {formik.values.elder?.name
-                                ? formik.values.elder?.name
-                                : "اختر العالم"}
-                              <TiArrowSortedUp
-                                className={`dropdown-icon ${
-                                  toggle.elders ? "active" : ""
-                                }`}
-                              />
-                            </button>
-                            <div
-                              className={`dropdown-content ${
-                                toggle.elders ? "active" : ""
-                              }`}
-                            >
-                              {approvedScholars?.map((scholar) => (
-                                <button
-                                  type="button"
-                                  key={scholar?.id}
-                                  className={`item ${
-                                    formik.values.elder?.name === scholar?.name
-                                      ? "active"
-                                      : ""
-                                  }`}
-                                  value={scholar?.id}
-                                  name="elder"
-                                  onClick={() => {
-                                    setToggle({
-                                      ...toggle,
-                                      elders: !toggle.elders,
-                                    });
-                                    formik.setFieldValue("elder", {
-                                      name: scholar?.name,
-                                      id: scholar?.id,
-                                    });
-                                  }}
-                                >
-                                  {scholar?.name}
-                                </button>
-                              ))}
-                            </div>
-                          </div>
-                          {formik.errors.elder && formik.touched.elder ? (
-                            <span className="error">{formik.errors.elder}</span>
-                          ) : null}
-                        </div>
-                      </Col>
-                      <Col lg={12}>
-                        <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                          <button type="submit" className="add-btn">
-                            {/* loading */}
-                            {loading ? (
-                              <span
-                                className="spinner-border spinner-border-sm"
-                                role="status"
-                                aria-hidden="true"
-                              ></span>
-                            ) : (
-                              "حفظ"
-                            )}
-                          </button>
-                          <button
-                            type="button"
-                            className="cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                edit: !toggle.edit,
-                              });
-                              formik.handleReset();
-                            }}
-                          >
-                            الغاء
-                          </button>
-                        </div>
-                      </Col>
-                    </Row>
-                  </form>
-                </ModalBody>
-              </Modal>
-            </tbody>
-          )}
-        </table>
-      </div>
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
+        </ModalBody>
+      </Modal>
       {/* Pagination */}
       {results.length > 0 && error === null && loading === false && (
         <PaginationUI />
@@ -1648,7 +1667,7 @@ const Audios = () => {
   //                 <label
   //                   htmlFor="upload-audio"
   //                   className="form-label d-block mt-2"
-  //                   dir="rtl"
+  //
   //                 >
   //                   <FaFileUpload />
   //                   {audio ? audio.name.split(".")[0] : "اختر ملف"}
@@ -1843,7 +1862,7 @@ const Audios = () => {
   //               <label
   //                 htmlFor="upload-audio"
   //                 className="form-label d-block mt-2"
-  //                 dir="rtl"
+  //
   //               >
   //                 <FaFileUpload />
   //                 {audio ? editAudio.name.split(".")[0] : "اختر ملف"}

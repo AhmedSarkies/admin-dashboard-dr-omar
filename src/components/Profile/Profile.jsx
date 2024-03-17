@@ -13,8 +13,10 @@ import {
 import { object, ref, string } from "yup";
 
 import anonymous from "../../assets/images/anonymous.png";
+import { useTranslation } from "react-i18next";
 
 const Profile = () => {
+  const { t } = useTranslation();
   const [toggle, setToggle] = useState({});
   const changePasswordFormik = useFormik({
     initialValues: {
@@ -102,7 +104,7 @@ const Profile = () => {
                       onChange={handleInputChangePassword}
                     />
                     <label htmlFor="oldPassword" className="label-form">
-                      كلمه المرور القديمة
+                      {t("profile.oldPassword")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -124,7 +126,7 @@ const Profile = () => {
                       onChange={handleInputChangePassword}
                     />
                     <label htmlFor="newPassword" className="label-form">
-                      كلمه المرور الجديدة
+                      {t("profile.newPassword")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -146,7 +148,7 @@ const Profile = () => {
                       onChange={handleInputChangePassword}
                     />
                     <label htmlFor="confirmPassword" className="label-form">
-                      تأكيد كلمه المرور
+                      {t("profile.confirmPassword")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -167,7 +169,7 @@ const Profile = () => {
                         })
                       }
                     >
-                      الغاء
+                      {t("cancel")}
                     </button>
                     <button
                       type="submit"
@@ -179,7 +181,7 @@ const Profile = () => {
                         })
                       }
                     >
-                      تحديث
+                      {t("update")}
                     </button>
                   </div>
                 </form>
@@ -291,7 +293,7 @@ const Profile = () => {
                     </div>
                     <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
                       <label htmlFor="image" className="form-label">
-                        <ImUpload /> اختر صورة
+                        <ImUpload /> {t("chooseImage")}
                       </label>
                       <input
                         type="file"
@@ -307,13 +309,13 @@ const Profile = () => {
                       type="text"
                       className="form-control"
                       id="name"
-                      placeholder="محمد"
+                      placeholder={t("profile.name")}
                       name="name"
                       value={editProfileFormik.values.name}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="name" className="label-form">
-                      الاسم
+                      {t("profile.name")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -329,13 +331,13 @@ const Profile = () => {
                       type="email"
                       className="form-control"
                       id="email"
-                      placeholder="البريد الالكتروني"
+                      placeholder={t("profile.email")}
                       name="email"
                       value={editProfileFormik.values.email}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="email" className="label-form">
-                      البريد الالكتروني
+                      {t("profile.email")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -351,13 +353,13 @@ const Profile = () => {
                       type="text"
                       className="form-control"
                       id="phone"
-                      placeholder="الهاتف"
+                      placeholder={t("profile.phone")}
                       name="phone"
                       value={editProfileFormik.values.phone}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="phone" className="label-form">
-                      الهاتف
+                      {t("profile.phone")}
                     </label>
                   </div>
                   <div className="error-container">
@@ -378,10 +380,10 @@ const Profile = () => {
                         })
                       }
                     >
-                      الغاء
+                      {t("cancel")}
                     </button>
                     <button type="submit" className="add-btn">
-                      تحديث
+                      {t("update")}
                     </button>
                   </div>
                 </form>
@@ -407,7 +409,7 @@ const Profile = () => {
                 <hr />
                 <div className="profile-body">
                   <p>
-                    <span>الاسم</span>
+                    <span>{t("profile.name")}</span>
                     {": "}
                     {editProfileFormik.values.name &&
                     editProfileFormik.values.name
@@ -415,7 +417,7 @@ const Profile = () => {
                       : "محمد"}
                   </p>
                   <p className="email">
-                    <span>البريد الالكتروني</span>
+                    <span>{t("profile.email")}</span>
                     {": "}
                     {editProfileFormik.values.email &&
                     editProfileFormik.values.email
@@ -423,7 +425,7 @@ const Profile = () => {
                       : "admin@gmail.com"}
                   </p>
                   <p>
-                    <span>الهاتف</span>
+                    <span>{t("profile.phone")}</span>
                     {": "}
                     {editProfileFormik.values.phone &&
                     editProfileFormik.values.phone
@@ -441,7 +443,7 @@ const Profile = () => {
                       })
                     }
                   >
-                    تغيير كلمة المرور
+                    {t("profile.changePassword")}
                   </button>
                   <button
                     className="add-btn"
@@ -452,7 +454,7 @@ const Profile = () => {
                       })
                     }
                   >
-                    تعديل
+                    {t("edit")}
                   </button>
                 </div>
               </div>
