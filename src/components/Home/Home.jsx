@@ -4,7 +4,6 @@ import { IoMdHome } from "react-icons/io";
 import { SiGooglescholar } from "react-icons/si";
 import { GiBookshelf, GiSoundWaves } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
-import { FaAssistiveListeningSystems } from "react-icons/fa";
 import {
   MdAdminPanelSettings,
   MdArticle,
@@ -106,11 +105,11 @@ const Home = () => {
       path: "/dr-omar/articles",
       icon: <MdArticle />,
     },
-    {
-      title: t("linkItems.mostListening"),
-      path: "/dr-omar/most-listening",
-      icon: <FaAssistiveListeningSystems />,
-    },
+    // {
+    //   title: t("linkItems.mostListening"),
+    //   path: "/dr-omar/most-listening",
+    //   icon: <FaAssistiveListeningSystems />,
+    // },
   ];
   const [menu, setMenu] = useState(false);
   const location = useLocation();

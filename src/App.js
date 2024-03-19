@@ -7,7 +7,6 @@ import {
   ForgetPassword,
   Home,
   Dashboard,
-  // Profile,
   SubAdmins,
   Messages,
   Settings,
@@ -23,7 +22,6 @@ import {
   Audios,
   Books,
   Images,
-  MostListening,
   CodeContent,
   PrayerTime,
   Links,
@@ -56,7 +54,6 @@ const App = () => {
         <Route path="/dr-omar" element={<Home />}>
           <Route path="*" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          {/* <Route path="profile" element={<Profile />} /> */}
           <Route path="sub-admins" element={<SubAdmins />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
@@ -75,7 +72,6 @@ const App = () => {
           <Route path="audios" element={<Audios />} />
           <Route path="books" element={<Books />} />
           <Route path="images" element={<Images />} />
-          <Route path="most-listening" element={<MostListening />} />
         </Route>
       </Routes>
     </div>

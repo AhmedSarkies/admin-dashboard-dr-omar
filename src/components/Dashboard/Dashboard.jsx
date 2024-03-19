@@ -53,7 +53,7 @@ const Dashboard = () => {
       icon: <SlPicture />,
       path: "/images",
       count: 60,
-      color: "linear-gradient(45deg, rgb(255, 153, 51), rgb(204, 102, 0))",
+      color: "linear-gradient(45deg, rgb(233 30 99), rgb(156 39 176))",
     },
     {
       id: 6,
