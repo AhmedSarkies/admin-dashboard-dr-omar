@@ -68,7 +68,7 @@ const useSchema = () => {
       }),
     }),
     image: object().shape({
-      image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
         }
@@ -131,6 +131,29 @@ const useSchema = () => {
       title: string().required(t("validation.subCategory")),
       bookCategory: object().shape({
         title: string().required(t("validation.mainCategory")),
+      }),
+    }),
+    book: object().shape({
+      title: string().required(t("validation.title")),
+      status: string(),
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
+      bookCategory: object().shape({
+        title: string().required(t("validation.category")),
+      }),
+      book: mixed().test("fileSize", t("validation.book"), (value) => {
+        if (value?.file) {
+          return value?.file?.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
       }),
     }),
   };
