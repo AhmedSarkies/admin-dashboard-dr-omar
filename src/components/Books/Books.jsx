@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -11,14 +9,12 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { FaBookReader, FaEdit, FaFileUpload } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
-
 import {
   getBooksApi,
   getBooks,
@@ -29,50 +25,13 @@ import {
   deleteBookApi,
   deleteBook,
 } from "../../store/slices/bookSlice";
-
-import {
-  getApprovedScholarsApi,
-  getApprovedScholars,
-} from "../../store/slices/scholarSlice";
-
 import { useFormik } from "formik";
-
-import { mixed, object, string } from "yup";
-
 import Swal from "sweetalert2";
-
 import { pdfjs } from "react-pdf";
 import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-
-const validationSchema = object().shape({
-  title: string().required("يجب اختيار عنوان الكتاب"),
-  status: string(),
-  image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
-    if (value.file) {
-      return value.file.size <= 2097152;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
-  Book: mixed().notRequired("required"),
-  // .test("fileSize", "يجب اختيار الكتاب", (value) => {
-  //   if (value.file) {
-  //     return value.file.size > 0;
-  //   }
-  //   if (typeof value === "string") {
-  //     return true;
-  //   }
-  // }),
-  elder: object().shape({
-    name: string().required("يجب اختيار العالم"),
-  }),
-  bookCategory: object().shape({
-    title: string().required("يجب اختيار تصنيف"),
-  }),
-});
+import useSchema from "../../hooks/useSchema";
 
 const initialValues = {
   title: "",
@@ -85,10 +44,6 @@ const initialValues = {
     preview: "",
   },
   status: "",
-  elder: {
-    name: "",
-    id: "",
-  },
   bookCategory: {
     title: "",
     id: "",
@@ -102,10 +57,10 @@ const Books = () => {
   );
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { books, bookCategories, loading, error } = useSelector(
     (state) => state.book
   );
-  const { approvedScholars } = useSelector((state) => state.scholar);
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
@@ -119,8 +74,8 @@ const Books = () => {
     pages: 0,
     activeColumn: false,
     toggleColumns: {
-      imageElder: true,
-      nameElder: true,
+      // imageElder: true,
+      // nameElder: true,
       image: true,
       title: true,
       book: true,
@@ -147,8 +102,8 @@ const Books = () => {
   });
   // Columns
   const columns = [
-    { id: 1, name: "imageElder", label: t("books.columns.elder.image") },
-    { id: 2, name: "nameElder", label: t("books.columns.elder.name") },
+    // { id: 1, name: "imageElder", label: t("books.columns.elder.image") },
+    // { id: 2, name: "nameElder", label: t("books.columns.elder.name") },
     { id: 3, name: "image", label: t("books.columns.book.image") },
     { id: 4, name: "title", label: t("books.columns.book.title") },
     { id: 5, name: "book", label: t("books.columns.book.book") },
@@ -159,19 +114,20 @@ const Books = () => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema,
+    validationSchema: validationSchema.book,
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("name", values.title);
-      formData.append("status", values.status);
       formData.append("file", toggle.pdf.file);
+      formData.append("image", values.image?.file);
       formData.append("categories_id", values.bookCategory?.id);
-      if (values.image.file !== "") {
-        formData.append("image", values.image.file);
-      }
-      if (toggle.pdf.file !== "") {
-        formData.append("file", toggle.pdf.file);
-      }
+      formData.append("status", values.status);
+      // if (values.image.file !== "") {
+      //   formData.append("image", values.image.file);
+      // }
+      // if (toggle.pdf.file !== "") {
+      //   formData.append("file", toggle.pdf.file);
+      // }
       if (values.isEditing) {
         // Update Book
         dispatch(updateBookApi(formData)).then((res) => {
@@ -273,16 +229,20 @@ const Books = () => {
 
   // handle Edit
   const handleEdit = (book) => {
-    formik.handleReset();
-    formik.setValues({
-      ...book,
-      elder: {
-        name: book.elder?.name,
-      },
-      bookCategory: {
-        title: book.bookCategory?.title,
-      },
-      isEditing: true,
+    formik.setValues(book);
+    formik.setFieldValue("title", book?.name);
+    formik.setFieldValue("status", book?.status);
+    formik.setFieldValue("bookCategory", {
+      title: book?.category?.title,
+      id: book?.category?.id,
+    });
+    formik.setFieldValue("image", {
+      file: "",
+      preview: book?.image,
+    });
+    formik.setFieldValue("book", {
+      file: "",
+      preview: book?.file,
     });
     setToggle({
       ...toggle,
@@ -334,11 +294,6 @@ const Books = () => {
       dispatch(getBooksCategoriesApi()).then((res) => {
         if (!res.error && res.payload.length > 0) {
           dispatch(getBooksCategories(res.payload));
-        }
-      });
-      dispatch(getApprovedScholarsApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getApprovedScholars(res.payload));
         }
       });
     } catch (error) {
@@ -429,7 +384,7 @@ const Books = () => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.imageElder && (
+              {/*{toggle.toggleColumns.imageElder && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("books.columns.elder.image")}
                   {toggle.sortColumn === columns[0].name ? (
@@ -452,11 +407,11 @@ const Books = () => {
                     )
                   ) : null}
                 </th>
-              )}
+              )}*/}
               {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[2])}>
+                <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("books.columns.book.image")}
-                  {toggle.sortColumn === columns[2].name ? (
+                  {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -466,9 +421,9 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.title && (
-                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("books.columns.book.title")}
-                  {toggle.sortColumn === columns[3].name ? (
+                  {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -478,9 +433,9 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.book && (
-                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
                   {t("books.columns.book.book")}
-                  {toggle.sortColumn === columns[4].name ? (
+                  {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -490,9 +445,9 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.status && (
-                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
                   {t("status")}
-                  {toggle.sortColumn === columns[5].name ? (
+                  {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -502,9 +457,9 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                <th className="table-th" onClick={() => handleSort(columns[4])}>
                   {t("action")}
-                  {toggle.sortColumn === columns[6].name ? (
+                  {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -519,7 +474,7 @@ const Books = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -537,7 +492,7 @@ const Books = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="5">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -557,7 +512,7 @@ const Books = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -569,7 +524,7 @@ const Books = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="5">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -580,7 +535,7 @@ const Books = () => {
             <tbody>
               {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.imageElder && (
+                  {/*{toggle.toggleColumns.imageElder && (
                     <td className="table-td">
                       <img
                         src={result?.elder?.image}
@@ -596,7 +551,7 @@ const Books = () => {
                   )}
                   {toggle.toggleColumns.nameElder && (
                     <td className="table-td name">{result?.elder?.name}</td>
-                  )}
+                  )}*/}
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
                       <img
@@ -660,9 +615,7 @@ const Books = () => {
                       <span className="table-btn-container">
                         <FaEdit
                           className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                          }}
+                          onClick={() => handleEdit(result)}
                         />
                         <MdDeleteOutline
                           className="delete-btn"
@@ -833,8 +786,8 @@ const Books = () => {
                 <div className="form-group-container d-flex flex-column align-items-end mb-3 w-100">
                   <label
                     htmlFor={
-                      formik.values.book?.file !== "" &&
-                      formik.values.book?.preview !== ""
+                      formik.values?.book?.file !== "" &&
+                      formik.values?.book?.preview !== ""
                         ? ""
                         : "book"
                     }
@@ -1025,7 +978,7 @@ const Books = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                {/* <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
                   <label htmlFor="elder" className="form-label">
                     {t("books.columns.elder.name")}
                   </label>
@@ -1088,7 +1041,7 @@ const Books = () => {
                   {formik.errors.elder?.name && formik.touched.elder?.name ? (
                     <span className="error">{formik.errors.elder?.name}</span>
                   ) : null}
-                </div>
+                </div> */}
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
@@ -1281,18 +1234,18 @@ const Books = () => {
                 <div className="form-group-container d-flex flex-column align-items-end mb-3 w-100">
                   <label
                     htmlFor={
-                      formik.values.book?.file !== "" &&
-                      formik.values.book?.preview !== ""
+                      formik.values?.book?.file !== "" &&
+                      formik.values?.book?.preview !== ""
                         ? ""
                         : "book"
                     }
                     className="form-label mt-4"
                   >
                     <iframe
-                      src={toggle?.pdf?.preview}
-                      title={toggle?.pdf?.file?.name}
+                      src={formik.values?.Book}
+                      title={formik.values?.name}
                       width="100%"
-                      height={toggle.pdf?.preview ? "500px" : "0"}
+                      height="500px"
                     />
                   </label>
                 </div>
@@ -1480,7 +1433,7 @@ const Books = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                {/* <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
                   <label htmlFor="elder" className="form-label">
                     {t("books.columns.elder.name")}
                   </label>
@@ -1543,7 +1496,7 @@ const Books = () => {
                   {formik.errors.elder && formik.touched.elder ? (
                     <span className="error">{formik.errors.elder}</span>
                   ) : null}
-                </div>
+                </div> */}
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">

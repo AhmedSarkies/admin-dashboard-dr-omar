@@ -8,41 +8,44 @@ const contactFields = [
     name: "facebook",
   },
   {
-    name: "twitter",
+    name: "whatsapp",
+  },
+  {
+    name: "messenger",
   },
   {
     name: "instagram",
   },
-  {
-    name: "snapchat",
-  },
-  {
-    name: "linkedin",
-  },
-  {
-    name: "youtube",
-  },
-  {
-    name: "tikTok",
-  },
-  {
-    name: "whatsapp",
-  },
-  {
-    name: "telegram",
-  },
-  {
-    name: "phone",
-  },
-  {
-    name: "email",
-  },
-  {
-    name: "address",
-  },
-  {
-    name: "map",
-  },
+  // {
+  //   name: "twitter",
+  // },
+  // {
+  //   name: "snapchat",
+  // },
+  // {
+  //   name: "linkedin",
+  // },
+  // {
+  //   name: "youtube",
+  // },
+  // {
+  //   name: "tikTok",
+  // },
+  // {
+  //   name: "telegram",
+  // },
+  // {
+  //   name: "phone",
+  // },
+  // {
+  //   name: "email",
+  // },
+  // {
+  //   name: "address",
+  // },
+  // {
+  //   name: "map",
+  // },
 ];
 
 const appFields = [
