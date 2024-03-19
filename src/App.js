@@ -1,52 +1,33 @@
+/* eslint-disable no-unused-vars */
 import { Navigate, Route, Routes } from "react-router-dom";
-import i18n from "i18next";
-import { initReactI18next } from "react-i18next";
-import LanguageDetector from "i18next-browser-languagedetector";
-import HttpApi from "i18next-http-backend";
+import locale from "./utils/locale";
 import {
-  Login,
-  Dashboard,
-  ForgetPassword,
-  Elder,
-  Home,
   LoginLayout,
+  Login,
+  ForgetPassword,
+  Home,
+  Dashboard,
+  Profile,
+  SubAdmins,
+  Messages,
+  Settings,
+  Slider,
+  TermsAndConditions,
   CategoriesArticle,
   CategoriesImage,
   CategoriesAudio,
   CategoriesBook,
   SubCategoriesBook,
+  Elder,
   Articles,
   Audios,
   Books,
   Images,
-  Profile,
-  Messages,
-  SubAdmins,
   MostListening,
+  CodeContent,
+  PrayerTime,
+  Links,
 } from "./components";
-
-i18n
-  .use(initReactI18next)
-  .use(LanguageDetector)
-  .use(HttpApi)
-  .init({
-    fallbackLng: "en",
-    detection: {
-      order: [
-        "cookie",
-        "htmlTag",
-        "path",
-        "localStorage",
-        "sessionStorage",
-        "navigator",
-        "subdomain",
-      ],
-      caches: ["cookie"],
-    },
-    backend: {
-      loadPath: "/locale/{{lng}}/translation.json",
-    },
-  });
 
 const App = () => {
   return (
@@ -75,19 +56,25 @@ const App = () => {
         <Route path="/dr-omar" element={<Home />}>
           <Route path="*" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="elder" element={<Elder />} />
+          <Route path="profile" element={<Profile />} />
+          <Route path="sub-admins" element={<SubAdmins />} />
+          <Route path="messages" element={<Messages />} />
+          <Route path="settings" element={<Settings />} />
+          <Route path="prayer-time" element={<PrayerTime />} />
+          <Route path="code-content" element={<CodeContent />} />
+          <Route path="slider" element={<Slider />} />
+          <Route path="terms&conditions" element={<TermsAndConditions />} />
+          <Route path="links" element={<Links />} />
           <Route path="categories-article" element={<CategoriesArticle />} />
           <Route path="categories-image" element={<CategoriesImage />} />
           <Route path="categories-audio" element={<CategoriesAudio />} />
           <Route path="main-categories-book" element={<CategoriesBook />} />
           <Route path="sub-categories-book" element={<SubCategoriesBook />} />
+          <Route path="elder" element={<Elder />} />
           <Route path="articles" element={<Articles />} />
           <Route path="audios" element={<Audios />} />
           <Route path="books" element={<Books />} />
           <Route path="images" element={<Images />} />
-          <Route path="profile" element={<Profile />} />
-          <Route path="sub-admins" element={<SubAdmins />} />
-          <Route path="messages" element={<Messages />} />
           <Route path="most-listening" element={<MostListening />} />
         </Route>
       </Routes>

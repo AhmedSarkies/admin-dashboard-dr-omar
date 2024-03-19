@@ -8,8 +8,8 @@ import store from "./store/store.js";
 
 import { ToastContainer } from "react-toastify";
 
-// eslint-disable-next-line no-unused-vars
-import { Chart as ChartJS } from "chart.js/auto";
+// // eslint-disable-next-line no-unused-vars
+// import { Chart as ChartJS } from "chart.js/auto";
 
 import App from "./App";
 
