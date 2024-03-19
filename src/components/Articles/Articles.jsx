@@ -17,9 +17,7 @@ import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { FaEdit } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose, IoMdEye } from "react-icons/io";
-
 import anonymous from "../../assets/images/anonymous.png";
-
 import {
   deleteArticleApi,
   getArticles,
@@ -34,38 +32,12 @@ import {
   getApprovedScholarsApi,
   getApprovedScholars,
 } from "../../store/slices/scholarSlice";
-
 import { useFormik } from "formik";
-
-import { mixed, object, string } from "yup";
-
 import Swal from "sweetalert2";
-
 import { toast } from "react-toastify";
-
-import useFiltration from "../../hooks/useFiltration";
+import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
 
-const validationSchema = object().shape({
-  title: string().required("يجب ادخال عنوان المقال"),
-  status: string(),
-  // Validation for image file must be uploaded with the form or just string
-  image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
-    if (value.file) {
-      return value.file.size <= 2097152;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
-  content: string(),
-  elder: object().shape({
-    name: string().required("يجب ادخال اسم العالم"),
-  }),
-  articleCategories: object().shape({
-    title: string().required("يجب ادخال تصنيف المقال"),
-  }),
-});
 const initialValues = {
   image: {
     file: "",
@@ -81,12 +53,13 @@ const initialValues = {
     title: "",
     id: "",
   },
-  status: "الحالة",
+  status: "",
 };
 
 const Articles = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { articles, articleCategories, loading, error } = useSelector(
     (state) => state.article
   );
@@ -108,6 +81,7 @@ const Articles = () => {
       content: true,
       category: true,
       status: true,
+      visitCount: true,
       control: true,
     },
     sortColumn: "",
@@ -126,7 +100,8 @@ const Articles = () => {
     { id: 5, name: "content", label: t("articles.columns.article") },
     { id: 6, name: "category", label: t("articles.columns.category") },
     { id: 7, name: "status", label: t("status") },
-    { id: 8, name: "control", label: t("action") },
+    { id: 8, name: "visitCount", label: t("visits") },
+    { id: 9, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -143,7 +118,7 @@ const Articles = () => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema,
+    validationSchema: validationSchema.article,
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("title", values.title);
@@ -171,7 +146,6 @@ const Articles = () => {
         ) {
           setToggle({ ...toggle, edit: !toggle.edit });
           toast.error(t("noChange"));
-          return;
         } else {
           formData.append("id", values.id);
           if (values.image.file !== "") {
@@ -242,8 +216,8 @@ const Articles = () => {
         id: article?.elder?.id,
       },
       articleCategories: {
-        title: article?.articleCategories?.title,
-        id: article?.articleCategories?.id,
+        title: article?.Category?.title,
+        id: article?.Category?.id,
       },
       status: article?.status,
     });
@@ -472,10 +446,22 @@ const Articles = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.visitCount && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("action")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -490,7 +476,7 @@ const Articles = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -508,7 +494,7 @@ const Articles = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -528,7 +514,7 @@ const Articles = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -540,7 +526,7 @@ const Articles = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -592,8 +578,8 @@ const Articles = () => {
                         : result?.content}
                     </td>
                   )}
-                  {toggle.toggleColumns.title && (
-                    <td className="table-td title">{result?.category}</td>
+                  {toggle.toggleColumns.category && (
+                    <td className="table-td title">{result?.Category.title}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
@@ -615,6 +601,9 @@ const Articles = () => {
                           : t("private")}
                       </span>
                     </td>
+                  )}
+                  {toggle.toggleColumns.visitCount && (
+                    <td className="table-td">{result?.visit_count}</td>
                   )}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
@@ -1020,9 +1009,7 @@ const Articles = () => {
                     <span className="error">{formik.errors.elder?.name}</span>
                   ) : null}
                 </div>
-              </Col>
-              <Col lg={12} className="mb-3">
-                <div className="form-group-container d-flex flex-column align-items-end gap-3">
+                <div className="form-group-container d-flex flex-column align-items-end mt-3">
                   <label htmlFor="content" className="form-label">
                     {t("articles.columns.article")}
                   </label>
@@ -1034,10 +1021,10 @@ const Articles = () => {
                     value={formik.values.content}
                     onChange={handleInput}
                   ></textarea>
+                  {formik.errors.content && formik.touched.content ? (
+                    <span className="error">{formik.errors.content}</span>
+                  ) : null}
                 </div>
-                {formik.errors.content && formik.touched.content ? (
-                  <span className="error">{formik.errors.content}</span>
-                ) : null}
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
@@ -1386,7 +1373,7 @@ const Articles = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="elder" className="form-label">
                     {t("elder")}
                   </label>
@@ -1448,9 +1435,7 @@ const Articles = () => {
                     <span className="error">{formik.errors.elder?.name}</span>
                   ) : null}
                 </div>
-              </Col>
-              <Col lg={12} className="mb-3">
-                <div className="form-group-container d-flex flex-column align-items-end gap-3">
+                <div className="form-group-container d-flex flex-column align-items-end">
                   <label htmlFor="content" className="form-label">
                     {t("articles.columns.article")}
                   </label>
@@ -1462,10 +1447,10 @@ const Articles = () => {
                     value={formik.values.content}
                     onChange={handleInput}
                   ></textarea>
+                  {formik.errors.content && formik.touched.content ? (
+                    <span className="error">{formik.errors.content}</span>
+                  ) : null}
                 </div>
-                {formik.errors.content && formik.touched.content ? (
-                  <span className="error">{formik.errors.content}</span>
-                ) : null}
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">

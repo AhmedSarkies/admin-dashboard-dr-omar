@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-
 import {
   getBooksSubCategoriesApi,
   getBooksSubCategories,
@@ -19,20 +15,17 @@ import {
   getBooksCategories,
   getBooksCategoriesApi,
 } from "../../store/slices/bookSlice";
-
 import { useFormik } from "formik";
-
-import { object, string } from "yup";
-
 import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useFiltration, useSchema } from "../../hooks";
 
 const SubCategoriesBook = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { bookSubCategories, bookCategories, loading, error } = useSelector(
     (state) => state.book
   );
@@ -80,12 +73,7 @@ const SubCategoriesBook = () => {
         ID_Main_Category: "",
       },
     },
-    validationSchema: object().shape({
-      title: string().required("يجب ادخال عنوان التصنيف الفرعي"),
-      bookCategory: object().shape({
-        title: string().required("يجب اختيار التصنيف الرئيسي"),
-      }),
-    }),
+    validationSchema: validationSchema.bookSubCategory,
     onSubmit: (values) => {
       if (values.isEditing) {
         dispatch(
@@ -366,23 +354,27 @@ const SubCategoriesBook = () => {
           {/* Data */}
           {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((bookCategory) => (
-                <tr key={bookCategory?.id + new Date().getDate()}>
-                  <td className="table-td name">{bookCategory?.title}</td>
-                  <td className="table-td">
-                    <span className="table-btn-container">
-                      <FaEdit
-                        className="edit-btn"
-                        onClick={() => {
-                          handleEdit(bookCategory);
-                        }}
-                      />
-                      <MdDeleteOutline
-                        className="delete-btn"
-                        onClick={() => handleDelete(bookCategory)}
-                      />
-                    </span>
-                  </td>
+              {results?.map((result) => (
+                <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.title && (
+                    <td className="table-td name">{result?.title}</td>
+                  )}
+                  {toggle.toggleColumns?.control && (
+                    <td className="table-td">
+                      <span className="table-btn-container">
+                        <FaEdit
+                          className="edit-btn"
+                          onClick={() => {
+                            handleEdit(result);
+                          }}
+                        />
+                        <MdDeleteOutline
+                          className="delete-btn"
+                          onClick={() => handleDelete(result)}
+                        />
+                      </span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -611,75 +603,6 @@ const SubCategoriesBook = () => {
                   />
                   {formik.errors.title && formik.touched.title ? (
                     <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12} className="mb-5">
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="bookCategories" className="form-label">
-                    {t("mainCategoriesBooks.columns.category")}
-                  </label>
-                  <div
-                    className={`dropdown form-input ${
-                      toggle.isBookCategories ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          isBookCategories: !toggle.isBookCategories,
-                        });
-                      }}
-                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.bookCategory?.title
-                        ? formik.values.bookCategory?.title
-                        : t("chooseCategory")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.isBookCategories ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.isBookCategories ? "active" : ""
-                      }`}
-                    >
-                      {bookCategories?.map((category) => (
-                        <button
-                          type="button"
-                          key={category?.id}
-                          className={`item ${
-                            formik.values.bookCategory?.id === category?.id
-                              ? "active"
-                              : ""
-                          }`}
-                          value={category?.id}
-                          name="bookCategory"
-                          onClick={() => {
-                            setToggle({
-                              ...toggle,
-                              isBookCategories: !toggle.isBookCategories,
-                            });
-                            formik.setFieldValue("bookCategory", {
-                              title: category.title,
-                              id: category?.id,
-                            });
-                          }}
-                        >
-                          {category.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  {formik.errors.bookCategory?.title &&
-                  formik.touched.bookCategory?.title ? (
-                    <span className="error">
-                      {formik.errors.bookCategory?.title}
-                    </span>
                   ) : null}
                 </div>
               </Col>

@@ -2,10 +2,9 @@ import React, { useEffect, useState } from "react";
 
 import { IoMdHome } from "react-icons/io";
 import { SiGooglescholar } from "react-icons/si";
-import { BiCategory } from "react-icons/bi";
 import { GiBookshelf, GiSoundWaves } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
-import { IoPerson, IoPeople } from "react-icons/io5";
+import { IoPerson } from "react-icons/io5";
 import { FaAssistiveListeningSystems } from "react-icons/fa";
 import { IoIosDocument } from "react-icons/io";
 
@@ -14,7 +13,7 @@ import { Header, Sidebar } from "../";
 import logo from "../../assets/images/logo.jpg";
 
 import { Outlet, useLocation } from "react-router-dom";
-import { MdOutlineMarkunread } from "react-icons/md";
+import { MdAdminPanelSettings, MdOutlineMarkunread } from "react-icons/md";
 import { useTranslation } from "react-i18next";
 
 const Home = () => {
@@ -33,7 +32,7 @@ const Home = () => {
     {
       title: t("linkItems.subAdmins"),
       path: "/dr-omar/sub-admins",
-      icon: <IoPeople />,
+      icon: <MdAdminPanelSettings />,
     },
     {
       title: t("linkItems.messages"),
@@ -41,19 +40,53 @@ const Home = () => {
       icon: <MdOutlineMarkunread />,
     },
     {
-      title: t("linkItems.elder"),
-      path: "/dr-omar/elder",
-      icon: <SiGooglescholar />,
+      title: t("linkItems.settingsApp"),
+      path: "/dr-omar/settings",
+    },
+    {
+      title: t("linkItems.prayerTime"),
+      path: "/dr-omar/prayer-time",
+    },
+    {
+      title: t("linkItems.codeContent"),
+      path: "/dr-omar/code-content",
+    },
+    {
+      title: t("linkItems.slider"),
+      path: "/dr-omar/slider",
+    },
+    {
+      title: t("linkItems.termsAndConditions"),
+      path: "/dr-omar/terms&conditions",
+    },
+    {
+      title: t("linkItems.links"),
+      path: "/dr-omar/links",
     },
     {
       title: t("linkItems.mainCategoriesBooks"),
       path: "/dr-omar/main-categories-book",
-      icon: <BiCategory />,
     },
     {
       title: t("linkItems.subCategoriesBooks"),
       path: "/dr-omar/sub-categories-book",
-      icon: <BiCategory />,
+    },
+    {
+      title: t("linkItems.categoriesAudio"),
+      path: "/dr-omar/categories-audio",
+    },
+    {
+      title: t("linkItems.categoriesImage"),
+      path: "/dr-omar/categories-image",
+    },
+    {
+      title: t("linkItems.categoriesArticle"),
+      path: "/dr-omar/categories-article",
+    },
+    {
+      title: t("linkItems.elder"),
+      path: "/dr-omar/elder",
+      icon: <SiGooglescholar />,
     },
     {
       title: t("linkItems.books"),
@@ -61,29 +94,14 @@ const Home = () => {
       icon: <GiBookshelf />,
     },
     {
-      title: t("linkItems.categoriesAudio"),
-      path: "/dr-omar/categories-audio",
-      icon: <BiCategory />,
-    },
-    {
       title: t("linkItems.audios"),
       path: "/dr-omar/audios",
       icon: <GiSoundWaves />,
     },
     {
-      title: t("linkItems.categoriesImage"),
-      path: "/dr-omar/categories-image",
-      icon: <BiCategory />,
-    },
-    {
       title: t("linkItems.images"),
       path: "/dr-omar/images",
       icon: <SlPicture />,
-    },
-    {
-      title: t("linkItems.categoriesArticle"),
-      path: "/dr-omar/categories-article",
-      icon: <BiCategory />,
     },
     {
       title: t("linkItems.articles"),

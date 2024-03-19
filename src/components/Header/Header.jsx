@@ -38,7 +38,12 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
         </div>
         <div className="dashboard-header-title">
           <h6 className="login-title">
-            {linkItems.find((item) => item.path === location.pathname)?.title}
+            {
+              linkItems.find(
+                (item) =>
+                  item.path.toLowerCase() === location.pathname.toLowerCase()
+              )?.title
+            }
           </h6>
           <button className="btn menu-btn" onClick={toggleMenu}>
             <MdMenu />

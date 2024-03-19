@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -11,51 +9,23 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline, MdRemoveRedEye } from "react-icons/md";
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 import { FaPen } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";
-
 import anonymous from "../../assets/images/anonymous.png";
-
 import {
   deleteSubAdminApi,
   getSubAdmins,
   getSubAdminsApi,
   addSubAdminApi,
-  updateSubAdminApi,
 } from "../../store/slices/subAdminSlice";
-
 import { useFormik } from "formik";
-
-import { mixed, object, string } from "yup";
-
 import Swal from "sweetalert2";
-
 import { toast } from "react-toastify";
-
-import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
-
-const validationSchema = object().shape({
-  name: string().required("يجب ادخال اسم مسؤول الفرع"),
-  email: string()
-    .email("Invalid email")
-    .required("يجب ادخال البريد الالكتروني"),
-  phone: string().required("يجب ادخال رقم الهاتف"),
-  status: string(),
-  // Validation for image file must be uploaded with the form or just string
-  image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
-    if (value.file) {
-      return value.file.size <= 2097152;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
-});
+import { useFiltration, useSchema } from "../../hooks";
 
 const initialValues = {
   image: {
@@ -71,6 +41,7 @@ const initialValues = {
 const SubAdmins = ({ dashboard }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({
     add: false,
@@ -97,7 +68,7 @@ const SubAdmins = ({ dashboard }) => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema,
+    validationSchema: validationSchema.subAdmins,
     onSubmit: (values) => {
       // if email and phone is already exist with another scholar if just i change them to new values
       if (subAdmins.length > 0) {
@@ -117,68 +88,85 @@ const SubAdmins = ({ dashboard }) => {
         }
       }
       const formData = new FormData();
+      // formData.append("name", formik.values.name);
+      // formData.append("email", formik.values.email);
+      // formData.append("phone", formik.values.phone);
+      // formData.append("password", formik.values.password);
+      // formData.append(
+      //   "status",
+      //   formik.values.status === "Inactive"
+      //     ? "Inactive"
+      //     : formik.values.status === "Active"
+      //     ? "Active"
+      //     : "Inactive"
+      // );
+      // if (values.id) {
+      //   // if the scholar don't change anything even the image
+      //   const scholar = subAdmins.find((scholar) => scholar.id === values.id);
+      //   if (
+      //     scholar.name === values.name &&
+      //     scholar.email === values.email &&
+      //     scholar.phone === values.phone &&
+      //     scholar.status === values.status &&
+      //     scholar.image === values.image
+      //   ) {
+      //     setToggle({
+      //       ...toggle,
+      //       edit: !toggle.edit,
+      //     });
+      //     toast.error(t("noChange"));
+      //     return;
+      //   } else {
+      //     formData.append("id", values.id);
+      //     if (values.image.file !== undefined) {
+      //       formData.append("image", values.image.file);
+      //     }
+      //     dispatch(updateSubAdminApi(formData)).then((res) => {
+      //       dispatch(getSubAdminsApi());
+      //       if (!res.error) {
+      //         formik.handleReset();
+      //         setToggle({
+      //           ...toggle,
+      //           edit: !toggle.edit,
+      //         });
+      //         toast.success(t("toast.subAdmin.editSuccess"));
+      //       } else {
+      //         toast.error(t("toast.subAdmin.editError"));
+      //       }
+      //     });
+      //   }
+      // } else {
+      //   formData.append("image", formik.values.image.file);
+      //   dispatch(addSubAdminApi(formData)).then((res) => {
+      //     dispatch(getSubAdminsApi());
+      //     if (!res.error) {
+      //       toast.success(t("toast.subAdmin.addSuccess"));
+      //       formik.handleReset();
+      //       setToggle({
+      //         ...toggle,
+      //         add: !toggle.add,
+      //       });
+      //     } else {
+      //       toast.error(t("toast.subAdmin.addError"));
+      //     }
+      //   });
+      // }
       formData.append("name", formik.values.name);
       formData.append("email", formik.values.email);
-      formData.append("phone", formik.values.phone);
-      formData.append(
-        "status",
-        formik.values.status === "Inactive"
-          ? "Inactive"
-          : formik.values.status === "Active"
-          ? "Active"
-          : "Inactive"
-      );
-      if (values.id) {
-        // if the scholar don't change anything even the image
-        const scholar = subAdmins.find((scholar) => scholar.id === values.id);
-        if (
-          scholar.name === values.name &&
-          scholar.email === values.email &&
-          scholar.phone === values.phone &&
-          scholar.status === values.status &&
-          scholar.image === values.image
-        ) {
+      formData.append("password", formik.values.password);
+      dispatch(addSubAdminApi(formData)).then((res) => {
+        dispatch(getSubAdminsApi());
+        if (!res.error) {
+          toast.success(t("toast.subAdmin.addSuccess"));
+          formik.handleReset();
           setToggle({
             ...toggle,
-            edit: !toggle.edit,
+            add: !toggle.add,
           });
-          toast.error(t("noChange"));
-          return;
         } else {
-          formData.append("id", values.id);
-          if (values.image.file !== undefined) {
-            formData.append("image", values.image.file);
-          }
-          dispatch(updateSubAdminApi(formData)).then((res) => {
-            dispatch(getSubAdminsApi());
-            if (!res.error) {
-              formik.handleReset();
-              setToggle({
-                ...toggle,
-                edit: !toggle.edit,
-              });
-              toast.success(t("toast.subAdmin.editSuccess"));
-            } else {
-              toast.error(t("toast.subAdmin.editError"));
-            }
-          });
+          toast.error(t("toast.subAdmin.addError"));
         }
-      } else {
-        formData.append("image", formik.values.image.file);
-        dispatch(addSubAdminApi(formData)).then((res) => {
-          dispatch(getSubAdminsApi());
-          if (!res.error) {
-            toast.success(t("toast.subAdmin.addSuccess"));
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          } else {
-            toast.error(t("toast.subAdmin.addError"));
-          }
-        });
-      }
+      });
     },
   });
 
@@ -788,6 +776,23 @@ const SubAdmins = ({ dashboard }) => {
                     <span className="error">{formik.errors.phone}</span>
                   ) : null}
                 </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="password" className="form-label">
+                    {t("subAdmin.columns.password")}
+                  </label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    id="password"
+                    placeholder="********"
+                    name="password"
+                    value={formik.values?.password}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.password && formik.touched.password ? (
+                    <span className="error">{formik.errors.password}</span>
+                  ) : null}
+                </div>
                 <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
@@ -1088,6 +1093,23 @@ const SubAdmins = ({ dashboard }) => {
                   />
                   {formik.errors.phone && formik.touched.phone ? (
                     <span className="error">{formik.errors.phone}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="password" className="form-label">
+                    {t("auth.login.password")}
+                  </label>
+                  <input
+                    type="password"
+                    className="form-input"
+                    id="password"
+                    placeholder="********"
+                    name="password"
+                    value={formik.values?.password}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.password && formik.touched.password ? (
+                    <span className="error">{formik.errors.password}</span>
                   ) : null}
                 </div>
                 <div className="form-group-container d-flex flex-column justify-content-center align-items-end">

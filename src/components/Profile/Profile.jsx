@@ -73,12 +73,16 @@ const Profile = () => {
 
   // Handle Image Change
   const handleImageChange = (e) => {
-    const file = e.currentTarget.files[0];
-    if (file) {
-      editProfileFormik.setFieldValue("image", {
-        file: file,
-        preview: URL.createObjectURL(file),
-      });
+    try {
+      const file = e.currentTarget.files[0];
+      if (file) {
+        editProfileFormik.setFieldValue("image", {
+          file: file,
+          preview: URL.createObjectURL(file),
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   };
 

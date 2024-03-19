@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-
 import {
   getArticlesCategoriesApi,
   getArticlesCategories,
@@ -17,13 +13,9 @@ import {
   updateArticleCategory,
   deleteArticleCategory,
 } from "../../store/slices/articleSlice";
-
 import { useFormik } from "formik";
-
-import { object, string } from "yup";
-
 import Swal from "sweetalert2";
-import useFiltration from "../../hooks/useFiltration";
+import {useFiltration, useSchema} from "../../hooks";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -31,6 +23,7 @@ import { toast } from "react-toastify";
 const CategoriesArticle = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { articleCategories, loading, error } = useSelector(
     (state) => state.article
   );
@@ -65,15 +58,12 @@ const CategoriesArticle = () => {
     { id: 0, name: "title", label: t("categories.columns.category") },
     { id: 1, name: "control", label: t("action") },
   ];
-
   // Formik
   const formik = useFormik({
     initialValues: {
       title: "",
     },
-    validationSchema: object().shape({
-      title: string().required("يجب ادخال عنوان التصنيف"),
-    }),
+    validationSchema: validationSchema.category,
     onSubmit: (values) => {
       if (values.isEditing) {
         dispatch(

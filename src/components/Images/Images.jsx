@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -15,7 +13,6 @@ import anonymous from "../../assets/images/anonymous.png";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-
 import {
   getPicturesApi,
   addPictureApi,
@@ -28,21 +25,18 @@ import {
   getPicturesCategoriesApi,
   getPicturesCategories,
 } from "../../store/slices/pictureSlice";
-
 import { useFormik } from "formik";
-
-import { mixed, object, string } from "yup";
-
 import Swal from "sweetalert2";
 import { ImUpload } from "react-icons/im";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useFiltration, useSchema } from "../../hooks";
 
 const Images = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { pictures, pictureCategories, loading, error } = useSelector(
     (state) => state.picture
   );
@@ -100,22 +94,8 @@ const Images = () => {
         id: "",
       },
     },
-    validationSchema: object().shape({
-      image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
-        if (value.file) {
-          return value.file.size <= 2097152;
-        }
-        if (typeof value === "string") {
-          return true;
-        }
-      }),
-    }),
-    status: string(),
-    pictureCategory: object().shape({
-      title: string().required("يجب اختيار تصنيف"),
-    }),
+    validationSchema: validationSchema.image,
     onSubmit: (values) => {
-      console.log(values);
       const formData = new FormData();
       formData.append("status", values.status);
       formData.append("id", values.id);

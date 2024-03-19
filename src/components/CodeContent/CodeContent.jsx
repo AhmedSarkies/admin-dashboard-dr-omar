@@ -1,33 +1,38 @@
 import React, { useEffect, useState } from "react";
+import { useFormik } from "formik";
+import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import {
-  getBooksCategoriesApi,
-  getBooksCategories,
-  addBookCategoryApi,
-  updateBookCategoryApi,
-  deleteBookCategoryApi,
-  updateBookCategory,
-  deleteBookCategory,
-} from "../../store/slices/bookSlice";
-import { useFormik } from "formik";
+  getCodeContentsApi,
+  getCodeContents,
+  deleteCodeContentApi,
+  deleteCodeContent,
+} from "../../store/slices/codeContentSlice";
 import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { useFiltration, useSchema } from "../../hooks";
-import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useFiltration } from "../../hooks";
 
-const CategoriesBook = () => {
+const CodeContent = () => {
   const { t } = useTranslation();
+  const formik = useFormik({
+    initialValues: {},
+    onSubmit: (values) => {
+      console.log(values);
+    },
+  });
   const dispatch = useDispatch();
-  const { validationSchema } = useSchema();
-  const { bookCategories, loading, error } = useSelector((state) => state.book);
+  const { codeContent, loading, error } = useSelector(
+    (state) => state.codeContent
+  );
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
+    isBookCategories: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -36,7 +41,9 @@ const CategoriesBook = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
-      title: true,
+      code: true,
+      content: true,
+      email: true,
       control: true,
     },
   });
@@ -44,8 +51,22 @@ const CategoriesBook = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 1, name: "title", label: t("mainCategoriesBooks.columns.category") },
-    { id: 2, name: "control", label: t("action") },
+    {
+      id: 1,
+      name: "email",
+      label: t("settings.settingsApp.codeContent.columns.email"),
+    },
+    {
+      id: 2,
+      name: "code",
+      label: t("settings.settingsApp.codeContent.columns.code"),
+    },
+    {
+      id: 3,
+      name: "content",
+      label: t("settings.settingsApp.codeContent.columns.content"),
+    },
+    { id: 4, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -54,55 +75,18 @@ const CategoriesBook = () => {
     handleToggleColumns,
     results,
   } = useFiltration({
-    rowData: bookCategories,
+    rowData: codeContent,
     toggle,
     setToggle,
   });
 
-  // Formik
-  const formik = useFormik({
-    initialValues: {
-      title: "",
-    },
-    validationSchema: validationSchema.category,
-    onSubmit: (values) => {
-      if (values.isEditing) {
-        dispatch(
-          updateBookCategoryApi({ id: values.id, title: values.title })
-        ).then((res) => {
-          if (!res.error) {
-            dispatch(updateBookCategory(res.meta.arg));
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-            toast.success(t("toast.category.updatedSuccess"));
-          } else {
-            toast.error(t("toast.category.updatedError"));
-          }
-        });
-      } else {
-        dispatch(addBookCategoryApi(values)).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksCategoriesApi());
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-            toast.success(t("toast.category.addedSuccess"));
-          } else {
-            toast.error(t("toast.category.addedError"));
-          }
-        });
-      }
-    },
-  });
+  const handleInputChange = (e) => {
+    formik.handleChange(e);
+  };
 
   // Handle Edit Book Category
-  const handleEdit = (bookCategory) => {
-    formik.setValues({ ...bookCategory, isEditing: true });
+  const handleEdit = (bookSubCategory) => {
+    formik.setValues({ ...bookSubCategory, isEditing: true });
     setToggle({
       ...toggle,
       edit: !toggle.edit,
@@ -110,9 +94,9 @@ const CategoriesBook = () => {
   };
 
   // Delete Book Category
-  const handleDelete = (bookCategory) => {
+  const handleDelete = (bookSubCategory) => {
     Swal.fire({
-      title: t("titleDeleteAlert") + bookCategory?.title + "?",
+      title: t("titleDeleteAlert") + bookSubCategory?.title + "?",
       text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
@@ -122,12 +106,12 @@ const CategoriesBook = () => {
       cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteBookCategoryApi(bookCategory?.id)).then((res) => {
+        dispatch(deleteCodeContentApi(bookSubCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteBookCategory(bookCategory?.id));
+            dispatch(deleteCodeContent(bookSubCategory?.id));
             Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${bookCategory?.title}`,
-              text: `${t("titleDeletedSuccess")} ${bookCategory?.title} ${t(
+              title: `${t("titleDeletedSuccess")} ${bookSubCategory?.title}`,
+              text: `${t("titleDeletedSuccess")} ${bookSubCategory?.title} ${t(
                 "textDeletedSuccess"
               )}`,
               icon: "success",
@@ -145,9 +129,14 @@ const CategoriesBook = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksCategoriesApi()).then((res) => {
+      dispatch(getCodeContentsApi()).then((res) => {
         if (!res.error) {
-          dispatch(getBooksCategories(res.payload));
+          dispatch(getCodeContents(res.payload));
+          dispatch(getCodeContentsApi()).then((res) => {
+            if (!res.error && res.payload.length > 0) {
+              dispatch(getCodeContents(res.payload));
+            }
+          });
         }
       });
     } catch (error) {
@@ -160,15 +149,16 @@ const CategoriesBook = () => {
       <div className="table-header">
         <button
           className="add-btn"
-          onClick={() =>
+          onClick={() => {
             setToggle({
               ...toggle,
               add: !toggle.add,
-            })
-          }
+            });
+            formik.handleReset();
+          }}
         >
           <MdAdd />
-          {t("mainCategoriesBooks.addTitle")}
+          {t("settings.settingsApp.codeContent.addTitle")}
         </button>
       </div>
       <div className="scholar">
@@ -237,9 +227,9 @@ const CategoriesBook = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns?.title && (
+              {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("mainCategoriesBooks.columns.category")}
+                  {t("settings.settingsApp.codeContent.columns.email")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -249,10 +239,34 @@ const CategoriesBook = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.code && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("action")}
+                  {t("settings.settingsApp.codeContent.columns.code")}
                   {toggle.sortColumn === columns[1].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.content && (
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
+                  {t("settings.settingsApp.codeContent.columns.content")}
+                  {toggle.sortColumn === columns[2].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -267,7 +281,7 @@ const CategoriesBook = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -285,7 +299,7 @@ const CategoriesBook = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="4">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -305,7 +319,7 @@ const CategoriesBook = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -317,7 +331,7 @@ const CategoriesBook = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="4">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -328,8 +342,21 @@ const CategoriesBook = () => {
             <tbody>
               {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns?.title && (
-                    <td className="table-td name">{result?.title}</td>
+                  {toggle.toggleColumns?.email && (
+                    <td className="table-td email">
+                      <a
+                        href={`mailto:${result?.email}`}
+                        className="email-link"
+                      >
+                        {result?.email}
+                      </a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.code && (
+                    <td className="table-td code">{result?.code}</td>
+                  )}
+                  {toggle.toggleColumns?.content && (
+                    <td className="table-td content">{result?.content}</td>
                   )}
                   {toggle.toggleColumns?.control && (
                     <td className="table-td">
@@ -353,14 +380,16 @@ const CategoriesBook = () => {
           )}
         </table>
       </div>
-      {/* Add Book Category */}
+      {/* Add Code Content */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
           setToggle({
             ...toggle,
             add: !toggle.add,
+            isBookCategories: false,
           });
+          formik.handleReset();
         }}
         centered={true}
         keyboard={true}
@@ -376,13 +405,15 @@ const CategoriesBook = () => {
             formik.handleReset();
           }}
         >
-          {t("mainCategoriesBooks.addTitle")}
+          {t("settings.settingsApp.codeContent.addTitle")}
           <IoMdClose
             onClick={() => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                isBookCategories: !toggle.isBookCategories,
               });
+              formik.handleReset();
             }}
           />
         </ModalHeader>
@@ -394,20 +425,66 @@ const CategoriesBook = () => {
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="title" className="form-label">
-                    {t("mainCategoriesBooks.columns.category")}
+                  <label htmlFor="email" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.email")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
-                    id="title"
-                    placeholder={t("mainCategoriesBooks.columns.category")}
-                    name="title"
-                    value={formik.values?.title}
-                    onChange={formik.handleChange}
+                    id="email"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.email"
+                    )}
+                    name="email"
+                    value={formik.values?.email}
+                    onChange={handleInputChange}
                   />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
+                  {formik.errors.email && formik.touched.email ? (
+                    <span className="error">{formik.errors.email}</span>
+                  ) : null}
+                </div>
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="code" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.code")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="code"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.code"
+                    )}
+                    name="code"
+                    value={formik.values?.code}
+                    onChange={handleInputChange}
+                  />
+                  {formik.errors.code && formik.touched.code ? (
+                    <span className="error">{formik.errors.code}</span>
+                  ) : null}
+                </div>
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="content" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.content")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="content"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.content"
+                    )}
+                    name="content"
+                    value={formik.values?.content}
+                    onChange={handleInputChange}
+                  />
+                  {formik.errors.content && formik.touched.content ? (
+                    <span className="error">{formik.errors.content}</span>
                   ) : null}
                 </div>
               </Col>
@@ -443,13 +520,14 @@ const CategoriesBook = () => {
           </form>
         </ModalBody>
       </Modal>
-      {/* Edit Book Category */}
+      {/* Edit Code Content */}
       <Modal
         isOpen={toggle.edit}
         toggle={() => {
           setToggle({
             ...toggle,
             edit: !toggle.edit,
+            isBookCategories: false,
           });
           formik.handleReset();
         }}
@@ -467,12 +545,13 @@ const CategoriesBook = () => {
             formik.handleReset();
           }}
         >
-          {t("mainCategoriesBooks.editTitle")}
+          {t("settings.settingsApp.codeContent.editTitle")}
           <IoMdClose
             onClick={() => {
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
+                isBookCategories: !toggle.isBookCategories,
               });
               formik.handleReset();
             }}
@@ -486,20 +565,66 @@ const CategoriesBook = () => {
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="title" className="form-label">
-                    {t("mainCategoriesBooks.columns.category")}
+                  <label htmlFor="email" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.email")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
-                    id="title"
-                    placeholder={t("mainCategoriesBooks.columns.category")}
-                    name="title"
-                    value={formik.values?.title}
-                    onChange={formik.handleChange}
+                    id="email"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.email"
+                    )}
+                    name="email"
+                    value={formik.values?.email}
+                    onChange={handleInputChange}
                   />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
+                  {formik.errors.email && formik.touched.email ? (
+                    <span className="error">{formik.errors.email}</span>
+                  ) : null}
+                </div>
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="code" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.code")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="code"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.code"
+                    )}
+                    name="code"
+                    value={formik.values?.code}
+                    onChange={handleInputChange}
+                  />
+                  {formik.errors.code && formik.touched.code ? (
+                    <span className="error">{formik.errors.code}</span>
+                  ) : null}
+                </div>
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="content" className="form-label">
+                    {t("settings.settingsApp.codeContent.columns.content")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="content"
+                    placeholder={t(
+                      "settings.settingsApp.codeContent.columns.content"
+                    )}
+                    name="content"
+                    value={formik.values?.content}
+                    onChange={handleInputChange}
+                  />
+                  {formik.errors.content && formik.touched.content ? (
+                    <span className="error">{formik.errors.content}</span>
                   ) : null}
                 </div>
               </Col>
@@ -544,4 +669,4 @@ const CategoriesBook = () => {
   );
 };
 
-export default CategoriesBook;
+export default CodeContent;

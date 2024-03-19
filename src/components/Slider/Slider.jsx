@@ -1,7 +1,5 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -11,153 +9,146 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
-import { MdAdd, MdDeleteOutline } from "react-icons/md";
-import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
-import { FaPen } from "react-icons/fa";
-import { ImUpload } from "react-icons/im";
-import { IoMdClose } from "react-icons/io";
-
 import anonymous from "../../assets/images/anonymous.png";
-
+import { MdAdd, MdDeleteOutline } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
+import { IoMdClose, IoMdEye } from "react-icons/io";
 import {
-  deleteScholarApi,
-  getScholars,
-  getScholarsApi,
-  addScholarApi,
-  updateScholarApi,
-  deleteScholar,
-} from "../../store/slices/scholarSlice";
-
+  getSlidersApi,
+  addSliderApi,
+  updateSliderApi,
+  deleteSliderApi,
+  getSliders,
+  addSlider,
+  updateSlider,
+  deleteSlider,
+} from "../../store/slices/sliderSlice";
 import { useFormik } from "formik";
-
 import Swal from "sweetalert2";
-
-import { toast } from "react-toastify";
-
-import { useFiltration, useSchema } from "../../hooks";
+import { ImUpload } from "react-icons/im";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
+import { useFiltration, useSchema } from "../../hooks";
 
-const initialValues = {
-  image: {
-    file: "",
-    preview: "",
-  },
-  name: "",
-  email: "",
-  phone: "",
-  status: "",
-};
-
-const Elder = ({ dashboard }) => {
+const Slider = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
-  const { scholars, loading, error } = useSelector((state) => state.scholar);
+  const { sliders, loading, error } = useSelector((state) => state.slider);
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
     imagePreview: false,
     status: false,
-    searchTerm: "",
+    elders: false,
+    pictureCategories: false,
     activeColumn: false,
-    activeRows: false,
-    rowsPerPage: 5,
-    currentPage: 1,
-    sortColumn: "",
-    sortOrder: "asc",
     toggleColumns: {
       image: true,
-      name: true,
-      email: true,
-      phone: true,
+      title: true,
+      description: true,
+      order: true,
       status: true,
       control: true,
     },
+    sortColumn: "",
+    sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
   });
+
+  // Filtration, Sorting, Pagination
+  const {
+    PaginationUI,
+    handleSort,
+    handleSearch,
+    handleToggleColumns,
+    results,
+  } = useFiltration({
+    rowData: sliders,
+    toggle,
+    setToggle,
+  });
+  // Columns
+  const columns = [
+    { id: 1, name: "image", label: t("settings.slider.columns.image") },
+    { id: 2, name: "title", label: t("settings.slider.columns.title") },
+    {
+      id: 3,
+      name: "description",
+      label: t("settings.slider.columns.description"),
+    },
+    { id: 4, name: "order", label: t("settings.slider.columns.order") },
+    { id: 5, name: "status", label: t("status") },
+    { id: 6, name: "control", label: t("action") },
+  ];
 
   // Formik
   const formik = useFormik({
-    initialValues,
-    validationSchema: validationSchema.elder,
+    initialValues: {
+      image: {
+        file: "",
+        preview: "",
+      },
+      title: "",
+      order: "",
+      status: "",
+      description: "",
+    },
+    validationSchema: validationSchema.slider,
     onSubmit: (values) => {
-      // if email and phone is already exist with another scholar if just i change them to new values
-      if (scholars.length > 0) {
-        const emailExist = scholars.find(
-          (scholar) => scholar.email === formik.values.email
-        );
-        const phoneExist = scholars.find(
-          (scholar) => scholar.phone === formik.values.phone
-        );
-        if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error(t("emailExisted"));
-          return;
-        }
-        if (phoneExist && phoneExist.id !== formik.values.id) {
-          toast.error(t("phoneExisted"));
-          return;
-        }
-      }
       const formData = new FormData();
-      formData.append("name", formik.values.name);
-      formData.append("email", formik.values.email);
-      formData.append("phone", formik.values.phone);
-      formData.append(
-        "status",
-        formik.values.status === "Pending"
-          ? "Pending"
-          : formik.values.status === "Approve"
-          ? "Approve"
-          : "Pending"
-      );
+      formData.append("status", values.status);
+      formData.append("id", values.id);
+      if (values.image.file !== "") {
+        formData.append("image", values.image.file);
+      }
       if (values.id) {
-        // if the scholar don't change anything even the image
-        const scholar = scholars.find((scholar) => scholar.id === values.id);
-        if (
-          scholar.name === values.name &&
-          scholar.email === values.email &&
-          scholar.phone === values.phone &&
-          scholar.status === values.status &&
-          scholar.image === values.image
-        ) {
-          setToggle({
-            ...toggle,
-            edit: !toggle.edit,
-          });
-          toast.error(t("noChange"));
-          return;
-        } else {
-          formData.append("id", values.id);
-          if (values.image.file !== undefined) {
-            formData.append("image", values.image.file);
-          }
-          dispatch(updateScholarApi(formData)).then((res) => {
-            dispatch(getScholarsApi());
-            if (!res.error) {
-              formik.handleReset();
-              setToggle({
-                ...toggle,
-                edit: !toggle.edit,
-              });
-              toast.success(t("toast.elder.editSuccess"));
-            } else {
-              toast.error(t("toast.elder.editError"));
-            }
-          });
-        }
-      } else {
-        formData.append("image", formik.values.image.file);
-        dispatch(addScholarApi(formData)).then((res) => {
-          dispatch(getScholarsApi());
+        dispatch(
+          updateSliderApi({
+            id: values.id,
+            title: values.title,
+            image: values.image.file,
+            status: values.status,
+          })
+        ).then((res) => {
           if (!res.error) {
+            dispatch(
+              updateSlider({
+                id: values.id,
+                title: values.title,
+                image: values.image.file,
+                status: values.status,
+              })
+            );
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
+            toast.success(t("toast.image.updatedSuccess"));
+          } else {
+            toast.error(t("toast.image.updatedError"));
+          }
+        });
+      } else {
+        dispatch(addSliderApi(formData)).then((res) => {
+          if (!res.error) {
+            dispatch(
+              addSlider({
+                ...values,
+                image: values.image.preview,
+              })
+            );
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
-            toast.success(t("toast.elder.addSuccess"));
+            formik.handleReset();
+            toast.success(t("toast.image.addedSuccess"));
           } else {
-            toast.error(t("toast.elder.addError"));
+            toast.error(t("toast.image.addedError"));
           }
         });
       }
@@ -175,20 +166,27 @@ const Elder = ({ dashboard }) => {
     }
   };
 
-  // handle Input Using Formik
-  const handleInput = (e) => {
-    formik.handleChange(e);
+  // Handle Edit Picture
+  const handleEdit = (picture) => {
+    formik.setValues({
+      ...picture,
+      image: picture?.image,
+      status: picture?.status,
+      pictureCategory: {
+        title: picture?.pictureCategory?.title,
+        id: picture?.pictureCategory?.id,
+      },
+    });
+    setToggle({
+      ...toggle,
+      edit: !toggle.edit,
+    });
   };
 
-  // Handle Edit Scholar
-  const handleEdit = (scholar) => {
-    formik.setValues(scholar);
-  };
-
-  // Delete Scholar
-  const handleDelete = (elder) => {
+  // Delete Picture
+  const handleDelete = (picture) => {
     Swal.fire({
-      title: t("titleDeleteAlert") + elder?.name + "?",
+      title: t("titleDeleteAlert") + picture?.title + "?",
       text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
@@ -198,54 +196,32 @@ const Elder = ({ dashboard }) => {
       cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteScholarApi(elder?.id)).then((res) => {
+        dispatch(deleteSliderApi(picture?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteScholar(elder?.id));
+            dispatch(deleteSlider(picture?.id));
             Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${elder?.name}`,
-              text: `${t("titleDeletedSuccess")} ${elder?.name} ${t(
+              title: `${t("titleDeletedSuccess")} ${picture?.title}`,
+              text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
                 "textDeletedSuccess"
               )}`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
               confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.elder.deleteSuccess")));
+            }).then(() => toast.success(t("toast.image.deletedSuccess")));
           } else {
-            toast.error(t("toast.elder.deleteError"));
+            toast.error(t("toast.image.deletedError"));
           }
         });
       }
     });
   };
 
-  // Filtration, Sorting, Pagination
-  // Columns
-  const columns = [
-    { id: 1, name: "image", label: t("elders.columns.image") },
-    { id: 2, name: "name", label: t("elders.columns.name") },
-    { id: 3, name: "email", label: t("elders.columns.email") },
-    { id: 4, name: "phone", label: t("elders.columns.phone") },
-    { id: 5, name: "status", label: t("status") },
-    { id: 6, name: "control", label: t("action") },
-  ];
-  const {
-    PaginationUI,
-    handleSort,
-    handleSearch,
-    handleToggleColumns,
-    results,
-  } = useFiltration({
-    rowData: scholars,
-    toggle,
-    setToggle,
-  });
-
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getScholarsApi()).then((res) => {
+      dispatch(getSlidersApi()).then((res) => {
         if (!res.error) {
-          dispatch(getScholars(res.payload));
+          dispatch(getSliders(res.payload));
         }
       });
     } catch (error) {
@@ -266,9 +242,8 @@ const Elder = ({ dashboard }) => {
           }
         >
           <MdAdd />
-          {t("elders.addTitle")}
+          {t("settings.slider.addTitle")}
         </button>
-        {dashboard && <h2>{t("elders.title")}</h2>}
       </div>
       <div className="scholar">
         <div className="table-header">
@@ -339,7 +314,7 @@ const Elder = ({ dashboard }) => {
               {/* Show and Hide Columns */}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("elders.columns.image")}
+                  {t("settings.slider.columns.image")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -349,9 +324,9 @@ const Elder = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.name && (
+              {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("elders.columns.name")}
+                  {t("settings.slider.columns.title")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -361,9 +336,9 @@ const Elder = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.email && (
+              {toggle.toggleColumns.description && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("elders.columns.email")}
+                  {t("settings.slider.columns.description")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -373,9 +348,9 @@ const Elder = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.phone && (
+              {toggle.toggleColumns.order && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("elders.columns.phone")}
+                  {t("settings.slider.columns.order")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -398,16 +373,7 @@ const Elder = ({ dashboard }) => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[5].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+                <th className="table-th">{t("action")}</th>
               )}
             </tr>
           </thead>
@@ -436,10 +402,10 @@ const Elder = ({ dashboard }) => {
                 <td className="table-td" colSpan="6">
                   <div className="no-data mb-0">
                     <Spinner
+                      color="primary"
                       style={{
                         height: "3rem",
                         width: "3rem",
-                        color: "var(--main-color)",
                       }}
                     >
                       Loading...
@@ -450,7 +416,7 @@ const Elder = ({ dashboard }) => {
             </tbody>
           )}
           {/* No Data */}
-          {results.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -472,7 +438,7 @@ const Elder = ({ dashboard }) => {
             </tbody>
           )}
           {/* Data */}
-          {results.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
               {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
@@ -490,25 +456,14 @@ const Elder = ({ dashboard }) => {
                       />
                     </td>
                   )}
-                  {toggle.toggleColumns.name && (
-                    <td className="table-td name">{result?.name}</td>
+                  {toggle.toggleColumns.title && (
+                    <td className="table-td">{result?.title}</td>
                   )}
-                  {toggle.toggleColumns.email && (
-                    <td className="table-td">
-                      <a
-                        className="text-white"
-                        href={`mailto:${result?.email}`}
-                      >
-                        {result?.email}
-                      </a>
-                    </td>
+                  {toggle.toggleColumns.description && (
+                    <td className="table-td">{result?.description}</td>
                   )}
-                  {toggle.toggleColumns.phone && (
-                    <td className="table-td">
-                      <a className="text-white" href={`tel:${result?.phone}`}>
-                        {result?.phone}
-                      </a>
-                    </td>
+                  {toggle.toggleColumns.order && (
+                    <td className="table-td">{result?.order}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
@@ -516,25 +471,26 @@ const Elder = ({ dashboard }) => {
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.status === "Approve"
+                            result?.status === "Public"
                               ? "green"
-                              : result?.status === "Pending"
+                              : result?.status === "Private"
                               ? "red"
                               : "red",
                         }}
                       >
-                        {result?.status === "Approve"
-                          ? t("approve")
-                          : result?.status === "Pending"
-                          ? t("pending")
-                          : t("pending")}
+                        {result?.status === "Public"
+                          ? t("public")
+                          : result?.status === "Private"
+                          ? t("private")
+                          : t("private")}
                       </span>
                     </td>
                   )}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
-                        <FaPen
+                        <IoMdEye />
+                        <FaEdit
                           className="edit-btn"
                           onClick={() => {
                             handleEdit(result);
@@ -557,15 +513,15 @@ const Elder = ({ dashboard }) => {
           )}
         </table>
       </div>
-      {/* Add Elder */}
+      {/* Add Slider */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
-          formik.handleReset();
           setToggle({
             ...toggle,
             add: !toggle.add,
           });
+          formik.handleReset();
         }}
         centered={true}
         keyboard={true}
@@ -574,21 +530,21 @@ const Elder = ({ dashboard }) => {
       >
         <ModalHeader
           toggle={() => {
-            formik.handleReset();
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
+            formik.handleReset();
           }}
         >
-          {t("elders.addTitle")}
+          {t("settings.slider.addTitle")}
           <IoMdClose
             onClick={() => {
-              formik.handleReset();
               setToggle({
                 ...toggle,
                 add: !toggle.add,
               });
+              formik.handleReset();
             }}
           />
         </ModalHeader>
@@ -677,7 +633,7 @@ const Elder = ({ dashboard }) => {
                               });
                             }}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -707,61 +663,51 @@ const Elder = ({ dashboard }) => {
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="name" className="form-label">
-                    {t("elders.columns.name")}
+                  <label htmlFor="title" className="form-label">
+                    {t("settings.slider.columns.title")}
                   </label>
                   <input
                     type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("elders.columns.name")}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={handleInput}
+                    className="form-input w-100"
+                    id="title"
+                    placeholder={t("settings.slider.columns.title")}
+                    name="title"
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
                   />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("elders.columns.email")}
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="order" className="form-label">
+                    {t("settings.slider.columns.order")}
                   </label>
                   <input
                     type="text"
-                    className="form-input"
-                    id="email"
-                    placeholder={t("elders.columns.email")}
-                    name="email"
-                    value={formik.values.email}
-                    onChange={handleInput}
+                    className="form-input w-100"
+                    id="order"
+                    placeholder={t("settings.slider.columns.order")}
+                    name="order"
+                    value={formik.values.order}
+                    onChange={formik.handleChange}
                   />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
+                  {formik.errors.order && formik.touched.order ? (
+                    <span className="error">{formik.errors.order}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("elders.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="test"
-                    placeholder={t("elders.columns.phone")}
-                    name="phone"
-                    value={formik.values.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
-                  <div className="dropdown form-input">
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
                     <button
                       type="button"
                       onClick={() => {
@@ -772,10 +718,10 @@ const Elder = ({ dashboard }) => {
                       }}
                       className="dropdown-btn d-flex justify-content-between align-items-center"
                     >
-                      {formik.values.status === "Pending"
-                        ? t("pending")
-                        : formik.values.status === "Approve"
-                        ? t("approve")
+                      {formik.values.status === "Private"
+                        ? t("private")
+                        : formik.values.status === "Public"
+                        ? t("public")
                         : t("status")}
                       <TiArrowSortedUp
                         className={`dropdown-icon ${
@@ -791,39 +737,58 @@ const Elder = ({ dashboard }) => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Pending" ? "active" : ""
+                          formik.values.status === "Private" ? "active" : ""
                         }`}
-                        value="Pending"
+                        value="Private"
                         name="status"
-                        onClick={(e) => {
+                        onClick={() => {
                           setToggle({
                             ...toggle,
                             status: !toggle.status,
                           });
-                          formik.setFieldValue("status", "Pending");
+                          formik.setFieldValue("status", "Private");
                         }}
                       >
-                        {t("pending")}
+                        {t("private")}
                       </button>
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Approve" ? "active" : ""
+                          formik.values.status === "Public" ? "active" : ""
                         }`}
-                        value="Approve"
+                        value="Public"
                         name="status"
-                        onClick={(e) => {
+                        onClick={() => {
                           setToggle({
                             ...toggle,
                             status: !toggle.status,
                           });
-                          formik.setFieldValue("status", "Approve");
+                          formik.setFieldValue("status", "Public");
                         }}
                       >
-                        {t("approve")}
+                        {t("public")}
                       </button>
                     </div>
                   </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                  <label htmlFor="description" className="form-label">
+                    {t("settings.slider.columns.description")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="description"
+                    placeholder={t("settings.slider.columns.description")}
+                    name="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.description && formik.touched.description ? (
+                    <span className="error">{formik.errors.description}</span>
+                  ) : null}
                 </div>
               </Col>
               <Col lg={12}>
@@ -859,15 +824,15 @@ const Elder = ({ dashboard }) => {
           </form>
         </ModalBody>
       </Modal>
-      {/* Edit Elder */}
+      {/* Edit Slider  */}
       <Modal
         isOpen={toggle.edit}
         toggle={() => {
-          formik.handleReset();
           setToggle({
             ...toggle,
             edit: !toggle.edit,
           });
+          formik.handleReset();
         }}
         centered={true}
         keyboard={true}
@@ -876,21 +841,21 @@ const Elder = ({ dashboard }) => {
       >
         <ModalHeader
           toggle={() => {
-            formik.handleReset();
             setToggle({
               ...toggle,
               edit: !toggle.edit,
             });
+            formik.handleReset();
           }}
         >
-          {t("elders.editTitle")}
+          {t("settings.slider.editTitle")}
           <IoMdClose
             onClick={() => {
-              formik.handleReset();
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
               });
+              formik.handleReset();
             }}
           />
         </ModalHeader>
@@ -901,118 +866,137 @@ const Elder = ({ dashboard }) => {
                 lg={5}
                 className="d-flex flex-column justify-content-center align-items-center"
               >
-                <div className="image-preview-container d-flex justify-content-center align-items-center">
-                  <label
-                    htmlFor={
-                      formik.values?.image
-                        ? formik.values?.image.file === ""
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={
+                        formik.values.image.file === undefined
+                          ? ""
+                          : formik.values.image.file === ""
                           ? "image"
                           : ""
-                        : "image"
-                    }
-                    className="form-label d-flex justify-content-center align-items-center"
-                  >
-                    <img
-                      src={
-                        formik.values?.image.file === undefined
-                          ? formik.values?.image
-                          : formik.values?.image.file === ""
-                          ? anonymous
-                          : formik.values?.image.preview
                       }
-                      alt="avatar"
-                      className="image-preview"
-                      onClick={() =>
-                        formik.values?.image && formik.values?.image.file === ""
-                          ? ""
-                          : setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                      }
-                    />
-                    <Modal
-                      isOpen={toggle.imagePreview}
-                      toggle={() =>
-                        setToggle({
-                          ...toggle,
-                          imagePreview: !toggle.imagePreview,
-                        })
-                      }
-                      centered={true}
-                      keyboard={true}
-                      size={"md"}
-                      contentClassName="modal-preview-image modal-add-scholar"
+                      className="form-label d-flex justify-content-center align-items-center"
                     >
-                      <ModalHeader
+                      <img
+                        src={
+                          formik.values?.image?.preview
+                            ? formik.values.image?.preview
+                            : formik.values.image?.preview === undefined
+                            ? formik.values.image
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values.image.file
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : formik.values.image.file === ""
+                            ? ""
+                            : setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
                         toggle={() =>
                           setToggle({
                             ...toggle,
                             imagePreview: !toggle.imagePreview,
                           })
                         }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
                       >
-                        <IoMdClose
-                          onClick={() =>
+                        <ModalHeader
+                          toggle={() =>
                             setToggle({
                               ...toggle,
                               imagePreview: !toggle.imagePreview,
                             })
                           }
-                        />
-                      </ModalHeader>
-                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                        <img
-                          src={
-                            formik.values?.image.file
-                              ? formik.values?.image.preview
-                              : formik.values?.image
-                          }
-                          alt="avatar"
-                          className="image-preview"
-                        />
-                      </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={() => {
+                        >
+                          <IoMdClose
+                            onClick={() =>
                               setToggle({
                                 ...toggle,
                                 imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
-                          >
-                            حذف
-                          </button>
-                        </div>
-                      </ModalFooter>
-                    </Modal>
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {formik.values?.image?.file ? (
-                  formik.errors.image && formik.touched.image ? (
-                    <span className="error">{formik.errors.image}</span>
-                  ) : (
-                    formik.values.image.file === undefined &&
-                    formik.values?.image.includes("https")
-                  )
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image
+                                ? formik.values.image?.preview
+                                  ? formik.values.image?.preview
+                                  : formik.values.image
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImage")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+                {formik.errors.image && formik.touched.image ? (
+                  <span className="error text-center">
+                    {formik.errors.image}
+                  </span>
                 ) : null}
               </Col>
               <Col lg={7} className="mb-5">
@@ -1020,61 +1004,51 @@ const Elder = ({ dashboard }) => {
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="name" className="form-label">
-                    {t("elders.columns.name")}
+                  <label htmlFor="title" className="form-label">
+                    {t("settings.slider.columns.title")}
                   </label>
                   <input
                     type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("elders.columns.name")}
-                    name="name"
-                    value={formik.values?.name}
-                    onChange={handleInput}
+                    className="form-input w-100"
+                    id="title"
+                    placeholder={t("settings.slider.columns.title")}
+                    name="title"
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
                   />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("elders.columns.email")}
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="order" className="form-label">
+                    {t("settings.slider.columns.order")}
                   </label>
                   <input
                     type="text"
-                    className="form-input"
-                    id="email"
-                    placeholder={t("elders.columns.email")}
-                    name="email"
-                    value={formik.values?.email}
-                    onChange={handleInput}
+                    className="form-input w-100"
+                    id="order"
+                    placeholder={t("settings.slider.columns.order")}
+                    name="order"
+                    value={formik.values.order}
+                    onChange={formik.handleChange}
                   />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
+                  {formik.errors.order && formik.touched.order ? (
+                    <span className="error">{formik.errors.order}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("elders.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="phone"
-                    placeholder={t("elders.columns.phone")}
-                    name="phone"
-                    value={formik.values?.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
-                  <div className="dropdown form-input">
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
                     <button
                       type="button"
                       onClick={() => {
@@ -1085,10 +1059,10 @@ const Elder = ({ dashboard }) => {
                       }}
                       className="dropdown-btn d-flex justify-content-between align-items-center"
                     >
-                      {formik.values?.status === "Pending"
-                        ? t("pending")
-                        : formik.values?.status === "Approve"
-                        ? t("approve")
+                      {formik.values.status === "Private"
+                        ? t("private")
+                        : formik.values.status === "Public"
+                        ? t("public")
                         : t("status")}
                       <TiArrowSortedUp
                         className={`dropdown-icon ${
@@ -1104,39 +1078,58 @@ const Elder = ({ dashboard }) => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values?.status === "Pending" ? "active" : ""
+                          formik.values.status === "Private" ? "active" : ""
                         }`}
-                        value="Pending"
+                        value="Private"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: !toggle.status,
                           });
-                          formik.setFieldValue("status", "Pending");
+                          formik.setFieldValue("status", "Private");
                         }}
                       >
-                        {t("pending")}
+                        {t("private")}
                       </button>
                       <button
                         type="button"
                         className={`item ${
-                          formik.values?.status === "Approve" ? "active" : ""
+                          formik.values.status === "Public" ? "active" : ""
                         }`}
-                        value="Approve"
+                        value="Public"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: !toggle.status,
                           });
-                          formik.setFieldValue("status", "Approve");
+                          formik.setFieldValue("status", "Public");
                         }}
                       >
-                        {t("approve")}
+                        {t("public")}
                       </button>
                     </div>
                   </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                  <label htmlFor="description" className="form-label">
+                    {t("settings.slider.columns.description")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="description"
+                    placeholder={t("settings.slider.columns.description")}
+                    name="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.description && formik.touched.description ? (
+                    <span className="error">{formik.errors.description}</span>
+                  ) : null}
                 </div>
               </Col>
               <Col lg={12}>
@@ -1172,12 +1165,62 @@ const Elder = ({ dashboard }) => {
           </form>
         </ModalBody>
       </Modal>
+      {/* Preview Slider */}
+      <Modal
+        isOpen={toggle.previewSlider}
+        toggle={() =>
+          setToggle({
+            ...toggle,
+            previewSlider: !toggle.previewSlider,
+          })
+        }
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-read-more modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() =>
+            setToggle({
+              ...toggle,
+              previewSlider: !toggle.previewSlider,
+            })
+          }
+        >
+          {formik.values?.title}
+          <IoMdClose
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                previewSlider: !toggle.previewSlider,
+              })
+            }
+          />
+        </ModalHeader>
+        <ModalBody>
+          <div className="read-more-container text-center">
+            <h3 className="text-center mb-3">{formik.values?.title}</h3>
+            <img
+              src={formik.values?.image}
+              alt={formik.values?.title || "avatar"}
+              className="read-more-image mb-3"
+              style={{
+                maxWidth: "700px",
+                maxHeight: "400px",
+                objectFit: "cover",
+              }}
+            />
+            <div className="content text-end">{formik.values?.order}</div>
+            <div className="content text-end">{formik.values?.description}</div>
+          </div>
+        </ModalBody>
+      </Modal>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {results?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>
   );
 };
 
-export default Elder;
+export default Slider;

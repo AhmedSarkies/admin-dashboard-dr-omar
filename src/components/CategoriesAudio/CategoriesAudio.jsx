@@ -1,13 +1,9 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
-
 import {
   getAudiosCategoriesApi,
   getAudiosCategories,
@@ -17,20 +13,17 @@ import {
   updateAudioCategory,
   deleteAudioCategory,
 } from "../../store/slices/audioSlice";
-
 import { useFormik } from "formik";
-
-import { object, string } from "yup";
-
 import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import { useFiltration, useSchema } from "../../hooks";
 
 const CategoriesAudio = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { audioCategories, loading, error } = useSelector(
     (state) => state.audio
   );
@@ -73,9 +66,7 @@ const CategoriesAudio = () => {
     initialValues: {
       title: "",
     },
-    validationSchema: object().shape({
-      title: string().required("يجب ادخال عنوان التصنيف"),
-    }),
+    validationSchema: validationSchema.category,
     onSubmit: (values) => {
       if (values.isEditing) {
         dispatch(

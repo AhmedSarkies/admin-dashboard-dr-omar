@@ -2,36 +2,46 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { useFormik } from "formik";
-import { object, string } from "yup";
+import { useSchema } from "../../hooks";
 
 import logo from "../../assets/images/logo.jpg";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
+import Http from "../../Http";
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const { validationSchema } = useSchema();
+  const submitHandler = async (values) => {
+    try {
+      const response = await Http({
+        method: "POST",
+        url: "/login",
+        data: values,
+        withCredentials: true,
+      });
+      if (response.status === 200) {
+        navigate("/dashboard", { replace: true, state: response.data });
+      }
+    } catch (error) {
+      toast.error(error.response.data.message);
+    }
+  };
   const formik = useFormik({
     initialValues: {
       email: "",
       password: "",
       //   userType: "",
     },
-    validationSchema: object().shape({
-      email: string()
-        .email("يجب ادخال البريد الالكتروني بشكل صحيح")
-        .required("يجب ادخال البريد الالكتروني"),
-      password: string()
-        .min(8, "يجب ادخال كلمة مرور لا تقل عن 8 احرف")
-        .required("يجب ادخال كلمة المرور"),
-      //   userType: string().required("يجب اختيار نوع المستخدم"),
-    }),
+    validationSchema: validationSchema.login,
     onSubmit: (values) => {
       if (
         values.email !== "admin@gmail.com" &&
         values.password !== "admin123"
       ) {
         toast.error("الحساب غير موجود");
+        submitHandler(values);
       } else {
         navigate("/dr-omar/dashboard", { replace: true, state: values });
       }

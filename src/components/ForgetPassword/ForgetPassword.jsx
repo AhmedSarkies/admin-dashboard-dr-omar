@@ -2,21 +2,18 @@ import React from "react";
 
 import logo from "../../assets/images/logo.jpg";
 import { toast } from "react-toastify";
-import { object, string } from "yup";
+import { useSchema } from "../../hooks";
 import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
 
 const ForgetPassword = () => {
   const { t } = useTranslation();
+  const { validationSchema } = useSchema();
   const formik = useFormik({
     initialValues: {
       email: "",
     },
-    validationSchema: object().shape({
-      email: string()
-        .email("يجب ادخال البريد الالكتروني بشكل صحيح")
-        .required("يجب ادخال البريد الالكتروني"),
-    }),
+    validationSchema: validationSchema.forgetPassword,
     onSubmit: (values) => {
       if (values.email !== "admin@gmail.com") {
         toast.error("الحساب غير موجود");

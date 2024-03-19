@@ -10,7 +10,7 @@ import { IoMdClose } from "react-icons/io";
 import { getMessagesApi, getMessages } from "../../store/slices/messagesSlice";
 
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import useFiltration from "../../hooks/useFiltration";
+import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
 const Messages = () => {
   const { t } = useTranslation();
@@ -45,7 +45,7 @@ const Messages = () => {
   // Columns
   const columns = [
     { id: 0, name: "first_name", label: t("message.columns.name") },
-    { id: 2, name: "phone", label: t("message.columns.phone") },
+    { id: 1, name: "phone", label: t("message.columns.phone") },
     { id: 2, name: "email", label: t("message.columns.email") },
     { id: 3, name: "subject", label: t("message.columns.content") },
     { id: 4, name: "readMessage", label: t("message.columns.read") },
@@ -260,9 +260,7 @@ const Messages = () => {
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="5">
-                  <p className="no-data no-columns mb-0">
-                    {t("noColumns")}
-                  </p>
+                  <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
