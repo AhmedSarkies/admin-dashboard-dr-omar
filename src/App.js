@@ -1,10 +1,11 @@
+import React, { useEffect } from "react";
+import Cookies from "js-cookie";
 /* eslint-disable no-unused-vars */
 import { Navigate, Route, Routes } from "react-router-dom";
 import locale from "./utils/locale";
 import {
   LoginLayout,
   Login,
-  ForgetPassword,
   Home,
   Dashboard,
   SubAdmins,
@@ -28,6 +29,12 @@ import {
 } from "./components";
 
 const App = () => {
+  const lng = Cookies.get("i18next") || "ar";
+
+  useEffect(() => {
+    document.documentElement.lang = lng;
+  }, [lng]);
+
   return (
     <div className="App">
       <Routes>
@@ -49,7 +56,7 @@ const App = () => {
             element={<Navigate to="/dr-omar/login" replace={true} />}
           />
           <Route path="dr-omar/login" element={<Login />} />
-          <Route path="dr-omar/forget-password" element={<ForgetPassword />} />
+          {/* <Route path="dr-omar/forget-password" element={<ForgetPassword />} /> */}
         </Route>
         <Route path="/dr-omar" element={<Home />}>
           <Route path="*" element={<Dashboard />} />
