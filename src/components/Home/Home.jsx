@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from "react";
-
+import { Outlet, useLocation } from "react-router-dom";
 import { IoMdHome } from "react-icons/io";
 import { SiGooglescholar } from "react-icons/si";
 import { GiBookshelf, GiSoundWaves } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
-import { IoPerson } from "react-icons/io5";
 import { FaAssistiveListeningSystems } from "react-icons/fa";
-import { IoIosDocument } from "react-icons/io";
-
-import { Header, Sidebar } from "../";
-
-import logo from "../../assets/images/logo.jpg";
-
-import { Outlet, useLocation } from "react-router-dom";
-import { MdAdminPanelSettings, MdOutlineMarkunread } from "react-icons/md";
+import {
+  MdAdminPanelSettings,
+  MdArticle,
+  MdOutlineMarkunread,
+} from "react-icons/md";
 import { useTranslation } from "react-i18next";
+  import { Header, Sidebar } from "../";
+import logo from "../../assets/images/logo.jpg";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -24,11 +22,11 @@ const Home = () => {
       title: t("linkItems.home"),
       path: "/dr-omar/dashboard",
     },
-    {
-      title: t("linkItems.profile"),
-      path: "/dr-omar/profile",
-      icon: <IoPerson />,
-    },
+    // {
+    //   title: t("linkItems.profile"),
+    //   path: "/dr-omar/profile",
+    //   icon: <IoPerson />,
+    // },
     {
       title: t("linkItems.subAdmins"),
       path: "/dr-omar/sub-admins",
@@ -106,7 +104,7 @@ const Home = () => {
     {
       title: t("linkItems.articles"),
       path: "/dr-omar/articles",
-      icon: <IoIosDocument />,
+      icon: <MdArticle />,
     },
     {
       title: t("linkItems.mostListening"),

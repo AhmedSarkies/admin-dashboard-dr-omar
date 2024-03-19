@@ -1,13 +1,16 @@
 import React from "react";
-import { HiUsers } from "react-icons/hi2";
-import { SiBookstack } from "react-icons/si";
-import { LiaFileAudioSolid } from "react-icons/lia";
-import { FaUser } from "react-icons/fa";
-
-import { Card, Elder, SubAdmins } from "../";
 import { Col, Container, Row } from "reactstrap";
-// import { UserData } from "../../data";
+import { HiUsers } from "react-icons/hi2";
+import { SiGooglescholar } from "react-icons/si";
+import { LiaFileAudioSolid } from "react-icons/lia";
+import { GrFavorite } from "react-icons/gr";
 import { useTranslation } from "react-i18next";
+import { GiBookshelf } from "react-icons/gi";
+import { SlPicture } from "react-icons/sl";
+import { MdArticle } from "react-icons/md";
+import { IoCloudDownloadSharp } from "react-icons/io5";
+import { Card, Elder, SubAdmins } from "../";
+// import { UserData } from "../../data";
 
 const Dashboard = () => {
   const { t } = useTranslation();
@@ -22,14 +25,22 @@ const Dashboard = () => {
     },
     {
       id: 2,
+      title: t("dashboard.elders"),
+      icon: <SiGooglescholar />,
+      path: "/elder",
+      count: 40,
+      color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
+    },
+    {
+      id: 3,
       title: t("dashboard.books"),
-      icon: <SiBookstack />,
+      icon: <GiBookshelf />,
       path: "/books",
       count: 20,
       color: "linear-gradient(45deg, rgb(50, 31, 219), rgb(31, 20, 152))",
     },
     {
-      id: 3,
+      id: 4,
       title: t("dashboard.audios"),
       icon: <LiaFileAudioSolid />,
       path: "/audios",
@@ -37,33 +48,25 @@ const Dashboard = () => {
       color: "linear-gradient(45deg, rgb(203, 93, 255), rgb(128, 12, 184))",
     },
     {
-      id: 4,
-      title: t("dashboard.elders"),
-      icon: <FaUser />,
-      path: "/elder",
-      count: 40,
-      color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
+      id: 5,
+      title: t("dashboard.images"),
+      icon: <SlPicture />,
+      path: "/images",
+      count: 60,
+      color: "linear-gradient(45deg, rgb(255, 153, 51), rgb(204, 102, 0))",
     },
     {
-      id: 5,
+      id: 6,
       title: t("dashboard.articles"),
-      icon: <SiBookstack />,
+      icon: <MdArticle />,
       path: "/articles",
       count: 50,
       color: "linear-gradient(45deg, rgb(255, 51, 51), rgb(204, 0, 0))",
     },
     {
-      id: 6,
-      title: t("dashboard.pictures"),
-      icon: <SiBookstack />,
-      path: "/pictures",
-      count: 60,
-      color: "linear-gradient(45deg, rgb(255, 153, 51), rgb(204, 102, 0))",
-    },
-    {
       id: 7,
       title: t("dashboard.downloads"),
-      icon: <SiBookstack />,
+      icon: <IoCloudDownloadSharp />,
       path: "/downloads",
       count: 70,
       color: "linear-gradient(45deg, rgb(0, 204, 204), rgb(0, 153, 153))",
@@ -71,51 +74,51 @@ const Dashboard = () => {
     {
       id: 8,
       title: t("dashboard.favorites"),
-      icon: <SiBookstack />,
+      icon: <GrFavorite />,
       path: "/favorites",
       count: 80,
       color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
     },
-    {
-      id: 9,
-      title: t("dashboard.shares"),
-      icon: <SiBookstack />,
-      path: "/shares",
-      count: 90,
-      color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
-    },
-    {
-      id: 10,
-      title: t("dashboard.newUsers"),
-      icon: <SiBookstack />,
-      path: "/new-users",
-      count: 100,
-      color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
-    },
-    {
-      id: 11,
-      title: t("dashboard.activeUsers"),
-      icon: <SiBookstack />,
-      path: "/active-users",
-      count: 110,
-      color: "linear-gradient(45deg, rgb(0, 204, 153), rgb(0, 153, 102))",
-    },
-    {
-      id: 12,
-      title: t("dashboard.inactiveUsers"),
-      icon: <SiBookstack />,
-      path: "/inactive-users",
-      count: 120,
-      color: "linear-gradient(45deg, rgb(255, 102, 102), rgb(204, 0, 0))",
-    },
-    {
-      id: 13,
-      title: t("dashboard.deletedUsers"),
-      icon: <SiBookstack />,
-      path: "/deleted-users",
-      count: 130,
-      color: "linear-gradient(45deg, rgb(0, 204, 255), rgb(0, 153, 204))",
-    },
+    // {
+    //   id: 9,
+    //   title: t("dashboard.shares"),
+    //   icon: <SiBookstack />,
+    //   path: "/shares",
+    //   count: 90,
+    //   color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
+    // },
+    // {
+    //   id: 10,
+    //   title: t("dashboard.newUsers"),
+    //   icon: <SiBookstack />,
+    //   path: "/new-users",
+    //   count: 100,
+    //   color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
+    // },
+    // {
+    //   id: 11,
+    //   title: t("dashboard.activeUsers"),
+    //   icon: <SiBookstack />,
+    //   path: "/active-users",
+    //   count: 110,
+    //   color: "linear-gradient(45deg, rgb(0, 204, 153), rgb(0, 153, 102))",
+    // },
+    // {
+    //   id: 12,
+    //   title: t("dashboard.inactiveUsers"),
+    //   icon: <SiBookstack />,
+    //   path: "/inactive-users",
+    //   count: 120,
+    //   color: "linear-gradient(45deg, rgb(255, 102, 102), rgb(204, 0, 0))",
+    // },
+    // {
+    //   id: 13,
+    //   title: t("dashboard.deletedUsers"),
+    //   icon: <SiBookstack />,
+    //   path: "/deleted-users",
+    //   count: 130,
+    //   color: "linear-gradient(45deg, rgb(0, 204, 255), rgb(0, 153, 204))",
+    // },
   ];
   // // eslint-disable-next-line no-unused-vars
   // const [userData, setUserData] = useState({
@@ -234,7 +237,7 @@ const Dashboard = () => {
         <Container style={{ minWidth: "100%" }}>
           <Row
             style={{ maxWidth: "100vw" }}
-            className="flex-wrap justify-content-between align-items-center g-3"
+            className="flex-wrap flex-row-reverse justify-content-between align-items-center g-3"
           >
             {cardItems.map((item) => (
               <Col xl="3" lg="4" md="6" sm="12" key={item.id}>

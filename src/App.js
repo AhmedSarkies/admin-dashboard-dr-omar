@@ -7,7 +7,7 @@ import {
   ForgetPassword,
   Home,
   Dashboard,
-  Profile,
+  // Profile,
   SubAdmins,
   Messages,
   Settings,
@@ -56,7 +56,7 @@ const App = () => {
         <Route path="/dr-omar" element={<Home />}>
           <Route path="*" element={<Dashboard />} />
           <Route path="dashboard" element={<Dashboard />} />
-          <Route path="profile" element={<Profile />} />
+          {/* <Route path="profile" element={<Profile />} /> */}
           <Route path="sub-admins" element={<SubAdmins />} />
           <Route path="messages" element={<Messages />} />
           <Route path="settings" element={<Settings />} />
