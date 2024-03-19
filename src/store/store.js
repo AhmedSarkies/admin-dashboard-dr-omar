@@ -1,17 +1,22 @@
 import { configureStore } from "@reduxjs/toolkit";
 
-import scholarReducer from "./slices/scholarSlice.js";
-import bookSlice from "./slices/bookSlice.js";
-import pictureSlice from "./slices/pictureSlice.js";
-import audioSlice from "./slices/audioSlice.js";
-import articleSlice from "./slices/articleSlice.js";
-import subAdminSlice from "./slices/subAdminSlice.js";
-import messagesSlice from "./slices/messagesSlice.js";
-import mostListeningSlice from "./slices/mostListeningSlice.js";
+import {
+  scholarSlice,
+  bookSlice,
+  pictureSlice,
+  audioSlice,
+  articleSlice,
+  subAdminSlice,
+  messagesSlice,
+  mostListeningSlice,
+  sliderSlice,
+  codeContentSlice,
+  settingsSlice,
+} from "./slices";
 
 const store = configureStore({
   reducer: {
-    scholar: scholarReducer,
+    scholar: scholarSlice,
     book: bookSlice,
     picture: pictureSlice,
     audio: audioSlice,
@@ -19,6 +24,9 @@ const store = configureStore({
     subAdmin: subAdminSlice,
     messages: messagesSlice,
     mostListening: mostListeningSlice,
+    slider: sliderSlice,
+    codeContent: codeContentSlice,
+    settings: settingsSlice,
   },
 });
 

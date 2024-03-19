@@ -35,7 +35,7 @@ export const addSubAdminApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/SubAdmin/Insert`,
+        url: `/admin/register`,
         data,
       }).then((response) => {
         return response.data;
