@@ -15,6 +15,7 @@
   "save": "Save",
   "delete": "Delete",
   "update": "Update",
+  "visits": "Visits",
   "chooseElder": "Choose Elder",
   "chooseBook": "Choose Book",
   "chooseImageBook": "Choose Image Book",
@@ -38,6 +39,20 @@
   "networkError": "Network Error",
   "serverError": "Server Error",
   "someError": "Some Error",
+  "auth": {
+    "login": {
+      "title": "Login to Dr.Omar Kamel",
+      "email": "email",
+      "password": "password",
+      "submit": "Login",
+      "forgetPassword": "Forgot Password?"
+    },
+    "forgetPassword": {
+      "title": "Enter your email to reset your password",
+      "email": "email",
+      "submit": "Send"
+    }
+  },
   "dashboard": {
     "users": "Users",
     "articles": "Articles",
@@ -57,19 +72,36 @@
     "home": "Home",
     "profile": "Profile",
     "subAdmins": "Sub Admins",
+    "settings": "Settings",
+    "settingsApp": "App Settings",
+    "prayerTime": "Prayer Time",
+    "codeContent": "Code Content",
+    "slider": "Slider",
+    "termsAndConditions": "Terms And Conditions",
+    "links": "Links",
     "messages": "Messages",
+    "categories": "Categories",
+    "mainCategoriesBooks": "Main Book",
+    "subCategoriesBooks": "Sub Book",
+    "categoriesAudio": "Audio",
+    "categoriesImage": "Image",
+    "categoriesArticle": "Article",
     "elder": "Elders",
     "users": "Users",
-    "mainCategoriesBooks": "Main Categories Books",
-    "subCategoriesBooks": "Sub Categories Books",
     "books": "Books",
-    "categoriesAudio": "Categories Audio",
     "audios": "Audios",
-    "categoriesImage": "Categories Image",
     "images": "Images",
-    "categoriesArticle": "Categories Article",
     "articles": "Articles",
     "mostListening": "Most Listening"
+  },
+  "profile": {
+    "name": "Name",
+    "email": "Email",
+    "phone": "Phone",
+    "changePassword": "Change Password",
+    "oldPassword": "Old Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password"
   },
   "subAdmin": {
     "title": "Sub Admins",
@@ -91,6 +123,90 @@
       "read": "Read"
     }
   },
+  "settings": {
+    "settingsApp": {
+      "logo": "Logo",
+      "prayer": {
+        "time": "Prayer Time",
+        "adhan": "Adhan",
+        "iqama": "Iqama"
+      },
+      "codeContent": {
+        "title": "Code Content",
+        "addTitle": "Add Code Content",
+        "editTitle": "Edit Code Content",
+        "columns": {
+          "code": "Code",
+          "content": "Content",
+          "email": "Email"
+        }
+      }
+    },
+    "slider": {
+      "addTitle": "Add Slider",
+      "editTitle": "Edit Slider",
+      "columns": {
+        "image": "Image",
+        "title": "Title",
+        "description": "Description",
+        "order": "Order"
+      }
+    },
+    "termsAndConditions": {
+      "title": "Terms And Conditions",
+      "addTitle": "Add Terms And Conditions",
+      "editTitle": "Edit Terms And Conditions",
+      "columns": {
+        "title": "Title",
+        "description": "Description",
+        "ar": {
+          "title": "Title (Arabic)",
+          "description": "Description (Arabic)"
+        },
+        "en": {
+          "title": "Title (English)",
+          "description": "Description (English)"
+        }
+      }
+    },
+    "links": {
+      "contact": {
+        "title": "Contact Us",
+        "addTitle": "Add Contact",
+        "contactLinks": "Links Contact",
+        "editTitle": "Edit Contact",
+        "columns": {
+          "contactLinks": "Links Contact",
+          "appLinks": "Links App",
+          "facebook": "Facebook",
+          "twitter": "Twitter",
+          "instagram": "Instagram",
+          "telegram": "Telegram",
+          "linkedin": "Linkedin",
+          "tikTok": "Tik Tok",
+          "youtube": "Youtube",
+          "whatsapp": "Whatsapp",
+          "snapchat": "Snapchat",
+          "phone": "Phone",
+          "email": "Email",
+          "address": "Address",
+          "map": "Map",
+          "appStore": "App Store",
+          "playStore": "Play Store"
+        }
+      },
+      "appLink": {
+        "title": "App Links",
+        "addTitle": "Add App Link",
+        "editTitle": "Edit App Link",
+        "appLinks": "Links App",
+        "columns": {
+          "appStore": "App Store",
+          "playStore": "Play Store"
+        }
+      }
+    }
+  },
   "elders": {
     "title": "Elders",
     "addTitle": "Add Elder",
@@ -100,6 +216,13 @@
       "name": "Elder",
       "email": "Email",
       "phone": "Phone"
+    }
+  },
+  "categories": {
+    "addTitle": "Add Category",
+    "editTitle": "Edit Category",
+    "columns": {
+      "category": "Category"
     }
   },
   "mainCategoriesBooks": {
@@ -130,13 +253,6 @@
         "title": "Title Book",
         "book": "Book"
       }
-    }
-  },
-  "categories": {
-    "addTitle": "Add Category",
-    "editTitle": "Edit Category",
-    "columns": {
-      "category": "Category"
     }
   },
   "audios": {
@@ -188,29 +304,6 @@
       "title": "Title",
       "article": "Article",
       "category": "Category"
-    }
-  },
-  "profile": {
-    "name": "Name",
-    "email": "Email",
-    "phone": "Phone",
-    "changePassword": "Change Password",
-    "oldPassword": "Old Password",
-    "newPassword": "New Password",
-    "confirmPassword": "Confirm Password"
-  },
-  "auth": {
-    "login": {
-      "title": "Login to Dr.Omar Kamel",
-      "email": "email",
-      "password": "password",
-      "submit": "Login",
-      "forgetPassword": "Forgot Password?"
-    },
-    "forgetPassword": {
-      "title": "Enter your email to reset your password",
-      "email": "email",
-      "submit": "Send"
     }
   },
   "toast": {
@@ -270,5 +363,25 @@
       "deleteSuccess": "Category deleted successfully",
       "deleteError": "An error occurred while deleting category"
     }
+  },
+  "validation": {
+    "required": "This field is required",
+    "email": "Please enter a valid email",
+    "password": "Password must be at least 6 characters",
+    "confirmPassword": "Password and confirm password must be the same",
+    "phone": "Please enter a valid phone number 11 digits (Ex: 01234567890)",
+    "image": "Please choose an image",
+    "audio": "Please choose an audio",
+    "book": "Please choose a book",
+    "article": "Please choose an article",
+    "category": "Please choose a category",
+    "elder": "Please choose an elder",
+    "title": "Please enter a title",
+    "description": "Please enter a description",
+    "order": "Please enter number of order",
+    "name": "Please enter a name",
+    "content": "Please enter a content",
+    "mainCategory": "Please choose a main category",
+    "subCategory": "Please choose a sub category"
   }
 }

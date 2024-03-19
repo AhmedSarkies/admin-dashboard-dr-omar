@@ -15,6 +15,7 @@
   "save": "حفظ",
   "delete": "حذف",
   "update": "تحديث",
+  "visits": "الزيارات",
   "chooseElder": "اختر العالم",
   "chooseImage": "اختر صورة",
   "chooseBook": "اختر الكتاب",
@@ -38,6 +39,20 @@
   "networkError": "خطأ في الشبكة",
   "serverError": "خطأ في الخادم",
   "someError": "حدث خطأ ما",
+  "auth": {
+    "login": {
+      "title": "تسجيل الدخول إلى د.عمر كامل",
+      "email": "البريد الإلكتروني",
+      "password": "كلمة المرور",
+      "submit": "تسجيل الدخول",
+      "forgetPassword": "هل نسيت كلمة المرور؟"
+    },
+    "forgetPassword": {
+      "title": "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور الخاصة بك",
+      "email": "البريد الإلكتروني",
+      "submit": "إرسال"
+    }
+  },
   "dashboard": {
     "users": "المستخدمين",
     "articles": "المقالات",
@@ -57,19 +72,36 @@
     "home": "الصفحة الرئيسية",
     "profile": "الصفحة الشخصية",
     "subAdmins": "المسؤولين الفرعيين",
+    "settings": "الإعدادات",
+    "settingsApp": "إعدادات التطبيق",
+    "prayerTime": "أوقات الصلاة",
+    "codeContent": "رمز المحتوى",
+    "slider": "السلايدر",
+    "termsAndConditions": "الشروط والأحكام",
+    "links": "الروابط",
     "messages": "الرسائل",
+    "categories": "التصنيفات",
+    "mainCategoriesBooks": "الكتب الرئيسية",
+    "subCategoriesBooks": "الكتب الفرعية",
+    "categoriesAudio": "الصوتيات",
+    "categoriesImage": "الصور",
+    "categoriesArticle": "المقالات",
     "elder": "العلماء",
     "users": "المستخدمين",
-    "mainCategoriesBooks": "تصنيفات الكتب الرئيسية",
-    "subCategoriesBooks": "تصنيفات الكتب الفرعية",
     "books": "الكتب",
-    "categoriesAudio": "تصنيفات الصوتيات",
     "audios": "الصوتيات",
-    "categoriesImage": "تصنيفات الصور",
     "images": "الصور",
-    "categoriesArticle": "تصنيفات المقالات",
     "articles": "المقالات",
     "mostListening": "الأكثر استماعا"
+  },
+  "profile": {
+    "name": "الاسم",
+    "email": "البريد الإلكتروني",
+    "phone": "الهاتف",
+    "changePassword": "تغيير كلمة المرور",
+    "oldPassword": "كلمة المرور القديمة",
+    "newPassword": "كلمة المرور الجديدة",
+    "confirmPassword": "تأكيد كلمة المرور"
   },
   "subAdmin": {
     "title": "المسؤولين الفرعيين",
@@ -91,15 +123,90 @@
       "read": "قراءة"
     }
   },
-  "elders": {
-    "title": "العلماء",
-    "addTitle": "إضافة عالم",
-    "editTitle": "تعديل عالم",
+  "settings": {
+    "settingsApp": {
+      "logo": "الشعار",
+      "prayer": {
+        "time": "أوقات الصلاة",
+        "adhan": "الأذان",
+        "iqama": "الإقامة"
+      },
+      "codeContent": {
+        "title": "رمز المحتوى",
+        "addTitle": "إضافة رمز المحتوى",
+        "editTitle": "تعديل رمز المحتوى",
+        "columns": {
+          "code": "الرمز",
+          "content": "المحتوى",
+          "email": "البريد الإلكتروني"
+        }
+      }
+    },
+    "slider": {
+      "addTitle": "إضافة سلايدر",
+      "editTitle": "تعديل سلايدر",
+      "columns": {
+        "image": "الصورة",
+        "title": "العنوان",
+        "description": "الوصف",
+        "order": "الترتيب"
+      }
+    },
+    "termsAndConditions": {
+      "title": "الشروط والأحكام",
+      "addTitle": "إضافة شرط وحكم",
+      "editTitle": "تعديل شرط وحكم",
+      "columns": {
+        "title": "العنوان",
+        "description": "الوصف",
+        "ar": {
+          "title": "العنوان (بالعربي)",
+          "description": "الوصف (بالعربي)"
+        },
+        "en": {
+          "title": "العنوان (بالإنجليزية)",
+          "description": "الوصف (بالإنجليزية)"
+        }
+      }
+    },
+    "links": {
+      "contact": {
+        "title": "تواصل معنا",
+        "addTitle": "إضافة رابط تواصل",
+        "contactLinks": "روابط التواصل",
+        "editTitle": "تعديل رابط تواصل",
+        "columns": {
+          "facebook": "فيسبوك",
+          "twitter": "تويتر",
+          "instagram": "انستجرام",
+          "telegram": "تليجرام",
+          "linkedin": "لينكد إن",
+          "tikTok": "تيك توك",
+          "youtube": "يوتيوب",
+          "whatsapp": "واتساب",
+          "snapchat": "سناب شات",
+          "phone": "الهاتف",
+          "email": "البريد الإلكتروني",
+          "address": "العنوان",
+          "map": "الخريطة"
+        }
+      },
+      "appLink": {
+        "title": "روابط التطبيق",
+        "addTitle": "إضافة رابط التطبيق",
+        "editTitle": "تعديل رابط التطبيق",
+        "columns": {
+          "appStore": "آب ستور",
+          "playStore": "بلاي ستور"
+        }
+      }
+    }
+  },
+  "categories": {
+    "addTitle": "إضافة تصنيف",
+    "editTitle": "تعديل تصنيف",
     "columns": {
-      "image": "الصورة",
-      "name": "العالم",
-      "email": "البريد الإلكتروني",
-      "phone": "الهاتف"
+      "category": "التصنيف"
     }
   },
   "mainCategoriesBooks": {
@@ -116,6 +223,17 @@
       "category": "التصنيف"
     }
   },
+  "elders": {
+    "title": "العلماء",
+    "addTitle": "إضافة عالم",
+    "editTitle": "تعديل عالم",
+    "columns": {
+      "image": "الصورة",
+      "name": "العالم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف"
+    }
+  },
   "books": {
     "addTitle": "إضافة كتاب",
     "editTitle": "تعديل كتاب",
@@ -129,13 +247,6 @@
         "title": "عنوان الكتاب",
         "book": "الكتاب"
       }
-    }
-  },
-  "categories": {
-    "addTitle": "إضافة تصنيف",
-    "editTitle": "تعديل تصنيف",
-    "columns": {
-      "category": "التصنيف"
     }
   },
   "audios": {
@@ -187,29 +298,6 @@
       "title": "العنوان",
       "article": "المقال",
       "category": "التصنيف"
-    }
-  },
-  "profile": {
-    "name": "الاسم",
-    "email": "البريد الإلكتروني",
-    "phone": "الهاتف",
-    "changePassword": "تغيير كلمة المرور",
-    "oldPassword": "كلمة المرور القديمة",
-    "newPassword": "كلمة المرور الجديدة",
-    "confirmPassword": "تأكيد كلمة المرور"
-  },
-  "auth": {
-    "login": {
-      "title": "تسجيل الدخول إلى د.عمر كامل",
-      "email": "البريد الإلكتروني",
-      "password": "كلمة المرور",
-      "submit": "تسجيل الدخول",
-      "forgetPassword": "هل نسيت كلمة المرور؟"
-    },
-    "forgetPassword": {
-      "title": "أدخل بريدك الإلكتروني لإعادة تعيين كلمة المرور الخاصة بك",
-      "email": "البريد الإلكتروني",
-      "submit": "إرسال"
     }
   },
   "toast": {
@@ -267,5 +355,25 @@
       "deleteSuccess": "تم حذف التصنيف بنجاح",
       "deleteError": "حدث خطأ أثناء حذف التصنيف"
     }
+  },
+  "validation": {
+    "required": "هذا الحقل مطلوب",
+    "email": "الرجاء إدخال بريد إلكتروني صحيح",
+    "password": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل",
+    "confirmPassword": "كلمة المرور غير متطابقة",
+    "phone": "الرجاء إدخال رقم هاتف صحيح مكون من 11 رقم (مثال: 01234567890)",
+    "image": "الرجاء اختيار صورة",
+    "audio": "الرجاء اختيار صوتية",
+    "book": "الرجاء اختيار كتاب",
+    "article": "الرجاء اختيار مقال",
+    "category": "الرجاء اختيار تصنيف",
+    "elder": "الرجاء اختيار عالم",
+    "title": "الرجاء إدخال عنوان",
+    "description": "الرجاء إدخال وصف",
+    "order": "الرجاء إدخال رقم الترتيب",
+    "name": "الرجاء إدخال اسم",
+    "content": "الرجاء إدخال محتوى",
+    "mainCategory": "الرجاء اختيار تصنيف رئيسي",
+    "subCategory": "الرجاء اختيار تصنيف فرعي"
   }
 }
