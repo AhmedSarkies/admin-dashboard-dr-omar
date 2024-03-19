@@ -158,13 +158,16 @@
       "editTitle": "Edit Terms And Conditions",
       "columns": {
         "title": "Title",
+        "country": "Country",
         "description": "Description",
         "ar": {
           "title": "Title (Arabic)",
+          "country": "Country (Arabic)",
           "description": "Description (Arabic)"
         },
         "en": {
           "title": "Title (English)",
+          "country": "Country (English)",
           "description": "Description (English)"
         }
       }
@@ -176,9 +179,8 @@
         "contactLinks": "Links Contact",
         "editTitle": "Edit Contact",
         "columns": {
-          "contactLinks": "Links Contact",
-          "appLinks": "Links App",
           "facebook": "Facebook",
+          "messenger": "Messenger",
           "twitter": "Twitter",
           "instagram": "Instagram",
           "telegram": "Telegram",
@@ -190,9 +192,7 @@
           "phone": "Phone",
           "email": "Email",
           "address": "Address",
-          "map": "Map",
-          "appStore": "App Store",
-          "playStore": "Play Store"
+          "map": "Map"
         }
       },
       "appLink": {
