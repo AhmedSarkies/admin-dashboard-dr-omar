@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -93,6 +93,7 @@ const initialValues = {
 const Audios = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const fileRef = useRef();
   const { audios, audioCategories, loading, error } = useSelector(
     (state) => state.audio
   );
@@ -239,6 +240,23 @@ const Audios = () => {
         preview: URL.createObjectURL(file),
       });
     }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
   };
 
   const handleDurationAudio = (e) => {
@@ -801,16 +819,7 @@ const Audios = () => {
                           <div className="form-group-container d-flex justify-content-center align-items-center">
                             <button
                               className="delete-btn cancel-btn"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                });
-                                formik.setFieldValue("image", {
-                                  file: "",
-                                  preview: "",
-                                });
-                              }}
+                              onClick={handleDeleteImage}
                             >
                               {t("delete")}
                             </button>
@@ -828,6 +837,7 @@ const Audios = () => {
                       accept="image/*"
                       className="form-input form-img-input"
                       id="image"
+                      ref={fileRef}
                       onChange={handleImageChange}
                     />
                   </div>
@@ -1262,16 +1272,7 @@ const Audios = () => {
                           <div className="form-group-container d-flex justify-content-center align-items-center">
                             <button
                               className="delete-btn cancel-btn"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                });
-                                formik.setFieldValue("image", {
-                                  file: "",
-                                  preview: "",
-                                });
-                              }}
+                              onClick={handleDeleteImage}
                             >
                               {t("delete")}
                             </button>
@@ -1289,6 +1290,7 @@ const Audios = () => {
                       accept="image/*"
                       className="form-input form-img-input"
                       id="image"
+                      ref={fileRef}
                       onChange={handleImageChange}
                     />
                   </div>

@@ -10,7 +10,7 @@ import {
   MdOutlineMarkunread,
 } from "react-icons/md";
 import { useTranslation } from "react-i18next";
-  import { Header, Sidebar } from "../";
+import { Header, Sidebar } from "../";
 import logo from "../../assets/images/logo.jpg";
 
 const Home = () => {

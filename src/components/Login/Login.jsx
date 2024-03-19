@@ -1,5 +1,5 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 import { useFormik } from "formik";
 import { useSchema } from "../../hooks";
@@ -130,9 +130,9 @@ const Login = () => {
           {t("auth.login.submit")}
         </button>
       </form>
-      <Link to="/dr-omar/forget-password" className="forget-password">
+      {/* <Link to="/dr-omar/forget-password" className="forget-password">
         {t("auth.login.forgetPassword")}
-      </Link>
+      </Link> */}
     </div>
   );
 };

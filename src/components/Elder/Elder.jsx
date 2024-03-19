@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -53,6 +53,7 @@ const Elder = ({ dashboard }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
+  const fileRef = useRef();
   const { scholars, loading, error } = useSelector((state) => state.scholar);
   const [toggle, setToggle] = useState({
     add: false,
@@ -139,9 +140,9 @@ const Elder = ({ dashboard }) => {
                 ...toggle,
                 edit: !toggle.edit,
               });
-              toast.success(t("toast.elder.editSuccess"));
+              toast.success(t("toast.elder.updatedSuccess"));
             } else {
-              toast.error(t("toast.elder.editError"));
+              toast.error(t("toast.elder.updatedError"));
             }
           });
         }
@@ -155,9 +156,9 @@ const Elder = ({ dashboard }) => {
               ...toggle,
               add: !toggle.add,
             });
-            toast.success(t("toast.elder.addSuccess"));
+            toast.success(t("toast.elder.addedSuccess"));
           } else {
-            toast.error(t("toast.elder.addError"));
+            toast.error(t("toast.elder.addedError"));
           }
         });
       }
@@ -173,6 +174,23 @@ const Elder = ({ dashboard }) => {
         preview: URL.createObjectURL(file),
       });
     }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
   };
 
   // handle Input Using Formik
@@ -209,9 +227,9 @@ const Elder = ({ dashboard }) => {
               icon: "success",
               confirmButtonColor: "#0d1d34",
               confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.elder.deleteSuccess")));
+            }).then(() => toast.success(t("toast.elder.deletedSuccess")));
           } else {
-            toast.error(t("toast.elder.deleteError"));
+            toast.error(t("toast.elder.deletedError"));
           }
         });
       }
@@ -666,18 +684,9 @@ const Elder = ({ dashboard }) => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -693,6 +702,7 @@ const Elder = ({ dashboard }) => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
@@ -976,18 +986,9 @@ const Elder = ({ dashboard }) => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -1003,6 +1004,7 @@ const Elder = ({ dashboard }) => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>

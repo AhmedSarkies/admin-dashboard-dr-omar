@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import cookies from "js-cookie";
+import Cookies from "js-cookie";
 import React, { useEffect } from "react";
 import { MdMenu, MdOutlineLogout } from "react-icons/md";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -7,7 +7,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const Header = ({ menu, toggleMenu, linkItems }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const lng = cookies.get("i18next") || "ar";
+  const lng = Cookies.get("i18next") || "ar";
 
   useEffect(() => {
     document.documentElement.lang = lng;

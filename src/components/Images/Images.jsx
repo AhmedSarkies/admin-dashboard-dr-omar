@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Col,
@@ -37,6 +37,7 @@ const Images = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
+  const fileRef = useRef();
   const { pictures, pictureCategories, loading, error } = useSelector(
     (state) => state.picture
   );
@@ -59,7 +60,6 @@ const Images = () => {
     rowsPerPage: 5,
     currentPage: 1,
   });
-  const cate = pictureCategories?.map((category) => category);
 
   // Filtration, Sorting, Pagination
   const {
@@ -98,7 +98,6 @@ const Images = () => {
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("status", values.status);
-      formData.append("id", values.id);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
@@ -131,7 +130,11 @@ const Images = () => {
           }
         });
       } else {
-        dispatch(addPictureApi(formData)).then((res) => {
+        dispatch(addPictureApi({
+          image_categories_id: values.pictureCategory.id,
+          image: values.image.file,
+          status: values.status,
+        })).then((res) => {
           if (!res.error) {
             dispatch(
               addPicture({
@@ -163,6 +166,23 @@ const Images = () => {
         preview: URL.createObjectURL(file),
       });
     }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
   };
 
   // Handle Edit Picture
@@ -446,9 +466,7 @@ const Images = () => {
                     </td>
                   )}
                   {toggle.toggleColumns.category && (
-                    <td className="table-td name">
-                      {cate[result?.image_categories_id - 1]?.title}
-                    </td>
+                    <td className="table-td name">{result?.image_category}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
@@ -606,16 +624,7 @@ const Images = () => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
                             {t("delete")}
                           </button>
@@ -633,6 +642,7 @@ const Images = () => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
@@ -979,6 +989,7 @@ const Images = () => {
                       accept="image/*"
                       className="form-input form-img-input"
                       id="image"
+                      ref={fileRef}
                       onChange={handleImageChange}
                     />
                   </div>

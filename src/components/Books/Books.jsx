@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Col,
@@ -58,6 +58,7 @@ const Books = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
+  const fileRef = useRef();
   const { books, bookCategories, loading, error } = useSelector(
     (state) => state.book
   );
@@ -138,9 +139,9 @@ const Books = () => {
               edit: !toggle.edit,
             });
             formik.handleReset();
-            toast.success(t("toast.book.addSuccess"));
+            toast.success(t("toast.book.addedSuccess"));
           } else {
-            toast.error(t("toast.book.addError"));
+            toast.error(t("toast.book.addedError"));
           }
         });
       } else {
@@ -153,9 +154,9 @@ const Books = () => {
               add: !toggle.add,
             });
             formik.handleReset();
-            toast.success(t("toast.book.addSuccess"));
+            toast.success(t("toast.book.addedSuccess"));
           } else {
-            toast.error(t("toast.book.addError"));
+            toast.error(t("toast.book.addedError"));
           }
         });
       }
@@ -220,6 +221,23 @@ const Books = () => {
     } catch (error) {
       console.log(error);
     }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
   };
 
   // handle Input Using Formik
@@ -743,16 +761,7 @@ const Books = () => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
                             {t("delete")}
                           </button>
@@ -770,6 +779,7 @@ const Books = () => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
@@ -1191,16 +1201,7 @@ const Books = () => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
                             {t("delete")}
                           </button>
@@ -1218,6 +1219,7 @@ const Books = () => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>

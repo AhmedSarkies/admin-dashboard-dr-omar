@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
 import { useDispatch, useSelector } from "react-redux";
 
@@ -60,6 +60,7 @@ const Articles = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
+  const fileRef = useRef();
   const { articles, articleCategories, loading, error } = useSelector(
     (state) => state.article
   );
@@ -196,6 +197,23 @@ const Articles = () => {
         preview: URL.createObjectURL(file),
       });
     }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
   };
 
   // handle Input Using Formik
@@ -746,16 +764,7 @@ const Articles = () => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
                             {t("delete")}
                           </button>
@@ -773,6 +782,7 @@ const Articles = () => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
@@ -1174,16 +1184,7 @@ const Articles = () => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
+                            onClick={handleDeleteImage}
                           >
                             {t("delete")}
                           </button>
@@ -1201,6 +1202,7 @@ const Articles = () => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
+                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
