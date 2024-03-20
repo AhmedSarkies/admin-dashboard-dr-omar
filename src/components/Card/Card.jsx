@@ -6,8 +6,13 @@ const Card = ({ item }) => {
   return (
     <div
       className="card"
-      style={{ background: item.color, cursor: "pointer", color: "#fff" }}
-      onClick={() => navigate(`/dr-omar${item.path}`)}
+      style={{
+        background: item.color,
+        cursor: item.disabled ? "default" : "pointer",
+        color: "#fff",
+        pointerEvents: item.disabled ? "none" : "auto",
+      }}
+      onClick={() => navigate(`/dr-omar/${item.path}`)}
     >
       <div className="card-info">
         <h6 className="title text-center">{item.title}</h6>
