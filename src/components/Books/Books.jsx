@@ -589,22 +589,18 @@ const Books = () => {
                   )}
                   {toggle.toggleColumns.book && (
                     <td className="table-td">
-                      <span
+                      <a
+                        href={result?.file}
+                        target="_blank"
+                        rel="noreferrer"
                         style={{
                           cursor: "pointer",
                           color: "blue",
                         }}
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            readMore: !toggle.readMore,
-                          });
-                          formik.setValues(result);
-                        }}
                       >
                         عرض الكتاب
                         <FaBookReader className="me-2" />
-                      </span>
+                      </a>
                     </td>
                   )}
                   {toggle.toggleColumns.status && (
@@ -1534,7 +1530,7 @@ const Books = () => {
         </ModalBody>
       </Modal>
       {/* Preview Book */}
-      <Modal
+      {/*<Modal
         isOpen={toggle.readMore}
         toggle={() =>
           setToggle({
@@ -1566,7 +1562,7 @@ const Books = () => {
             height="500px"
           />
         </ModalBody>
-      </Modal>
+      </Modal>*/}
       {/* Pagination */}
       {results.length > 0 && error === null && loading === false && (
         <PaginationUI />
