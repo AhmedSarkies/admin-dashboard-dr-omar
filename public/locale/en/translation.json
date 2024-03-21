@@ -159,16 +159,16 @@
       "columns": {
         "title": "Title",
         "country": "Country",
-        "description": "Description",
+        "text": "Description",
         "ar": {
           "title": "Title (Arabic)",
           "country": "Country (Arabic)",
-          "description": "Description (Arabic)"
+          "text": "Description (Arabic)"
         },
         "en": {
           "title": "Title (English)",
           "country": "Country (English)",
-          "description": "Description (English)"
+          "text": "Description (English)"
         }
       }
     },
@@ -308,60 +308,68 @@
   },
   "toast": {
     "subAdmin": {
-      "addSuccess": "Sub Admin added successfully",
-      "addError": "An error occurred while adding sub admin",
-      "editSuccess": "Sub Admin edited successfully",
-      "editError": "An error occurred while editing sub admin",
-      "deleteSuccess": "Sub Admin deleted successfully",
-      "deleteError": "An error occurred while deleting sub admin"
+      "addedSuccess": "Sub Admin added successfully",
+      "addedError": "An error occurred while adding sub admin",
+      "editedSuccess": "Sub Admin edited successfully",
+      "editedError": "An error occurred while editing sub admin",
+      "deletedSuccess": "Sub Admin deleted successfully",
+      "deletedError": "An error occurred while deleting sub admin"
     },
     "elder": {
-      "addSuccess": "Elder added successfully",
-      "addError": "An error occurred while adding elder",
-      "editSuccess": "Elder edited successfully",
-      "editError": "An error occurred while editing elder",
-      "deleteSuccess": "Elder deleted successfully",
-      "deleteError": "An error occurred while deleting elder"
+      "addedSuccess": "Elder added successfully",
+      "addedError": "An error occurred while adding elder",
+      "editedSuccess": "Elder edited successfully",
+      "editedError": "An error occurred while editing elder",
+      "deletedSuccess": "Elder deleted successfully",
+      "deletedError": "An error occurred while deleting elder"
     },
     "article": {
-      "addSuccess": "The article has been added successfully",
-      "addError": "An error occurred while adding the article",
-      "editSuccess": "The article has been edited successfully",
-      "editError": "An error occurred while editing the article",
-      "deleteSuccess": "The article has been deleted successfully",
-      "deleteError": "An error occurred while deleting the article"
+      "addedSuccess": "The article has been added successfully",
+      "addedError": "An error occurred while adding the article",
+      "editedSuccess": "The article has been edited successfully",
+      "editedError": "An error occurred while editing the article",
+      "deletedSuccess": "The article has been deleted successfully",
+      "deletedError": "An error occurred while deleting the article"
     },
     "audio": {
-      "addSuccess": "Audio added successfully",
-      "addError": "An error occurred while adding audio",
-      "editSuccess": "Audio edited successfully",
-      "editError": "An error occurred while editing audio",
-      "deleteSuccess": "Audio deleted successfully",
-      "deleteError": "An error occurred while deleting audio"
+      "addedSuccess": "Audio added successfully",
+      "addedError": "An error occurred while adding audio",
+      "editedSuccess": "Audio edited successfully",
+      "editedError": "An error occurred while editing audio",
+      "deletedSuccess": "Audio deleted successfully",
+      "deletedError": "An error occurred while deleting audio"
     },
     "image": {
-      "addSuccess": "Image added successfully",
-      "addError": "An error occurred while adding image",
-      "editSuccess": "Image edited successfully",
-      "editError": "An error occurred while editing image",
-      "deleteSuccess": "Image deleted successfully",
-      "deleteError": "An error occurred while deleting image"
+      "addedSuccess": "Image added successfully",
+      "addedError": "An error occurred while adding image",
+      "editedSuccess": "Image edited successfully",
+      "editedError": "An error occurred while editing image",
+      "deletedSuccess": "Image deleted successfully",
+      "deletedError": "An error occurred while deleting image"
     },
     "book": {
-      "addSuccess": "Book added successfully",
-      "addError": "An error occurred while adding book",
-      "editSuccess": "Book edited successfully",
-      "editError": "An error occurred while editing book",
-      "deleteSuccess": "Book deleted successfully",
-      "deleteError": "An error occurred while deleting book"
+      "addedSuccess": "Book added successfully",
+      "addedError": "An error occurred while adding book",
+      "editedSuccess": "Book edited successfully",
+      "editedError": "An error occurred while editing book",
+      "deletedSuccess": "Book deleted successfully",
+      "deletedError": "An error occurred while deleting book"
     },
     "category": {
-      "addSuccess": "Category added successfully",
-      "addError": "An error occurred while adding category",
-      "editSuccess": "Category edited successfully",
-      "editError": "An error occurred while editing category",
-      "deleteSuccess": "Category deleted successfully",
-      "deleteError": "An error occurred while deleting category"
+      "addedSuccess": "Category added successfully",
+      "addedError": "An error occurred while adding category",
+      "editedSuccess": "Category edited successfully",
+      "editedError": "An error occurred while editing category",
+      "deletedSuccess": "Category deleted successfully",
+      "deletedError": "An error occurred while deleting category"
+    },
+    "termsAndConditions": {
+      "addedSuccess": "Terms and Conditions added successfully",
+      "addedError": "An error occurred while adding terms and conditions",
+      "editedSuccess": "Terms and Conditions edited successfully",
+      "editedError": "An error occurred while editing terms and conditions",
+      "deletedSuccess": "Terms and Conditions deleted successfully",
+      "deletedError": "An error occurred while deleting terms and conditions"
     }
   },
   "validation": {
@@ -382,6 +390,7 @@
     "name": "Please enter a name",
     "content": "Please enter a content",
     "mainCategory": "Please choose a main category",
-    "subCategory": "Please choose a sub category"
+    "subCategory": "Please choose a sub category",
+    "url": "Please enter a valid URL"
   }
 }
