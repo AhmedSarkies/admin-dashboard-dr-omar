@@ -9,3 +9,4 @@ export { default as sliderSlice } from "./sliderSlice";
 export { default as subAdminSlice } from "./subAdminSlice";
 export { default as codeContentSlice } from "./codeContentSlice";
 export { default as settingsSlice } from "./settingsSlice";
+export { default as termsConditionsSlice } from "./termsConditionsSlice";

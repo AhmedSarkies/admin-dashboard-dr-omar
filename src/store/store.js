@@ -12,6 +12,7 @@ import {
   sliderSlice,
   codeContentSlice,
   settingsSlice,
+  termsConditionsSlice,
 } from "./slices";
 
 const store = configureStore({
@@ -27,6 +28,7 @@ const store = configureStore({
     slider: sliderSlice,
     codeContent: codeContentSlice,
     settings: settingsSlice,
+    termsAndConditions: termsConditionsSlice,
   },
 });
 
