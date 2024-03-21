@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { mixed, number, object, string } from "yup";
+import { boolean, mixed, number, object, string } from "yup";
 
 const useSchema = () => {
   const { t } = useTranslation();
@@ -155,6 +155,17 @@ const useSchema = () => {
           return true;
         }
       }),
+    }),
+    settings: object().shape({
+      image: mixed().notRequired(),
+      prayerTime: boolean().notRequired(),
+      adhan: boolean().notRequired(),
+      facebook: string().url(t("validation.url")).notRequired(),
+      whatsapp: string().url(t("validation.url")).notRequired(),
+      messenger: string().url(t("validation.url")).notRequired(),
+      instagram: string().url(t("validation.url")).notRequired(),
+      playStore: string().url(t("validation.url")).notRequired(),
+      appStore: string().url(t("validation.url")).notRequired(),
     }),
   };
 

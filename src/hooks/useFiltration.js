@@ -109,7 +109,7 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
 
   // TODO: Sorting
   // Sorting
-  results.sort((firstRow, otherRow) =>
+  results?.sort((firstRow, otherRow) =>
     firstRow[toggle.sortColumn]
       ?.toString()
       .localeCompare(otherRow[toggle.sortColumn].toString())
