@@ -1352,15 +1352,6 @@ div[tabindex] {
   .login-title {
     font-size: 1rem;
   }
-  .dashboard .dashboard-header .dashboard-header-title .login-title,
-  .login.forget-password-page .login-title {
-    font-size: 0.8rem;
-    width: max-content;
-  }
-  .dashboard .dashboard-header .dashboard-header-btns button {
-    font-size: 0.7rem;
-    gap: 0.2rem;
-  }
   .login-logo {
     width: 180px;
   }
@@ -1373,5 +1364,26 @@ div[tabindex] {
   .change-password-btn,
   .profile .profile-footer .add-btn {
     font-size: 0.6rem !important;
+  }
+}
+@media only screen and (max-width: 480px) {
+  .dashboard-header {
+    padding: 5px !important;
+  }
+  .dashboard .dashboard-header .dashboard-header-btns,
+  .dashboard .dashboard-header .dashboard-header-title {
+    gap: 0.25rem;
+  }
+  .dashboard .dashboard-header .dashboard-header-title .login-title,
+  .login.forget-password-page .login-title {
+    font-size: 0.8rem;
+    width: max-content;
+  }
+  .dashboard .dashboard-header .dashboard-header-btns button {
+    font-size: 0.6rem;
+    gap: 0.4rem;
+  }
+  .dashboard .dashboard-header .dashboard-header-btns button.lang-btn {
+    padding: 0.25rem 0.5rem !important;
   }
 }
