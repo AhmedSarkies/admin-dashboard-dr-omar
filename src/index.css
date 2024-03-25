@@ -1321,6 +1321,12 @@ div[tabindex] {
   .table-header .add-btn {
     font-size: 1.1rem;
   }
+  .table-header .add-btn.send {
+    font-size: 0.8rem;
+  }
+  .pagination-container {
+    gap: 0.5rem;
+  }
   .table-td .table-btn-container svg {
     font-size: 1rem !important;
   }
