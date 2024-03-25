@@ -2,10 +2,9 @@ import i18next from "i18next";
 import Cookies from "js-cookie";
 import React, { useEffect } from "react";
 import { MdMenu, MdOutlineLogout } from "react-icons/md";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 const Header = ({ menu, toggleMenu, linkItems }) => {
-  const navigate = useNavigate();
   const location = useLocation();
   const lng = Cookies.get("i18next") || "ar";
 
@@ -16,7 +15,6 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
   // Logout Function
   const logout = () => {
     Cookies.remove("_auth");
-    navigate("/dr-omar/login", { replace: true });
     window.location.href = "/dr-omar/login";
   };
 
