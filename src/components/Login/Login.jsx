@@ -1,18 +1,14 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-
 import { useFormik } from "formik";
-import { useSchema } from "../../hooks";
-
-import logo from "../../assets/images/logo.jpg";
-import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
-import Http from "../../Http";
 import Cookies from "js-cookie";
+import { toast } from "react-toastify";
+import Http from "../../Http";
+import { useSchema } from "../../hooks";
+import logo from "../../assets/images/logo.jpg";
 
 const Login = () => {
   const { t } = useTranslation();
-  const navigate = useNavigate();
   const { validationSchema } = useSchema();
   const [loading, setLoading] = useState(false);
   const onSubmit = async (values) => {
@@ -27,14 +23,12 @@ const Login = () => {
         Cookies.remove("_auth");
         // Set Token in Cookies
         Cookies.set("_auth", JSON.stringify(response.data.data.token), {
-          expires: 7,
+          expires: 30,
           secure: true,
           sameSite: "strict",
           path: "/",
         });
         setLoading(false);
-        // Navigate to Dashboard
-        navigate("/dr-omar/dashboard", { replace: true });
         window.location.href = "/dr-omar/dashboard";
       }
     } catch (error) {
@@ -104,33 +98,43 @@ const Login = () => {
             <span className="error">{formik.errors.password}</span>
           ) : null}
         </div>
-        {/* <div className="form-group radio-group mt-2">
-                  <label className="radio admin" htmlFor="admin">
-                    <input
-                      type="radio"
-                      name="userType"
-                      id="admin"
-                      value="admin"
-                      checked={formik.values.userType === "admin"}
-                      onChange={handleInputChange}
-                    />
-                    أدمن
-                    <div className="radio-btn"></div>
-                  </label>
-                  <label className="radio admin sub-admin" htmlFor="sub-admin">
-                    <input
-                      type="radio"
-                      name="userType"
-                      id="sub-admin"
-                      value="sub-admin"
-                      checked={formik.values.userType === "sub-admin"}
-                      onChange={handleInputChange}
-                    />
-                    مسؤول فرعي
-                    <div className="radio-btn"></div>
-                  </label>
-                </div> */}
-        <button type="submit" className="btn submit-btn w-100">
+        {/*<div className="form-group radio-group mt-2">
+          <label className="radio admin" htmlFor="admin">
+            <input
+              type="radio"
+              name="userType"
+              id="admin"
+              value="admin"
+              checked={formik.values.userType === "admin"}
+              onChange={handleInputChange}
+            />
+            أدمن
+            <div className="radio-btn"></div>
+          </label>
+          <label className="radio admin sub-admin" htmlFor="sub-admin">
+            <input
+              type="radio"
+              name="userType"
+              id="sub-admin"
+              value="sub-admin"
+              checked={formik.values.userType === "sub-admin"}
+              onChange={handleInputChange}
+            />
+            مسؤول فرعي
+            <div className="radio-btn"></div>
+          </label>
+        </div>*/}
+        <button
+          type="submit"
+          className="btn submit-btn w-100"
+          disabled={loading ? true : false}
+          style={{
+            opacity: 1,
+            background: `${
+              loading ? "rgb(11 28 48 / 85%)" : "rgb(11 28 48 / 93%)"
+            }`,
+          }}
+        >
           {loading ? (
             <div className="spinner-border text-light" role="status">
               <span className="visually-hidden">Loading...</span>
@@ -140,9 +144,9 @@ const Login = () => {
           )}
         </button>
       </form>
-      {/* <Link to="/dr-omar/forget-password" className="forget-password">
+      {/*<Link to="/dr-omar/forget-password" className="forget-password">
         {t("auth.login.forgetPassword")}
-      </Link> */}
+      </Link>*/}
     </div>
   );
 };
