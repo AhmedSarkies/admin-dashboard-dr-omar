@@ -590,12 +590,12 @@ const Books = () => {
                   {toggle.toggleColumns.book && (
                     <td className="table-td">
                       <a
-                        href={result?.file}
+                        href={result?.Book}
                         target="_blank"
                         rel="noreferrer"
                         style={{
                           cursor: "pointer",
-                          color: "blue",
+                          color: "blue !important",
                         }}
                       >
                         عرض الكتاب

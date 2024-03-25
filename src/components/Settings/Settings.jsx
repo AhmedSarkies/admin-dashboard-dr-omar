@@ -1,7 +1,12 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  getSettings,
+  addSetting,
+  updateSetting,
+} from "../../store/slices/settingsSlice";
 import {
   Col,
   Modal,
@@ -70,8 +75,9 @@ const appFields = [
 
 const Settings = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   // const { validationSchema } = useSchema();
-  const { loading } = useSelector((state) => state.settings);
+  const { settings, loading } = useSelector((state) => state.settings);
   const fileRef = useRef();
   const [toggle, setToggle] = useState({
     add: false,
@@ -83,8 +89,7 @@ const Settings = () => {
         file: "",
         preview: "",
       },
-      prayerTime: false,
-      adhan: false,
+      prayer_timings: false,
       facebook: "",
       whatsapp: "",
       messenger: "",
@@ -94,7 +99,33 @@ const Settings = () => {
     },
     // validationSchema: validationSchema.settings,
     onSubmit: (values) => {
-      console.log(values);
+      if (settings) {
+        dispatch(
+          updateSetting({
+            image: values.image.file,
+            prayer_timings: values.prayer_timings === true ? 1 : 0,
+            facebook: values.facebook,
+            whatsapp: values.whatsapp,
+            messenger: values.messenger,
+            instagram: values.instagram,
+            play_store: values.playStore,
+            app_store: values.appStore,
+          })
+        );
+      } else {
+        dispatch(
+          addSetting({
+            image: values.image.file,
+            prayer_timings: values.prayer_timings === true ? 1 : 0,
+            facebook: values.facebook,
+            whatsapp: values.whatsapp,
+            messenger: values.messenger,
+            instagram: values.instagram,
+            play_store: values.playStore,
+            app_store: values.appStore,
+          })
+        );
+      }
     },
   });
 
@@ -134,6 +165,31 @@ const Settings = () => {
   const handleInputChange = (e) => {
     formik.handleChange(e);
   };
+
+  // Get Settings
+  useEffect(() => {
+    dispatch(getSettings());
+  }, [dispatch]);
+
+  // Set Settings
+  useEffect(() => {
+    if (settings) {
+      formik.setValues({
+        image: {
+          file: settings?.image,
+          preview: settings?.image,
+        },
+        prayer_timings: settings?.prayer_timings === 1 ? true : false,
+        facebook: settings?.facebook,
+        whatsapp: settings?.whatsapp,
+        messenger: settings?.messenger,
+        instagram: settings?.instagram,
+        playStore: settings?.play_store,
+        appStore: settings?.app_store,
+      });
+    }
+    /* eslint-disable react-hooks/exhaustive-deps */
+  }, [settings]);
 
   return (
     <>
@@ -268,30 +324,16 @@ const Settings = () => {
             </h3>
           </div>
           <Row>
-            <Col sm={6}>
+            <Col sm={12}>
               <div className="form-group d-flex justify-content-end mb-4">
-                <label htmlFor="prayerTime" className="form-label">
+                <label htmlFor="prayer_timings" className="form-label">
                   {t("settings.settingsApp.prayer.time")}
                 </label>
                 <input
                   type="checkbox"
                   className="prayer-time-input me-3 ms-3"
-                  id="prayerTime"
-                  name="prayerTime"
-                  onChange={handleInputChange}
-                />
-              </div>
-            </Col>
-            <Col sm={6}>
-              <div className="form-group d-flex justify-content-end mb-4">
-                <label htmlFor="adhan" className="form-label">
-                  {t("settings.settingsApp.prayer.adhan")}
-                </label>
-                <input
-                  type="checkbox"
-                  className="prayer-time-input me-3 ms-3"
-                  id="adhan"
-                  name="adhan"
+                  id="prayer_timings"
+                  name="prayer_timings"
                   onChange={handleInputChange}
                 />
               </div>

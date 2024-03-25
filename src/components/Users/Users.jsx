@@ -1,23 +1,18 @@
 import React, { useEffect, useState } from "react";
-import { useFormik } from "formik";
-import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
-import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-import { MdSend } from "react-icons/md";
-import { IoMdClose } from "react-icons/io";
-import { sendCodeContent } from "../../store/slices/codeContentSlice";
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { toast } from "react-toastify";
-import { useFiltration, useSchema } from "../../hooks";
+import { Spinner } from "reactstrap";
 import { getUsers } from "../../store/slices/userSlice";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import { useFiltration } from "../../hooks";
+import { useTranslation } from "react-i18next";
 
-const CodeContent = () => {
+const Users = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
     add: false,
+    readMessage: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -29,34 +24,6 @@ const CodeContent = () => {
       id: true,
       name: true,
       email: true,
-      send: true,
-    },
-  });
-
-  // Formik
-  const formik = useFormik({
-    initialValues: {
-      User_id: "",
-      code: "",
-    },
-    validationSchema: validationSchema.codeContent,
-    onSubmit: (values) => {
-      if (toggle.everyOne) {
-        console.log("Send to every one");
-      } else {
-        dispatch(sendCodeContent(values)).then((response) => {
-          if (sendCodeContent.fulfilled.match(response)) {
-            toast.success(t("toast.codeContent.addedSuccess"));
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-          } else if (sendCodeContent.rejected.match(response)) {
-            toast.error(t("toast.codeContent.addedError"));
-          }
-        });
-      }
     },
   });
 
@@ -66,7 +33,6 @@ const CodeContent = () => {
     { id: 0, name: "id", label: t("user.columns.id") },
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "send", label: t("settings.codeContent.columns.send") },
   ];
   const {
     PaginationUI,
@@ -80,16 +46,6 @@ const CodeContent = () => {
     setToggle,
   });
 
-  // Handle Add
-  const handleAdd = (result) => {
-    setToggle({
-      ...toggle,
-      add: !toggle.add,
-      everyOne: false,
-    });
-    formik.setFieldValue("User_id", result?.id);
-  };
-
   // get data from api
   useEffect(() => {
     try {
@@ -101,21 +57,6 @@ const CodeContent = () => {
 
   return (
     <div className="scholar-container mt-4 m-3">
-      <div className="table-header">
-        <button
-          className="add-btn send"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              everyOne: true,
-            })
-          }
-        >
-          <MdSend />
-          {t("settings.codeContent.sendTitleEveryOne")}
-        </button>
-      </div>
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
@@ -219,11 +160,6 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.send && (
-                <th className="table-th">
-                  {t("settings.codeContent.columns.send")}
-                </th>
-              )}
             </tr>
           </thead>
           {/* Error */}
@@ -296,115 +232,12 @@ const CodeContent = () => {
                   <td className="table-td email">
                     <a href={`mailto:${result?.email}`}>{result?.email}</a>
                   </td>
-                  <td className="table-td send">
-                    <MdSend
-                      className="btn-edit"
-                      style={{
-                        color: "green",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleAdd(result)}
-                    />
-                  </td>
                 </tr>
               ))}
             </tbody>
           )}
         </table>
       </div>
-      {/* Add Book */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-          formik.handleReset();
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-book modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-          }}
-        >
-          {t("settings.codeContent.sendTitle")}
-          <IoMdClose
-            onClick={() => {
-              setToggle({
-                ...toggle,
-                add: !toggle.add,
-              });
-              formik.handleReset();
-            }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12}>
-                {/* Code */}
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="code" className="form-label">
-                    {t("settings.codeContent.columns.code")}
-                  </label>
-                  <input
-                    type="text"
-                    id="code"
-                    name="code"
-                    className="form-input w-100"
-                    placeholder={t("settings.codeContent.columns.code")}
-                    value={formik.values.code}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors.code && formik.touched.code ? (
-                    <span className="error">{formik.errors.code}</span>
-                  ) : null}
-                </div>
-              </Col>
-            </Row>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("settings.codeContent.columns.send")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
       {/* Pagination */}
       {results?.length > 0 && error === null && loading === false && (
         <PaginationUI />
@@ -413,4 +246,4 @@ const CodeContent = () => {
   );
 };
 
-export default CodeContent;
+export default Users;

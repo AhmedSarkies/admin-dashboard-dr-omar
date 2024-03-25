@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { useFormik } from "formik";
@@ -8,24 +8,38 @@ import logo from "../../assets/images/logo.jpg";
 import { toast } from "react-toastify";
 import { useTranslation } from "react-i18next";
 import Http from "../../Http";
+import Cookies from "js-cookie";
 
 const Login = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
   const { validationSchema } = useSchema();
-  const submitHandler = async (values) => {
+  const [loading, setLoading] = useState(false);
+  const onSubmit = async (values) => {
+    setLoading(true);
     try {
       const response = await Http({
         method: "POST",
-        url: "/login",
+        url: "/admin/login",
         data: values,
-        withCredentials: true,
       });
       if (response.status === 200) {
-        navigate("/dashboard", { replace: true, state: response.data });
+        Cookies.remove("_auth");
+        // Set Token in Cookies
+        Cookies.set("_auth", JSON.stringify(response.data.data.token), {
+          expires: 7,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        setLoading(false);
+        // Navigate to Dashboard
+        navigate("/dr-omar/dashboard", { replace: true });
+        window.location.href = "/dr-omar/dashboard";
       }
     } catch (error) {
-      toast.error(error.response.data.message);
+      setLoading(false);
+      toast.error("error.response.data.message");
     }
   };
   const formik = useFormik({
@@ -35,17 +49,7 @@ const Login = () => {
       //   userType: "",
     },
     validationSchema: validationSchema.login,
-    onSubmit: (values) => {
-      if (
-        values.email !== "admin@gmail.com" &&
-        values.password !== "admin123"
-      ) {
-        toast.error("الحساب غير موجود");
-        submitHandler(values);
-      } else {
-        navigate("/dr-omar/dashboard", { replace: true, state: values });
-      }
-    },
+    onSubmit,
   });
   //   Handle Input Change using formik
   const handleInputChange = (e) => {
@@ -127,7 +131,13 @@ const Login = () => {
                   </label>
                 </div> */}
         <button type="submit" className="btn submit-btn w-100">
-          {t("auth.login.submit")}
+          {loading ? (
+            <div className="spinner-border text-light" role="status">
+              <span className="visually-hidden">Loading...</span>
+            </div>
+          ) : (
+            t("auth.login.submit")
+          )}
         </button>
       </form>
       {/* <Link to="/dr-omar/forget-password" className="forget-password">

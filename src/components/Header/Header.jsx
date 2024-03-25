@@ -13,6 +13,13 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
     document.documentElement.lang = lng;
   }, [lng]);
 
+  // Logout Function
+  const logout = () => {
+    Cookies.remove("_auth");
+    navigate("/dr-omar/login", { replace: true });
+    window.location.href = "/dr-omar/login";
+  };
+
   return (
     <>
       <div className={`overlay${menu ? " active" : ""}`}></div>
@@ -20,7 +27,9 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
         <div className="dashboard-header-btns">
           <button
             className="btn logout-btn"
-            onClick={() => navigate("/dr-omar/login", { replace: true })}
+            onClick={() => {
+              logout();
+            }}
           >
             <MdOutlineLogout />
             {lng === "en" ? "Logout" : "تسجيل الخروج"}

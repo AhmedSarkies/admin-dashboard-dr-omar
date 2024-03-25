@@ -12,14 +12,15 @@ import {
 import { useTranslation } from "react-i18next";
 import { Header, Sidebar } from "../";
 import logo from "../../assets/images/logo.jpg";
+import { HiUsers } from "react-icons/hi2";
 
 const Home = () => {
   const { t } = useTranslation();
   const linkItems = [
     {
-      icon: <IoMdHome />,
       title: t("linkItems.home"),
       path: "/dr-omar/dashboard",
+      icon: <IoMdHome />,
     },
     // {
     //   title: t("linkItems.profile"),
@@ -32,6 +33,11 @@ const Home = () => {
       icon: <MdAdminPanelSettings />,
     },
     {
+      title: t("linkItems.users"),
+      path: "/dr-omar/users",
+      icon: <HiUsers />,
+    },
+    {
       title: t("linkItems.messages"),
       path: "/dr-omar/messages",
       icon: <MdOutlineMarkunread />,
@@ -40,10 +46,10 @@ const Home = () => {
       title: t("linkItems.settingsApp"),
       path: "/dr-omar/settings",
     },
-    {
-      title: t("linkItems.prayerTime"),
-      path: "/dr-omar/prayer-time",
-    },
+    // {
+    //   title: t("linkItems.prayerTime"),
+    //   path: "/dr-omar/prayer-time",
+    // },
     {
       title: t("linkItems.codeContent"),
       path: "/dr-omar/code-content",
@@ -56,10 +62,10 @@ const Home = () => {
       title: t("linkItems.termsAndConditions"),
       path: "/dr-omar/terms&conditions",
     },
-    {
-      title: t("linkItems.links"),
-      path: "/dr-omar/links",
-    },
+    // {
+    //   title: t("linkItems.links"),
+    //   path: "/dr-omar/links",
+    // },
     {
       title: t("linkItems.mainCategoriesBooks"),
       path: "/dr-omar/main-categories-book",

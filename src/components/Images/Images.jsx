@@ -101,11 +101,11 @@ const Images = () => {
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
-      if (values.id) {
+      if (values?.id) {
         dispatch(
           updatePictureApi({
             id: values.id,
-            category_id: values.pictureCategory.id,
+            category_id: values.pictureCategory?.id,
             image: values.image.file,
             status: values.status,
           })
@@ -113,8 +113,8 @@ const Images = () => {
           if (!res.error) {
             dispatch(
               updatePicture({
-                id: values.id,
-                category_id: values.pictureCategory.id,
+                id: values?.id,
+                category_id: values.pictureCategory?.id,
                 image: values.image.file,
                 status: values.status,
               })
@@ -130,16 +130,18 @@ const Images = () => {
           }
         });
       } else {
-        dispatch(addPictureApi({
-          image_categories_id: values.pictureCategory.id,
-          image: values.image.file,
-          status: values.status,
-        })).then((res) => {
+        dispatch(
+          addPictureApi({
+            image_categories_id: values.pictureCategory?.id,
+            image: values.image.file,
+            status: values.status,
+          })
+        ).then((res) => {
           if (!res.error) {
             dispatch(
               addPicture({
                 ...values,
-                image_categories_id: values.pictureCategory.id,
+                image_categories_id: values.pictureCategory?.id,
                 image: values.image.preview,
               })
             );
@@ -192,7 +194,7 @@ const Images = () => {
       image: picture?.image,
       status: picture?.status,
       pictureCategory: {
-        title: picture?.pictureCategory?.title,
+        title: picture?.image_category?.title,
         id: picture?.pictureCategory?.id,
       },
     });
@@ -314,7 +316,7 @@ const Images = () => {
               {columns.map((column) => (
                 <button
                   type="button"
-                  key={column.id}
+                  key={column?.id}
                   className={`item filter`}
                   onClick={() => handleToggleColumns(column.name)}
                 >
@@ -466,7 +468,9 @@ const Images = () => {
                     </td>
                   )}
                   {toggle.toggleColumns.category && (
-                    <td className="table-td name">{result?.image_category}</td>
+                    <td className="table-td name">
+                      {result?.image_category?.title}
+                    </td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
@@ -689,13 +693,13 @@ const Images = () => {
                       {pictureCategories?.map((category) => (
                         <button
                           type="button"
-                          key={category.id}
+                          key={category?.id}
                           className={`item ${
-                            formik.values.pictureCategory.id === category.id
+                            formik.values.pictureCategory?.id === category?.id
                               ? "active"
                               : ""
                           }`}
-                          value={category.id}
+                          value={category?.id}
                           name="pictureCategory"
                           onClick={() => {
                             setToggle({
@@ -703,12 +707,12 @@ const Images = () => {
                               pictureCategories: !toggle.pictureCategories,
                             });
                             formik.setFieldValue("pictureCategory", {
-                              title: category.title,
-                              id: category.id,
+                              title: category?.title,
+                              id: category?.id,
                             });
                           }}
                         >
-                          {category.title}
+                          {category?.title}
                         </button>
                       ))}
                     </div>
@@ -1042,13 +1046,13 @@ const Images = () => {
                       {pictureCategories?.map((category) => (
                         <button
                           type="button"
-                          key={category.id}
+                          key={category?.id}
                           className={`item ${
-                            formik.values.pictureCategory.id === category.id
+                            formik.values.pictureCategory?.id === category?.id
                               ? "active"
                               : ""
                           }`}
-                          value={category.id}
+                          value={category?.id}
                           name="pictureCategory"
                           onClick={() => {
                             setToggle({
@@ -1056,12 +1060,12 @@ const Images = () => {
                               pictureCategories: !toggle.pictureCategories,
                             });
                             formik.setFieldValue("pictureCategory", {
-                              title: category.title,
-                              id: category.id,
+                              title: category?.title,
+                              id: category?.id,
                             });
                           }}
                         >
-                          {category.title}
+                          {category?.title}
                         </button>
                       ))}
                     </div>
