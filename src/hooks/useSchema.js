@@ -167,6 +167,15 @@ const useSchema = () => {
       playStore: string().url(t("validation.url")).notRequired(),
       appStore: string().url(t("validation.url")).notRequired(),
     }),
+    codeContent: object().shape({
+      code: number()
+        .typeError(t("validation.code"))
+        .positive(t("validation.code"))
+        .integer(t("validation.code"))
+        .min(1000, t("validation.code"))
+        .max(9999, t("validation.code"))
+        .required(t("validation.codeContent")),
+    }),
   };
 
   return { validationSchema };

@@ -9,6 +9,7 @@ import {
   Home,
   Dashboard,
   SubAdmins,
+  Users,
   Messages,
   Settings,
   Slider,
@@ -24,64 +25,68 @@ import {
   Books,
   Images,
   CodeContent,
-  PrayerTime,
-  Links,
 } from "./components";
 
 const App = () => {
   const lng = Cookies.get("i18next") || "ar";
+  const auth = Cookies.get("_auth");
 
   useEffect(() => {
     document.documentElement.lang = lng;
   }, [lng]);
 
+  return <div className="App">{auth ? <RoutesHome /> : <RoutesLogin />}</div>;
+};
+
+const RoutesLogin = () => {
   return (
-    <div className="App">
-      <Routes>
-        {/* <Route
-          path="/"
+    <Routes>
+      <Route path="/" element={<LoginLayout />}>
+        <Route
+          path=""
           element={<Navigate to="/dr-omar/login" replace={true} />}
-        /> */}
-        <Route path="/" element={<LoginLayout />}>
-          <Route
-            path=""
-            element={<Navigate to="/dr-omar/login" replace={true} />}
-          />
-          <Route
-            path="*"
-            element={<Navigate to="/dr-omar/login" replace={true} />}
-          />
-          <Route
-            path="dr-omar"
-            element={<Navigate to="/dr-omar/login" replace={true} />}
-          />
-          <Route path="dr-omar/login" element={<Login />} />
-          {/* <Route path="dr-omar/forget-password" element={<ForgetPassword />} /> */}
-        </Route>
-        <Route path="/dr-omar" element={<Home />}>
-          <Route path="*" element={<Dashboard />} />
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="sub-admins" element={<SubAdmins />} />
-          <Route path="messages" element={<Messages />} />
-          <Route path="settings" element={<Settings />} />
-          <Route path="prayer-time" element={<PrayerTime />} />
-          <Route path="code-content" element={<CodeContent />} />
-          <Route path="slider" element={<Slider />} />
-          <Route path="terms&conditions" element={<TermsAndConditions />} />
-          <Route path="links" element={<Links />} />
-          <Route path="categories-article" element={<CategoriesArticle />} />
-          <Route path="categories-image" element={<CategoriesImage />} />
-          <Route path="categories-audio" element={<CategoriesAudio />} />
-          <Route path="main-categories-book" element={<CategoriesBook />} />
-          <Route path="sub-categories-book" element={<SubCategoriesBook />} />
-          <Route path="elder" element={<Elder />} />
-          <Route path="articles" element={<Articles />} />
-          <Route path="audios" element={<Audios />} />
-          <Route path="books" element={<Books />} />
-          <Route path="images" element={<Images />} />
-        </Route>
-      </Routes>
-    </div>
+        />
+        <Route
+          path="*"
+          element={<Navigate to="/dr-omar/login" replace={true} />}
+        />
+        <Route
+          path="dr-omar"
+          element={<Navigate to="/dr-omar/login" replace={true} />}
+        />
+        <Route path="dr-omar/login" element={<Login />} />
+      </Route>
+    </Routes>
+  );
+};
+
+const RoutesHome = () => {
+  return (
+    <Routes>
+      <Route path="/dr-omar" element={<Home />}>
+        <Route path="" element={<Navigate to="/dr-omar/dashboard" />} />
+        <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />
+        <Route path="*" element={<Dashboard />} />
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="sub-admins" element={<SubAdmins />} />
+        <Route path="users" element={<Users />} />
+        <Route path="messages" element={<Messages />} />
+        <Route path="settings" element={<Settings />} />
+        <Route path="code-content" element={<CodeContent />} />
+        <Route path="slider" element={<Slider />} />
+        <Route path="terms&conditions" element={<TermsAndConditions />} />
+        <Route path="categories-article" element={<CategoriesArticle />} />
+        <Route path="categories-image" element={<CategoriesImage />} />
+        <Route path="categories-audio" element={<CategoriesAudio />} />
+        <Route path="main-categories-book" element={<CategoriesBook />} />
+        <Route path="sub-categories-book" element={<SubCategoriesBook />} />
+        <Route path="elder" element={<Elder />} />
+        <Route path="articles" element={<Articles />} />
+        <Route path="audios" element={<Audios />} />
+        <Route path="books" element={<Books />} />
+        <Route path="images" element={<Images />} />
+      </Route>
+    </Routes>
   );
 };
 
