@@ -34,7 +34,7 @@ const Login = () => {
       }
     } catch (error) {
       setLoading(false);
-      toast.error("error.response.data.message");
+      toast.error(t("toast.login.error"));
     }
   };
   const formik = useFormik({
