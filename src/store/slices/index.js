@@ -3,6 +3,7 @@ export { default as scholarSlice } from "./scholarSlice";
 export { default as bookSlice } from "./bookSlice";
 export { default as audioSlice } from "./audioSlice";
 export { default as messagesSlice } from "./messagesSlice";
+export { default as userSlice } from "./userSlice";
 export { default as mostListeningSlice } from "./mostListeningSlice";
 export { default as pictureSlice } from "./pictureSlice";
 export { default as sliderSlice } from "./sliderSlice";

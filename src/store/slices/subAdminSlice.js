@@ -9,13 +9,13 @@ const initialState = {
 };
 
 // Get SubAdmins using Axios and Redux Thunk
-export const getSubAdminsApi = createAsyncThunk(
-  "subAdmin/getSubAdminsApi",
+export const getSubAdmins = createAsyncThunk(
+  "subAdmin/getSubAdmins",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
         method: "GET",
-        url: "/SubAdmin/Get",
+        url: "/admin/Get",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -29,8 +29,8 @@ export const getSubAdminsApi = createAsyncThunk(
 );
 
 // Add SubAdmin using Axios and Redux Thunk
-export const addSubAdminApi = createAsyncThunk(
-  "SubAdmin/addSubAdminApi",
+export const addSubAdmin = createAsyncThunk(
+  "SubAdmin/addSubAdmin",
   async (data, { rejectWithValue }) => {
     try {
       await Http({
@@ -46,32 +46,14 @@ export const addSubAdminApi = createAsyncThunk(
   }
 );
 
-// Update SubAdmin using Axios and Redux Thunk
-export const updateSubAdminApi = createAsyncThunk(
-  "subAdmin/updateSubAdminApi",
-  async (data, { rejectWithValue }) => {
-    try {
-      await Http({
-        method: "POST",
-        url: `/SubAdmin/Update`,
-        data,
-      }).then((response) => {
-        return response.data;
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 // Delete SubAdmin using Axios and Redux Thunk
-export const deleteSubAdminApi = createAsyncThunk(
-  "subAdmin/deleteSubAdminApi",
+export const deleteSubAdmin = createAsyncThunk(
+  "subAdmin/deleteSubAdmin",
   async (id, { rejectWithValue }) => {
     try {
       await Http({
         method: "POST",
-        url: `/SubAdmin/Delete`,
+        url: `/admin/Delete`,
         params: { id },
         headers: {
           "Content-Type": "application/json",
@@ -90,89 +72,52 @@ export const deleteSubAdminApi = createAsyncThunk(
 const subAdminSlice = createSlice({
   name: "subAdmin",
   initialState,
-  reducers: {
-    // Get SubAdmins
-    getSubAdmins: (state, action) => {
-      state.subAdmins = action.payload;
-    },
-    // Add SubAdmin
-    addSubAdmin: (state, action) => {
-      state.subAdmins.push(action.payload);
-    },
-    // Update SubAdmin
-    updateSubAdmin: (state, action) => {
-      state.subAdmins = state.subAdmins.map((subAdmin) =>
-        subAdmin.id === action.payload.id ? action.payload : subAdmin
-      );
-    },
-    // Delete SubAdmin
-    deleteSubAdmin: (state, action) => {
-      state.subAdmins = state.subAdmins.filter(
-        (subAdmin) => subAdmin.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get SubAdmin======
     // Pending
-    builder.addCase(getSubAdminsApi.pending, (state, action) => {
+    builder.addCase(getSubAdmins.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(getSubAdminsApi.fulfilled, (state, action) => {
+    builder.addCase(getSubAdmins.fulfilled, (state, action) => {
       state.subAdmins = action.payload;
       state.loading = false;
     });
     // Rejected
-    builder.addCase(getSubAdminsApi.rejected, (state, action) => {
+    builder.addCase(getSubAdmins.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
     // ======Add SubAdmin======
     // Pending
-    builder.addCase(addSubAdminApi.pending, (state, action) => {
+    builder.addCase(addSubAdmin.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(addSubAdminApi.fulfilled, (state, action) => {
+    builder.addCase(addSubAdmin.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(addSubAdminApi.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
-    // ======Update SubAdmin======
-    // Pending
-    builder.addCase(updateSubAdminApi.pending, (state, action) => {
-      state.loading = true;
-    });
-    // Fulfilled
-    builder.addCase(updateSubAdminApi.fulfilled, (state, action) => {
-      state.loading = false;
-    });
-    // Rejected
-    builder.addCase(updateSubAdminApi.rejected, (state, action) => {
+    builder.addCase(addSubAdmin.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
     // ======Delete SubAdmin======
     // Pending
-    builder.addCase(deleteSubAdminApi.pending, (state, action) => {
+    builder.addCase(deleteSubAdmin.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(deleteSubAdminApi.fulfilled, (state, action) => {
+    builder.addCase(deleteSubAdmin.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(deleteSubAdminApi.rejected, (state, action) => {
+    builder.addCase(deleteSubAdmin.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
   },
 });
 
-export const { getSubAdmins, addPicture, updatePicture, deletePicture } =
-  subAdminSlice.actions;
 export default subAdminSlice.reducer;

@@ -9,13 +9,13 @@ const initialState = {
 };
 
 // Get Settings using Axios and Redux Thunk
-export const getSettingsApi = createAsyncThunk(
-  "settings/getSettingsApi",
+export const getSettings = createAsyncThunk(
+  "settings/getSettings",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
         method: "GET",
-        url: "/Settings/Get",
+        url: "/Settings/Get-all",
       });
       return response.data;
     } catch (error) {
@@ -25,8 +25,8 @@ export const getSettingsApi = createAsyncThunk(
 );
 
 // Add Book using Axios and Redux Thunk
-export const addSettingApi = createAsyncThunk(
-  "settings/addSettingApi",
+export const addSetting = createAsyncThunk(
+  "settings/addSetting",
   async (data, { rejectWithValue }) => {
     try {
       await Http({
@@ -43,8 +43,8 @@ export const addSettingApi = createAsyncThunk(
 );
 
 // Update Settings using Axios and Redux Thunk
-export const updateSettingApi = createAsyncThunk(
-  "settings/updateSettingApi",
+export const updateSetting = createAsyncThunk(
+  "settings/updateSetting",
   async (data, { rejectWithValue }) => {
     try {
       await Http({
@@ -60,119 +60,56 @@ export const updateSettingApi = createAsyncThunk(
   }
 );
 
-// Delete Settings using Axios and Redux Thunk
-export const deleteSettingApi = createAsyncThunk(
-  "settings/deleteSettingApi",
-  async (id, { rejectWithValue }) => {
-    try {
-      await Http({
-        method: "POST",
-        url: `/Settings/Delete`,
-        params: { id },
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
-      }).then((response) => {
-        return response.data;
-      });
-    } catch (error) {
-      return rejectWithValue(error.message);
-    }
-  }
-);
-
 // Settings Slice
 const settingsSlice = createSlice({
   name: "settings",
   initialState,
-  reducers: {
-    // Get Settings
-    getSettings: (state, action) => {
-      state.settings = action.payload;
-    },
-    // Add Setting
-    addSetting: (state, action) => {
-      state.settings.push(action.payload);
-    },
-    // Update Setting
-    updateSetting: (state, action) => {
-      state.settings = state.settings.map((settings) =>
-        settings.id === action.payload.id ? action.payload : settings
-      );
-    },
-    // Delete Setting
-    deleteSetting: (state, action) => {
-      state.settings = state.settings.filter(
-        (settings) => settings.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Settings======
     // Pending
-    builder.addCase(getSettingsApi.pending, (state, action) => {
+    builder.addCase(getSettings.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(getSettingsApi.fulfilled, (state, action) => {
+    builder.addCase(getSettings.fulfilled, (state, action) => {
       state.settings = action.payload;
       state.loading = false;
     });
     // Rejected
-    builder.addCase(getSettingsApi.rejected, (state, action) => {
+    builder.addCase(getSettings.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
     // ======Add Setting======
     // Pending
-    builder.addCase(addSettingApi.pending, (state, action) => {
+    builder.addCase(addSetting.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(addSettingApi.fulfilled, (state, action) => {
+    builder.addCase(addSetting.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(addSettingApi.rejected, (state, action) => {
+    builder.addCase(addSetting.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
     // ======Update Settings======
     // Pending
-    builder.addCase(updateSettingApi.pending, (state, action) => {
+    builder.addCase(updateSetting.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(updateSettingApi.fulfilled, (state, action) => {
+    builder.addCase(updateSetting.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(updateSettingApi.rejected, (state, action) => {
-      state.loading = false;
-      state.error = action.payload;
-    });
-    // ======Delete Settings======
-    // Pending
-    builder.addCase(deleteSettingApi.pending, (state, action) => {
-      state.loading = true;
-    });
-    // Fulfilled
-    builder.addCase(deleteSettingApi.fulfilled, (state, action) => {
-      state.loading = false;
-    });
-    // Rejected
-    builder.addCase(deleteSettingApi.rejected, (state, action) => {
+    builder.addCase(updateSetting.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
   },
 });
 
-export const {
-  getSettings,
-  addSetting,
-  updateSetting,
-  deleteSetting,
-} = settingsSlice.actions;
 export default settingsSlice.reducer;
