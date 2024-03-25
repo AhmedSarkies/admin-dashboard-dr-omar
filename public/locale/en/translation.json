@@ -114,6 +114,13 @@
       "phone": "Phone"
     }
   },
+  "user": {
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email"
+    }
+  },
   "message": {
     "columns": {
       "name": "Name",
@@ -130,16 +137,17 @@
         "time": "Prayer Time",
         "adhan": "Adhan",
         "iqama": "Iqama"
-      },
-      "codeContent": {
-        "title": "Code Content",
-        "addTitle": "Add Code Content",
-        "editTitle": "Edit Code Content",
-        "columns": {
-          "code": "Code",
-          "content": "Content",
-          "email": "Email"
-        }
+      }
+    },
+    "codeContent": {
+      "title": "Code Content",
+      "sendTitle": "Send Code Content",
+      "sendTitleEveryOne": "Send Code To Everyone",
+      "columns": {
+        "code": "Code",
+        "name": "Name",
+        "email": "Email",
+        "send": "Send Code"
       }
     },
     "slider": {
@@ -370,6 +378,14 @@
       "editedError": "An error occurred while editing terms and conditions",
       "deletedSuccess": "Terms and Conditions deleted successfully",
       "deletedError": "An error occurred while deleting terms and conditions"
+    },
+    "codeContent": {
+      "addedSuccess": "Code Content added successfully",
+      "addedError": "An error occurred while adding code content",
+      "editedSuccess": "Code Content edited successfully",
+      "editedError": "An error occurred while editing code content",
+      "deletedSuccess": "Code Content deleted successfully",
+      "deletedError": "An error occurred while deleting code content"
     }
   },
   "validation": {
