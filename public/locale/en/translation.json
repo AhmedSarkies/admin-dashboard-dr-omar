@@ -315,6 +315,10 @@
     }
   },
   "toast": {
+    "login": {
+      "success": "Logged in successfully",
+      "error": "An error occurred while logging in"
+    },
     "subAdmin": {
       "addedSuccess": "Sub Admin added successfully",
       "addedError": "An error occurred while adding sub admin",
