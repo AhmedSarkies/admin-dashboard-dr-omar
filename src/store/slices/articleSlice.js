@@ -172,7 +172,7 @@ const articleSlice = createSlice({
   reducers: {
     // Get Articles
     getArticles: (state, action) => {
-      state.articles = action.payload;
+      state.articles = action.payload.data;
     },
     // Add Article
     addArticle: (state, action) => {
@@ -221,7 +221,7 @@ const articleSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getArticlesApi.fulfilled, (state, action) => {
-      state.articles = action.payload;
+      state.articles = action.payload.data;
       state.loading = false;
     });
     // Rejected

@@ -73,7 +73,7 @@ const CodeContent = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: users,
     toggle,
@@ -139,9 +139,6 @@ const CodeContent = () => {
                 });
               }}
               className="dropdown-btn d-flex justify-content-between align-items-center"
-              style={{
-                width: "180px",
-              }}
             >
               <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
@@ -265,7 +262,7 @@ const CodeContent = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="3">
@@ -287,9 +284,9 @@ const CodeContent = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
@@ -406,7 +403,7 @@ const CodeContent = () => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {results?.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

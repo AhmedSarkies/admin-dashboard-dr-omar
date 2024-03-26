@@ -67,6 +67,7 @@ const Elder = ({ dashboard }) => {
     currentPage: 1,
     sortColumn: "",
     sortOrder: "asc",
+    elder: scholars,
     toggleColumns: {
       image: true,
       name: true,
@@ -251,7 +252,7 @@ const Elder = ({ dashboard }) => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: scholars,
     toggle,
@@ -274,19 +275,21 @@ const Elder = ({ dashboard }) => {
   return (
     <div className="scholar-container mt-4 m-3">
       <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("elders.addTitle")}
-        </button>
-        {dashboard && <h2>{t("elders.title")}</h2>}
+        {dashboard && (
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("elders.addTitle")}
+          </button>
+        )}
+        <h2>{t("elders.title")}</h2>
       </div>
       <div className="scholar">
         <div className="table-header">
@@ -310,9 +313,6 @@ const Elder = ({ dashboard }) => {
                 });
               }}
               className="dropdown-btn d-flex justify-content-between align-items-center"
-              style={{
-                width: "180px",
-              }}
             >
               <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
@@ -468,7 +468,7 @@ const Elder = ({ dashboard }) => {
             </tbody>
           )}
           {/* No Data */}
-          {results.length === 0 && error === null && !loading && (
+          {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -490,9 +490,9 @@ const Elder = ({ dashboard }) => {
             </tbody>
           )}
           {/* Data */}
-          {results.length > 0 && error === null && loading === false && (
+          {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
@@ -1175,7 +1175,7 @@ const Elder = ({ dashboard }) => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

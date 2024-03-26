@@ -88,7 +88,7 @@ export const deleteAudioApi = createAsyncThunk(
 
 // Get Audios Category using Axios and Redux Thunk
 export const getAudiosCategoriesApi = createAsyncThunk(
-  "audio/getAudiosCategoryApi",
+  "audio/getAudiosCategoriesApi",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
@@ -170,7 +170,7 @@ const audioSlice = createSlice({
   reducers: {
     // Get Audios
     getAudios: (state, action) => {
-      state.audios = action.payload;
+      state.audios = action.payload.data;
     },
     // Update Audio
     updateAudio: (state, action) => {
@@ -213,7 +213,7 @@ const audioSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getAudiosApi.fulfilled, (state, action) => {
-      state.audios = action.payload;
+      state.audios = action.payload.data;
       state.loading = false;
     });
     // Rejected
@@ -274,7 +274,7 @@ const audioSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getAudiosCategoriesApi.fulfilled, (state, action) => {
-      state.audioCategories = action.payload;
+      state.audioCategories = action.payload.data;
       state.loading = false;
     });
     // Rejected

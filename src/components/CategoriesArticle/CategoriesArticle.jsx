@@ -15,7 +15,7 @@ import {
 } from "../../store/slices/articleSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
-import {useFiltration, useSchema} from "../../hooks";
+import { useFiltration, useSchema } from "../../hooks";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -47,7 +47,7 @@ const CategoriesArticle = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: articleCategories,
     toggle,
@@ -192,9 +192,6 @@ const CategoriesArticle = () => {
                 });
               }}
               className="dropdown-btn d-flex justify-content-between align-items-center"
-              style={{
-                width: "180px",
-              }}
             >
               <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
@@ -301,7 +298,7 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="2">
@@ -323,9 +320,9 @@ const CategoriesArticle = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
@@ -543,7 +540,7 @@ const CategoriesArticle = () => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {results?.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

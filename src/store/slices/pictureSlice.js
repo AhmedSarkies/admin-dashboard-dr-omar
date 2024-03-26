@@ -172,7 +172,7 @@ const pictureSlice = createSlice({
   reducers: {
     // Get Pictures
     getPictures: (state, action) => {
-      state.pictures = action.payload;
+      state.pictures = action.payload.data;
     },
     // Add Picture
     addPicture: (state, action) => {
@@ -221,7 +221,7 @@ const pictureSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getPicturesApi.fulfilled, (state, action) => {
-      state.pictures = action.payload;
+      state.pictures = action.payload.data;
       state.loading = false;
     });
     // Rejected

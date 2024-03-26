@@ -46,7 +46,7 @@ const mostListeningSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getMostListeningApi.fulfilled, (state, action) => {
-      state.mostListening = action.payload;
+      state.mostListening = action.payload.data;
       state.loading = false;
     });
     // Rejected

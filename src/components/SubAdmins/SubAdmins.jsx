@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Col,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-  Spinner,
-} from "reactstrap";
+import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
@@ -136,7 +129,7 @@ const SubAdmins = ({ dashboard }) => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: subAdmins,
     toggle,
@@ -191,9 +184,6 @@ const SubAdmins = ({ dashboard }) => {
                 });
               }}
               className="dropdown-btn d-flex justify-content-between align-items-center"
-              style={{
-                width: "180px",
-              }}
             >
               <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
@@ -313,7 +303,7 @@ const SubAdmins = ({ dashboard }) => {
             </tbody>
           )}
           {/* No Data */}
-          {results.length === 0 && error === null && !loading && (
+          {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="6">
@@ -335,9 +325,9 @@ const SubAdmins = ({ dashboard }) => {
             </tbody>
           )}
           {/* Data */}
-          {results.length > 0 && error === null && loading === false && (
+          {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.name && (
                     <td className="table-td name">{result?.name}</td>
@@ -369,7 +359,7 @@ const SubAdmins = ({ dashboard }) => {
         </table>
       </div>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
       {/* Add Sub Admin */}

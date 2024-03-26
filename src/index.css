@@ -1350,6 +1350,33 @@ div[tabindex] {
   .profile .profile-header img {
     max-width: 100px;
   }
+  .add-btn {
+    font-size: 0.7rem !important;
+    padding: 0.25rem 0.5rem;
+    gap: 0.25rem;
+  }
+  .sidebar-link {
+    font-size: 0.8rem !important;
+    gap: 0.25rem !important;
+  }
+  .sidebar-link svg {
+    font-size: 1rem !important;
+  }
+  .accordion-button::after {
+    width: 1rem !important;
+    height: 1rem !important;
+  }
+  .accordion-header .icon {
+    font-size: 0.8rem !important;
+    gap: 0.25rem !important;
+  }
+  .accordion-header .icon svg {
+    width: 1rem !important;
+  }
+  .accordion {
+    --bs-accordion-btn-icon-width: 1rem !important;
+    --bs-accordion-btn-icon-height: 1rem !important;
+  }
 }
 @media only screen and (max-width: 576px) {
   .form-group-btns {

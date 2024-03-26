@@ -41,7 +41,7 @@ const userSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getUsers.fulfilled, (state, action) => {
-      state.users = action.payload;
+      state.users = action.payload.data;
       state.loading = false;
     });
     // Rejected

@@ -102,7 +102,7 @@ const scholarSlice = createSlice({
   reducers: {
     // Get Scholars
     getScholars: (state, action) => {
-      state.scholars = action.payload;
+      state.scholars = action.payload.data;
     },
     // Update Scholar
     updateScholar: (state, action) => {
@@ -131,7 +131,7 @@ const scholarSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getScholarsApi.fulfilled, (state, action) => {
-      state.scholars = action.payload;
+      state.scholars = action.payload.data;
       state.loading = false;
     });
     // Rejected

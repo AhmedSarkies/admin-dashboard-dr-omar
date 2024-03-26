@@ -24,6 +24,7 @@ import {
 
 const RoutesHome = () => (
   <Routes>
+    <Route path="/" element={<Navigate to="/dr-omar" />} />
     <Route path="/dr-omar" element={<Home />}>
       <Route path="" element={<Navigate to="/dr-omar/dashboard" />} />
       <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />

@@ -71,22 +71,11 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
         >
           <TiArrowLeft />
         </button>
-        {Array.from({ length: totalPages }, (_, index) => (
-          <button
-            key={index + new Date().getDate()}
-            className={`pagination-btn ${
-              toggle.currentPage === index + 1 ? "active" : ""
-            }`}
-            onClick={() =>
-              setToggle({
-                ...toggle,
-                currentPage: index + 1,
-              })
-            }
-          >
-            {index + 1}
-          </button>
-        ))}
+        {/* Button for the current page */}
+        <button className="pagination-btn">{toggle.currentPage}</button>
+        <span>of</span>
+        {/* Button for the total pages */}
+        <button className="pagination-btn">{totalPages}</button>
         <button
           className="pagination-btn"
           onClick={() =>
@@ -127,29 +116,6 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
     });
   };
 
-  // TODO: Filtration
-  // Search
-  const handleSearch = (e) => {
-    setToggle({
-      ...toggle,
-      searchTerm: e.target.value,
-    });
-  };
-
-  // if search term is not empty
-  const searchResults = () => {
-    if (toggle.searchTerm === "") {
-      return results;
-    } else {
-      return results?.filter((dataRow) =>
-        Object.values(dataRow).some((val) =>
-          String(val)?.toLowerCase().includes(toggle.searchTerm?.toLowerCase())
-        )
-      );
-    }
-  };
-  searchResults();
-
   // Filters Column
   const handleToggleColumns = (column) => {
     setToggle({
@@ -162,12 +128,33 @@ const useFiltration = ({ rowData, toggle, setToggle }) => {
     });
   };
 
+  // TODO: Filtration
+  // Search
+  const handleSearch = (e) => {
+    setToggle({
+      ...toggle,
+      searchTerm: e.target.value,
+    });
+  };
+
+  // Search Filter
+  const searchResults =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? results?.filter((dataRow) =>
+          Object.values(dataRow).some((val) =>
+            String(val)
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          )
+        )
+      : results;
+
   return {
     PaginationUI,
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   };
 };
 

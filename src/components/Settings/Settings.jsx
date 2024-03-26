@@ -174,19 +174,17 @@ const Settings = () => {
   // Set Settings
   useEffect(() => {
     if (settings) {
-      formik.setValues({
-        image: {
-          file: settings?.image,
-          preview: settings?.image,
-        },
-        prayer_timings: settings?.prayer_timings === 1 ? true : false,
-        facebook: settings?.facebook,
-        whatsapp: settings?.whatsapp,
-        messenger: settings?.messenger,
-        instagram: settings?.instagram,
-        playStore: settings?.play_store,
-        appStore: settings?.app_store,
+      formik.setFieldValue("image", {
+        file: settings?.image,
+        preview: settings?.image,
       });
+      formik.setFieldValue("prayer_timings", settings?.prayer_timings);
+      formik.setFieldValue("facebook", settings?.facebook);
+      formik.setFieldValue("whatsapp", settings?.whatsapp);
+      formik.setFieldValue("messenger", settings?.messenger);
+      formik.setFieldValue("instagram", settings?.instagram);
+      formik.setFieldValue("playStore", settings?.play_store);
+      formik.setFieldValue("appStore", settings?.app_store);
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [settings]);
@@ -334,6 +332,8 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="prayer_timings"
                   name="prayer_timings"
+                  value={formik.values.prayer_timings}
+                  checked={formik.values.prayer_timings}
                   onChange={handleInputChange}
                 />
               </div>
@@ -364,6 +364,7 @@ const Settings = () => {
                     className="form-control"
                     id={field.name}
                     name={field.name}
+                    value={formik.values[field.name]}
                     placeholder={t(
                       `settings.links.contact.columns.${field.name}`
                     )}
@@ -404,6 +405,7 @@ const Settings = () => {
                     className="form-control"
                     id={field.name}
                     name={field.name}
+                    value={formik.values[field.name]}
                     placeholder={t(
                       `settings.links.appLink.columns.${field.name}`
                     )}

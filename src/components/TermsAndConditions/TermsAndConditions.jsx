@@ -141,7 +141,7 @@ const TermsAndConditions = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: termsAndConditions,
     toggle,
@@ -258,9 +258,6 @@ const TermsAndConditions = () => {
                   });
                 }}
                 className="dropdown-btn d-flex justify-content-between align-items-center"
-                style={{
-                  width: "180px",
-                }}
               >
                 <span>{t("columnsFilter")}</span>
                 <TiArrowSortedUp
@@ -403,7 +400,7 @@ const TermsAndConditions = () => {
               </tbody>
             )}
             {/* No Data */}
-            {results?.length === 0 && error === null && !loading && (
+            {searchResults?.length === 0 && error === null && !loading && (
               <tbody>
                 <tr className="no-data-container">
                   <td className="table-td" colSpan="3">
@@ -425,45 +422,47 @@ const TermsAndConditions = () => {
               </tbody>
             )}
             {/* Data */}
-            {results?.length > 0 && error === null && loading === false && (
-              <tbody>
-                {results?.map((result) => (
-                  <tr key={result?.id + new Date().getDate()}>
-                    {/* {toggle.toggleColumns?.title && (
+            {searchResults?.length > 0 &&
+              error === null &&
+              loading === false && (
+                <tbody>
+                  {searchResults?.map((result) => (
+                    <tr key={result?.id + new Date().getDate()}>
+                      {/* {toggle.toggleColumns?.title && (
                       <td className="table-td title">
                         {lng === "ar" ? result?.title.ar : result?.title.en}
                       </td>
                     )} */}
-                    {toggle.toggleColumns?.country && (
-                      <td className="table-td country">
-                        {lng === "ar" ? result?.country : result?.country_en}
-                      </td>
-                    )}
-                    {toggle.toggleColumns?.text && (
-                      <td className="table-td text">
-                        {lng === "ar" ? result?.text : result?.text_en}
-                      </td>
-                    )}
-                    {toggle.toggleColumns?.control && (
-                      <td className="table-td">
-                        <span className="table-btn-container">
-                          <FaEdit
-                            className="edit-btn"
-                            onClick={() => {
-                              handleEdit(result);
-                            }}
-                          />
-                          <MdDeleteOutline
-                            className="delete-btn"
-                            onClick={() => handleDelete(result)}
-                          />
-                        </span>
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            )}
+                      {toggle.toggleColumns?.country && (
+                        <td className="table-td country">
+                          {lng === "ar" ? result?.country : result?.country_en}
+                        </td>
+                      )}
+                      {toggle.toggleColumns?.text && (
+                        <td className="table-td text">
+                          {lng === "ar" ? result?.text : result?.text_en}
+                        </td>
+                      )}
+                      {toggle.toggleColumns?.control && (
+                        <td className="table-td">
+                          <span className="table-btn-container">
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                              }}
+                            />
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          </span>
+                        </td>
+                      )}
+                    </tr>
+                  ))}
+                </tbody>
+              )}
           </table>
         </div>
         {/* Add Terms And Conditions */}
@@ -912,7 +911,7 @@ const TermsAndConditions = () => {
           </ModalBody>
         </Modal>
         {/* Pagination */}
-        {results?.length > 0 && error === null && loading === false && (
+        {searchResults?.length > 0 && error === null && loading === false && (
           <PaginationUI />
         )}
       </div>

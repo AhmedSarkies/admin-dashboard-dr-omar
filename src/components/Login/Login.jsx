@@ -27,7 +27,7 @@ const Login = () => {
           secure: true,
           sameSite: "strict",
           path: "/",
-          tokenType: "Bearer",
+          tokenType: "Bearer" + response.data.data.token,
         });
         setLoading(false);
         window.location.href = "/dr-omar/dashboard";

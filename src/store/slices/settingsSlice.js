@@ -1,5 +1,6 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import Http from "../../Http";
+import axios from "axios";
 
 // Initial State
 const initialState = {
@@ -13,9 +14,9 @@ export const getSettings = createAsyncThunk(
   "settings/getSettings",
   async (_, { rejectWithValue }) => {
     try {
-      const response = await Http({
+      const response = await axios({
         method: "GET",
-        url: "/Settings/Get-all",
+        url: "https://tsquarehost.info/public/api/Settings/Get-all",
       });
       return response.data;
     } catch (error) {
@@ -50,7 +51,7 @@ export const updateSetting = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/Settings/Update`,
-        data,
+        params: { data },
       }).then((response) => {
         return response.data;
       });

@@ -57,7 +57,7 @@ const SubCategoriesBook = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    results,
+    searchResults,
   } = useFiltration({
     rowData: bookSubCategories,
     toggle,
@@ -221,9 +221,6 @@ const SubCategoriesBook = () => {
                 });
               }}
               className="dropdown-btn d-flex justify-content-between align-items-center"
-              style={{
-                width: "180px",
-              }}
             >
               <span>{t("columnsFilter")}</span>
               <TiArrowSortedUp
@@ -330,7 +327,7 @@ const SubCategoriesBook = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
+          {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="2">
@@ -352,9 +349,9 @@ const SubCategoriesBook = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
+          {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
@@ -640,7 +637,7 @@ const SubCategoriesBook = () => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {results.length > 0 && error === null && loading === false && (
+      {searchResults.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>

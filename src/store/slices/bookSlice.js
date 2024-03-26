@@ -255,7 +255,7 @@ const bookSlice = createSlice({
   reducers: {
     // Get Books
     getBooks: (state, action) => {
-      state.books = action.payload;
+      state.books = action.payload.data;
     },
     // Add Book
     addBook: (state, action) => {
@@ -322,7 +322,7 @@ const bookSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getBooksApi.fulfilled, (state, action) => {
-      state.books = action.payload;
+      state.books = action.payload.data;
       state.loading = false;
     });
     // Rejected
