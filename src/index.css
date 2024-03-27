@@ -656,6 +656,7 @@ body {
 .table-header h2 {
   font-size: 1.5rem;
   font-weight: 600;
+  text-align: end;
 }
 .add-btn {
   display: inline-flex;
@@ -1306,6 +1307,10 @@ div[tabindex] {
   }
 }
 @media only screen and (max-width: 768px) {
+  .table-header {
+    margin: 0.2rem;
+    margin-bottom: 1.5rem;
+  }
   .modal-content.modal-add-scholar.modal-preview-image img {
     max-width: 200px;
   }
@@ -1315,7 +1320,7 @@ div[tabindex] {
   }
   .modal-content.modal-add-scholar .modal-header h5,
   .table-header h2 {
-    font-size: 1.25rem;
+    font-size: 0.8rem;
   }
   .scholar .table-body .table-td .table-btn-container svg,
   .table-header .add-btn {
@@ -1398,10 +1403,21 @@ div[tabindex] {
   .profile .profile-footer .add-btn {
     font-size: 0.6rem !important;
   }
+  .add-btn {
+    font-size: 0.6rem !important;
+    gap: 0.1rem;
+  }
 }
 @media only screen and (max-width: 480px) {
+  .add-btn {
+    font-size: 0.5rem !important;
+    gap: 0.1rem;
+  }
   .dashboard-header {
     padding: 5px !important;
+  }
+  .table-header h2 {
+    font-size: 0.6rem;
   }
   .dashboard .dashboard-header .dashboard-header-btns,
   .dashboard .dashboard-header .dashboard-header-title {
