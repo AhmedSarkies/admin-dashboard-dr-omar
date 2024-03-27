@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Container, Row } from "reactstrap";
 import { HiUsers } from "react-icons/hi2";
 import { SiGooglescholar } from "react-icons/si";
@@ -10,10 +10,14 @@ import { SlPicture } from "react-icons/sl";
 import { MdArticle } from "react-icons/md";
 import { IoCloudDownloadSharp } from "react-icons/io5";
 import { Card, Elder, SubAdmins } from "../";
+import { useDispatch, useSelector } from "react-redux";
+import { getCounts } from "../../store/slices/dashboardSlice";
 // import { UserData } from "../../data";
 
 const Dashboard = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
+  const { counts } = useSelector((state) => state.dashboard);
   const cardItems = [
     {
       id: 1,
@@ -21,7 +25,7 @@ const Dashboard = () => {
       icon: <HiUsers />,
       path: "users",
       disabled: false,
-      count: 10,
+      count: counts?.User_Count || 0,
       color: "linear-gradient(45deg, rgb(249, 177, 21), rgb(246, 150, 11))",
     },
     {
@@ -30,7 +34,7 @@ const Dashboard = () => {
       icon: <SiGooglescholar />,
       path: "elder",
       disabled: false,
-      count: 40,
+      count: counts?.Elder_Count || 0,
       color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
     },
     {
@@ -39,7 +43,7 @@ const Dashboard = () => {
       icon: <GiBookshelf />,
       path: "books",
       disabled: false,
-      count: 20,
+      count: counts?.Book_Count || 0,
       color: "linear-gradient(45deg, rgb(50, 31, 219), rgb(31, 20, 152))",
     },
     {
@@ -48,7 +52,7 @@ const Dashboard = () => {
       icon: <LiaFileAudioSolid />,
       path: "audios",
       disabled: false,
-      count: 30,
+      count: counts?.Audio_Count || 0,
       color: "linear-gradient(45deg, rgb(203, 93, 255), rgb(128, 12, 184))",
     },
     {
@@ -57,7 +61,7 @@ const Dashboard = () => {
       icon: <SlPicture />,
       path: "images",
       disabled: false,
-      count: 60,
+      count: counts?.Image_Count || 0,
       color: "linear-gradient(45deg, rgb(233 30 99), rgb(156 39 176))",
     },
     {
@@ -66,7 +70,7 @@ const Dashboard = () => {
       icon: <MdArticle />,
       path: "articles",
       disabled: false,
-      count: 50,
+      count: counts?.Articles_Count || 0,
       color: "linear-gradient(45deg, rgb(255, 51, 51), rgb(204, 0, 0))",
     },
     {
@@ -75,7 +79,7 @@ const Dashboard = () => {
       icon: <IoCloudDownloadSharp />,
       path: "downloads",
       disabled: true,
-      count: 70,
+      count: counts?.total_downloads_count_Count || 0,
       color: "linear-gradient(45deg, rgb(0, 204, 204), rgb(0, 153, 153))",
     },
     {
@@ -84,7 +88,7 @@ const Dashboard = () => {
       icon: <GrFavorite />,
       path: "favorites",
       disabled: true,
-      count: 80,
+      count: counts?.total_favorites_count_Count || 0,
       color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
     },
     // {
@@ -244,13 +248,21 @@ const Dashboard = () => {
   //   ],
   // });
 
+  useEffect(() => {
+    try {
+      dispatch(getCounts());
+    } catch (error) {
+      console.log(error);
+    }
+  }, [dispatch]);
+
   return (
     <>
       <div className="dashboard-cards mb-3 mt-5 bg-white p-4">
         <Container style={{ minWidth: "100%" }}>
           <Row
             style={{ maxWidth: "100vw" }}
-            className="flex-wrap flex-row-reverse justify-content-between align-items-center g-3"
+            className="flex-wrap flex-row-reverse justify-content-start align-items-center g-3"
           >
             {cardItems.map((item) => (
               <Col xl="3" lg="4" md="6" sm="12" key={item.id}>

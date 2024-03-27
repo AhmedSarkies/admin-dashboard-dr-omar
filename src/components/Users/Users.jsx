@@ -56,7 +56,7 @@ const Users = () => {
   }, [dispatch]);
 
   return (
-    <div className="scholar-container mt-4 m-3">
+    <div className="scholar-container mt-4 m-sm-3 m-0">
       <div className="scholar">
         <div className="table-header">
           {/* Search */}

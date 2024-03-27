@@ -379,7 +379,7 @@ const Audios = () => {
   }, [dispatch]);
 
   return (
-    <div className="audio-container scholar-container mt-4 m-3">
+    <div className="audio-container scholar-container mt-4 m-sm-3 m-0">
       <div className="table-header">
         <button
           className="add-btn"
