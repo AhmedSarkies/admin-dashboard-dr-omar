@@ -25,6 +25,8 @@ import {
 const RoutesHome = () => (
   <Routes>
     <Route path="/" element={<Navigate to="/dr-omar" />} />
+    <Route path="/*" element={<Navigate to="/dr-omar" />} />
+    <Route path="*" element={<Navigate to="/dr-omar" />} />
     <Route path="/dr-omar" element={<Home />}>
       <Route path="" element={<Navigate to="/dr-omar/dashboard" />} />
       <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />
@@ -35,7 +37,7 @@ const RoutesHome = () => (
       <Route path="messages" element={<Messages />} />
       <Route path="settings" element={<Settings />} />
       <Route path="code-content" element={<CodeContent />} />
-      <Route path="slider" element={<Slider />} />
+      <Route path="introduction-page" element={<Slider />} />
       <Route path="terms&conditions" element={<TermsAndConditions />} />
       <Route path="categories-article" element={<CategoriesArticle />} />
       <Route path="categories-image" element={<CategoriesImage />} />
