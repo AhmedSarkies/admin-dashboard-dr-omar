@@ -91,14 +91,6 @@ const useSchema = () => {
         }
       }),
       title: string().required(t("validation.title")),
-      order: number()
-        .typeError(t("validation.order"))
-        .positive(t("validation.order"))
-        .integer(t("validation.order"))
-        .min(0, t("validation.order"))
-        .max(99999999999, t("validation.order"))
-        .required(t("validation.order")),
-      status: string(),
       description: string().required(t("validation.description")),
     }),
     category: object().shape({
