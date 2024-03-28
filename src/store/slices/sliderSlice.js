@@ -14,12 +14,8 @@ export const getSlidersApi = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
-        method: "GET",
-        url: "/Slider/Get",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        method: "POST",
+        url: "/IntroductionPage/Get",
       });
       return response.data;
     } catch (error) {
@@ -35,8 +31,11 @@ export const addSliderApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Slider/Insert`,
-        data,
+        url: `/IntroductionPage/Insert`,
+        params: {
+          title: data.title,
+          body: data.body,
+        },
       }).then((response) => {
         return response.data;
       });
@@ -53,8 +52,12 @@ export const updateSliderApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Slider/Update`,
-        data,
+        url: `/IntroductionPage/update`,
+        params: {
+          id: data.id,
+          title: data.title,
+          body: data.body,
+        },
       }).then((response) => {
         return response.data;
       });
@@ -71,12 +74,8 @@ export const deleteSliderApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Slider/Delete`,
+        url: `/IntroductionPage/Delete`,
         params: { id },
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
       }).then((response) => {
         return response.data;
       });
