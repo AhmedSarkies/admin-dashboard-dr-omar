@@ -76,7 +76,7 @@
     "settingsApp": "App Settings",
     "prayerTime": "Prayer Time",
     "codeContent": "Code Content",
-    "slider": "Slider",
+    "slider": "Introduction Page",
     "termsAndConditions": "Terms And Conditions",
     "links": "Links",
     "messages": "Messages",
@@ -151,8 +151,8 @@
       }
     },
     "slider": {
-      "addTitle": "Add Slider",
-      "editTitle": "Edit Slider",
+      "addTitle": "Add Introduction Page",
+      "editTitle": "Edit Introduction Page",
       "columns": {
         "image": "Image",
         "title": "Title",

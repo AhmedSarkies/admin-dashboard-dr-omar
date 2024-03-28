@@ -76,7 +76,7 @@
     "settingsApp": "إعدادات التطبيق",
     "prayerTime": "أوقات الصلاة",
     "codeContent": "رمز المحتوى",
-    "slider": "السلايدر",
+    "slider": "الصفحة التعريفية",
     "termsAndConditions": "الشروط والأحكام",
     "links": "الروابط",
     "messages": "الرسائل",
@@ -151,8 +151,8 @@
       }
     },
     "slider": {
-      "addTitle": "إضافة سلايدر",
-      "editTitle": "تعديل سلايدر",
+      "addTitle": "إضافة صفخة تعريفية",
+      "editTitle": "تعديل صفخة تعريفية",
       "columns": {
         "image": "الصورة",
         "title": "العنوان",
