@@ -72,16 +72,16 @@ const Slider = () => {
   });
   // Columns
   const columns = [
-    { id: 1, name: "image", label: t("settings.slider.columns.image") },
-    { id: 2, name: "title", label: t("settings.slider.columns.title") },
+    // { id: 1, name: "image", label: t("settings.slider.columns.image") },
+    { id: 1, name: "title", label: t("settings.slider.columns.title") },
     {
-      id: 3,
+      id: 2,
       name: "description",
       label: t("settings.slider.columns.description"),
     },
-    { id: 4, name: "order", label: t("settings.slider.columns.order") },
-    { id: 5, name: "status", label: t("status") },
-    { id: 6, name: "control", label: t("action") },
+    // { id: 4, name: "order", label: t("settings.slider.columns.order") },
+    // { id: 5, name: "status", label: t("status") },
+    { id: 3, name: "control", label: t("action") },
   ];
 
   // Formik
@@ -99,8 +99,6 @@ const Slider = () => {
     validationSchema: validationSchema.slider,
     onSubmit: (values) => {
       const formData = new FormData();
-      formData.append("status", values.status);
-      formData.append("id", values.id);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
@@ -109,8 +107,7 @@ const Slider = () => {
           updateSliderApi({
             id: values.id,
             title: values.title,
-            image: values.image.file,
-            status: values.status,
+            body: values.description,
           })
         ).then((res) => {
           if (!res.error) {
@@ -118,8 +115,7 @@ const Slider = () => {
               updateSlider({
                 id: values.id,
                 title: values.title,
-                image: values.image.file,
-                status: values.status,
+                body: values.description,
               })
             );
             setToggle({
@@ -133,12 +129,17 @@ const Slider = () => {
           }
         });
       } else {
-        dispatch(addSliderApi(formData)).then((res) => {
+        dispatch(
+          addSliderApi({
+            title: values.title,
+            body: values.description,
+          })
+        ).then((res) => {
           if (!res.error) {
             dispatch(
               addSlider({
-                ...values,
-                image: values.image.preview,
+                title: values.title,
+                body: values.description,
               })
             );
             setToggle({
@@ -309,7 +310,7 @@ const Slider = () => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.image && (
+              {/* {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("settings.slider.columns.image")}
                   {toggle.sortColumn === columns[0].name ? (
@@ -320,11 +321,11 @@ const Slider = () => {
                     )
                   ) : null}
                 </th>
-              )}
+              )} */}
               {toggle.toggleColumns.title && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("settings.slider.columns.title")}
-                  {toggle.sortColumn === columns[1].name ? (
+                  {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -334,9 +335,9 @@ const Slider = () => {
                 </th>
               )}
               {toggle.toggleColumns.description && (
-                <th className="table-th" onClick={() => handleSort(columns[2])}>
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("settings.slider.columns.description")}
-                  {toggle.sortColumn === columns[2].name ? (
+                  {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -345,7 +346,7 @@ const Slider = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.order && (
+              {/* {toggle.toggleColumns.order && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
                   {t("settings.slider.columns.order")}
                   {toggle.sortColumn === columns[3].name ? (
@@ -368,7 +369,7 @@ const Slider = () => {
                     )
                   ) : null}
                 </th>
-              )}
+              )} */}
               {toggle.toggleColumns.control && (
                 <th className="table-th">{t("action")}</th>
               )}
@@ -439,7 +440,7 @@ const Slider = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.image && (
+                  {/* {toggle.toggleColumns.image && (
                     <td className="table-td">
                       <img
                         src={result?.image === "" ? anonymous : result?.image}
@@ -452,14 +453,14 @@ const Slider = () => {
                         }}
                       />
                     </td>
-                  )}
+                  )} */}
                   {toggle.toggleColumns.title && (
                     <td className="table-td">{result?.title}</td>
                   )}
                   {toggle.toggleColumns.description && (
-                    <td className="table-td">{result?.description}</td>
+                    <td className="table-td">{result?.body}</td>
                   )}
-                  {toggle.toggleColumns.order && (
+                  {/* {toggle.toggleColumns.order && (
                     <td className="table-td">{result?.order}</td>
                   )}
                   {toggle.toggleColumns.status && (
@@ -482,7 +483,7 @@ const Slider = () => {
                           : t("private")}
                       </span>
                     </td>
-                  )}
+                  )} */}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
@@ -676,7 +677,7 @@ const Slider = () => {
                     <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
-                <div
+                {/* <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
@@ -695,8 +696,8 @@ const Slider = () => {
                   {formik.errors.order && formik.touched.order ? (
                     <span className="error">{formik.errors.order}</span>
                   ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                </div> */}
+                {/* <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
@@ -770,7 +771,7 @@ const Slider = () => {
                   {formik.errors.status && formik.touched.status ? (
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
-                </div>
+                </div> */}
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
                   <label htmlFor="description" className="form-label">
                     {t("settings.slider.columns.description")}
@@ -1017,7 +1018,7 @@ const Slider = () => {
                     <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
-                <div
+                {/* <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
@@ -1036,8 +1037,8 @@ const Slider = () => {
                   {formik.errors.order && formik.touched.order ? (
                     <span className="error">{formik.errors.order}</span>
                   ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                </div> */}
+                {/* <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
@@ -1111,7 +1112,7 @@ const Slider = () => {
                   {formik.errors.status && formik.touched.status ? (
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
-                </div>
+                </div> */}
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
                   <label htmlFor="description" className="form-label">
                     {t("settings.slider.columns.description")}

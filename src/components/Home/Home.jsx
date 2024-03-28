@@ -56,7 +56,7 @@ const Home = () => {
     },
     {
       title: t("linkItems.slider"),
-      path: "/dr-omar/slider",
+      path: "/dr-omar/introduction-page",
     },
     {
       title: t("linkItems.termsAndConditions"),
