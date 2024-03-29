@@ -329,6 +329,7 @@ const Books = () => {
             setToggle({
               ...toggle,
               add: !toggle.add,
+              pdf: null,
             })
           }
         >
@@ -649,6 +650,7 @@ const Books = () => {
           setToggle({
             ...toggle,
             add: !toggle.add,
+            pdf: null,
           });
         }}
         centered={true}
@@ -661,6 +663,7 @@ const Books = () => {
             setToggle({
               ...toggle,
               add: !toggle.add,
+              pdf: null,
             });
             formik.handleReset();
           }}
@@ -671,6 +674,7 @@ const Books = () => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                pdf: null,
               });
             }}
           />
@@ -1068,6 +1072,7 @@ const Books = () => {
                       setToggle({
                         ...toggle,
                         add: !toggle.add,
+                        pdf: null,
                       });
                       formik.handleReset();
                     }}
