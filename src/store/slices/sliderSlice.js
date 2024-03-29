@@ -89,28 +89,7 @@ export const deleteSliderApi = createAsyncThunk(
 const sliderSlice = createSlice({
   name: "slider",
   initialState,
-  reducers: {
-    // Get Pictures
-    getPictures: (state, action) => {
-      state.sliders = action.payload;
-    },
-    // Add Picture
-    addPicture: (state, action) => {
-      state.sliders.push(action.payload);
-    },
-    // Update Picture
-    updatePicture: (state, action) => {
-      state.sliders = state.sliders.map((slider) =>
-        slider.id === action.payload.id ? action.payload : slider
-      );
-    },
-    // Delete Picture
-    deletePicture: (state, action) => {
-      state.sliders = state.sliders.filter(
-        (slider) => slider.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Sliders======
     // Pending
@@ -172,6 +151,4 @@ const sliderSlice = createSlice({
   },
 });
 
-export const { getSliders, addSlider, updateSlider, deleteSlider } =
-  sliderSlice.actions;
 export default sliderSlice.reducer;
