@@ -82,14 +82,14 @@ const useSchema = () => {
       title: string().required("يجب اختيار تصنيف"),
     }),
     slider: object().shape({
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
-        if (value.file) {
-          return value.file.size <= 2097152;
-        }
-        if (typeof value === "string") {
-          return true;
-        }
-      }),
+      // image: mixed().test("fileSize", t("validation.image"), (value) => {
+      //   if (value.file) {
+      //     return value.file.size <= 2097152;
+      //   }
+      //   if (typeof value === "string") {
+      //     return true;
+      //   }
+      // }),
       title: string().required(t("validation.title")),
       description: string().required(t("validation.description")),
     }),
