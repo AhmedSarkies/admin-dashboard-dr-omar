@@ -4,28 +4,21 @@ import {
   Col,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   Row,
   Spinner,
 } from "reactstrap";
-import anonymous from "../../assets/images/anonymous.png";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-import { IoMdClose, IoMdEye } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 import {
   getSlidersApi,
   addSliderApi,
   updateSliderApi,
   deleteSliderApi,
-  getSliders,
-  addSlider,
-  updateSlider,
-  deleteSlider,
 } from "../../store/slices/sliderSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
-import { ImUpload } from "react-icons/im";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -111,13 +104,6 @@ const Slider = () => {
           })
         ).then((res) => {
           if (!res.error) {
-            dispatch(
-              updateSlider({
-                id: values.id,
-                title: values.title,
-                body: values.description,
-              })
-            );
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -136,12 +122,6 @@ const Slider = () => {
           })
         ).then((res) => {
           if (!res.error) {
-            dispatch(
-              addSlider({
-                title: values.title,
-                body: values.description,
-              })
-            );
             setToggle({
               ...toggle,
               add: !toggle.add,
@@ -156,27 +136,24 @@ const Slider = () => {
     },
   });
 
-  // Handle Image Change
-  const handleImageChange = (e) => {
-    const file = e.currentTarget.files[0];
-    if (file) {
-      formik.setFieldValue("image", {
-        file: file,
-        preview: URL.createObjectURL(file),
-      });
-    }
-  };
+  // // Handle Image Change
+  // const handleImageChange = (e) => {
+  //   const file = e.currentTarget.files[0];
+  //   if (file) {
+  //     formik.setFieldValue("image", {
+  //       file: file,
+  //       preview: URL.createObjectURL(file),
+  //     });
+  //   }
+  // };
 
   // Handle Edit Picture
-  const handleEdit = (picture) => {
+  const handleEdit = (slider) => {
     formik.setValues({
-      ...picture,
-      image: picture?.image,
-      status: picture?.status,
-      pictureCategory: {
-        title: picture?.pictureCategory?.title,
-        id: picture?.pictureCategory?.id,
-      },
+      ...formik.values,
+      id: slider.id,
+      title: slider.title,
+      description: slider.body,
     });
     setToggle({
       ...toggle,
@@ -199,7 +176,7 @@ const Slider = () => {
       if (result.isConfirmed) {
         dispatch(deleteSliderApi(picture?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteSlider(picture?.id));
+            dispatch(getSlidersApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${picture?.title}`,
               text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
@@ -220,11 +197,7 @@ const Slider = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getSlidersApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getSliders(res.payload));
-        }
-      });
+      dispatch(getSlidersApi());
     } catch (error) {
       console.log(error);
     }
@@ -487,7 +460,6 @@ const Slider = () => {
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
-                        <IoMdEye />
                         <FaEdit
                           className="edit-btn"
                           onClick={() => {
@@ -549,7 +521,7 @@ const Slider = () => {
         <ModalBody>
           <form className="overlay-form" onSubmit={formik.handleSubmit}>
             <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col
+              {/* <Col
                 lg={5}
                 className="d-flex flex-column justify-content-center align-items-center"
               >
@@ -655,8 +627,8 @@ const Slider = () => {
                     {formik.errors.image}
                   </span>
                 ) : null}
-              </Col>
-              <Col lg={7} className="mb-5">
+              </Col> */}
+              <Col lg={12} className="mb-5">
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
@@ -860,7 +832,7 @@ const Slider = () => {
         <ModalBody>
           <form className="overlay-form" onSubmit={formik.handleSubmit}>
             <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col
+              {/* <Col
                 lg={5}
                 className="d-flex flex-column justify-content-center align-items-center"
               >
@@ -996,8 +968,8 @@ const Slider = () => {
                     {formik.errors.image}
                   </span>
                 ) : null}
-              </Col>
-              <Col lg={7} className="mb-5">
+              </Col> */}
+              <Col lg={12} className="mb-5">
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
