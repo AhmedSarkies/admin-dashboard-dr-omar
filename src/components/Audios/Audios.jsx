@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -11,17 +9,13 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit, FaFileUpload } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
-
 import anonymous from "../../assets/images/anonymous.png";
 import { useFormik } from "formik";
 import { IoMdClose } from "react-icons/io";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { mixed, object, string } from "yup";
-
 import {
   getAudiosApi,
   getAudios,
@@ -32,7 +26,6 @@ import {
   deleteAudioApi,
   deleteAudio,
 } from "../../store/slices/audioSlice";
-
 import {
   getApprovedScholarsApi,
   getApprovedScholars,
@@ -41,33 +34,7 @@ import useFiltration from "../../hooks/useFiltration";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
-
-const validationSchema = object().shape({
-  title: string().required("يجب اختيار عنوان الصوتية"),
-  status: string(),
-  image: mixed().test("fileSize", "يجب اختيار صورة", (value) => {
-    if (value.file) {
-      return value.file.size <= 2097152;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
-  audio: mixed().test("fileSize", "يجب اختيار صوتية", (value) => {
-    if (value.file) {
-      return value.file.size > 0;
-    }
-    if (typeof value === "string") {
-      return true;
-    }
-  }),
-  elder: object().shape({
-    name: string().required("يجب اختيار العالم"),
-  }),
-  audioCategory: object().shape({
-    title: string().required("يجب اختيار تصنيف"),
-  }),
-});
+import { useSchema } from "../../hooks";
 
 const initialValues = {
   title: "",
@@ -92,6 +59,7 @@ const initialValues = {
 
 const Audios = () => {
   const { t } = useTranslation();
+  const { validationSchema } = useSchema();
   const dispatch = useDispatch();
   const fileRef = useRef();
   const { audios, audioCategories, loading, error } = useSelector(
@@ -114,6 +82,7 @@ const Audios = () => {
       image: true,
       title: true,
       audio: true,
+      visits: true,
       status: true,
       control: true,
     },
@@ -143,8 +112,9 @@ const Audios = () => {
     { id: 3, name: "image", label: t("audios.columns.audio.image") },
     { id: 4, name: "title", label: t("audios.columns.audio.title") },
     { id: 5, name: "audio", label: t("audios.columns.audio.audio") },
-    { id: 6, name: "status", label: t("status") },
-    { id: 7, name: "control", label: t("action") },
+    { id: 6, name: "visits", label: t("visits") },
+    { id: 7, name: "status", label: t("status") },
+    { id: 8, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -183,7 +153,7 @@ const Audios = () => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema,
+    validationSchema: validationSchema.audio,
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("title", values.title);
@@ -518,9 +488,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("status")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -530,10 +500,22 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("action")}
+                  {t("status")}
                   {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -651,6 +633,9 @@ const Audios = () => {
                         style={{ width: "250px" }}
                       />
                     </td>
+                  )}
+                  {toggle.toggleColumns.visits && (
+                    <td className="table-td">{result?.visits_count}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
