@@ -274,7 +274,7 @@ const audioSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getAudiosCategoriesApi.fulfilled, (state, action) => {
-      state.audioCategories = action.payload.data;
+      state.audioCategories = action.payload;
       state.loading = false;
     });
     // Rejected
