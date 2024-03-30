@@ -147,11 +147,7 @@ const CategoriesAudio = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getAudiosCategoriesApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getAudiosCategories(res.payload));
-        }
-      });
+      dispatch(getAudiosCategoriesApi());
     } catch (error) {
       console.log(error);
     }
