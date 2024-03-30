@@ -63,20 +63,20 @@ const SubAdmins = ({ dashboard }) => {
         }
       }
       const formData = new FormData();
-      formData.append("name", formik.values.name);
-      formData.append("email", formik.values.email);
-      formData.append("password", formik.values.password);
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("password", values.password);
       dispatch(addSubAdmin(formData)).then((res) => {
         dispatch(getSubAdmins());
         if (!res.error) {
-          toast.success(t("toast.subAdmin.addSuccess"));
+          toast.success(t("toast.subAdmin.addedSuccess"));
           formik.handleReset();
           setToggle({
             ...toggle,
             add: !toggle.add,
           });
         } else {
-          toast.error(t("toast.subAdmin.addError"));
+          toast.error(t("toast.subAdmin.addedError"));
         }
       });
     },
@@ -108,9 +108,9 @@ const SubAdmins = ({ dashboard }) => {
               text: `تم حذف ${subAdmin?.name} بنجاح`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
-            }).then(() => toast.success(t("toast.subAdmin.deleteSuccess")));
+            }).then(() => toast.success(t("toast.subAdmin.deletedSuccess")));
           } else {
-            toast.error(t("toast.subAdmin.deleteError"));
+            toast.error(t("toast.subAdmin.deletedError"));
           }
         });
       }
@@ -400,7 +400,7 @@ const SubAdmins = ({ dashboard }) => {
         <ModalBody>
           <form className="overlay-form" onSubmit={formik.handleSubmit}>
             <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={7} className="mb-5">
+              <Col lg={12} className="mb-5">
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
