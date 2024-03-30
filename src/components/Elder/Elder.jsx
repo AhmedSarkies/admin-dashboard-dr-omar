@@ -275,20 +275,18 @@ const Elder = ({ dashboard }) => {
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
       <div className="table-header">
-        {dashboard && (
-          <button
-            className="add-btn"
-            onClick={() =>
-              setToggle({
-                ...toggle,
-                add: !toggle.add,
-              })
-            }
-          >
-            <MdAdd />
-            {t("elders.addTitle")}
-          </button>
-        )}
+        <button
+          className="add-btn"
+          onClick={() =>
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            })
+          }
+        >
+          <MdAdd />
+          {t("elders.addTitle")}
+        </button>
         <h2>{t("elders.title")}</h2>
       </div>
       <div className="scholar">
