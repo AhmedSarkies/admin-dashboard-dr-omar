@@ -110,6 +110,7 @@ const Settings = () => {
             instagram: values.instagram,
             play_store: values.playStore,
             app_store: values.appStore,
+            id: settings.id,
           })
         );
       } else {
@@ -123,6 +124,7 @@ const Settings = () => {
             instagram: values.instagram,
             play_store: values.playStore,
             app_store: values.appStore,
+            id: settings.id,
           })
         );
       }
@@ -174,17 +176,19 @@ const Settings = () => {
   // Set Settings
   useEffect(() => {
     if (settings) {
-      formik.setFieldValue("image", {
-        file: settings?.image,
-        preview: settings?.image,
+      formik.setValues({
+        image: {
+          file: settings?.image,
+          preview: settings?.image,
+        },
+        prayer_timings: settings?.prayer_timings === "true" ? true : false,
+        facebook: settings?.facebook,
+        whatsapp: settings?.whatsapp,
+        messenger: settings?.messenger,
+        instagram: settings?.instagram,
+        playStore: settings?.play_store,
+        appStore: settings?.app_store,
       });
-      formik.setFieldValue("prayer_timings", settings?.prayer_timings);
-      formik.setFieldValue("facebook", settings?.facebook);
-      formik.setFieldValue("whatsapp", settings?.whatsapp);
-      formik.setFieldValue("messenger", settings?.messenger);
-      formik.setFieldValue("instagram", settings?.instagram);
-      formik.setFieldValue("playStore", settings?.play_store);
-      formik.setFieldValue("appStore", settings?.app_store);
     }
     /* eslint-disable react-hooks/exhaustive-deps */
   }, [settings]);

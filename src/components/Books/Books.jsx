@@ -24,6 +24,7 @@ import {
   updateBookApi,
   deleteBookApi,
   deleteBook,
+  getBooksSubCategoriesApi,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -59,7 +60,7 @@ const Books = () => {
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
-  const { books, bookCategories, loading, error } = useSelector(
+  const { books, bookSubCategories, loading, error } = useSelector(
     (state) => state.book
   );
   const [toggle, setToggle] = useState({
@@ -69,7 +70,7 @@ const Books = () => {
     readMore: false,
     status: false,
     elders: false,
-    bookCategories: false,
+    bookSubCategories: false,
     bookCategory: false,
     pdf: null,
     pages: 0,
@@ -116,38 +117,19 @@ const Books = () => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema: validationSchema.book,
+    // validationSchema: validationSchema.book,
     onSubmit: (values) => {
-      const formData = new FormData();
-      formData.append("name", values.title);
-      formData.append("file", toggle.pdf.file);
-      formData.append("image", values.image?.file);
-      formData.append("categories_id", values.bookCategory?.id);
-      formData.append("status", values.status);
-      // if (values.image.file !== "") {
-      //   formData.append("image", values.image.file);
-      // }
-      // if (toggle.pdf.file !== "") {
-      //   formData.append("file", toggle.pdf.file);
-      // }
-      if (values.isEditing) {
-        // Update Book
-        dispatch(updateBookApi(formData)).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-            toast.success(t("toast.book.addedSuccess"));
-          } else {
-            toast.error(t("toast.book.addedError"));
-          }
-        });
-      } else {
-        // Add Book
-        dispatch(addBookApi(formData)).then((res) => {
+      // Add Book
+      if (!toggle.edit) {
+        dispatch(
+          addBookApi({
+            name: values.title,
+            file: values.book.file,
+            image: values.image.file,
+            categories_id: values.bookCategory.id,
+            status: values.status,
+          })
+        ).then((res) => {
           if (!res.error) {
             dispatch(getBooksApi());
             setToggle({
@@ -158,6 +140,33 @@ const Books = () => {
             toast.success(t("toast.book.addedSuccess"));
           } else {
             toast.error(t("toast.book.addedError"));
+            dispatch(getBooksApi());
+          }
+        });
+      }
+      // Edit Book
+      else {
+        dispatch(
+          updateBookApi({
+            id: formik.values.id,
+            name: values.title,
+            file: values.book?.file || values.book,
+            image: values.image?.file || values.image,
+            categories_id: values.bookCategory.id,
+            status: values.status,
+          })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getBooksApi());
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            formik.handleReset();
+            toast.success(t("toast.book.updatedSuccess"));
+          } else {
+            toast.error(t("toast.book.updatedError"));
+            dispatch(getBooksApi());
           }
         });
       }
@@ -175,6 +184,10 @@ const Books = () => {
             file: file,
             preview: URL.createObjectURL(file),
           },
+        });
+        formik.setFieldValue("book", {
+          file: file,
+          preview: URL.createObjectURL(file),
         });
       }
       // // Get Number Of Pages From PDF
@@ -255,24 +268,18 @@ const Books = () => {
       title: book?.category?.title,
       id: book?.category?.id,
     });
-    formik.setFieldValue("image", {
-      file: "",
-      preview: book?.image,
-    });
-    formik.setFieldValue("book", {
-      file: "",
-      preview: book?.file,
-    });
+    formik.setFieldValue("image", book?.image);
+    formik.setFieldValue("book", book?.file);
     setToggle({
       ...toggle,
-      edit: !toggle.edit,
+      edit: true,
     });
   };
 
   // Delete Book
   const handleDelete = (book) => {
     Swal.fire({
-      title: t("titleDeleteAlert") + book?.title + "?",
+      title: t("titleDeleteAlert") + book?.name + "?",
       text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
@@ -284,10 +291,10 @@ const Books = () => {
       if (result.isConfirmed) {
         dispatch(deleteBookApi(book?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteBook(book?.id));
+            dispatch(getBooksApi());
             Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${book?.title}`,
-              text: `${t("titleDeletedSuccess")} ${book?.title} ${t(
+              title: `${t("titleDeletedSuccess")} ${book?.name}`,
+              text: `${t("titleDeletedSuccess")} ${book?.name} ${t(
                 "textDeletedSuccess"
               )}`,
               icon: "success",
@@ -296,6 +303,7 @@ const Books = () => {
             }).then(() => toast.success(t("toast.book.deletedSuccess")));
           } else {
             toast.error(t("toast.book.deletedError"));
+            dispatch(getBooksApi());
           }
         });
       }
@@ -305,16 +313,8 @@ const Books = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getBooks(res.payload));
-        }
-      });
-      dispatch(getBooksCategoriesApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getBooksCategories(res.payload));
-        }
-      });
+      dispatch(getBooksApi());
+      dispatch(getBooksSubCategoriesApi());
     } catch (error) {
       console.log(error);
     }
@@ -878,7 +878,7 @@ const Books = () => {
                         toggle.bookCategory ? "active" : ""
                       }`}
                     >
-                      {bookCategories?.map((category) => (
+                      {bookSubCategories?.map((category) => (
                         <button
                           type="button"
                           key={category?.id}
@@ -1093,6 +1093,7 @@ const Books = () => {
           setToggle({
             ...toggle,
             edit: !toggle.edit,
+            pdf: null,
           });
           formik.handleReset();
         }}
@@ -1106,6 +1107,7 @@ const Books = () => {
             setToggle({
               ...toggle,
               edit: !toggle.edit,
+              pdf: null,
             });
             formik.handleReset();
           }}
@@ -1135,8 +1137,10 @@ const Books = () => {
                   >
                     <img
                       src={
-                        formik.values?.image && formik.values.image?.preview
+                        formik.values.image?.file
                           ? formik.values.image?.preview
+                          : formik.values.image?.file === undefined
+                          ? formik.values.image
                           : anonymous
                       }
                       alt="avatar"
@@ -1260,6 +1264,7 @@ const Books = () => {
                     accept="application/pdf"
                     className="form-input form-img-input"
                     id="book"
+                    name="book"
                     onChange={handlePDFChange}
                   />
                 </div>
@@ -1318,7 +1323,7 @@ const Books = () => {
                         toggle.bookCategory ? "active" : ""
                       }`}
                     >
-                      {bookCategories?.map((category) => (
+                      {bookSubCategories?.map((category) => (
                         <button
                           type="button"
                           key={category?.id}
@@ -1372,10 +1377,10 @@ const Books = () => {
                       className="dropdown-btn d-flex justify-content-between align-items-center"
                     >
                       {formik.values.status === "Private" ||
-                      formik.values.status === "private"
+                      formik.values.status === "Private"
                         ? t("private")
                         : formik.values.status === "Public" ||
-                          formik.values.status === "public"
+                          formik.values.status === "Public"
                         ? t("public")
                         : t("status")}
                       <TiArrowSortedUp
@@ -1393,7 +1398,7 @@ const Books = () => {
                         type="button"
                         className={`item ${
                           formik.values.status === "Private" ||
-                          formik.values.status === "private"
+                          formik.values.status === "Private"
                             ? "active"
                             : ""
                         }`}
@@ -1413,7 +1418,7 @@ const Books = () => {
                         type="button"
                         className={`item ${
                           formik.values.status === "Public" ||
-                          formik.values.status === "public"
+                          formik.values.status === "Public"
                             ? "active"
                             : ""
                         }`}
@@ -1521,6 +1526,7 @@ const Books = () => {
                       setToggle({
                         ...toggle,
                         edit: !toggle.edit,
+                        pdf: null,
                       });
                       formik.handleReset();
                     }}

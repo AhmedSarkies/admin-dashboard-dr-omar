@@ -63,31 +63,28 @@ const TermsAndConditions = () => {
       isEditing: false,
     },
     onSubmit: (values) => {
-      if (values.isEditing) {
+      if (values.id) {
         // Edit
         dispatch(
           updateTermAndConditionApi({
+            ...values,
             country: values.country.toLowerCase(),
             country_en: values.country_en.toLowerCase(),
             text: values.text.toLowerCase(),
             text_en: values.text_en.toLowerCase(),
-            id: termsAndConditions?.id,
           })
         ).then((res) => {
           if (!res.error) {
-            dispatch(
-              updateTermAndCondition({
-                ...values,
-                id: termsAndConditions?.id,
-              })
-            );
+            dispatch(getTermsAndConditionsApi());
             setToggle({
               ...toggle,
-              edit: !toggle.edit,
+              edit: false,
             });
-            toast.success(t("toast.termsAndConditions.editedSuccess"));
+            toast.success(t("toast.termsAndConditions.updatedSuccess"));
+            formik.resetForm();
           } else {
-            toast.error(t("toast.termsAndConditions.editedError"));
+            getTermsAndConditionsApi();
+            toast.error(t("toast.termsAndConditions.updatedError"));
           }
         });
       } else {
@@ -101,14 +98,15 @@ const TermsAndConditions = () => {
           })
         ).then((res) => {
           if (!res.error) {
-            console.log(res);
-            dispatch(addTermAndCondition(res.meta.arg));
+            dispatch(getTermsAndConditionsApi());
             toast.success(t("toast.termsAndConditions.addedSuccess"));
             setToggle({
               ...toggle,
-              add: !toggle.add,
+              add: false,
             });
+            formik.resetForm();
           } else {
+            dispatch(getTermsAndConditionsApi());
             toast.error(t("toast.termsAndConditions.addedError"));
           }
         });
@@ -154,7 +152,14 @@ const TermsAndConditions = () => {
 
   // Handle Edit term And Condition
   const handleEdit = (termsAndCondition) => {
-    formik.setValues({ ...termsAndCondition, isEditing: true });
+    formik.setValues({
+      country: termsAndCondition?.country,
+      country_en: termsAndCondition?.country_en,
+      text: termsAndCondition?.text,
+      text_en: termsAndCondition?.text_en,
+      isEditing: true,
+      id: termsAndCondition?.id,
+    });
     setToggle({
       ...toggle,
       edit: !toggle.edit,
@@ -164,7 +169,10 @@ const TermsAndConditions = () => {
   // Delete term And Condition
   const handleDelete = (termsAndCondition) => {
     Swal.fire({
-      title: t("titleDeleteAlert") + termsAndCondition?.title + "?",
+      title:
+        t("titleDeleteAlert") + lng === "ar"
+          ? termsAndCondition?.country
+          : termsAndCondition.country_en + "?",
       text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
@@ -177,13 +185,17 @@ const TermsAndConditions = () => {
         dispatch(deleteTermAndConditionApi(termsAndCondition?.id)).then(
           (res) => {
             if (!res.error) {
-              dispatch(deleteTermAndCondition(termsAndCondition?.id));
+              dispatch(getTermsAndConditionsApi());
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${
-                  termsAndCondition?.title
+                  lng === "ar"
+                    ? termsAndCondition?.country
+                    : termsAndCondition.country_en
                 }`,
                 text: `${t("titleDeletedSuccess")} ${
-                  termsAndCondition?.title
+                  lng === "ar"
+                    ? termsAndCondition?.country
+                    : termsAndCondition.country_en
                 } ${t("textDeletedSuccess")}`,
                 icon: "success",
                 confirmButtonColor: "#0d1d34",
@@ -192,6 +204,7 @@ const TermsAndConditions = () => {
                 toast.success(t("toast.termsAndConditions.deletedSuccess"))
               );
             } else {
+              dispatch(getTermsAndConditionsApi());
               toast.error(t("toast.termsAndConditions.deletedError"));
             }
           }
@@ -203,16 +216,7 @@ const TermsAndConditions = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getTermsAndConditionsApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getTermsAndConditions(res.payload));
-          dispatch(getTermsAndConditionsApi()).then((res) => {
-            if (!res.error && res.payload?.length > 0) {
-              dispatch(getTermsAndConditions(res.payload));
-            }
-          });
-        }
-      });
+      dispatch(getTermsAndConditionsApi());
     } catch (error) {
       console.log(error);
     }
@@ -538,6 +542,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.country"
                       )}
+                      value={formik.values.country}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="country" className="label-form">
@@ -557,6 +562,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.text"
                       )}
+                      value={formik.values.text}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="text" className="label-form">
@@ -579,6 +585,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.country"
                       )}
+                      value={formik.values.country_en}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="country_en" className="label-form">
@@ -598,6 +605,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.text"
                       )}
+                      value={formik.values.text_en}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="text_en" className="label-form">
@@ -708,6 +716,7 @@ const TermsAndConditions = () => {
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
+                isBookCategories: !toggle.isBookCategories,
               });
               formik.handleReset();
             }}
@@ -760,6 +769,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.country"
                       )}
+                      value={formik.values.country}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="country" className="label-form">
@@ -779,6 +789,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.text"
                       )}
+                      value={formik.values.text}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="text" className="label-form">
@@ -801,6 +812,7 @@ const TermsAndConditions = () => {
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.country"
                       )}
+                      value={formik.values.country_en}
                       onChange={handleInputChange}
                     />
                     <label htmlFor="country_en" className="label-form">
@@ -817,6 +829,7 @@ const TermsAndConditions = () => {
                       className="form-control"
                       id="text_en"
                       name="text_en"
+                      value={formik.values.text_en}
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.text"
                       )}
@@ -915,7 +928,7 @@ const TermsAndConditions = () => {
           <PaginationUI />
         )}
       </div>
-      <div className="scholar-container mt-5 mb-5 m-3">
+      {/* <div className="scholar-container mt-5 mb-5 m-3">
         <div className="table-header justify-content-center">
           <h3
             className="title"
@@ -950,7 +963,7 @@ const TermsAndConditions = () => {
             <p>الشرط الاول</p>
           </div>
         </div>
-      </div>
+      </div> */}
     </>
   );
 };

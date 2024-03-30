@@ -111,14 +111,7 @@ const Images = () => {
           })
         ).then((res) => {
           if (!res.error) {
-            dispatch(
-              updatePicture({
-                id: values?.id,
-                category_id: values.pictureCategory?.id,
-                image: values.image.file,
-                status: values.status,
-              })
-            );
+            dispatch(getPicturesApi());
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -127,6 +120,7 @@ const Images = () => {
             toast.success(t("toast.image.updatedSuccess"));
           } else {
             toast.error(t("toast.image.updatedError"));
+            dispatch(getPicturesApi());
           }
         });
       } else {
@@ -138,13 +132,7 @@ const Images = () => {
           })
         ).then((res) => {
           if (!res.error) {
-            dispatch(
-              addPicture({
-                ...values,
-                image_categories_id: values.pictureCategory?.id,
-                image: values.image.preview,
-              })
-            );
+            dispatch(getPicturesApi());
             setToggle({
               ...toggle,
               add: !toggle.add,
@@ -153,6 +141,7 @@ const Images = () => {
             toast.success(t("toast.image.addedSuccess"));
           } else {
             toast.error(t("toast.image.addedError"));
+            dispatch(getPicturesApi());
           }
         });
       }
@@ -219,7 +208,7 @@ const Images = () => {
       if (result.isConfirmed) {
         dispatch(deletePictureApi(picture?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deletePicture(picture?.id));
+            dispatch(getPicturesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${picture?.title}`,
               text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
@@ -228,9 +217,12 @@ const Images = () => {
               icon: "success",
               confirmButtonColor: "#0d1d34",
               confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.image.deletedSuccess")));
+            }).then(() => {
+              toast.success(t("toast.image.deletedSuccess"));
+            });
           } else {
             toast.error(t("toast.image.deletedError"));
+            dispatch(getPicturesApi());
           }
         });
       }

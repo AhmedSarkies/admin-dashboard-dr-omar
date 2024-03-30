@@ -1,13 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Col,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-  Spinner,
-} from "reactstrap";
+import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -109,9 +102,10 @@ const Slider = () => {
               edit: !toggle.edit,
             });
             formik.handleReset();
-            toast.success(t("toast.image.updatedSuccess"));
+            toast.success(t("toast.slider.updatedSuccess"));
+            dispatch(getSlidersApi());
           } else {
-            toast.error(t("toast.image.updatedError"));
+            toast.error(t("toast.slider.updatedError"));
           }
         });
       } else {
@@ -127,9 +121,10 @@ const Slider = () => {
               add: !toggle.add,
             });
             formik.handleReset();
-            toast.success(t("toast.image.addedSuccess"));
+            toast.success(t("toast.slider.addedSuccess"));
+            dispatch(getSlidersApi());
           } else {
-            toast.error(t("toast.image.addedError"));
+            toast.error(t("toast.slider.addedError"));
           }
         });
       }
@@ -185,9 +180,9 @@ const Slider = () => {
               icon: "success",
               confirmButtonColor: "#0d1d34",
               confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.image.deletedSuccess")));
+            }).then(() => toast.success(t("toast.slider.deletedSuccess")));
           } else {
-            toast.error(t("toast.image.deletedError"));
+            toast.error(t("toast.slider.deletedError"));
           }
         });
       }
