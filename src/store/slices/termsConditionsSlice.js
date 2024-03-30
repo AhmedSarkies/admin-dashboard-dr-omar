@@ -15,11 +15,7 @@ export const getTermsAndConditionsApi = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/TermsConditions/get_terms_conditions`",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        url: "/TermsConditions/Get_Term_All`",
       });
       return response.data;
     } catch (error) {
