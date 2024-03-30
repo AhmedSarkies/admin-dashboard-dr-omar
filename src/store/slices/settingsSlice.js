@@ -51,7 +51,17 @@ export const updateSetting = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/Settings/Update`,
-        params: { data },
+        params: {
+          id: data.id,
+          prayer_timings: data.prayer_timings,
+        },
+        data: {
+          image: data.image,
+          facebook: data.facebook,
+          whatsapp: data.whatsapp,
+          messenger: data.messenger,
+          instagram: data.instagram,
+        },
       }).then((response) => {
         return response.data;
       });

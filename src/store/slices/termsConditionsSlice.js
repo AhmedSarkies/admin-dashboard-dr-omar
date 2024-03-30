@@ -3,7 +3,7 @@ import Http from "../../Http";
 
 // Initial State
 const initialState = {
-  termsConditions: [],
+  termsAndConditions: [],
   loading: false,
   error: null,
 };
@@ -15,7 +15,7 @@ export const getTermsAndConditionsApi = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/TermsConditions/Get_Term_All`",
+        url: "/TermsConditions/Get_Term_All",
       });
       return response.data;
     } catch (error) {
@@ -49,7 +49,7 @@ export const updateTermAndConditionApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/SubAdmin/Update`,
+        url: `/TermsConditions/updateTerm`,
         data,
       }).then((response) => {
         return response.data;
@@ -66,13 +66,9 @@ export const deleteTermAndConditionApi = createAsyncThunk(
   async (id, { rejectWithValue }) => {
     try {
       await Http({
-        method: "POST",
-        url: `/SubAdmin/Delete`,
+        method: "DELETE",
+        url: `/TermsConditions/deleteTerm`,
         params: { id },
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
       }).then((response) => {
         return response.data;
       });
@@ -89,19 +85,19 @@ const termsConditionsSlice = createSlice({
   reducers: {
     // Get Terms And Conditions
     getTermsAndConditions: (state, action) => {
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     },
     // Add Term And Condition
     addTermAndCondition: (state, action) => {
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     },
     // Update Term And Condition
     updateTermAndCondition: (state, action) => {
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     },
     // Delete Term And Condition
     deleteTermAndCondition: (state, action) => {
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -112,7 +108,7 @@ const termsConditionsSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getTermsAndConditionsApi.fulfilled, (state, action) => {
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
       state.loading = false;
     });
     // Rejected
@@ -128,7 +124,7 @@ const termsConditionsSlice = createSlice({
     // Fulfilled
     builder.addCase(addTermAndConditionApi.fulfilled, (state, action) => {
       state.loading = false;
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     });
     // Rejected
     builder.addCase(addTermAndConditionApi.rejected, (state, action) => {
@@ -143,7 +139,7 @@ const termsConditionsSlice = createSlice({
     // Fulfilled
     builder.addCase(updateTermAndConditionApi.fulfilled, (state, action) => {
       state.loading = false;
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     });
     // Rejected
     builder.addCase(updateTermAndConditionApi.rejected, (state, action) => {
@@ -158,7 +154,7 @@ const termsConditionsSlice = createSlice({
     // Fulfilled
     builder.addCase(deleteTermAndConditionApi.fulfilled, (state, action) => {
       state.loading = false;
-      state.termsConditions = action.payload;
+      state.termsAndConditions = action.payload;
     });
     // Rejected
     builder.addCase(deleteTermAndConditionApi.rejected, (state, action) => {

@@ -65,12 +65,12 @@ export const updateBookApi = createAsyncThunk(
 // Delete Book using Axios and Redux Thunk
 export const deleteBookApi = createAsyncThunk(
   "book/deleteBookApi",
-  async (id, { rejectWithValue }) => {
+  async (Book_id, { rejectWithValue }) => {
     try {
       await Http({
         method: "POST",
         url: `/Books/Delete`,
-        params: { id },
+        params: { Book_id },
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",

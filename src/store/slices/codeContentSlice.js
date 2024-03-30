@@ -35,7 +35,7 @@ const codeContentSlice = createSlice({
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // ======Add Book======
+    // ======Add Code Content======
     // Pending
     builder.addCase(sendCodeContent.pending, (state, action) => {
       state.loading = true;
