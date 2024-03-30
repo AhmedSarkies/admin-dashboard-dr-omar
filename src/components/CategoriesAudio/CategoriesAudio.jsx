@@ -6,7 +6,6 @@ import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import {
   getAudiosCategoriesApi,
-  getAudiosCategories,
   addAudioCategoryApi,
   updateAudioCategoryApi,
   deleteAudioCategoryApi,
