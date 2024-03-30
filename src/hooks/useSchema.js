@@ -39,7 +39,7 @@ const useSchema = () => {
         .required(t("validation.phone")),
       status: string(),
       // Validation for image file must be uploaded with the form or just string
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
+      image: mixed().test("fileSize", t("validation.imageElder"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
         }
@@ -51,7 +51,7 @@ const useSchema = () => {
     article: object().shape({
       title: string().required(t("validation.title")),
       status: string(),
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
+      image: mixed().test("fileSize", t("validation.imageArticle"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
         }
@@ -101,23 +101,26 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
-      phone: number()
-        .typeError(t("validation.phone"))
-        .positive(t("validation.phone"))
-        .integer(t("validation.phone"))
-        .min(1000000000, t("validation.phone"))
-        .max(9999999999, t("validation.phone"))
-        .required(t("validation.phone")),
-      status: string(),
-      // Validation for image file must be uploaded with the form or just string
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
-        if (value.file) {
-          return value.file.size <= 2097152;
-        }
-        if (typeof value === "string") {
-          return true;
-        }
-      }),
+      password: string()
+        .min(8, t("validation.password"))
+        .required(t("validation.password")),
+      // phone: number()
+      //   .typeError(t("validation.phone"))
+      //   .positive(t("validation.phone"))
+      //   .integer(t("validation.phone"))
+      //   .min(1000000000, t("validation.phone"))
+      //   .max(9999999999, t("validation.phone"))
+      //   .required(t("validation.phone")),
+      // status: string(),
+      // // Validation for image file must be uploaded with the form or just string
+      // image: mixed().test("fileSize", t("validation.image"), (value) => {
+      //   if (value.file) {
+      //     return value.file.size <= 2097152;
+      //   }
+      //   if (typeof value === "string") {
+      //     return true;
+      //   }
+      // }),
     }),
     bookSubCategory: object().shape({
       title: string().required(t("validation.subCategory")),
@@ -128,7 +131,7 @@ const useSchema = () => {
     book: object().shape({
       title: string().required(t("validation.title")),
       status: string(),
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
+      image: mixed().test("fileSize", t("validation.imageBook"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
         }
@@ -146,6 +149,32 @@ const useSchema = () => {
         if (typeof value === "string") {
           return true;
         }
+      }),
+    }),
+    audio: object().shape({
+      title: string().required(t("validation.title")),
+      status: string(),
+      image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
+        if (value.file) {
+          return value.file.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
+      audio: mixed().test("fileSize", t("validation.audio"), (value) => {
+        if (value.file) {
+          return value.file.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
+      elder: object().shape({
+        name: string().required(t("validation.elder")),
+      }),
+      audioCategory: object().shape({
+        title: string().required(t("validation.category")),
       }),
     }),
     settings: object().shape({
