@@ -34,8 +34,8 @@ const useSchema = () => {
         .typeError(t("validation.phone"))
         .positive(t("validation.phone"))
         .integer(t("validation.phone"))
-        .min(10000000000, t("validation.phone"))
-        .max(99999999999, t("validation.phone"))
+        .min(100000000, t("validation.phone"))
+        .max(9999999999, t("validation.phone"))
         .required(t("validation.phone")),
       status: string(),
       // Validation for image file must be uploaded with the form or just string
@@ -132,8 +132,8 @@ const useSchema = () => {
       title: string().required(t("validation.title")),
       status: string(),
       image: mixed().test("fileSize", t("validation.imageBook"), (value) => {
-        if (value.file) {
-          return value.file.size <= 2097152;
+        if (value?.file) {
+          return value?.file.size <= 2097152;
         }
         if (typeof value === "string") {
           return true;
@@ -144,7 +144,7 @@ const useSchema = () => {
       }),
       book: mixed().test("fileSize", t("validation.book"), (value) => {
         if (value?.file) {
-          return value?.file?.size <= 2097152;
+          return value?.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
