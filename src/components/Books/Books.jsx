@@ -652,6 +652,7 @@ const Books = () => {
             add: !toggle.add,
             pdf: null,
           });
+          formik.handleReset();
         }}
         centered={true}
         keyboard={true}
