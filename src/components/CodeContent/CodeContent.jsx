@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from "react-redux";
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-import { sendCodeContent } from "../../store/slices/codeContentSlice";
+import {
+  sendCodeContent,
+  sendCodeContentAll,
+} from "../../store/slices/codeContentSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
@@ -42,7 +45,21 @@ const CodeContent = () => {
     validationSchema: validationSchema.codeContent,
     onSubmit: (values) => {
       if (toggle.everyOne) {
-        console.log("Send to every one");
+        dispatch(sendCodeContentAll(values)).then((res) => {
+          if (!res.error) {
+            toast.success(t("toast.codeContent.addedSuccess"));
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              everyOne: false,
+            });
+            dispatch(getUsers());
+            formik.handleReset();
+          } else {
+            toast.error(t("toast.codeContent.addedError"));
+            dispatch(getUsers());
+          }
+        });
       } else {
         dispatch(sendCodeContent(values)).then((response) => {
           if (sendCodeContent.fulfilled.match(response)) {

@@ -29,6 +29,26 @@ export const sendCodeContent = createAsyncThunk(
   }
 );
 
+// Send Code Content All using Axios and Redux Thunk
+export const sendCodeContentAll = createAsyncThunk(
+  "codeContent/sendCodeContentAll",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `Settings/sendCodeAll`,
+        params: {
+          code: data.code,
+        },
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Books Slice
 const codeContentSlice = createSlice({
   name: "codeContent",
@@ -47,6 +67,20 @@ const codeContentSlice = createSlice({
     });
     // Rejected
     builder.addCase(sendCodeContent.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Add Code Content All======
+    // Pending
+    builder.addCase(sendCodeContentAll.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(sendCodeContentAll.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(sendCodeContentAll.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
