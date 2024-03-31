@@ -20,13 +20,19 @@ const useSchema = () => {
       //   userType: string().required("يجب اختيار نوع المستخدم"),
     }),
     termsAndConditions: object().shape({
-      titleArabic: string().required(t("validation.title")),
-      titleEnglish: string().required(t("validation.title")),
+      titleArabic: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+      titleEnglish: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       descriptionArabic: string().required(t("validation.description")),
       descriptionEnglish: string().required(t("validation.description")),
     }),
     elder: object().shape({
-      name: string().required(t("validation.elder")),
+      name: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.elder")),
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
@@ -49,7 +55,9 @@ const useSchema = () => {
       }),
     }),
     article: object().shape({
-      title: string().required(t("validation.title")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       status: string(),
       image: mixed().test("fileSize", t("validation.imageArticle"), (value) => {
         if (value.file) {
@@ -79,7 +87,9 @@ const useSchema = () => {
       status: string(),
     }),
     pictureCategory: object().shape({
-      title: string().required("يجب اختيار تصنيف"),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required("يجب اختيار تصنيف"),
     }),
     slider: object().shape({
       // image: mixed().test("fileSize", t("validation.image"), (value) => {
@@ -90,14 +100,20 @@ const useSchema = () => {
       //     return true;
       //   }
       // }),
-      title: string().required(t("validation.title")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       description: string().required(t("validation.description")),
     }),
     category: object().shape({
-      title: string().required(t("validation.category")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.category")),
     }),
     subAdmins: object().shape({
-      name: string().required(t("validation.name")),
+      name: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.name")),
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
@@ -123,13 +139,17 @@ const useSchema = () => {
       // }),
     }),
     bookSubCategory: object().shape({
-      title: string().required(t("validation.subCategory")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.subCategory")),
       bookCategory: object().shape({
         title: string().required(t("validation.mainCategory")),
       }),
     }),
     book: object().shape({
-      title: string().required(t("validation.title")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       status: string(),
       image: mixed().test("fileSize", t("validation.imageBook"), (value) => {
         if (value?.file) {
@@ -152,7 +172,9 @@ const useSchema = () => {
       }),
     }),
     audio: object().shape({
-      title: string().required(t("validation.title")),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       status: string(),
       image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
         if (value.file) {
