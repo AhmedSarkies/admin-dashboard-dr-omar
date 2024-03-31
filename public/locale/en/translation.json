@@ -415,6 +415,9 @@
     "content": "Please enter a content",
     "mainCategory": "Please choose a main category",
     "subCategory": "Please choose a sub category",
-    "url": "Please enter a valid URL"
+    "url": "Please enter a valid URL",
+    "codeContent": "Please enter a code content",
+    "code": "Please enter a right code 4 digits (Ex: 1234)",
+    "maxCharacters": "Please enter a maximum of 40 characters"
   }
 }
