@@ -25,7 +25,7 @@ const Dashboard = () => {
       icon: <HiUsers />,
       path: "users",
       disabled: false,
-      count: counts?.User_Count || 0,
+      count: counts?.User_Count,
       color: "linear-gradient(45deg, rgb(249, 177, 21), rgb(246, 150, 11))",
     },
     {
@@ -34,7 +34,7 @@ const Dashboard = () => {
       icon: <SiGooglescholar />,
       path: "elder",
       disabled: false,
-      count: counts?.Elder_Count || 0,
+      count: counts?.Elder_Count,
       color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
     },
     {
@@ -43,7 +43,7 @@ const Dashboard = () => {
       icon: <GiBookshelf />,
       path: "books",
       disabled: false,
-      count: counts?.Book_Count || 0,
+      count: counts?.Book_Count,
       color: "linear-gradient(45deg, rgb(50, 31, 219), rgb(31, 20, 152))",
     },
     {
@@ -52,7 +52,7 @@ const Dashboard = () => {
       icon: <LiaFileAudioSolid />,
       path: "audios",
       disabled: false,
-      count: counts?.Audio_Count || 0,
+      count: counts?.Audio_Count,
       color: "linear-gradient(45deg, rgb(203, 93, 255), rgb(128, 12, 184))",
     },
     {
@@ -61,7 +61,7 @@ const Dashboard = () => {
       icon: <SlPicture />,
       path: "images",
       disabled: false,
-      count: counts?.Image_Count || 0,
+      count: counts?.Image_Count,
       color: "linear-gradient(45deg, rgb(233 30 99), rgb(156 39 176))",
     },
     {
@@ -70,7 +70,7 @@ const Dashboard = () => {
       icon: <MdArticle />,
       path: "articles",
       disabled: false,
-      count: counts?.Articles_Count || 0,
+      count: counts?.Articles_Count,
       color: "linear-gradient(45deg, rgb(255, 51, 51), rgb(204, 0, 0))",
     },
     {
@@ -79,7 +79,7 @@ const Dashboard = () => {
       icon: <IoCloudDownloadSharp />,
       path: "downloads",
       disabled: true,
-      count: counts?.total_downloads_count_Count || 0,
+      count: counts?.total_download_count_Count,
       color: "linear-gradient(45deg, rgb(0, 204, 204), rgb(0, 153, 153))",
     },
     {
@@ -88,7 +88,7 @@ const Dashboard = () => {
       icon: <GrFavorite />,
       path: "favorites",
       disabled: true,
-      count: counts?.total_favorites_count_Count || 0,
+      count: counts?.total_favorite_count_Count,
       color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
     },
     // {

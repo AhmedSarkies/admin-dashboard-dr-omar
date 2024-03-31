@@ -18,9 +18,7 @@ import { IoMdClose } from "react-icons/io";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import {
   getAudiosApi,
-  getAudios,
   getAudiosCategoriesApi,
-  getAudiosCategories,
   addAudioApi,
   updateAudioApi,
   deleteAudioApi,
@@ -28,7 +26,6 @@ import {
 } from "../../store/slices/audioSlice";
 import {
   getApprovedScholarsApi,
-  getApprovedScholars,
 } from "../../store/slices/scholarSlice";
 import useFiltration from "../../hooks/useFiltration";
 import Swal from "sweetalert2";
@@ -155,46 +152,58 @@ const Audios = () => {
     initialValues,
     validationSchema: validationSchema.audio,
     onSubmit: (values) => {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("status", values.status);
-      formData.append("audio", values.audio.file);
-      formData.append("elder_id", values.elder.id);
-      formData.append("Audio_category", values.audioCategory.id);
-      if (values.image.file !== "") {
-        formData.append("image", values.image.file);
-      }
-      if (values.audio.file !== "") {
-        formData.append("audio", values.audio.file);
-      }
-      if (values.isEditing) {
-        // Update Audio
-        dispatch(updateAudioApi(formData)).then((res) => {
+      // Add Audio
+      if (!values.id) {
+        dispatch(
+          addAudioApi({
+            title: values.title,
+            image: values.image.file,
+            audio: values.audio.file,
+            status: values.status,
+            elder_id: values.elder.id,
+            Audio_category: values.audioCategory.id,
+          })
+        ).then((res) => {
           if (!res.error) {
             dispatch(getAudiosApi());
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
             formik.handleReset();
-            toast.success(t("toast.audio.updatedSuccess"));
-          } else {
-            toast.error(t("toast.audio.updatedError"));
-          }
-        });
-      } else {
-        // Add Audio
-        dispatch(addAudioApi(formData)).then((res) => {
-          if (!res.error) {
-            dispatch(getAudiosApi());
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
-            formik.handleReset();
             toast.success(t("toast.audio.addedSuccess"));
           } else {
             toast.error(t("toast.audio.addedError"));
+            dispatch(getAudiosApi());
+          }
+        });
+      } else {
+        // Update Audio
+        const formDate = {
+          id: values.id,
+          title: values.title,
+          status: values.status === "Public" ? "public" : "private",
+          Audio_category: values.audioCategory.id,
+          tag_name: ["tag 1", "tag 2"],
+        };
+        if (values.image.file) {
+          formDate.image = values.image.file;
+        }
+        if (values.audio.file) {
+          formDate.audio = values.audio.file;
+        }
+        dispatch(updateAudioApi(formDate)).then((res) => {
+          if (!res.error) {
+            dispatch(getAudiosApi());
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            toast.success(t("toast.audio.updatedSuccess"));
+          } else {
+            toast.error(t("toast.audio.updatedError"));
+            dispatch(getAudiosApi());
           }
         });
       }
@@ -276,14 +285,20 @@ const Audios = () => {
   const handleEdit = (audio) => {
     formik.handleReset();
     formik.setValues({
-      ...audio,
+      id: audio.id,
+      title: audio.title,
+      image: audio.image,
+      audio: audio.audio,
+      status: audio.status,
       elder: {
         name: audio.elder?.name,
+        id: audio.elder?.id,
       },
       audioCategory: {
         title: audio.audioCategory?.title,
+        id: audio.audioCategory?.id,
       },
-      isEditing: true,
+      tag_name: ["tag 1", "tag 2"],
     });
     setToggle({
       ...toggle,
@@ -325,24 +340,11 @@ const Audios = () => {
   };
 
   // get data from api
-
   useEffect(() => {
     try {
-      dispatch(getAudiosApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getAudios(res.payload));
-          dispatch(getAudiosCategoriesApi()).then((res) => {
-            if (!res.error && res.payload.length > 0) {
-              dispatch(getAudiosCategories(res.payload));
-            }
-          });
-          dispatch(getApprovedScholarsApi()).then((res) => {
-            if (!res.error && res.payload.length > 0) {
-              dispatch(getApprovedScholars(res.payload));
-            }
-          });
-        }
-      });
+      dispatch(getAudiosApi());
+      dispatch(getAudiosCategoriesApi());
+      dispatch(getApprovedScholarsApi());
     } catch (error) {
       console.log(error);
     }
@@ -530,7 +532,7 @@ const Audios = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -548,7 +550,7 @@ const Audios = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -568,7 +570,7 @@ const Audios = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -580,7 +582,7 @@ const Audios = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>

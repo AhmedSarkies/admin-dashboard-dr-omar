@@ -18,12 +18,7 @@ import {
   addPictureApi,
   updatePictureApi,
   deletePictureApi,
-  getPictures,
-  addPicture,
-  updatePicture,
-  deletePicture,
   getPicturesCategoriesApi,
-  getPicturesCategories,
 } from "../../store/slices/pictureSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -184,7 +179,7 @@ const Images = () => {
       status: picture?.status,
       pictureCategory: {
         title: picture?.image_category?.title,
-        id: picture?.pictureCategory?.id,
+        id: picture?.image_category?.id,
       },
     });
     setToggle({
@@ -232,16 +227,8 @@ const Images = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getPicturesApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getPictures(res.payload));
-        }
-      });
-      dispatch(getPicturesCategoriesApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getPicturesCategories(res.payload));
-        }
-      });
+      dispatch(getPicturesApi());
+      dispatch(getPicturesCategoriesApi());
     } catch (error) {
       console.log(error);
     }

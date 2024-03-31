@@ -13,13 +13,9 @@ import { useFiltration } from "../../hooks";
 import Cookies from "js-cookie";
 import {
   getTermsAndConditionsApi,
-  deleteTermAndCondition,
   deleteTermAndConditionApi,
-  getTermsAndConditions,
-  updateTermAndCondition,
   updateTermAndConditionApi,
   addTermAndConditionApi,
-  addTermAndCondition,
 } from "../../store/slices/termsConditionsSlice";
 
 const TermsAndConditions = () => {

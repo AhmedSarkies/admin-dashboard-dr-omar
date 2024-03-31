@@ -19,6 +19,7 @@ import { IoMdClose } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
 // import { useSchema } from "../../hooks";
 import { ImUpload } from "react-icons/im";
+import { toast } from "react-toastify";
 const contactFields = [
   {
     name: "facebook",
@@ -99,20 +100,28 @@ const Settings = () => {
     },
     // validationSchema: validationSchema.settings,
     onSubmit: (values) => {
+      const data = new FormData();
+      data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
+      data.append("facebook", values.facebook);
+      data.append("whatsapp", values.whatsapp);
+      data.append("messenger", values.messenger);
+      data.append("instagram", values.instagram);
+      data.append("play_store", values.playStore);
+      data.append("app_store", values.appStore);
+      data.append("id", settings?.id);
+      if (values.image.file) {
+        data.append("image", values.image.file);
+      }
       if (settings) {
-        dispatch(
-          updateSetting({
-            image: values.image.file,
-            prayer_timings: values.prayer_timings === true ? 1 : 0,
-            facebook: values.facebook,
-            whatsapp: values.whatsapp,
-            messenger: values.messenger,
-            instagram: values.instagram,
-            play_store: values.playStore,
-            app_store: values.appStore,
-            id: settings.id,
-          })
-        );
+        dispatch(updateSetting(data)).then((res) => {
+          if (!res.error) {
+            dispatch(getSettings());
+            toast.success(t("toast.settingsApp.success"));
+          } else {
+            dispatch(getSettings());
+            toast.error(t("toast.settingsApp.error"));
+          }
+        });
       } else {
         dispatch(
           addSetting({
@@ -178,7 +187,7 @@ const Settings = () => {
     if (settings) {
       formik.setValues({
         image: {
-          file: settings?.image,
+          file: "",
           preview: settings?.image,
         },
         prayer_timings: settings?.prayer_timings === "true" ? true : false,

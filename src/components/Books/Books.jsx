@@ -17,13 +17,9 @@ import { IoMdClose } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
 import {
   getBooksApi,
-  getBooks,
-  getBooksCategoriesApi,
-  getBooksCategories,
   addBookApi,
   updateBookApi,
   deleteBookApi,
-  deleteBook,
   getBooksSubCategoriesApi,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
@@ -114,64 +110,64 @@ const Books = () => {
     { id: 7, name: "control", label: t("action") },
   ];
 
-  // Formik
-  const formik = useFormik({
-    initialValues,
-    // validationSchema: validationSchema.book,
-    onSubmit: (values) => {
-      // Add Book
-      if (!toggle.edit) {
-        dispatch(
-          addBookApi({
-            name: values.title,
-            file: values.book.file,
-            image: values.image.file,
-            categories_id: values.bookCategory.id,
-            status: values.status,
-          })
-        ).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-            toast.success(t("toast.book.addedSuccess"));
-          } else {
-            toast.error(t("toast.book.addedError"));
-            dispatch(getBooksApi());
-          }
-        });
+  const onSubmit = (values) => {
+    // Add Book
+    if (!values.id) {
+      dispatch(
+        addBookApi({
+          name: values.title,
+          file: values.book.file,
+          image: values.image.file,
+          categories_id: values.bookCategory.id,
+          status: values.status === "private" ? "Private" : "Public",
+        })
+      ).then((res) => {
+        if (!res.error) {
+          dispatch(getBooksApi());
+          setToggle({
+            ...toggle,
+            add: !toggle.add,
+          });
+          formik.handleReset();
+          toast.success(t("toast.book.addedSuccess"));
+        } else {
+          toast.error(t("toast.book.addedError"));
+          dispatch(getBooksApi());
+        }
+      });
+    }
+    // Edit Book
+    else {
+      const formDate = new FormData();
+      formDate.append("id", values.id);
+      formDate.append("name", values.title);
+      formDate.append("categories_id", values.bookCategory.id);
+      formDate.append(
+        "status",
+        values.status === "private" ? "Private" : "Public"
+      );
+      if (values.image.file) {
+        formDate.append("image", values.image.file);
       }
-      // Edit Book
-      else {
-        dispatch(
-          updateBookApi({
-            id: formik.values.id,
-            name: values.title,
-            file: values.book?.file || values.book,
-            image: values.image?.file || values.image,
-            categories_id: values.bookCategory.id,
-            status: values.status,
-          })
-        ).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-            toast.success(t("toast.book.updatedSuccess"));
-          } else {
-            toast.error(t("toast.book.updatedError"));
-            dispatch(getBooksApi());
-          }
-        });
+      if (values.book.file) {
+        formDate.append("file", values.book.file);
       }
-    },
-  });
+      dispatch(updateBookApi(formDate)).then((res) => {
+        if (!res.error) {
+          dispatch(getBooksApi());
+          setToggle({
+            ...toggle,
+            edit: !toggle.edit,
+          });
+          formik.handleReset();
+          toast.success(t("toast.book.updatedSuccess"));
+        } else {
+          toast.error(t("toast.book.updatedError"));
+          dispatch(getBooksApi());
+        }
+      });
+    }
+  };
 
   // Handle PDF Change
   const handlePDFChange = (e) => {
@@ -269,7 +265,7 @@ const Books = () => {
       id: book?.category?.id,
     });
     formik.setFieldValue("image", book?.image);
-    formik.setFieldValue("book", book?.file);
+    formik.setFieldValue("book", book?.Book);
     setToggle({
       ...toggle,
       edit: true,
@@ -319,6 +315,13 @@ const Books = () => {
       console.log(error);
     }
   }, [dispatch]);
+
+  // Formik
+  const formik = useFormik({
+    initialValues,
+    validationSchema: validationSchema.book,
+    onSubmit,
+  });
 
   return (
     <div className="book-container scholar-container mt-4 m-sm-3 m-0">
@@ -931,9 +934,9 @@ const Books = () => {
                       }}
                       className="dropdown-btn d-flex justify-content-between align-items-center"
                     >
-                      {formik.values.status === "Private"
+                      {formik.values.status === "private"
                         ? t("private")
-                        : formik.values.status === "Public"
+                        : formik.values.status === "public"
                         ? t("public")
                         : t("status")}
                       <TiArrowSortedUp
@@ -950,16 +953,16 @@ const Books = () => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Private" ? "active" : ""
+                          formik.values.status === "private" ? "active" : ""
                         }`}
-                        value="Private"
+                        value="private"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: false,
                           });
-                          formik.setFieldValue("status", "Private");
+                          formik.setFieldValue("status", "private");
                         }}
                       >
                         {t("private")}
@@ -967,16 +970,16 @@ const Books = () => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Public" ? "active" : ""
+                          formik.values.status === "public" ? "active" : ""
                         }`}
-                        value="Public"
+                        value="public"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: false,
                           });
-                          formik.setFieldValue("status", "Public");
+                          formik.setFieldValue("status", "public");
                         }}
                       >
                         {t("public")}
@@ -1376,11 +1379,11 @@ const Books = () => {
                       }}
                       className="dropdown-btn d-flex justify-content-between align-items-center"
                     >
-                      {formik.values.status === "Private" ||
-                      formik.values.status === "Private"
+                      {formik.values.status === "private" ||
+                      formik.values.status === "private"
                         ? t("private")
-                        : formik.values.status === "Public" ||
-                          formik.values.status === "Public"
+                        : formik.values.status === "public" ||
+                          formik.values.status === "public"
                         ? t("public")
                         : t("status")}
                       <TiArrowSortedUp
@@ -1397,19 +1400,19 @@ const Books = () => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Private" ||
-                          formik.values.status === "Private"
+                          formik.values.status === "private" ||
+                          formik.values.status === "private"
                             ? "active"
                             : ""
                         }`}
-                        value="Private"
+                        value="private"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: false,
                           });
-                          formik.setFieldValue("status", "Private");
+                          formik.setFieldValue("status", "private");
                         }}
                       >
                         {t("private")}
@@ -1417,19 +1420,19 @@ const Books = () => {
                       <button
                         type="button"
                         className={`item ${
-                          formik.values.status === "Public" ||
-                          formik.values.status === "Public"
+                          formik.values.status === "public" ||
+                          formik.values.status === "public"
                             ? "active"
                             : ""
                         }`}
-                        value="Public"
+                        value="public"
                         name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
                             status: false,
                           });
-                          formik.setFieldValue("status", "Public");
+                          formik.setFieldValue("status", "public");
                         }}
                       >
                         {t("public")}
