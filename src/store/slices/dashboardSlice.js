@@ -41,7 +41,7 @@ const dashboardSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getCounts.fulfilled, (state, action) => {
-      state.counts = action.payload.data;
+      state.counts = action.payload;
       state.loading = false;
     });
     // Rejected

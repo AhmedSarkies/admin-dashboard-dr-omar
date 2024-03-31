@@ -52,16 +52,10 @@ export const updateSetting = createAsyncThunk(
         method: "POST",
         url: `/Settings/Update`,
         params: {
-          id: data.id,
-          prayer_timings: data.prayer_timings,
+          id: data.get("id"),
+          prayer_timings: data.get("prayer_timings"),
         },
-        data: {
-          image: data.image,
-          facebook: data.facebook,
-          whatsapp: data.whatsapp,
-          messenger: data.messenger,
-          instagram: data.instagram,
-        },
+        data,
       }).then((response) => {
         return response.data;
       });

@@ -17,7 +17,7 @@ export const getBooksApi = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/Books/Get",
+        url: "/Books/Get_All_Books",
       });
       return response.data;
     } catch (error) {
@@ -322,7 +322,7 @@ const bookSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getBooksApi.fulfilled, (state, action) => {
-      state.books = action.payload.data;
+      state.books = action.payload;
       state.loading = false;
     });
     // Rejected
