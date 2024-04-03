@@ -108,7 +108,7 @@ const Settings = () => {
       data.append("instagram", values.instagram);
       data.append("play_store", values.playStore);
       data.append("app_store", values.appStore);
-      data.append("id", settings?.id);
+      data.append("id", 2);
       if (values.image.file) {
         data.append("image", values.image.file);
       }
