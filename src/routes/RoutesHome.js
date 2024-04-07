@@ -20,6 +20,10 @@ import {
   Books,
   Images,
   CodeContent,
+  Profile,
+  MostListening,
+  ChangePassword,
+  EditProfile,
 } from "../components";
 
 const RoutesHome = () => (
@@ -32,6 +36,9 @@ const RoutesHome = () => (
       <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />
       <Route path="*" element={<Dashboard />} />
       <Route path="dashboard" element={<Dashboard />} />
+      <Route path="profile" element={<Profile />} />
+      <Route path="profile/change-password" element={<ChangePassword />} />
+      <Route path="profile/edit-profile" element={<EditProfile />} />
       <Route path="sub-admins" element={<SubAdmins />} />
       <Route path="users" element={<Users />} />
       <Route path="messages" element={<Messages />} />
@@ -49,6 +56,7 @@ const RoutesHome = () => (
       <Route path="audios" element={<Audios />} />
       <Route path="books" element={<Books />} />
       <Route path="images" element={<Images />} />
+      <Route path="most-listening" element={<MostListening />} />
     </Route>
   </Routes>
 );
