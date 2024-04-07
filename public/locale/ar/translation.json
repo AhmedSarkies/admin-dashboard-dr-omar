@@ -66,7 +66,8 @@
     "newUsers": "مستخدمين جدد",
     "activeUsers": "مستخدمين نشطين",
     "inactiveUsers": "مستخدمين غير نشطين",
-    "deletedUsers": "مستخدمين محذوفين"
+    "deletedUsers": "مستخدمين محذوفين",
+    "mostListening": "الأكثر استماعا"
   },
   "linkItems": {
     "home": "الصفحة الرئيسية",
