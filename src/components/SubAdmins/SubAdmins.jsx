@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-import { MdAdd, MdDeleteOutline } from "react-icons/md";
+import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 import { IoMdClose } from "react-icons/io";
 import {
@@ -114,6 +114,20 @@ const SubAdmins = ({ dashboard }) => {
           }
         });
       }
+    });
+  };
+
+  // Handle Edit
+  const handleEdit = (subAdmin) => {
+    formik.setValues({
+      id: subAdmin?.id,
+      name: subAdmin?.name,
+      email: subAdmin?.email,
+      password: subAdmin?.password,
+    });
+    setToggle({
+      ...toggle,
+      add: !toggle.add,
     });
   };
 
@@ -349,6 +363,10 @@ const SubAdmins = ({ dashboard }) => {
                           className="delete-btn"
                           onClick={() => handleDelete(result)}
                         />
+                        <MdEdit
+                          className="edit-btn"
+                          onClick={() => handleEdit(result)}
+                        />
                       </span>
                     </td>
                   )}
@@ -362,7 +380,7 @@ const SubAdmins = ({ dashboard }) => {
       {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
-      {/* Add Sub Admin */}
+      {/* Add & Edit Sub Admin */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
@@ -448,7 +466,7 @@ const SubAdmins = ({ dashboard }) => {
                     id="password"
                     placeholder="********"
                     name="password"
-                    value={formik.values?.password}
+                    value={formik.values.password}
                     onChange={handleInput}
                   />
                   {formik.errors.password && formik.touched.password ? (
