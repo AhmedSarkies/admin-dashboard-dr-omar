@@ -8,6 +8,8 @@ export { default as Dashboard } from "./Dashboard/Dashboard";
 export { default as Card } from "./Card/Card";
 export { default as BarChart } from "./Charts/BarChart";
 export { default as Profile } from "./Profile/Profile";
+export { default as ChangePassword } from "./ChangePassword/ChangePassword";
+export { default as EditProfile } from "./EditProfile/EditProfile";
 export { default as SubAdmins } from "./SubAdmins/SubAdmins";
 export { default as Users } from "./Users/Users";
 export { default as Messages } from "./Messages/Messages";
@@ -26,3 +28,4 @@ export { default as Audios } from "./Audios/Audios";
 export { default as Articles } from "./Articles/Articles";
 export { default as Books } from "./Books/Books";
 export { default as MostListening } from "./MostListening/MostListening";
+
