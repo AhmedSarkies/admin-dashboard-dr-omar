@@ -25,6 +25,7 @@
   "chooseCategory": "اختر تصنيف",
   "elder": "العالم",
   "action": "الإجراءات",
+  "send": "إرسال",
   "status": "الحالة",
   "approve": "مفعل",
   "pending": "قيد الانتظار",
@@ -34,6 +35,7 @@
   "inactive": "غير نشط",
   "columnsFilter": "الأعمدة",
   "search": "بحث",
+  "noPhone": "لا يوجد هاتف",
   "noData": "لا توجد بيانات",
   "noColumns": "لا توجد أعمدة",
   "networkError": "خطأ في الشبكة",
@@ -80,7 +82,8 @@
     "slider": "الصفحة التعريفية",
     "termsAndConditions": "الشروط والأحكام",
     "links": "الروابط",
-    "messages": "الرسائل",
+    "messages": "الدعم الفني",
+    "notifications": "الإشعارات",
     "categories": "التصنيفات",
     "mainCategoriesBooks": "الكتب الرئيسية",
     "subCategoriesBooks": "الكتب الفرعية",
@@ -116,10 +119,15 @@
     }
   },
   "user": {
+    "title": "المستخدمين",
+    "addTitle": "إضافة مستخدم",
+    "editTitle": "تعديل مستخدم",
     "columns": {
       "id": "الرقم",
       "name": "الاسم",
-      "email": "البريد الإلكتروني"
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "created_at": "تاريخ الإنشاء"
     }
   },
   "message": {
@@ -130,6 +138,10 @@
       "phone": "الهاتف",
       "read": "قراءة"
     }
+  },
+  "notifications": {
+    "title": "الإشعارات",
+    "addTitle": "إرسال إشعار"
   },
   "settings": {
     "settingsApp": {
@@ -279,6 +291,9 @@
     }
   },
   "mostListening": {
+    "addTitle": "إضافة الأكثر استماعا",
+    "editTitle": "تعديل الأكثر استماعا",
+    "title": "الأكثر استماعا",
     "columns": {
       "elder": {
         "image": "صورة العالم",
@@ -289,6 +304,22 @@
         "title": "عنوان الصوتية",
         "audio": "الصوتية"
       }
+    }
+  },
+  "newUsers": {
+    "addTitle": "إضافة مستخدم جديد",
+    "editTitle": "تعديل مستخدم جديد",
+    "title": "المستخدمين الجدد",
+    "columns": {
+      "id": "الرقم",
+      "name": "الاسم",
+      "email": "البريد الإلكتروني",
+      "phone": "الهاتف",
+      "created_at": "تاريخ الإنشاء",
+      "updated_at": "تاريخ التحديث",
+      "email_verified_at": "تفعيل البريد الإلكتروني",
+      "notVerified": "غير مفعل",
+      "verified": "مفعل"
     }
   },
   "images": {
@@ -325,6 +356,14 @@
       "updatedError": "حدث خطأ أثناء تعديل المسؤول الفرعي",
       "deletedSuccess": "تم حذف المسؤول الفرعي بنجاح",
       "deletedError": "حدث خطأ أثناء حذف المسؤول الفرعي"
+    },
+    "user": {
+      "addedSuccess": "تم إضافة المستخدم بنجاح",
+      "addedError": "حدث خطأ أثناء إضافة المستخدم",
+      "updatedSuccess": "تم تعديل المستخدم بنجاح",
+      "updatedError": "حدث خطأ أثناء تعديل المستخدم",
+      "deletedSuccess": "تم حذف المستخدم بنجاح",
+      "deletedError": "حدث خطأ أثناء حذف المستخدم"
     },
     "elder": {
       "addedSuccess": "تم إضافة العالم بنجاح",

@@ -33,7 +33,9 @@
   "inactive": "Inactive",
   "chooseCategory": "Choose Category",
   "columnsFilter": "Columns",
+  "send": "Send",
   "search": "Search",
+  "noPhone": "No Phone",
   "noData": "No Data",
   "noColumns": "No Columns",
   "networkError": "Network Error",
@@ -80,7 +82,8 @@
     "slider": "Introduction Page",
     "termsAndConditions": "Terms And Conditions",
     "links": "Links",
-    "messages": "Messages",
+    "messages": "Support",
+    "notifications": "Notifications",
     "categories": "Categories",
     "mainCategoriesBooks": "Main Book",
     "subCategoriesBooks": "Sub Book",
@@ -116,10 +119,15 @@
     }
   },
   "user": {
+    "title": "Users",
+    "addTitle": "Add User",
+    "editTitle": "Edit User",
     "columns": {
       "id": "ID",
       "name": "Name",
-      "email": "Email"
+      "email": "Email",
+      "phone": "Phone",
+      "created_at": "Created"
     }
   },
   "message": {
@@ -130,6 +138,10 @@
       "phone": "Phone",
       "read": "Read"
     }
+  },
+  "notifications": {
+    "title": "Notifications",
+    "addTitle": "Send Notification"
   },
   "settings": {
     "settingsApp": {
@@ -281,6 +293,9 @@
     }
   },
   "mostListening": {
+    "addTitle": "Add Most Listening",
+    "editTitle": "Edit Most Listening",
+    "title": "Most Listening",
     "columns": {
       "elder": {
         "image": "Image Elder",
@@ -291,6 +306,20 @@
         "title": "Title Audio",
         "audio": "Audio"
       }
+    }
+  },
+  "newUsers": {
+    "title": "New Users",
+    "columns": {
+      "id": "ID",
+      "name": "Name",
+      "email": "Email",
+      "phone": "Phone",
+      "created_at": "Created",
+      "updated_at": "Updated",
+      "email_verified_at": "Email Verified",
+      "notVerified": "Not Verified",
+      "verified": "Verified"
     }
   },
   "images": {
@@ -327,6 +356,12 @@
       "editedError": "An error occurred while editing sub admin",
       "deletedSuccess": "Sub Admin deleted successfully",
       "deletedError": "An error occurred while deleting sub admin"
+    },
+    "user": {
+      "deletedSuccess": "User deleted successfully",
+      "deletedError": "An error occurred while deleting user",
+      "updatedSuccess": "User updated successfully",
+      "updatedError": "An error occurred while updating user"
     },
     "elder": {
       "addedSuccess": "Elder added successfully",
@@ -391,6 +426,18 @@
       "editedError": "An error occurred while editing code content",
       "deletedSuccess": "Code Content deleted successfully",
       "deletedError": "An error occurred while deleting code content"
+    },
+    "slider": {
+      "addedSuccess": "Introduction Page added successfully",
+      "addedError": "An error occurred while adding introduction page",
+      "editedSuccess": "Introduction Page edited successfully",
+      "editedError": "An error occurred while editing introduction page",
+      "deletedSuccess": "Introduction Page deleted successfully",
+      "deletedError": "An error occurred while deleting introduction page"
+    },
+    "settingsApp": {
+      "success": "App Settings updated successfully",
+      "error": "An error occurred while updating app settings"
     }
   },
   "validation": {
