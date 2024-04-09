@@ -14,7 +14,7 @@ import { Header, Sidebar } from "../";
 import logo from "../../assets/images/logo.jpg";
 import { HiUsers } from "react-icons/hi2";
 import { IoPerson } from "react-icons/io5";
-import { FaAssistiveListeningSystems } from "react-icons/fa";
+import { FaBell } from "react-icons/fa";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -43,6 +43,11 @@ const Home = () => {
       title: t("linkItems.messages"),
       path: "/dr-omar/messages",
       icon: <MdOutlineMarkunread />,
+    },
+    {
+      title: t("linkItems.notifications"),
+      path: "/dr-omar/notifications",
+      icon: <FaBell />,
     },
     {
       title: t("linkItems.settingsApp"),
@@ -113,11 +118,11 @@ const Home = () => {
       path: "/dr-omar/articles",
       icon: <MdArticle />,
     },
-    {
-      title: t("linkItems.mostListening"),
-      path: "/dr-omar/most-listening",
-      icon: <FaAssistiveListeningSystems />,
-    },
+    // {
+    //   title: t("linkItems.mostListening"),
+    //   path: "/dr-omar/most-listening",
+    //   icon: <FaAssistiveListeningSystems />,
+    // },
   ];
   const [menu, setMenu] = useState(false);
   const location = useLocation();

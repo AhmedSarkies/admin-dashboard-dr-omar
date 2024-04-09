@@ -8,28 +8,31 @@ import { object, ref, string } from "yup";
 
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { changePassword } from "../../store/slices/subAdminSlice";
+import { useDispatch } from "react-redux";
 
 const ChangePassword = () => {
   const { t } = useTranslation();
+  const dispatch = useDispatch();
   const [toggle, setToggle] = useState({});
   const navigate = useNavigate();
   const changePasswordFormik = useFormik({
     initialValues: {
-      oldPassword: "",
-      newPassword: "",
-      confirmPassword: "",
+      current_password: "",
+      new_password: "",
+      new_password_confirmation: "",
     },
     validationSchema: object().shape({
-      oldPassword: string().required("يجب ادخال كلمة المرور القديمة"),
-      newPassword: string()
+      current_password: string().required("يجب ادخال كلمة المرور القديمة"),
+      new_password: string()
         .min(8, "يجب ادخال كلمة مرور لا تقل عن 8 احرف")
         .required("يجب ادخال كلمة المرور الجديدة"),
-      confirmPassword: string()
+      new_password_confirmation: string()
         .oneOf([ref("newPassword"), null], "كلمة المرور غير متطابقة")
         .required("يجب ادخال تأكيد كلمة المرور"),
     }),
     onSubmit: (values) => {
-      console.log(values);
+      dispatch(changePassword(values));
     },
   });
 
@@ -50,65 +53,65 @@ const ChangePassword = () => {
                 <input
                   type="password"
                   className="form-control"
-                  id="oldPassword"
+                  id="current_password"
                   placeholder="*********"
-                  name="oldPassword"
-                  value={changePasswordFormik.values.oldPassword}
+                  name="current_password"
+                  value={changePasswordFormik.values.current_password}
                   onChange={handleInputChangePassword}
                 />
-                <label htmlFor="oldPassword" className="label-form">
+                <label htmlFor="current_password" className="label-form">
                   {t("profile.oldPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.oldPassword &&
-                changePasswordFormik.errors.oldPassword ? (
+                {changePasswordFormik.touched.current_password &&
+                changePasswordFormik.errors.current_password ? (
                   <span className="error">
-                    {changePasswordFormik.errors.oldPassword}
+                    {changePasswordFormik.errors.current_password}
                   </span>
                 ) : null}
               </div>
               <div className="form-group">
                 <input
-                  type="newPassword"
+                  type="password"
                   className="form-control"
-                  id="newPassword"
+                  id="new_password"
                   placeholder="*********"
-                  name="newPassword"
-                  value={changePasswordFormik.values.newPassword}
+                  name="new_password"
+                  value={changePasswordFormik.values.new_password}
                   onChange={handleInputChangePassword}
                 />
-                <label htmlFor="newPassword" className="label-form">
+                <label htmlFor="new_password" className="label-form">
                   {t("profile.newPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.newPassword &&
-                changePasswordFormik.errors.newPassword ? (
+                {changePasswordFormik.touched.new_password &&
+                changePasswordFormik.errors.new_password ? (
                   <span className="error">
-                    {changePasswordFormik.errors.newPassword}
+                    {changePasswordFormik.errors.new_password}
                   </span>
                 ) : null}
               </div>
               <div className="form-group">
                 <input
-                  type="confirmPassword"
+                  type="password"
                   className="form-control"
-                  id="confirmPassword"
+                  id="new_password_confirmation"
                   placeholder="*********"
-                  name="confirmPassword"
-                  value={changePasswordFormik.values.confirmPassword}
+                  name="new_password_confirmation"
+                  value={changePasswordFormik.values.new_password_confirmation}
                   onChange={handleInputChangePassword}
                 />
-                <label htmlFor="confirmPassword" className="label-form">
+                <label htmlFor="new_password_confirmation" className="label-form">
                   {t("profile.confirmPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.confirmPassword &&
-                changePasswordFormik.errors.confirmPassword ? (
+                {changePasswordFormik.touched.new_password_confirmation &&
+                changePasswordFormik.errors.new_password_confirmation ? (
                   <span className="error">
-                    {changePasswordFormik.errors.confirmPassword}
+                    {changePasswordFormik.errors.new_password_confirmation}
                   </span>
                 ) : null}
               </div>

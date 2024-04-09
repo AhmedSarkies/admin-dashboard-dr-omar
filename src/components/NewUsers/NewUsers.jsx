@@ -1,22 +1,15 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import { Spinner } from "reactstrap";
-
-import {
-  getMostListening,
-} from "../../store/slices/mostListeningSlice";
-
+import { getNewUsers } from "../../store/slices/userSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
-const MostListening = () => {
+
+const NewUsers = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { mostListening, loading, error } = useSelector(
-    (state) => state.mostListening
-  );
+  const { newUsers, loading, error } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
     add: false,
     readMessage: false,
@@ -28,29 +21,30 @@ const MostListening = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
-      imageElder: true,
-      nameElder: true,
-      image: true,
-      title: true,
-      audio: true,
-      status: true,
-      control: true,
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
+      created_at: true,
+      updated_at: true,
+      email_verified_at: true,
     },
   });
 
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("newUsers.columns.id") },
+    { id: 1, name: "name", label: t("newUsers.columns.name") },
+    { id: 2, name: "email", label: t("newUsers.columns.email") },
+    { id: 3, name: "phone", label: t("newUsers.columns.phone") },
+    { id: 4, name: "created_at", label: t("newUsers.columns.created_at") },
+    { id: 5, name: "updated_at", label: t("newUsers.columns.updated_at") },
     {
-      id: 1,
-      name: "imageElder",
-      label: t("mostListening.columns.elder.image"),
+      id: 6,
+      name: "email_verified_at",
+      label: t("newUsers.columns.email_verified_at"),
     },
-    { id: 2, name: "nameElder", label: t("mostListening.columns.elder.name") },
-    { id: 3, name: "image", label: t("mostListening.columns.audio.image") },
-    { id: 4, name: "title", label: t("mostListening.columns.audio.title") },
-    { id: 5, name: "audio", label: t("mostListening.columns.audio.audio") },
-    { id: 6, name: "status", label: t("status") },
   ];
   const {
     PaginationUI,
@@ -59,7 +53,7 @@ const MostListening = () => {
     handleToggleColumns,
     searchResults,
   } = useFiltration({
-    rowData: mostListening,
+    rowData: newUsers,
     toggle,
     setToggle,
   });
@@ -67,18 +61,18 @@ const MostListening = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getMostListening());
+      dispatch(getNewUsers());
     } catch (error) {
       console.log(error);
     }
   }, [dispatch]);
 
   return (
-    <div className="audio-container scholar-container mt-4 m-sm-3 m-0">
+    <div className="scholar-container mt-4 m-sm-3 m-0">
       <div className="table-header justify-content-end">
-        <h2>{t("mostListening.title")}</h2>
+        <h2>{t("newUsers.title")}</h2>
       </div>
-      <div className="audio scholar">
+      <div className="scholar">
         <div className="table-header">
           {/* Search */}
           <div className="search-container form-group-container form-input">
@@ -86,6 +80,7 @@ const MostListening = () => {
               type="text"
               className="form-input"
               placeholder={t("search")}
+              value={toggle.searchTerm}
               onChange={handleSearch}
             />
           </div>
@@ -141,10 +136,9 @@ const MostListening = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {/* Show and Hide Columns */}
-              {toggle.toggleColumns.imageElder && (
+              {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("mostListening.columns.elder.image")}
+                  {t("newUsers.columns.id")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -154,9 +148,9 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.nameElder && (
+              {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("mostListening.columns.elder.name")}
+                  {t("newUsers.columns.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -166,9 +160,9 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.image && (
+              {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("mostListening.columns.audio.image")}
+                  {t("newUsers.columns.email")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -178,9 +172,9 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.title && (
+              {toggle.toggleColumns?.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("mostListening.columns.audio.title")}
+                  {t("newUsers.columns.phone")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -190,9 +184,9 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.audio && (
+              {toggle.toggleColumns?.created_at && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("mostListening.columns.audio.audio")}
+                  {t("newUsers.columns.created_at")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -202,10 +196,22 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns?.updated_at && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("status")}
+                  {t("newUsers.columns.updated_at")}
                   {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns?.email_verified_at && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("newUsers.columns.email_verified_at")}
+                  {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -220,7 +226,7 @@ const MostListening = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -238,7 +244,7 @@ const MostListening = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -258,7 +264,7 @@ const MostListening = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -270,7 +276,7 @@ const MostListening = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -281,70 +287,33 @@ const MostListening = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.imageElder && (
-                    <td className="table-td">
-                      <img
-                        src={result?.elder?.image}
-                        alt={result?.elder || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.nameElder && (
-                    <td className="table-td name">{result?.elder?.name}</td>
-                  )}
-                  {toggle.toggleColumns.image && (
-                    <td className="table-td">
-                      <img
-                        src={result?.image}
-                        alt={result?.image?.name || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.title && (
-                    <td className="table-td">{result?.title}</td>
-                  )}
-                  {toggle.toggleColumns.audio && (
-                    <td className="table-td">
-                      <audio
-                        controls
-                        src={result?.audio}
-                        style={{ width: "250px" }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.status && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "public"
-                              ? "green"
-                              : result?.status === "private"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "public"
-                          ? "عام"
-                          : result?.status === "private"
-                          ? "خاص"
-                          : "خاص"}
+                  <td className="table-td id">{result?.id}</td>
+                  <td className="table-td name">{result?.name}</td>
+                  <td className="table-td email">
+                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                  </td>
+                  <td className="table-td phone">
+                    <a href={`mailto:${result?.phonenumber}`}>
+                      {result?.phonenumber}
+                    </a>
+                  </td>
+                  <td className="table-td created_at">
+                    {new Date(result?.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="table-td updated_at">
+                    {new Date(result?.updated_at).toLocaleDateString()}
+                  </td>
+                  <td className="table-td email_verified_at">
+                    {result?.email_verified_at === null ? (
+                      <span className="text-danger">
+                        {t("newUsers.columns.notVerified")}
                       </span>
-                    </td>
-                  )}
+                    ) : (
+                      <span className="text-success">
+                        {t("newUsers.columns.verified")}
+                      </span>
+                    )}
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -352,11 +321,11 @@ const MostListening = () => {
         </table>
       </div>
       {/* Pagination */}
-      {searchResults.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>
   );
 };
 
-export default MostListening;
+export default NewUsers;

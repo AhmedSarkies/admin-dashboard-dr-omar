@@ -22,12 +22,18 @@ const Login = () => {
       if (response.status === 200) {
         Cookies.remove("_auth");
         // Set Token in Cookies
-        Cookies.set("_auth", JSON.stringify(response.data.data.token), {
+        Cookies.set("_auth", response.data.data.token, {
           expires: 30,
           secure: true,
           sameSite: "strict",
           path: "/",
           tokenType: "Bearer" + response.data.data.token,
+        });
+        Cookies.set("_user", response.data.data.name, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
         });
         setLoading(false);
         window.location.href = "/dr-omar/dashboard";

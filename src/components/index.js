@@ -28,4 +28,6 @@ export { default as Audios } from "./Audios/Audios";
 export { default as Articles } from "./Articles/Articles";
 export { default as Books } from "./Books/Books";
 export { default as MostListening } from "./MostListening/MostListening";
+export { default as NewUsers } from "./NewUsers/NewUsers";
+export { default as Notifications } from "./Notifications/Notifications";
 

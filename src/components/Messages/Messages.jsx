@@ -12,8 +12,11 @@ import { getMessagesApi, getMessages } from "../../store/slices/messagesSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
+
 const Messages = () => {
   const { t } = useTranslation();
+  const lang = Cookies.get("i18next");
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.messages);
   const [toggle, setToggle] = useState({
@@ -327,17 +330,41 @@ const Messages = () => {
                 </ModalHeader>
                 <ModalBody>
                   <div className="read-more-container text-center">
-                    <h3 className="text-center mb-3">
+                    {/* <h3 className="text-center mb-3">
                       {toggle.message?.first_name}
-                    </h3>
-                    <div className="content text-end">
+                    </h3> */}
+                    <div
+                      className={`content ${
+                        lang === "ar" ? "text-end" : "text-start"
+                      }`}
+                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
+                    >
+                      {t("message.columns.phone")}
+                      {": "}
                       {toggle.message?.phone}
                     </div>
-                    <div className="content text-end">
+                    <div
+                      className={`content ${
+                        lang === "ar" ? "text-end" : "text-start"
+                      }`}
+                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
+                    >
+                      {t("message.columns.email")}
+                      {": "}
                       {toggle.message?.email}
                     </div>
-                    <div className="content text-end">
-                      {toggle.message?.subject}
+                    <div
+                      className={`content ${
+                        lang === "ar" ? "text-end" : "text-start"
+                      }`}
+                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
+                    >
+                      {t("message.columns.content")}
+                      {": "}
+                      <br />
+                      <p className="text-center">
+                        {toggle.message?.subject}
+                      </p>
                     </div>
                   </div>
                 </ModalBody>

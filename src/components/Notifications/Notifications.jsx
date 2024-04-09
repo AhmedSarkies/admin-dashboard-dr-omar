@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Col,
@@ -9,107 +9,123 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
-import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
+import { MdAdd, MdDeleteOutline, MdSend } from "react-icons/md";
+import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+import { ImUpload } from "react-icons/im";
 import {
-  getSubAdmins,
-  addSubAdmin,
-  deleteSubAdmin,
-} from "../../store/slices/subAdminSlice";
+  getSlidersApi,
+  addSliderApi,
+  updateSliderApi,
+  deleteSliderApi,
+} from "../../store/slices/sliderSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
-import { toast } from "react-toastify";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
+import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
-import { ImUpload } from "react-icons/im";
 import anonymous from "../../assets/images/anonymous.png";
+import { getUsers } from "../../store/slices/userSlice";
 
-const initialValues = {
-  image: {
-    file: "",
-    preview: "",
-  },
-  name: "",
-  email: "",
-  phone: "",
-  status: "",
-  password: "",
-};
-
-const SubAdmins = ({ dashboard }) => {
+const Notifications = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
-  const fileRef = useRef();
-  const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
+  const { users, loading, error } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
     add: false,
-    searchTerm: "",
+    edit: false,
+    imagePreview: false,
+    status: false,
+    elders: false,
+    pictureCategories: false,
     activeColumn: false,
-    activeRows: false,
-    rowsPerPage: 5,
-    currentPage: 1,
-    sortColumn: "",
-    sortOrder: "asc",
     toggleColumns: {
       image: true,
-      name: true,
-      email: true,
-      phone: true,
+      title: true,
+      description: true,
+      order: true,
       status: true,
       control: true,
     },
+    sortColumn: "",
+    sortOrder: "asc",
+    rowsPerPage: 5,
+    currentPage: 1,
+  });
+
+  // Filtration, Sorting, Pagination
+  const columns = [
+    { id: 0, name: "id", label: t("user.columns.id") },
+    { id: 1, name: "name", label: t("user.columns.name") },
+    { id: 2, name: "email", label: t("user.columns.email") },
+    { id: 3, name: "send", label: t("settings.codeContent.columns.send") },
+  ];
+  const {
+    PaginationUI,
+    handleSort,
+    handleSearch,
+    handleToggleColumns,
+    searchResults,
+  } = useFiltration({
+    rowData: users,
+    toggle,
+    setToggle,
   });
 
   // Formik
   const formik = useFormik({
-    initialValues,
-    validationSchema: validationSchema.subAdmins,
+    initialValues: {
+      image: {
+        file: "",
+        preview: "",
+      },
+      title: "",
+      order: "",
+      status: "",
+      description: "",
+    },
+    validationSchema: validationSchema.slider,
     onSubmit: (values) => {
-      // if email and phone is already exist with another subAdmin if just i change them to new values
-      if (subAdmins.length > 0) {
-        const emailExist = subAdmins.find(
-          (subAdmin) => subAdmin.email === formik.values.email
-        );
-        if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error(t("emailExisted"));
-          return;
-        }
-      }
       const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("phone", values.phone);
-      formData.append("active", values.status === "active" ? 1 : 0);
-      formData.append("password", values.password);
+      formData.append("title", values.title);
+      formData.append("body", values.description);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
       if (values.id) {
         formData.append("id", values.id);
-      } else {
-        dispatch(addSubAdmin(formData)).then((res) => {
-          dispatch(getSubAdmins());
+        dispatch(updateSliderApi(formData)).then((res) => {
           if (!res.error) {
-            toast.success(t("toast.subAdmin.addedSuccess"));
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
             formik.handleReset();
+            toast.success(t("toast.slider.updatedSuccess"));
+            dispatch(getSlidersApi());
+          } else {
+            toast.error(t("toast.slider.updatedError"));
+          }
+        });
+      } else {
+        dispatch(addSliderApi(formData)).then((res) => {
+          if (!res.error) {
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
+            formik.handleReset();
+            toast.success(t("toast.slider.addedSuccess"));
+            dispatch(getSlidersApi());
           } else {
-            toast.error(t("toast.subAdmin.addedError"));
+            toast.error(t("toast.slider.addedError"));
           }
         });
       }
     },
   });
-
-  // handle Input Using Formik
-  const handleInput = (e) => {
-    formik.handleChange(e);
-  };
 
   // Handle Image Change
   const handleImageChange = (e) => {
@@ -122,66 +138,59 @@ const SubAdmins = ({ dashboard }) => {
     }
   };
 
-  // Handle Delete Image
-  const handleDeleteImage = () => {
-    fileRef.current.value = "";
-    fileRef.current.files = null;
+  // Handle Edit Picture
+  const handleEdit = (slider) => {
     formik.setValues({
       ...formik.values,
-      image: {
-        file: fileRef.current.files[0],
-        preview: "",
-      },
+      id: slider.id,
+      title: slider.title,
+      description: slider.body,
     });
     setToggle({
       ...toggle,
-      imagePreview: false,
+      edit: !toggle.edit,
     });
   };
 
-  // Delete Sub Admin
-  const handleDelete = (subAdmin) => {
+  // Delete Picture
+  const handleDelete = (picture) => {
     Swal.fire({
-      title: `هل انت متأكد من حذف ${subAdmin?.name}؟`,
-      text: "لن تتمكن من التراجع عن هذا الاجراء!",
+      title: t("titleDeleteAlert") + picture?.title + "?",
+      text: t("textDeleteAlert"),
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
       cancelButtonColor: "#0d1d34",
-      confirmButtonText: "نعم, احذفه!",
-      cancelButtonText: "الغاء",
+      confirmButtonText: t("confirmButtonText"),
+      cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteSubAdmin(subAdmin.id)).then((res) => {
+        dispatch(deleteSliderApi(picture?.id)).then((res) => {
           if (!res.error) {
-            dispatch(getSubAdmins());
+            dispatch(getSlidersApi());
             Swal.fire({
-              title: `تم حذف ${subAdmin?.name}`,
-              text: `تم حذف ${subAdmin?.name} بنجاح`,
+              title: `${t("titleDeletedSuccess")} ${picture?.title}`,
+              text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
+                "textDeletedSuccess"
+              )}`,
               icon: "success",
               confirmButtonColor: "#0d1d34",
-            }).then(() => toast.success(t("toast.subAdmin.deletedSuccess")));
+              confirmButtonText: t("doneDeletedSuccess"),
+            }).then(() => toast.success(t("toast.slider.deletedSuccess")));
           } else {
-            toast.error(t("toast.subAdmin.deletedError"));
+            toast.error(t("toast.slider.deletedError"));
           }
         });
       }
     });
   };
 
-  // Handle Edit
-  const handleEdit = (subAdmin) => {
+  // Add Picture
+  const handleAdd = (user) => {
     formik.setValues({
-      id: subAdmin?.id,
-      name: subAdmin?.name,
-      email: subAdmin?.email,
-      password: subAdmin?.password,
-      phone: subAdmin?.phone,
-      status: subAdmin?.active ? "active" : "inactive",
-      image: {
-        file: "",
-        preview: subAdmin?.image,
-      },
+      ...formik.values,
+      title: user?.name,
+      description: user?.email,
     });
     setToggle({
       ...toggle,
@@ -189,32 +198,10 @@ const SubAdmins = ({ dashboard }) => {
     });
   };
 
-  // Filtration, Sorting, Pagination
-  // Columns
-  const columns = [
-    { id: 0, name: "image", label: t("subAdmin.columns.image") },
-    { id: 1, name: "name", label: t("subAdmin.columns.name") },
-    { id: 2, name: "email", label: t("subAdmin.columns.email") },
-    { id: 3, name: "phone", label: t("subAdmin.columns.phone") },
-    { id: 4, name: "status", label: t("status") },
-    { id: 5, name: "control", label: t("action") },
-  ];
-  const {
-    PaginationUI,
-    handleSort,
-    handleSearch,
-    handleToggleColumns,
-    searchResults,
-  } = useFiltration({
-    rowData: subAdmins,
-    toggle,
-    setToggle,
-  });
-
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getSubAdmins());
+      dispatch(getUsers());
     } catch (error) {
       console.log(error);
     }
@@ -233,9 +220,8 @@ const SubAdmins = ({ dashboard }) => {
           }
         >
           <MdAdd />
-          {t("subAdmin.addTitle")}
+          {t("notifications.addTitle")}
         </button>
-        {dashboard && <h2>{t("subAdmin.title")}</h2>}
       </div>
       <div className="scholar">
         <div className="table-header">
@@ -300,10 +286,9 @@ const SubAdmins = ({ dashboard }) => {
         <table className="table-body">
           <thead>
             <tr>
-              {/* Show and Hide Columns */}
-              {toggle.toggleColumns.image && (
+              {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("subAdmin.columns.image")}
+                  {t("user.columns.id")}
                   {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -313,9 +298,9 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.name && (
+              {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("subAdmin.columns.name")}
+                  {t("user.columns.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -325,9 +310,9 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.email && (
+              {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("subAdmin.columns.email")}
+                  {t("user.columns.email")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -337,32 +322,10 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.phone && (
-                <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("subAdmin.columns.phone")}
-                  {toggle.sortColumn === columns[3].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
+              {toggle.toggleColumns?.send && (
+                <th className="table-th">
+                  {t("settings.codeContent.columns.send")}
                 </th>
-              )}
-              {toggle.toggleColumns.status && (
-                <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("status")}
-                  {toggle.sortColumn === columns[4].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
-              {toggle.toggleColumns.control && (
-                <th className="table-th">{t("action")}</th>
               )}
             </tr>
           </thead>
@@ -370,7 +333,7 @@ const SubAdmins = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -388,13 +351,13 @@ const SubAdmins = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="4">
                   <div className="no-data mb-0">
                     <Spinner
+                      color="primary"
                       style={{
                         height: "3rem",
                         width: "3rem",
-                        color: "var(--main-color)",
                       }}
                     >
                       Loading...
@@ -408,7 +371,7 @@ const SubAdmins = ({ dashboard }) => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -420,7 +383,7 @@ const SubAdmins = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="4">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -431,53 +394,20 @@ const SubAdmins = ({ dashboard }) => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td">
-                    <img
-                      src={result?.image}
-                      alt={result?.name}
-                      className="table-img"
-                      width="50"
-                      height="50"
-                    />
-                  </td>
+                  <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
-                  <td className="table-td">
-                    <a className="text-white" href={`mailto:${result?.email}`}>
-                      {result?.email}
-                    </a>
+                  <td className="table-td email">
+                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
                   </td>
-                  <td className="table-td">
-                    {result?.phone ? (
-                      <a
-                        className="text-white"
-                        href={`mailto:${result?.phone}`}
-                      >
-                        ( result?.phone )
-                      </a>
-                    ) : (
-                      <span className="text-danger">{t("noPhone")}</span>
-                    )}
-                  </td>
-                  <td className="table-td">
-                    <span
-                      className={`status ${
-                        result?.active ? "active" : "inactive"
-                      }`}
-                    >
-                      {result?.active ? t("active") : t("inactive")}
-                    </span>
-                  </td>
-                  <td className="table-td">
-                    <span className="table-btn-container">
-                      <MdDeleteOutline
-                        className="delete-btn"
-                        onClick={() => handleDelete(result)}
-                      />
-                      <MdEdit
-                        className="edit-btn"
-                        onClick={() => handleEdit(result)}
-                      />
-                    </span>
+                  <td className="table-td send">
+                    <MdSend
+                      className="btn-edit"
+                      style={{
+                        color: "green",
+                        cursor: "pointer",
+                      }}
+                      onClick={() => handleAdd(result)}
+                    />
                   </td>
                 </tr>
               ))}
@@ -485,19 +415,15 @@ const SubAdmins = ({ dashboard }) => {
           )}
         </table>
       </div>
-      {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
-      {/* Add & Edit Sub Admin */}
+      {/* Add Slider */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
-          formik.handleReset();
           setToggle({
             ...toggle,
             add: !toggle.add,
           });
+          formik.handleReset();
         }}
         centered={true}
         keyboard={true}
@@ -506,21 +432,23 @@ const SubAdmins = ({ dashboard }) => {
       >
         <ModalHeader
           toggle={() => {
-            formik.handleReset();
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
+            formik.handleReset();
           }}
         >
-          {t("subAdmin.addTitle")}
+          {formik.values.id
+            ? t("notifications.editTitle")
+            : t("notifications.addTitle")}
           <IoMdClose
             onClick={() => {
-              formik.handleReset();
               setToggle({
                 ...toggle,
                 add: !toggle.add,
               });
+              formik.handleReset();
             }}
           />
         </ModalHeader>
@@ -598,7 +526,16 @@ const SubAdmins = ({ dashboard }) => {
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
-                            onClick={handleDeleteImage}
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              });
+                              formik.setFieldValue("image", {
+                                file: "",
+                                preview: "",
+                              });
+                            }}
                           >
                             {t("delete")}
                           </button>
@@ -616,7 +553,6 @@ const SubAdmins = ({ dashboard }) => {
                     accept="image/*"
                     className="form-input form-img-input"
                     id="image"
-                    ref={fileRef}
                     onChange={handleImageChange}
                   />
                 </div>
@@ -626,144 +562,41 @@ const SubAdmins = ({ dashboard }) => {
                   </span>
                 ) : null}
               </Col>
-              <Col lg={7} className="mb-5">
+              <Col lg={12} className="mb-5">
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="name" className="form-label">
-                    {t("subAdmin.columns.name")}
+                  <label htmlFor="title" className="form-label">
+                    {t("settings.slider.columns.title")}
                   </label>
                   <input
                     type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("subAdmin.columns.name")}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={handleInput}
+                    className="form-input w-100"
+                    id="title"
+                    placeholder={t("settings.slider.columns.title")}
+                    name="title"
+                    value={formik.values.title}
+                    onChange={formik.handleChange}
                   />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("subAdmin.columns.email")}
+                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                  <label htmlFor="description" className="form-label">
+                    {t("settings.slider.columns.description")}
                   </label>
-                  <input
-                    type="text"
+                  <textarea
                     className="form-input"
-                    id="email"
-                    placeholder={t("subAdmin.columns.email")}
-                    name="email"
-                    value={formik.values.email}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("subAdmin.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="phone"
-                    placeholder={t("subAdmin.columns.phone")}
-                    name="phone"
-                    value={formik.values.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "inactive"
-                        ? t("inactive")
-                        : formik.values.status === "active"
-                        ? t("active")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "inactive" ? "active" : ""
-                        }`}
-                        value="inactive"
-                        name="status"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "inactive");
-                        }}
-                      >
-                        {t("inactive")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "active" ? "active" : ""
-                        }`}
-                        value="active"
-                        name="status"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "active");
-                        }}
-                      >
-                        {t("active")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="password" className="form-label">
-                    {t("auth.login.password")}
-                  </label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    id="password"
-                    placeholder="********"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.password && formik.touched.password ? (
-                    <span className="error">{formik.errors.password}</span>
+                    id="description"
+                    placeholder={t("settings.slider.columns.description")}
+                    name="description"
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.description && formik.touched.description ? (
+                    <span className="error">{formik.errors.description}</span>
                   ) : null}
                 </div>
               </Col>
@@ -777,8 +610,10 @@ const SubAdmins = ({ dashboard }) => {
                         role="status"
                         aria-hidden="true"
                       ></span>
+                    ) : formik.values.id ? (
+                      t("edit")
                     ) : (
-                      t("add")
+                      t("send")
                     )}
                   </button>
                   <button
@@ -800,8 +635,12 @@ const SubAdmins = ({ dashboard }) => {
           </form>
         </ModalBody>
       </Modal>
+      {/* Pagination */}
+      {searchResults?.length > 0 && error === null && loading === false && (
+        <PaginationUI />
+      )}
     </div>
   );
 };
 
-export default SubAdmins;
+export default Notifications;

@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Col, Container, Row } from "reactstrap";
+import { Col, Container, Row, Spinner } from "reactstrap";
 import { HiUsers } from "react-icons/hi2";
 import { SiGooglescholar } from "react-icons/si";
 import { LiaFileAudioSolid } from "react-icons/lia";
@@ -9,7 +9,7 @@ import { GiBookshelf } from "react-icons/gi";
 import { SlPicture } from "react-icons/sl";
 import { MdArticle } from "react-icons/md";
 import { IoCloudDownloadSharp } from "react-icons/io5";
-import { Card, Elder, SubAdmins } from "../";
+import { Card, MostListening, NewUsers } from "../";
 import { useDispatch, useSelector } from "react-redux";
 import { getCounts } from "../../store/slices/dashboardSlice";
 // import { UserData } from "../../data";
@@ -17,7 +17,7 @@ import { getCounts } from "../../store/slices/dashboardSlice";
 const Dashboard = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const { counts } = useSelector((state) => state.dashboard);
+  const { counts, loading } = useSelector((state) => state.dashboard);
   const cardItems = [
     {
       id: 1,
@@ -91,24 +91,24 @@ const Dashboard = () => {
       count: counts?.total_favorite_count_Count,
       color: "linear-gradient(45deg, rgb(0, 204, 102), rgb(0, 153, 51))",
     },
-    {
-      id: 9,
-      title: t("dashboard.mostListening"),
-      icon: <LiaFileAudioSolid />,
-      path: "most-listening",
-    disabled: false,
-      count: counts?.most_listening_count_Count,
-      color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
-    },
-    {
-      id: 10,
-      title: t("dashboard.newUsers"),
-      icon: <HiUsers />,
-      path: "new-users",
-      disabled: false,
-      count: counts?.new_user_count_Count,
-      color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
-    },
+    // {
+    //   id: 9,
+    //   title: t("dashboard.mostListening"),
+    //   icon: <LiaFileAudioSolid />,
+    //   path: "most-listening",
+    // disabled: false,
+    //   count: counts?.most_listening_count_Count,
+    //   color: "linear-gradient(45deg, rgb(255, 204, 51), rgb(204, 153, 0))",
+    // },
+    // {
+    //   id: 10,
+    //   title: t("dashboard.newUsers"),
+    //   icon: <HiUsers />,
+    //   path: "new-users",
+    //   disabled: false,
+    //   count: counts?.new_user_count_Count,
+    //   color: "linear-gradient(45deg, rgb(153, 102, 255), rgb(102, 51, 204))",
+    // },
   ];
   // // eslint-disable-next-line no-unused-vars
   // const [userData, setUserData] = useState({
@@ -235,13 +235,25 @@ const Dashboard = () => {
         <Container style={{ minWidth: "100%" }}>
           <Row
             style={{ maxWidth: "100vw" }}
-            className="flex-wrap flex-row-reverse justify-content-start align-items-center g-3"
+            className={`${loading ? "justify-content-center mt-5" : "flex-wrap flex-row-reverse justify-content-start align-items-center g-3"}`}
           >
-            {cardItems.map((item) => (
-              <Col xl="3" lg="4" md="6" sm="12" key={item.id}>
-                <Card item={item} />
-              </Col>
-            ))}
+            {loading ? (
+              <Spinner
+                color="primary"
+                style={{
+                  height: "3rem",
+                  width: "3rem",
+                }}
+              >
+                Loading...
+              </Spinner>
+            ) : (
+              cardItems.map((item) => (
+                <Col xl="3" lg="4" md="6" sm="12" key={item.id}>
+                  <Card item={item} />
+                </Col>
+              ))
+            )}
           </Row>
         </Container>
       </div>
@@ -268,10 +280,10 @@ const Dashboard = () => {
       <div className="dashboard-users mb-5 p-4">
         <Row>
           <Col xl="12">
-            <SubAdmins dashboard={true} />
+            <NewUsers dashboard={true} />
           </Col>
           <Col xl="12">
-            <Elder dashboard={true} />
+            <MostListening dashboard={true} />
           </Col>
         </Row>
       </div>
