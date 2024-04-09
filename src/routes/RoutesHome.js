@@ -21,9 +21,9 @@ import {
   Images,
   CodeContent,
   Profile,
-  MostListening,
   ChangePassword,
   EditProfile,
+  Notifications,
 } from "../components";
 
 const RoutesHome = () => (
@@ -42,6 +42,7 @@ const RoutesHome = () => (
       <Route path="sub-admins" element={<SubAdmins />} />
       <Route path="users" element={<Users />} />
       <Route path="messages" element={<Messages />} />
+      <Route path="notifications" element={<Notifications />} />
       <Route path="settings" element={<Settings />} />
       <Route path="code-content" element={<CodeContent />} />
       <Route path="introduction-page" element={<Slider />} />
@@ -56,7 +57,7 @@ const RoutesHome = () => (
       <Route path="audios" element={<Audios />} />
       <Route path="books" element={<Books />} />
       <Route path="images" element={<Images />} />
-      <Route path="most-listening" element={<MostListening />} />
+      {/* <Route path="most-listening" element={<MostListening />} /> */}
     </Route>
   </Routes>
 );
