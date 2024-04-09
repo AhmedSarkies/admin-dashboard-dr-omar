@@ -1226,6 +1226,18 @@ div[tabindex] {
 [lang="en"] .scholar .checkbox-column:after {
   left: 20px;
 }
+.status.active {
+  background: #0d1d34;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+}
+.status.inactive {
+  background: #ff0000;
+  color: #fff;
+  padding: 0.25rem 0.5rem;
+  border-radius: 5px;
+}
 
 /* Media Screens */
 @media only screen and (max-width: 1200px) {
