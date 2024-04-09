@@ -9,13 +9,13 @@ const initialState = {
 };
 
 // Get Most Listening using Axios and Redux Thunk
-export const getMostListeningApi = createAsyncThunk(
-  "mostListening/getMostListeningApi",
+export const getMostListening = createAsyncThunk(
+  "mostListening/getMostListening",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
         method: "GET",
-        url: "/Most-Listening/Get",
+        url: "/Audios/MostListened",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -32,30 +32,24 @@ export const getMostListeningApi = createAsyncThunk(
 const mostListeningSlice = createSlice({
   name: "mostListening",
   initialState,
-  reducers: {
-    // Get Most Listening
-    getMostListening: (state, action) => {
-      state.mostListening = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Most Listening======
     // Pending
-    builder.addCase(getMostListeningApi.pending, (state, action) => {
+    builder.addCase(getMostListening.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(getMostListeningApi.fulfilled, (state, action) => {
-      state.mostListening = action.payload.data;
+    builder.addCase(getMostListening.fulfilled, (state, action) => {
+      state.mostListening = action.payload;
       state.loading = false;
     });
     // Rejected
-    builder.addCase(getMostListeningApi.rejected, (state, action) => {
+    builder.addCase(getMostListening.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
   },
 });
 
-export const { getMostListening } = mostListeningSlice.actions;
 export default mostListeningSlice.reducer;

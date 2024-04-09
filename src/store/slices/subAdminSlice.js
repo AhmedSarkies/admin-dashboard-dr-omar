@@ -68,6 +68,24 @@ export const deleteSubAdmin = createAsyncThunk(
   }
 );
 
+// Change Password using Axios and Redux Thunk
+export const changePassword = createAsyncThunk(
+  "subAdmin/changePassword",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/admin/changePassword`,
+        data,
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // SubAdmins Slice
 const subAdminSlice = createSlice({
   name: "subAdmin",
@@ -114,6 +132,20 @@ const subAdminSlice = createSlice({
     });
     // Rejected
     builder.addCase(deleteSubAdmin.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Change Password======
+    // Pending
+    builder.addCase(changePassword.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(changePassword.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(changePassword.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

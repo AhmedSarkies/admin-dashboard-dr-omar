@@ -32,10 +32,7 @@ export const addSliderApi = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/IntroductionPage/Insert`,
-        params: {
-          title: data.title,
-          body: data.body,
-        },
+        data: data,
       }).then((response) => {
         return response.data;
       });
@@ -53,11 +50,7 @@ export const updateSliderApi = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/IntroductionPage/update`,
-        params: {
-          id: data.id,
-          title: data.title,
-          body: data.body,
-        },
+        data: data,
       }).then((response) => {
         return response.data;
       });
@@ -75,7 +68,7 @@ export const deleteSliderApi = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/IntroductionPage/Delete`,
-        params: { id },
+        data: { id },
       }).then((response) => {
         return response.data;
       });
