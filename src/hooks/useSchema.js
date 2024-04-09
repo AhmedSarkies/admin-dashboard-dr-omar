@@ -92,14 +92,14 @@ const useSchema = () => {
         .required("يجب اختيار تصنيف"),
     }),
     slider: object().shape({
-      // image: mixed().test("fileSize", t("validation.image"), (value) => {
-      //   if (value.file) {
-      //     return value.file.size <= 2097152;
-      //   }
-      //   if (typeof value === "string") {
-      //     return true;
-      //   }
-      // }),
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
@@ -120,23 +120,39 @@ const useSchema = () => {
       password: string()
         .min(8, t("validation.password"))
         .required(t("validation.password")),
-      // phone: number()
-      //   .typeError(t("validation.phone"))
-      //   .positive(t("validation.phone"))
-      //   .integer(t("validation.phone"))
-      //   .min(1000000000, t("validation.phone"))
-      //   .max(9999999999, t("validation.phone"))
-      //   .required(t("validation.phone")),
-      // status: string(),
-      // // Validation for image file must be uploaded with the form or just string
-      // image: mixed().test("fileSize", t("validation.image"), (value) => {
-      //   if (value.file) {
-      //     return value.file.size <= 2097152;
-      //   }
-      //   if (typeof value === "string") {
-      //     return true;
-      //   }
-      // }),
+      phone: number()
+        .typeError(t("validation.phone"))
+        .positive(t("validation.phone"))
+        .integer(t("validation.phone"))
+        .min(1000000000, t("validation.phone"))
+        .max(9999999999, t("validation.phone"))
+        .required(t("validation.phone")),
+      status: string(),
+      // Validation for image file must be uploaded with the form or just string
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size <= 2097152;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
+    }),
+    user: object().shape({
+      name: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.name")),
+      email: string()
+        .email(t("validation.email"))
+        .required(t("validation.email")),
+      password: string().min(8, t("validation.password")).notRequired(),
+      phone: number()
+        .typeError(t("validation.phone"))
+        .positive(t("validation.phone"))
+        .integer(t("validation.phone"))
+        .min(1000000000, t("validation.phone"))
+        .max(9999999999, t("validation.phone"))
+        .required(t("validation.phone")),
     }),
     bookSubCategory: object().shape({
       title: string()
