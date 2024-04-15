@@ -1,5 +1,5 @@
 import { useTranslation } from "react-i18next";
-import { boolean, mixed, number, object, string } from "yup";
+import { boolean, mixed, number, object, ref, string } from "yup";
 
 const useSchema = () => {
   const { t } = useTranslation();
@@ -9,6 +9,15 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
+    }),
+    ChangePassword: object().shape({
+      current_password: string().required(t("validation.oldPassword")),
+      new_password: string()
+        .min(8, t("validation.password"))
+        .required(t("validation.newPassword")),
+        new_password_confirmation: string()
+        .oneOf([ref("new_password")], t("validation.confirmPassword"))
+        .required(t("validation.confirmPassword")),
     }),
     login: object().shape({
       email: string()
@@ -117,9 +126,8 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
-      password: string()
-        .min(8, t("validation.password"))
-        .required(t("validation.password")),
+      // make password required when creating new subAdmin and not required when updating
+      password: string().min(8, t("validation.password")).notRequired(),
       phone: number()
         .typeError(t("validation.phone"))
         .positive(t("validation.phone"))
@@ -128,12 +136,13 @@ const useSchema = () => {
         .max(9999999999, t("validation.phone"))
         .required(t("validation.phone")),
       status: string(),
+      powers: string().required(t("validation.powers")),
       // Validation for image file must be uploaded with the form or just string
       image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
         }
-        if (typeof value === "string") {
+        if (typeof value.preview === "string") {
           return true;
         }
       }),
