@@ -16,10 +16,8 @@ import {
   getIntroductionPageApi,
   addIntroductionPageApi,
   updateIntroductionPageApi,
-  deleteIntroductionPageApi,
 } from "../../store/slices/introductionPageSlice";
 import { useFormik } from "formik";
-import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
@@ -135,55 +133,6 @@ const Notifications = () => {
         preview: URL.createObjectURL(file),
       });
     }
-  };
-
-  // Handle Edit Picture
-  const handleEdit = (introductionPage) => {
-    formik.setValues({
-      ...formik.values,
-      id: introductionPage.id,
-      title: introductionPage.title,
-      description: introductionPage.body,
-    });
-    setToggle({
-      ...toggle,
-      edit: !toggle.edit,
-    });
-  };
-
-  // Delete Picture
-  const handleDelete = (picture) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + picture?.title + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteIntroductionPageApi(picture?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getIntroductionPageApi());
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${picture?.title}`,
-              text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() =>
-              toast.success(t("toast.introductionPage.deletedSuccess"))
-            );
-          } else {
-            toast.error(t("toast.introductionPage.deletedError"));
-          }
-        });
-      }
-    });
   };
 
   // Add Picture
