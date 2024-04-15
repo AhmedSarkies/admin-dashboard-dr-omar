@@ -24,6 +24,7 @@ import {
   ChangePassword,
   EditProfile,
   Notifications,
+  User,
 } from "../components";
 
 const RoutesHome = () => (
@@ -37,10 +38,11 @@ const RoutesHome = () => (
       <Route path="*" element={<Dashboard />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="profile" element={<Profile />} />
-      <Route path="profile/change-password" element={<ChangePassword />} />
-      <Route path="profile/edit-profile" element={<EditProfile />} />
+      <Route path="profile/change-password/:id" element={<ChangePassword />} />
+      <Route path="profile/edit-profile/:id" element={<EditProfile />} />
       <Route path="sub-admins" element={<SubAdmins />} />
       <Route path="users" element={<Users />} />
+      <Route path="users/:id" element={<User />} />
       <Route path="messages" element={<Messages />} />
       <Route path="notifications" element={<Notifications />} />
       <Route path="settings" element={<Settings />} />
