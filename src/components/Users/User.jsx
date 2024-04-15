@@ -2,15 +2,9 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { Spinner } from "reactstrap";
 import { getUsers } from "../../store/slices/userSlice";
-import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
-import { MdDeleteOutline, MdEdit } from "react-icons/md";
-import Swal from "sweetalert2";
-import { toast } from "react-toastify";
-import { Modal, ModalBody, ModalHeader, Row, Col } from "reactstrap";
-import { IoMdClose } from "react-icons/io";
-import { Link, useParams } from "react-router-dom";
+import { useParams } from "react-router-dom";
 
 const User = () => {
   const { id } = useParams();
@@ -61,48 +55,7 @@ const User = () => {
     },
   });
 
-  // Filtration, Sorting, Pagination
-  // Columns
-  const columns = [
-    { id: 0, name: "id", label: t("user.columns.id") },
-    { id: 1, name: "name", label: t("user.columns.name") },
-    { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "phone", label: t("user.columns.phone") },
-    { id: 4, name: "created_at", label: t("user.columns.created_at") },
-    {
-      id: 5,
-      name: "favorite_count_articles",
-      label: t("user.columns.favorite_count_articles"),
-    },
-    {
-      id: 6,
-      name: "favorite_count_books",
-      label: t("user.columns.favorite_count_books"),
-    },
-    {
-      id: 7,
-      name: "favorite_count_audios",
-      label: t("user.columns.favorite_count_audios"),
-    },
-    {
-      id: 8,
-      name: "favorite_count_images",
-      label: t("user.columns.favorite_count_images"),
-    },
-    {
-      id: 9,
-      name: "favorite_count_elders",
-      label: t("user.columns.favorite_count_elders"),
-    },
-    { id: 10, name: "control", label: t("action") },
-  ];
-  const {
-    PaginationUI,
-    handleSort,
-    handleSearch,
-    handleToggleColumns,
-    searchResults,
-  } = useFiltration({
+  const { searchResults } = useFiltration({
     rowData: users,
     toggle,
     setToggle,
@@ -125,7 +78,6 @@ const User = () => {
     setToggle({ ...toggle, user: data[0] });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users]);
-
 
   return (
     <div className="scholar-container mt-4 mb-5 pb-3 m-sm-3 m-0">

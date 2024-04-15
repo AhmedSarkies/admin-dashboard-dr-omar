@@ -9,6 +9,7 @@ import {
   ModalFooter,
   ModalHeader,
   Row,
+  Spinner,
 } from "reactstrap";
 import { object, string } from "yup";
 
@@ -16,7 +17,6 @@ import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getUsers } from "../../store/slices/userSlice";
 import { getSubAdmins, updateSubAdmin } from "../../store/slices/subAdminSlice";
 import Cookies from "js-cookie";
 import { toast } from "react-toastify";
@@ -140,188 +140,214 @@ const EditProfile = () => {
 
   return (
     <div className="profile-container">
-      <Row className="justify-content-center">
-        <Col>
-          <div className="profile">
-            <form
-              className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
-              onSubmit={formik.handleSubmit}
-            >
-              <Col
-                lg={5}
-                className="d-flex flex-column justify-content-center align-items-center"
+      {loading ? (
+        <div className="no-data mb-0 text-center mt-5">
+          <Spinner
+            color="primary"
+            style={{
+              height: "3rem",
+              width: "3rem",
+            }}
+          >
+            Loading...
+          </Spinner>
+        </div>
+      ) : (
+        <Row className="justify-content-center">
+          <Col>
+            <div className="profile">
+              <form
+                className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
+                onSubmit={formik.handleSubmit}
               >
-                <div className="image-preview-container d-flex justify-content-center align-items-center">
-                  <label
-                    htmlFor={formik.values.image.preview ? "" : "image"}
-                    className="form-label d-flex justify-content-center align-items-center"
-                  >
-                    <img
-                      src={
-                        formik.values.image && formik.values.image.preview
-                          ? formik.values.image.preview
-                          : anonymous
-                      }
-                      alt="avatar"
-                      className="image-preview"
-                      onClick={() =>
-                        formik.values.image && formik.values.image.preview
-                          ? setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          : ""
-                      }
-                    />
-                    <Modal
-                      isOpen={toggle.imagePreview}
-                      toggle={() =>
-                        setToggle({
-                          ...toggle,
-                          imagePreview: !toggle.imagePreview,
-                        })
-                      }
-                      centered={true}
-                      keyboard={true}
-                      size={"md"}
-                      contentClassName="modal-preview-image modal-add-scholar"
+                <Col
+                  lg={5}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
                     >
-                      <ModalHeader
+                      <img
+                        src={
+                          formik.values.image && formik.values.image.preview
+                            ? formik.values.image.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        onClick={() =>
+                          formik.values.image && formik.values.image.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
                         toggle={() =>
                           setToggle({
                             ...toggle,
                             imagePreview: !toggle.imagePreview,
                           })
                         }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
                       >
-                        <IoMdClose
-                          onClick={() =>
+                        <ModalHeader
+                          toggle={() =>
                             setToggle({
                               ...toggle,
                               imagePreview: !toggle.imagePreview,
                             })
                           }
-                        />
-                      </ModalHeader>
-                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                        <img
-                          src={
-                            formik.values.image && formik.values.image.preview
-                              ? formik.values.image.preview
-                              : anonymous
-                          }
-                          alt="avatar"
-                          className="image-preview"
-                        />
-                      </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={() => {
+                        >
+                          <IoMdClose
+                            onClick={() =>
                               setToggle({
                                 ...toggle,
                                 imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
-                          >
-                            حذف
-                          </button>
-                        </div>
-                      </ModalFooter>
-                    </Modal>
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values.image && formik.values.image.preview
+                                ? formik.values.image.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              حذف
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImage")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                </Col>
+                <div className="form-group">
                   <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    onChange={handleImageChange}
+                    type="text"
+                    className="form-control"
+                    id="name"
+                    placeholder={t("profile.name")}
+                    name="name"
+                    value={formik.values.name}
+                    onChange={handleInputChange}
                   />
+                  <label htmlFor="name" className="label-form">
+                    {t("profile.name")}
+                  </label>
                 </div>
-              </Col>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="name"
-                  placeholder={t("profile.name")}
-                  name="name"
-                  value={formik.values.name}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="name" className="label-form">
-                  {t("profile.name")}
-                </label>
-              </div>
-              <div className="error-container">
-                {formik.touched.name && formik.errors.name ? (
-                  <span className="error">{formik.errors.name}</span>
-                ) : null}
-              </div>
-              <div className="form-group">
-                <input
-                  type="email"
-                  className="form-control"
-                  id="email"
-                  placeholder={t("profile.email")}
-                  name="email"
-                  value={formik.values.email}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="email" className="label-form">
-                  {t("profile.email")}
-                </label>
-              </div>
-              <div className="error-container">
-                {formik.touched.email && formik.errors.email ? (
-                  <span className="error">{formik.errors.email}</span>
-                ) : null}
-              </div>
-              <div className="form-group">
-                <input
-                  type="text"
-                  className="form-control"
-                  id="phone"
-                  placeholder={t("profile.phone")}
-                  name="phone"
-                  value={formik.values.phone}
-                  onChange={handleInputChange}
-                />
-                <label htmlFor="phone" className="label-form">
-                  {t("profile.phone")}
-                </label>
-              </div>
-              <div className="error-container">
-                {formik.touched.phone && formik.errors.phone ? (
-                  <span className="error">{formik.errors.phone}</span>
-                ) : null}
-              </div>
-              <div className="form-group d-flex justify-content-end gap-2">
-                <button
-                  type="button"
-                  className="change-password-btn"
-                  onClick={() => navigate("/dr-omar/profile")}
-                >
-                  {t("cancel")}
-                </button>
-                <button type="submit" className="add-btn">
-                  {t("update")}
-                </button>
-              </div>
-            </form>
-          </div>
-        </Col>
-      </Row>
+                <div className="error-container">
+                  {formik.touched.name && formik.errors.name ? (
+                    <span className="error">{formik.errors.name}</span>
+                  ) : null}
+                </div>
+                <div className="form-group">
+                  <input
+                    type="email"
+                    className="form-control"
+                    id="email"
+                    placeholder={t("profile.email")}
+                    name="email"
+                    value={formik.values.email}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="email" className="label-form">
+                    {t("profile.email")}
+                  </label>
+                </div>
+                <div className="error-container">
+                  {formik.touched.email && formik.errors.email ? (
+                    <span className="error">{formik.errors.email}</span>
+                  ) : null}
+                </div>
+                <div className="form-group">
+                  <input
+                    type="text"
+                    className="form-control"
+                    id="phone"
+                    placeholder={t("profile.phone")}
+                    name="phone"
+                    value={formik.values.phone}
+                    onChange={handleInputChange}
+                  />
+                  <label htmlFor="phone" className="label-form">
+                    {t("profile.phone")}
+                  </label>
+                </div>
+                <div className="error-container">
+                  {formik.touched.phone && formik.errors.phone ? (
+                    <span className="error">{formik.errors.phone}</span>
+                  ) : null}
+                </div>
+                <div className="form-group d-flex justify-content-end gap-2">
+                  <button
+                    type="button"
+                    className="change-password-btn"
+                    onClick={() => navigate("/dr-omar/profile")}
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button type="submit" className="add-btn">
+                    {loading ? (
+                      <Spinner
+                        color="primary"
+                        style={{
+                          height: "1rem",
+                          width: "1rem",
+                        }}
+                      >
+                        Loading...
+                      </Spinner>
+                    ) : (
+                      t("update")
+                    )}
+                  </button>
+                </div>
+              </form>
+            </div>
+          </Col>
+        </Row>
+      )}
     </div>
   );
 };
