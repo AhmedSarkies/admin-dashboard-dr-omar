@@ -16,7 +16,7 @@ import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
 import { FaPen } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose, IoMdEye } from "react-icons/io";
 
 import anonymous from "../../assets/images/anonymous.png";
 
@@ -37,7 +37,7 @@ import { toast } from "react-toastify";
 
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const initialValues = {
   image: {
@@ -53,6 +53,7 @@ const initialValues = {
 const Elders = ({ dashboard }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
   const { scholars, loading, error } = useSelector((state) => state.scholar);
@@ -296,7 +297,6 @@ const Elders = ({ dashboard }) => {
           <MdAdd />
           {t("elders.addTitle")}
         </button>
-        <h2>{t("elders.title")}</h2>
       </div>
       <div className="scholar">
         <div className="table-header">
@@ -623,6 +623,12 @@ const Elders = ({ dashboard }) => {
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
+                        <IoMdEye
+                          className="edit-btn"
+                          onClick={() => {
+                            navigate(`/dr-omar/elders/${result?.id}`);
+                          }}
+                        />
                         <FaPen
                           className="edit-btn"
                           onClick={() => {
