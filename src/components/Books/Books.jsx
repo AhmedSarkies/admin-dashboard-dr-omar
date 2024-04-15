@@ -81,6 +81,7 @@ const Books = () => {
       visits: true,
       favorites: true,
       downloads: true,
+      shares: true,
       status: true,
       control: true,
     },
@@ -110,8 +111,9 @@ const Books = () => {
     { id: 3, name: "visits", label: t("visits") },
     { id: 4, name: "favorites", label: t("favorites") },
     { id: 5, name: "downloads", label: t("downloads") },
-    { id: 6, name: "status", label: t("status") },
-    { id: 7, name: "control", label: t("action") },
+    { id: 6, name: "shares", label: t("shares") },
+    { id: 7, name: "status", label: t("status") },
+    { id: 8, name: "control", label: t("action") },
   ];
 
   const onSubmit = (values) => {
@@ -479,10 +481,22 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("shares")}
+                  {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
                   {t("status")}
-                  {toggle.sortColumn === columns[6].name ? (
+                  {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -492,9 +506,9 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
                   {t("action")}
-                  {toggle.sortColumn === columns[7].name ? (
+                  {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -509,7 +523,7 @@ const Books = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -527,7 +541,7 @@ const Books = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -547,7 +561,7 @@ const Books = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -559,7 +573,7 @@ const Books = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -628,6 +642,9 @@ const Books = () => {
                   )}
                   {toggle.toggleColumns.downloads && (
                     <td className="table-td downloads">{0}</td>
+                  )}
+                  {toggle.toggleColumns.shares && (
+                    <td className="table-td">{0}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">

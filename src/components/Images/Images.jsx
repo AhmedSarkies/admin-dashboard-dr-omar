@@ -50,6 +50,7 @@ const Images = () => {
       visits: true,
       favorites: true,
       downloads: true,
+      shares: true,
       status: true,
       control: true,
     },
@@ -78,8 +79,9 @@ const Images = () => {
     { id: 3, name: "visits", label: t("visits") },
     { id: 4, name: "favorites", label: t("favorites") },
     { id: 5, name: "downloads", label: t("downloads") },
-    { id: 6, name: "status", label: t("status") },
-    { id: 7, name: "control", label: t("action") },
+    { id: 6, name: "shares", label: t("shares") },
+    { id: 7, name: "status", label: t("status") },
+    { id: 8, name: "control", label: t("action") },
   ];
 
   // Formik
@@ -380,9 +382,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("status")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -392,10 +394,22 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("action")}
+                  {t("status")}
                   {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -410,7 +424,7 @@ const Images = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -428,7 +442,7 @@ const Images = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -448,7 +462,7 @@ const Images = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -460,7 +474,7 @@ const Images = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -491,19 +505,16 @@ const Images = () => {
                     </td>
                   )}
                   {toggle.toggleColumns.visits && (
-                    <td className="table-td visits">
-                      {0}
-                    </td>
+                    <td className="table-td visits">{0}</td>
                   )}
                   {toggle.toggleColumns.favorites && (
-                    <td className="table-td favorites">
-                      {0}
-                    </td>
+                    <td className="table-td favorites">{0}</td>
                   )}
                   {toggle.toggleColumns.downloads && (
-                    <td className="table-td downloads">
-                      {0}
-                    </td>
+                    <td className="table-td downloads">{0}</td>
+                  )}
+                  {toggle.toggleColumns.shares && (
+                    <td className="table-td">{0}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
