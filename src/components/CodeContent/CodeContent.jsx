@@ -3,7 +3,7 @@ import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
 import { useDispatch, useSelector } from "react-redux";
 import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
-import { MdSend } from "react-icons/md";
+import { MdEdit, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import {
   sendCodeContent,
@@ -101,7 +101,7 @@ const CodeContent = () => {
   const handleAdd = (result) => {
     setToggle({
       ...toggle,
-      add: !toggle.add,
+      add: true,
       everyOne: false,
     });
     formik.setFieldValue("User_id", result?.id);
@@ -126,11 +126,26 @@ const CodeContent = () => {
               ...toggle,
               add: !toggle.add,
               everyOne: true,
+              edit: true,
+            })
+          }
+        >
+          <MdEdit />
+          {t("settings.codeContent.editTitle")}
+        </button>
+        <button
+          className="add-btn send"
+          onClick={() =>
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              everyOne: true,
+              edit: false,
             })
           }
         >
           <MdSend />
-          {t("settings.codeContent.sendTitleEveryOne")}
+          {t("settings.codeContent.addTitle")}
         </button>
       </div>
       <div className="scholar">
@@ -350,7 +365,12 @@ const CodeContent = () => {
             formik.handleReset();
           }}
         >
-          {t("settings.codeContent.sendTitle")}
+          {toggle.add === true && toggle.everyOne === true && toggle.edit === false
+            ? t("settings.codeContent.addTitle")
+            : toggle.edit === true && toggle.everyOne === true && toggle.add === true
+            ? t("settings.codeContent.editTitle")
+            : t("settings.codeContent.sendTitle")
+            }
           <IoMdClose
             onClick={() => {
               setToggle({

@@ -37,6 +37,7 @@ import { toast } from "react-toastify";
 
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
+import { Link } from "react-router-dom";
 
 const initialValues = {
   image: {
@@ -49,7 +50,7 @@ const initialValues = {
   status: "",
 };
 
-const Elder = ({ dashboard }) => {
+const Elders = ({ dashboard }) => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
@@ -563,7 +564,11 @@ const Elder = ({ dashboard }) => {
                     </td>
                   )}
                   {toggle.toggleColumns.name && (
-                    <td className="table-td name">{result?.name}</td>
+                    <td className="table-td name">
+                      <Link to={`/dr-omar/elders/${result?.id}`}>
+                        {result?.name}
+                      </Link>
+                    </td>
                   )}
                   {toggle.toggleColumns.email && (
                     <td className="table-td">
@@ -1248,4 +1253,4 @@ const Elder = ({ dashboard }) => {
   );
 };
 
-export default Elder;
+export default Elders;

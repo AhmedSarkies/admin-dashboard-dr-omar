@@ -9,16 +9,15 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-import { MdAdd, MdDeleteOutline, MdSend } from "react-icons/md";
-import { FaEdit } from "react-icons/fa";
+import { MdAdd, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { ImUpload } from "react-icons/im";
 import {
-  getSlidersApi,
-  addSliderApi,
-  updateSliderApi,
-  deleteSliderApi,
-} from "../../store/slices/sliderSlice";
+  getIntroductionPageApi,
+  addIntroductionPageApi,
+  updateIntroductionPageApi,
+  deleteIntroductionPageApi,
+} from "../../store/slices/introductionPageSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
@@ -86,7 +85,7 @@ const Notifications = () => {
       status: "",
       description: "",
     },
-    validationSchema: validationSchema.slider,
+    validationSchema: validationSchema.introductionPage,
     onSubmit: (values) => {
       const formData = new FormData();
       formData.append("title", values.title);
@@ -96,31 +95,31 @@ const Notifications = () => {
       }
       if (values.id) {
         formData.append("id", values.id);
-        dispatch(updateSliderApi(formData)).then((res) => {
+        dispatch(updateIntroductionPageApi(formData)).then((res) => {
           if (!res.error) {
             setToggle({
               ...toggle,
               edit: !toggle.edit,
             });
             formik.handleReset();
-            toast.success(t("toast.slider.updatedSuccess"));
-            dispatch(getSlidersApi());
+            toast.success(t("toast.introductionPage.updatedSuccess"));
+            dispatch(getIntroductionPageApi());
           } else {
-            toast.error(t("toast.slider.updatedError"));
+            toast.error(t("toast.introductionPage.updatedError"));
           }
         });
       } else {
-        dispatch(addSliderApi(formData)).then((res) => {
+        dispatch(addIntroductionPageApi(formData)).then((res) => {
           if (!res.error) {
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
             formik.handleReset();
-            toast.success(t("toast.slider.addedSuccess"));
-            dispatch(getSlidersApi());
+            toast.success(t("toast.introductionPage.addedSuccess"));
+            dispatch(getIntroductionPageApi());
           } else {
-            toast.error(t("toast.slider.addedError"));
+            toast.error(t("toast.introductionPage.addedError"));
           }
         });
       }
@@ -139,12 +138,12 @@ const Notifications = () => {
   };
 
   // Handle Edit Picture
-  const handleEdit = (slider) => {
+  const handleEdit = (introductionPage) => {
     formik.setValues({
       ...formik.values,
-      id: slider.id,
-      title: slider.title,
-      description: slider.body,
+      id: introductionPage.id,
+      title: introductionPage.title,
+      description: introductionPage.body,
     });
     setToggle({
       ...toggle,
@@ -165,9 +164,9 @@ const Notifications = () => {
       cancelButtonText: t("cancel"),
     }).then((result) => {
       if (result.isConfirmed) {
-        dispatch(deleteSliderApi(picture?.id)).then((res) => {
+        dispatch(deleteIntroductionPageApi(picture?.id)).then((res) => {
           if (!res.error) {
-            dispatch(getSlidersApi());
+            dispatch(getIntroductionPageApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${picture?.title}`,
               text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
@@ -176,9 +175,11 @@ const Notifications = () => {
               icon: "success",
               confirmButtonColor: "#0d1d34",
               confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.slider.deletedSuccess")));
+            }).then(() =>
+              toast.success(t("toast.introductionPage.deletedSuccess"))
+            );
           } else {
-            toast.error(t("toast.slider.deletedError"));
+            toast.error(t("toast.introductionPage.deletedError"));
           }
         });
       }
@@ -415,7 +416,7 @@ const Notifications = () => {
           )}
         </table>
       </div>
-      {/* Add Slider */}
+      {/* Add introductionPage */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
@@ -568,13 +569,13 @@ const Notifications = () => {
                   style={{ marginTop: "-4px" }}
                 >
                   <label htmlFor="title" className="form-label">
-                    {t("settings.slider.columns.title")}
+                    {t("settings.introductionPage.columns.title")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
                     id="title"
-                    placeholder={t("settings.slider.columns.title")}
+                    placeholder={t("settings.introductionPage.columns.title")}
                     name="title"
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -585,12 +586,14 @@ const Notifications = () => {
                 </div>
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
                   <label htmlFor="description" className="form-label">
-                    {t("settings.slider.columns.description")}
+                    {t("settings.introductionPage.columns.description")}
                   </label>
                   <textarea
                     className="form-input"
                     id="description"
-                    placeholder={t("settings.slider.columns.description")}
+                    placeholder={t(
+                      "settings.introductionPage.columns.description"
+                    )}
                     name="description"
                     value={formik.values.description}
                     onChange={formik.handleChange}

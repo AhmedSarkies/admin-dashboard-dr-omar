@@ -62,7 +62,7 @@ const Home = () => {
       path: "/dr-omar/code-content",
     },
     {
-      title: t("linkItems.slider"),
+      title: t("linkItems.introductionPage"),
       path: "/dr-omar/introduction-page",
     },
     {
@@ -95,7 +95,7 @@ const Home = () => {
     },
     {
       title: t("linkItems.elder"),
-      path: "/dr-omar/elder",
+      path: "/dr-omar/elders",
       icon: <SiGooglescholar />,
     },
     {
