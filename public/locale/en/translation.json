@@ -85,7 +85,7 @@
     "settingsApp": "App Settings",
     "prayerTime": "Prayer Time",
     "codeContent": "Code Content",
-    "slider": "Introduction Page",
+    "introductionPage": "Introduction Page",
     "termsAndConditions": "Terms And Conditions",
     "links": "Links",
     "messages": "Support",
@@ -178,7 +178,8 @@
     "codeContent": {
       "title": "Code Content",
       "sendTitle": "Send Code Content",
-      "sendTitleEveryOne": "Send Code To Everyone",
+      "addTitle": "Add Code Content",
+      "editTitle": "Edit Code Content",
       "columns": {
         "code": "Code",
         "name": "Name",
@@ -186,7 +187,7 @@
         "send": "Send Code"
       }
     },
-    "slider": {
+    "introductionPage": {
       "addTitle": "Add Introduction Page",
       "editTitle": "Edit Introduction Page",
       "columns": {
@@ -464,7 +465,7 @@
       "deletedSuccess": "Code Content deleted successfully",
       "deletedError": "An error occurred while deleting code content"
     },
-    "slider": {
+    "introductionPage": {
       "addedSuccess": "Introduction Page added successfully",
       "addedError": "An error occurred while adding introduction page",
       "editedSuccess": "Introduction Page edited successfully",

@@ -85,7 +85,7 @@
     "settingsApp": "إعدادات التطبيق",
     "prayerTime": "أوقات الصلاة",
     "codeContent": "رمز المحتوى",
-    "slider": "الصفحة التعريفية",
+    "introductionPage": "الصفحة التعريفية",
     "termsAndConditions": "الشروط والأحكام",
     "links": "الروابط",
     "messages": "الدعم الفني",
@@ -178,7 +178,8 @@
     "codeContent": {
       "title": "رمز المحتوى",
       "sendTitle": "إرسال رمز المحتوى",
-      "sendTitleEveryOne": "إرسال رمز للجميع",
+      "editTitle": "تعديل رمز المحتوى",
+      "addTitle": "إضافة رمز المحتوى",
       "columns": {
         "name": "الاسم",
         "code": "الرمز",
@@ -186,7 +187,7 @@
         "send": "إرسال الرمز"
       }
     },
-    "slider": {
+    "introductionPage": {
       "addTitle": "إضافة صفخة تعريفية",
       "editTitle": "تعديل صفخة تعريفية",
       "columns": {
@@ -466,7 +467,7 @@
       "deletedSuccess": "تم حذف رمز المحتوى بنجاح",
       "deletedError": "حدث خطأ أثناء حذف رمز المحتوى"
     },
-    "slider": {
+    "introductionPage": {
       "addedSuccess": "تم إضافة الصفحة التعريفية بنجاح",
       "addedError": "حدث خطأ أثناء إضافة الصفحة التعريفية",
       "updatedSuccess": "تم تعديل الصفحة التعريفية بنجاح",
