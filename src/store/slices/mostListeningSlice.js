@@ -15,7 +15,7 @@ export const getMostListening = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/Audios/MostListened",
+        url: "/admin/MostListened",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
@@ -41,7 +41,7 @@ const mostListeningSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(getMostListening.fulfilled, (state, action) => {
-      state.mostListening = action.payload;
+      state.mostListening = action.payload.data;
       state.loading = false;
     });
     // Rejected

@@ -46,6 +46,24 @@ export const addSubAdmin = createAsyncThunk(
   }
 );
 
+// Update SubAdmin using Axios and Redux Thunk
+export const updateSubAdmin = createAsyncThunk(
+  "subAdmin/updateSubAdmin",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/admin/Update`,
+        data,
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Delete SubAdmin using Axios and Redux Thunk
 export const deleteSubAdmin = createAsyncThunk(
   "subAdmin/deleteSubAdmin",
@@ -118,6 +136,20 @@ const subAdminSlice = createSlice({
     });
     // Rejected
     builder.addCase(addSubAdmin.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Update SubAdmin======
+    // Pending
+    builder.addCase(updateSubAdmin.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(updateSubAdmin.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(updateSubAdmin.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

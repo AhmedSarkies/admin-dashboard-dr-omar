@@ -12,3 +12,4 @@ export { default as codeContentSlice } from "./codeContentSlice";
 export { default as settingsSlice } from "./settingsSlice";
 export { default as termsConditionsSlice } from "./termsConditionsSlice";
 export { default as dashboardSlice } from "./dashboardSlice";
+export { default as profileSlice } from "./profileSlice";
