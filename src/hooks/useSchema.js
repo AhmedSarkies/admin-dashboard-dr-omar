@@ -3,7 +3,7 @@ import { boolean, mixed, number, object, ref, string } from "yup";
 
 const useSchema = () => {
   const { t } = useTranslation();
-  // Validation Schema for all app {login,forgetPassword,title,description,category,subCategory,article,audio,book,image,elder,mostListening,slider,contact,termsAndConditions,profile,subAdmins,messages,settings}
+  // Validation Schema for all app {login,forgetPassword,title,description,category,subCategory,article,audio,book,image,elder,mostListening,introductionPage,contact,termsAndConditions,profile,subAdmins,messages,settings}
   const validationSchema = {
     forgetPassword: object().shape({
       email: string()
@@ -15,7 +15,7 @@ const useSchema = () => {
       new_password: string()
         .min(8, t("validation.password"))
         .required(t("validation.newPassword")),
-        new_password_confirmation: string()
+      new_password_confirmation: string()
         .oneOf([ref("new_password")], t("validation.confirmPassword"))
         .required(t("validation.confirmPassword")),
     }),
@@ -100,7 +100,7 @@ const useSchema = () => {
         .max(40, t("validation.maxCharacters"))
         .required("يجب اختيار تصنيف"),
     }),
-    slider: object().shape({
+    introductionPage: object().shape({
       image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
           return value.file.size <= 2097152;
@@ -109,10 +109,14 @@ const useSchema = () => {
           return true;
         }
       }),
-      title: string()
+      titleAr: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      description: string().required(t("validation.description")),
+      descriptionAr: string().required(t("validation.description")),
+      titleEn: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+        descriptionEn: string().required(t("validation.description")),
     }),
     category: object().shape({
       title: string()
