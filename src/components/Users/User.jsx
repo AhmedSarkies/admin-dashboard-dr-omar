@@ -126,7 +126,6 @@ const User = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [users]);
 
-  console.log("user", toggle.user);
 
   return (
     <div className="scholar-container mt-4 mb-5 pb-3 m-sm-3 m-0">

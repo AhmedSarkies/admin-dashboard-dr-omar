@@ -556,6 +556,9 @@ body {
   font-weight: 400;
   color: var(--main-color);
 }
+.profile .profile-body p.name {
+  direction: rtl;
+}
 .profile .profile-body p.email {
   direction: rtl;
 }

@@ -7,6 +7,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { changePassword } from "../../store/slices/profileSlice";
 import useSchema from "../../hooks/useSchema";
+import { toast } from "react-toastify";
 
 const initialValues = {
   current_password: "",
@@ -29,7 +30,14 @@ const ChangePassword = () => {
           id,
           ...values,
         })
-      );
+      ).then((res) => {
+        if (res.meta.requestStatus === "fulfilled") {
+          navigate("/dr-omar/profile");
+          toast.success(t("toast.profile.passwordSuccess"));
+        } else {
+          toast.error(t("toast.profile.passwordError"));
+        }
+      });
     },
   });
 
@@ -117,14 +125,15 @@ const ChangePassword = () => {
                 ) : null}
               </div>
               <div className="form-group d-flex justify-content-end gap-2">
-                <button type="submit" className="add-btn">
-                  {t("update")}
-                </button>
                 <button
+                  type="button"
                   className="change-password-btn"
                   onClick={cancelChangePassword}
                 >
                   {t("cancel")}
+                </button>
+                <button type="submit" className="add-btn">
+                  {t("update")}
                 </button>
               </div>
             </form>

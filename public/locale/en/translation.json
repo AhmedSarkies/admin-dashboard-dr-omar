@@ -379,6 +379,12 @@
       "deletedSuccess": "Sub Admin deleted successfully",
       "deletedError": "An error occurred while deleting sub admin"
     },
+    "profile": {
+      "updatedSuccess": "Personal data updated successfully",
+      "updatedError": "An error occurred while updating personal data",
+      "passwordSuccess": "Password changed successfully",
+      "passwordError": "An error occurred while changing password"
+    },
     "user": {
       "deletedSuccess": "User deleted successfully",
       "deletedError": "An error occurred while deleting user",

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";
@@ -14,19 +14,30 @@ import { object, string } from "yup";
 
 import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getUsers } from "../../store/slices/userSlice";
+import { getSubAdmins, updateSubAdmin } from "../../store/slices/subAdminSlice";
+import Cookies from "js-cookie";
+import { toast } from "react-toastify";
 
 const EditProfile = () => {
   const { t } = useTranslation();
+  const { id } = useParams();
+  const dispatch = useDispatch();
+  const { subAdmins, loading } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({});
   const navigate = useNavigate();
 
-  const editProfileFormik = useFormik({
+  const formik = useFormik({
     initialValues: {
-      name: "احمد",
-      email: "admin@gmail.com",
-      phone: "01012349575",
-      image: "",
+      name: "",
+      email: "",
+      phone: "",
+      image: {
+        file: "",
+        preview: "",
+      },
     },
     validationSchema: object().shape({
       name: string().required("يجب ادخال الاسم"),
@@ -38,16 +49,51 @@ const EditProfile = () => {
         .required("يجب ادخال رقم الهاتف"),
     }),
     onSubmit: (values) => {
-      editProfileFormik.setValues(values);
-      setToggle({
-        ...toggle,
-        editProfile: !toggle.editProfile,
-      });
+      if (values.image.file === "") {
+        dispatch(
+          updateSubAdmin({
+            id: parseInt(id),
+            name: values.name,
+            email: values.email,
+            phone: values.phone,
+            active: Cookies.get("_active"),
+            powers: Cookies.get("_role"),
+          })
+        ).then((res) => {
+          if (res.meta.requestStatus === "fulfilled") {
+            formik.resetForm();
+            toast.success(t("toast.profile.updatedSuccess"));
+            navigate("/dr-omar/profile");
+          } else {
+            toast.error(t("toast.profile.updatedError"));
+          }
+        });
+      } else {
+        dispatch(
+          updateSubAdmin({
+            id: parseInt(id),
+            active: Cookies.get("_active"),
+            powers: Cookies.get("_role"),
+            image: values.image.file,
+            name: values.name,
+            email: values.email,
+            phone: values.phone,
+          })
+        ).then((res) => {
+          if (res.meta.requestStatus === "fulfilled") {
+            formik.resetForm();
+            toast.success(t("toast.profile.updatedSuccess"));
+            navigate("/dr-omar/profile");
+          } else {
+            toast.error(t("toast.profile.updatedError"));
+          }
+        });
+      }
     },
   });
 
   const handleInputChange = (e) => {
-    editProfileFormik.handleChange(e);
+    formik.handleChange(e);
   };
 
   // Handle Image Change
@@ -55,7 +101,7 @@ const EditProfile = () => {
     try {
       const file = e.currentTarget.files[0];
       if (file) {
-        editProfileFormik.setFieldValue("image", {
+        formik.setFieldValue("image", {
           file: file,
           preview: URL.createObjectURL(file),
         });
@@ -65,6 +111,33 @@ const EditProfile = () => {
     }
   };
 
+  useEffect(() => {
+    try {
+      dispatch(getSubAdmins());
+    } catch (error) {
+      console.log(error);
+    }
+  }, [dispatch]);
+
+  useEffect(() => {
+    if (id === undefined) return;
+    if (subAdmins.length === 0) return;
+    // Get Data By ID Using Filter Method
+    if (id) {
+      const data = subAdmins.filter((subAdmin) => subAdmin.id === parseInt(id));
+      formik.setValues({
+        name: data[0].name,
+        email: data[0].email,
+        phone: data[0].phone,
+        image: {
+          file: "",
+          preview: data[0].image,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [subAdmins]);
+
   return (
     <div className="profile-container">
       <Row className="justify-content-center">
@@ -72,7 +145,7 @@ const EditProfile = () => {
           <div className="profile">
             <form
               className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
-              onSubmit={editProfileFormik.handleSubmit}
+              onSubmit={formik.handleSubmit}
             >
               <Col
                 lg={5}
@@ -80,23 +153,19 @@ const EditProfile = () => {
               >
                 <div className="image-preview-container d-flex justify-content-center align-items-center">
                   <label
-                    htmlFor={
-                      editProfileFormik.values.image.preview ? "" : "image"
-                    }
+                    htmlFor={formik.values.image.preview ? "" : "image"}
                     className="form-label d-flex justify-content-center align-items-center"
                   >
                     <img
                       src={
-                        editProfileFormik.values.image &&
-                        editProfileFormik.values.image.preview
-                          ? editProfileFormik.values.image.preview
+                        formik.values.image && formik.values.image.preview
+                          ? formik.values.image.preview
                           : anonymous
                       }
                       alt="avatar"
                       className="image-preview"
                       onClick={() =>
-                        editProfileFormik.values.image &&
-                        editProfileFormik.values.image.preview
+                        formik.values.image && formik.values.image.preview
                           ? setToggle({
                               ...toggle,
                               imagePreview: !toggle.imagePreview,
@@ -137,9 +206,8 @@ const EditProfile = () => {
                       <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
                         <img
                           src={
-                            editProfileFormik.values.image &&
-                            editProfileFormik.values.image.preview
-                              ? editProfileFormik.values.image.preview
+                            formik.values.image && formik.values.image.preview
+                              ? formik.values.image.preview
                               : anonymous
                           }
                           alt="avatar"
@@ -155,7 +223,7 @@ const EditProfile = () => {
                                 ...toggle,
                                 imagePreview: !toggle.imagePreview,
                               });
-                              editProfileFormik.setFieldValue("image", {
+                              formik.setFieldValue("image", {
                                 file: "",
                                 preview: "",
                               });
@@ -188,7 +256,7 @@ const EditProfile = () => {
                   id="name"
                   placeholder={t("profile.name")}
                   name="name"
-                  value={editProfileFormik.values.name}
+                  value={formik.values.name}
                   onChange={handleInputChange}
                 />
                 <label htmlFor="name" className="label-form">
@@ -196,9 +264,8 @@ const EditProfile = () => {
                 </label>
               </div>
               <div className="error-container">
-                {editProfileFormik.touched.name &&
-                editProfileFormik.errors.name ? (
-                  <span className="error">{editProfileFormik.errors.name}</span>
+                {formik.touched.name && formik.errors.name ? (
+                  <span className="error">{formik.errors.name}</span>
                 ) : null}
               </div>
               <div className="form-group">
@@ -208,7 +275,7 @@ const EditProfile = () => {
                   id="email"
                   placeholder={t("profile.email")}
                   name="email"
-                  value={editProfileFormik.values.email}
+                  value={formik.values.email}
                   onChange={handleInputChange}
                 />
                 <label htmlFor="email" className="label-form">
@@ -216,11 +283,8 @@ const EditProfile = () => {
                 </label>
               </div>
               <div className="error-container">
-                {editProfileFormik.touched.email &&
-                editProfileFormik.errors.email ? (
-                  <span className="error">
-                    {editProfileFormik.errors.email}
-                  </span>
+                {formik.touched.email && formik.errors.email ? (
+                  <span className="error">{formik.errors.email}</span>
                 ) : null}
               </div>
               <div className="form-group">
@@ -230,7 +294,7 @@ const EditProfile = () => {
                   id="phone"
                   placeholder={t("profile.phone")}
                   name="phone"
-                  value={editProfileFormik.values.phone}
+                  value={formik.values.phone}
                   onChange={handleInputChange}
                 />
                 <label htmlFor="phone" className="label-form">
@@ -238,15 +302,13 @@ const EditProfile = () => {
                 </label>
               </div>
               <div className="error-container">
-                {editProfileFormik.touched.phone &&
-                editProfileFormik.errors.phone ? (
-                  <span className="error">
-                    {editProfileFormik.errors.phone}
-                  </span>
+                {formik.touched.phone && formik.errors.phone ? (
+                  <span className="error">{formik.errors.phone}</span>
                 ) : null}
               </div>
               <div className="form-group d-flex justify-content-end gap-2">
                 <button
+                  type="button"
                   className="change-password-btn"
                   onClick={() => navigate("/dr-omar/profile")}
                 >
