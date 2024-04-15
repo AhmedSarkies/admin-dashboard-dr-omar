@@ -191,8 +191,16 @@
       "editTitle": "Edit Introduction Page",
       "columns": {
         "image": "Image",
-        "title": "Title",
-        "description": "Description",
+        "title": {
+          "title": "Title",
+          "ar": "Title (Arabic)",
+          "en": "Title (English)"
+        },
+        "description": {
+          "description": "Description",
+          "ar": "Description (Arabic)",
+          "en": "Description (English)"
+        },
         "order": "Order"
       }
     },
