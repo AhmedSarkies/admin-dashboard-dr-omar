@@ -6,7 +6,7 @@ export { default as messagesSlice } from "./messagesSlice";
 export { default as userSlice } from "./userSlice";
 export { default as mostListeningSlice } from "./mostListeningSlice";
 export { default as pictureSlice } from "./pictureSlice";
-export { default as sliderSlice } from "./sliderSlice";
+export { default as introductionPageSlice } from "./introductionPageSlice";
 export { default as subAdminSlice } from "./subAdminSlice";
 export { default as codeContentSlice } from "./codeContentSlice";
 export { default as settingsSlice } from "./settingsSlice";

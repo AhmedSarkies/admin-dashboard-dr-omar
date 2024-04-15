@@ -3,14 +3,14 @@ import Http from "../../Http";
 
 // Initial State
 const initialState = {
-  sliders: [],
+  introductionPage: [],
   loading: false,
   error: null,
 };
 
-// Get Sliders using Axios and Redux Thunk
-export const getSlidersApi = createAsyncThunk(
-  "slider/getSlidersApi",
+// Get IntroductionPage using Axios and Redux Thunk
+export const getIntroductionPageApi = createAsyncThunk(
+  "introductionPage/getIntroductionPageApi",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
@@ -24,9 +24,9 @@ export const getSlidersApi = createAsyncThunk(
   }
 );
 
-// Add Slider using Axios and Redux Thunk
-export const addSliderApi = createAsyncThunk(
-  "slider/addSliderApi",
+// Add IntroductionPage using Axios and Redux Thunk
+export const addIntroductionPageApi = createAsyncThunk(
+  "introductionPage/addIntroductionPageApi",
   async (data, { rejectWithValue }) => {
     try {
       await Http({
@@ -42,9 +42,9 @@ export const addSliderApi = createAsyncThunk(
   }
 );
 
-// Update Slider using Axios and Redux Thunk
-export const updateSliderApi = createAsyncThunk(
-  "slider/updateSliderApi",
+// Update IntroductionPage using Axios and Redux Thunk
+export const updateIntroductionPageApi = createAsyncThunk(
+  "introductionPage/updateIntroductionPageApi",
   async (data, { rejectWithValue }) => {
     try {
       await Http({
@@ -60,9 +60,9 @@ export const updateSliderApi = createAsyncThunk(
   }
 );
 
-// Delete Slider using Axios and Redux Thunk
-export const deleteSliderApi = createAsyncThunk(
-  "slider/deleteSliderApi",
+// Delete IntroductionPage using Axios and Redux Thunk
+export const deleteIntroductionPageApi = createAsyncThunk(
+  "introductionPage/deleteIntroductionPageApi",
   async (id, { rejectWithValue }) => {
     try {
       await Http({
@@ -78,70 +78,70 @@ export const deleteSliderApi = createAsyncThunk(
   }
 );
 
-// Sliders Slice
-const sliderSlice = createSlice({
-  name: "slider",
+// IntroductionPage Slice
+const introductionPageSlice = createSlice({
+  name: "introductionPage",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
-    // ======Get Sliders======
+    // ======Get IntroductionPage======
     // Pending
-    builder.addCase(getSlidersApi.pending, (state, action) => {
+    builder.addCase(getIntroductionPageApi.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(getSlidersApi.fulfilled, (state, action) => {
-      state.sliders = action.payload;
+    builder.addCase(getIntroductionPageApi.fulfilled, (state, action) => {
+      state.introductionPage = action.payload;
       state.loading = false;
     });
     // Rejected
-    builder.addCase(getSlidersApi.rejected, (state, action) => {
+    builder.addCase(getIntroductionPageApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
-    // ======Add Slider======
+    // ======Add IntroductionPage======
     // Pending
-    builder.addCase(addSliderApi.pending, (state, action) => {
+    builder.addCase(addIntroductionPageApi.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(addSliderApi.fulfilled, (state, action) => {
+    builder.addCase(addIntroductionPageApi.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(addSliderApi.rejected, (state, action) => {
+    builder.addCase(addIntroductionPageApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
-    // ======Update Slider======
+    // ======Update IntroductionPage======
     // Pending
-    builder.addCase(updateSliderApi.pending, (state, action) => {
+    builder.addCase(updateIntroductionPageApi.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(updateSliderApi.fulfilled, (state, action) => {
+    builder.addCase(updateIntroductionPageApi.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(updateSliderApi.rejected, (state, action) => {
+    builder.addCase(updateIntroductionPageApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
-    // ======Delete Slider======
+    // ======Delete IntroductionPage======
     // Pending
-    builder.addCase(deleteSliderApi.pending, (state, action) => {
+    builder.addCase(deleteIntroductionPageApi.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(deleteSliderApi.fulfilled, (state, action) => {
+    builder.addCase(deleteIntroductionPageApi.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(deleteSliderApi.rejected, (state, action) => {
+    builder.addCase(deleteIntroductionPageApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
   },
 });
 
-export default sliderSlice.reducer;
+export default introductionPageSlice.reducer;
