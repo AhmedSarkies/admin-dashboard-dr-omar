@@ -7,14 +7,14 @@ import {
   Users,
   Messages,
   Settings,
-  Slider,
+  IntroductionPage,
   TermsAndConditions,
   CategoriesArticle,
   CategoriesImage,
   CategoriesAudio,
   CategoriesBook,
   SubCategoriesBook,
-  Elder,
+  Elders,
   Articles,
   Audios,
   Books,
@@ -25,6 +25,7 @@ import {
   EditProfile,
   Notifications,
   User,
+  Elder,
 } from "../components";
 
 const RoutesHome = () => (
@@ -47,14 +48,15 @@ const RoutesHome = () => (
       <Route path="notifications" element={<Notifications />} />
       <Route path="settings" element={<Settings />} />
       <Route path="code-content" element={<CodeContent />} />
-      <Route path="introduction-page" element={<Slider />} />
+      <Route path="introduction-page" element={<IntroductionPage />} />
       <Route path="terms&conditions" element={<TermsAndConditions />} />
       <Route path="categories-article" element={<CategoriesArticle />} />
       <Route path="categories-image" element={<CategoriesImage />} />
       <Route path="categories-audio" element={<CategoriesAudio />} />
       <Route path="main-categories-book" element={<CategoriesBook />} />
       <Route path="sub-categories-book" element={<SubCategoriesBook />} />
-      <Route path="elder" element={<Elder />} />
+      <Route path="elders" element={<Elders />} />
+      <Route path="elders/:id" element={<Elder />} />
       <Route path="articles" element={<Articles />} />
       <Route path="audios" element={<Audios />} />
       <Route path="books" element={<Books />} />
