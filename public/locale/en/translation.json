@@ -16,6 +16,8 @@
   "delete": "Delete",
   "update": "Update",
   "visits": "Visits",
+  "favorites": "Favorites",
+  "downloads": "Downloads",
   "chooseElder": "Choose Elder",
   "chooseBook": "Choose Book",
   "chooseImageBook": "Choose Image Book",
@@ -34,6 +36,9 @@
   "chooseCategory": "Choose Category",
   "columnsFilter": "Columns",
   "send": "Send",
+  "powers": "Powers",
+  "admin": "Admin",
+  "supAdmin": "Sub Admin",
   "search": "Search",
   "noPhone": "No Phone",
   "noData": "No Data",
@@ -122,12 +127,29 @@
     "title": "Users",
     "addTitle": "Add User",
     "editTitle": "Edit User",
+    "favorite": "Favorite",
+    "download": "Download",
+    "favorite_data_books": "Favorite Books",
+    "favorite_data_audios": "Favorite Audios",
+    "favorite_data_articles": "Favorite Articles",
+    "favorite_data_images": "Favorite Images",
+    "favorite_data_elders": "Favorite Elders",
     "columns": {
       "id": "ID",
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
-      "created_at": "Created"
+      "created_at": "Created",
+      "favorite_count_books": "Books",
+      "favorite_count_audios": "Audios",
+      "favorite_count_articles": "Articles",
+      "favorite_count_images": "Images",
+      "favorite_count_elders": "Elders",
+      "download_count_books": "Books",
+      "download_count_audios": "Audios",
+      "download_count_articles": "Articles",
+      "download_count_images": "Images",
+      "download_count_elders": "Elders"
     }
   },
   "message": {
@@ -466,6 +488,9 @@
     "url": "Please enter a valid URL",
     "codeContent": "Please enter a code content",
     "code": "Please enter a right code 4 digits (Ex: 1234)",
-    "maxCharacters": "Please enter a maximum of 40 characters"
+    "maxCharacters": "Please enter a maximum of 40 characters",
+    "powers": "Please choose a power",
+    "oldPassword": "Please enter a old password",
+    "newPassword": "Please enter a new password"
   }
 }

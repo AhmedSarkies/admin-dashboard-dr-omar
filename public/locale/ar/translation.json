@@ -16,6 +16,8 @@
   "delete": "حذف",
   "update": "تحديث",
   "visits": "الزيارات",
+  "favorites": "المفضلة",
+  "downloads": "التحميلات",
   "chooseElder": "اختر العالم",
   "chooseImage": "اختر صورة",
   "chooseBook": "اختر الكتاب",
@@ -27,6 +29,9 @@
   "action": "الإجراءات",
   "send": "إرسال",
   "status": "الحالة",
+  "powers": "الصلاحيات",
+  "supAdmin": "مسؤول فرعي",
+  "admin": "مسؤول رئيسي",
   "approve": "مفعل",
   "pending": "قيد الانتظار",
   "private": "خاص",
@@ -122,12 +127,29 @@
     "title": "المستخدمين",
     "addTitle": "إضافة مستخدم",
     "editTitle": "تعديل مستخدم",
+    "favorite": "المفضلة",
+    "download": "التحميل",
+    "favorite_data_books": "الكتب المفضلة",
+    "favorite_data_audios": "الصوتيات المفضلة",
+    "favorite_data_articles": "المقالات المفضلة",
+    "favorite_data_images": "الصور المفضلة",
+    "favorite_data_elders": "العلماء المفضلة",
     "columns": {
       "id": "الرقم",
       "name": "الاسم",
       "email": "البريد الإلكتروني",
       "phone": "الهاتف",
-      "created_at": "تاريخ الإنشاء"
+      "created_at": "تاريخ الإنشاء",
+      "favorite_count_books": "الكتب",
+      "favorite_count_audios": "الصوتيات",
+      "favorite_count_articles": "المقالات",
+      "favorite_count_images": "الصور",
+      "favorite_count_elders": "العلماء",
+      "download_count_books": "الكتب",
+      "download_count_audios": "الصوتيات",
+      "download_count_articles": "المقالات",
+      "download_count_images": "الصور",
+      "download_count_elders": "العلماء"
     }
   },
   "message": {
@@ -445,7 +467,7 @@
   "validation": {
     "required": "هذا الحقل مطلوب",
     "email": "الرجاء إدخال بريد إلكتروني صحيح",
-    "password": "كلمة المرور يجب أن تحتوي على 6 أحرف على الأقل",
+    "password": "كلمة المرور يجب أن تحتوي على 8 أحرف على الأقل",
     "confirmPassword": "كلمة المرور غير متطابقة",
     "phone": "الرجاء إدخال رقم هاتف صحيح مكون من 11 رقم (مثال: 01234567890)",
     "image": "الرجاء اختيار صورة",
@@ -468,6 +490,9 @@
     "url": "الرجاء إدخال رابط",
     "codeContent": "الرجاء إدخال رمز المحتوى",
     "code": "الرجاء إدخال رمز صحيح (مثال: 1234)",
-    "maxCharacters": "الحد الأقصى لعدد الأحرف هو 40 حرفًا"
+    "maxCharacters": "الحد الأقصى لعدد الأحرف هو 40 حرفًا",
+    "powers": "الرجاء اختيار صلاحية",
+    "oldPassword": "الرجاء إدخال كلمة المرور القديمة",
+    "newPassword": "الرجاء إدخال كلمة المرور الجديدة"
   }
 }
