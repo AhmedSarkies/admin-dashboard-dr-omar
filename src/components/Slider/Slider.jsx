@@ -26,6 +26,7 @@ import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import anonymous from "../../assets/images/anonymous.png";
+import Cookies from "js-cookie";
 
 const Slider = () => {
   const { t } = useTranslation();
@@ -53,6 +54,11 @@ const Slider = () => {
     rowsPerPage: 5,
     currentPage: 1,
   });
+  const lng = Cookies.get("i18next") || "ar";
+  // Change Language
+  useEffect(() => {
+    document.documentElement.lang = lng;
+  }, [lng]);
 
   // Filtration, Sorting, Pagination
   const {
@@ -69,11 +75,11 @@ const Slider = () => {
   // Columns
   const columns = [
     { id: 1, name: "image", label: t("settings.slider.columns.image") },
-    { id: 2, name: "title", label: t("settings.slider.columns.title") },
+    { id: 2, name: "title", label: t("settings.slider.columns.title.title") },
     {
       id: 3,
       name: "description",
-      label: t("settings.slider.columns.description"),
+      label: t("settings.slider.columns.description.description"),
     },
     // { id: 4, name: "order", label: t("settings.slider.columns.order") },
     // { id: 5, name: "status", label: t("status") },
@@ -87,16 +93,20 @@ const Slider = () => {
         file: "",
         preview: "",
       },
-      title: "",
+      titleAr: "",
+      titleEn: "",
       order: "",
       status: "",
-      description: "",
+      descriptionAr: "",
+      descriptionEn: "",
     },
     validationSchema: validationSchema.slider,
     onSubmit: (values) => {
       const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("body", values.description);
+      formData.append("titleAr", values.titleAr);
+      formData.append("bodyAr", values.descriptionAr);
+      formData.append("titleEn", values.titleEn);
+      formData.append("bodyEn", values.descriptionEn);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
@@ -149,8 +159,14 @@ const Slider = () => {
     formik.setValues({
       ...formik.values,
       id: slider.id,
-      title: slider.title,
-      description: slider.body,
+      titleAr: slider.titleAr,
+      titleEn: slider.titleEn,
+      descriptionAr: slider.bodyAr,
+      descriptionEn: slider.bodyEn,
+      image: {
+        file: "",
+        preview: slider.image,
+      },
     });
     setToggle({
       ...toggle,
@@ -294,7 +310,7 @@ const Slider = () => {
               )}
               {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("settings.slider.columns.title")}
+                  {t("settings.slider.columns.title.title")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -306,7 +322,7 @@ const Slider = () => {
               )}
               {toggle.toggleColumns.description && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("settings.slider.columns.description")}
+                  {t("settings.slider.columns.description.description")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -519,7 +535,7 @@ const Slider = () => {
         </ModalHeader>
         <ModalBody>
           <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
+            <Row className="d-flex justify-content-center align-items-center mb-3">
               <Col
                 lg={5}
                 className="d-flex flex-column justify-content-center align-items-center"
@@ -627,139 +643,94 @@ const Slider = () => {
                   </span>
                 ) : null}
               </Col>
-              <Col lg={12} className="mb-5">
+            </Row>
+            <Row className="d-flex justify-content-center align-items-center ps-3 pe-3">
+              <Col lg={6}>
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="title" className="form-label">
-                    {t("settings.slider.columns.title")}
+                  <label htmlFor="titleAr" className="form-label">
+                    {t("settings.slider.columns.title.ar")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
-                    id="title"
-                    placeholder={t("settings.slider.columns.title")}
-                    name="title"
-                    value={formik.values.title}
+                    id="titleAr"
+                    placeholder={t("settings.slider.columns.title.ar")}
+                    name="titleAr"
+                    value={formik.values.titleAr}
                     onChange={formik.handleChange}
                   />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-                {/* <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="order" className="form-label">
-                    {t("settings.slider.columns.order")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="order"
-                    placeholder={t("settings.slider.columns.order")}
-                    name="order"
-                    value={formik.values.order}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors.order && formik.touched.order ? (
-                    <span className="error">{formik.errors.order}</span>
-                  ) : null}
-                </div> */}
-                {/* <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div
-                    className={`dropdown form-input ${
-                      toggle.status ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "Private"
-                        ? t("private")
-                        : formik.values.status === "Public"
-                        ? t("public")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "Private" ? "active" : ""
-                        }`}
-                        value="Private"
-                        name="status"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "Private");
-                        }}
-                      >
-                        {t("private")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "Public" ? "active" : ""
-                        }`}
-                        value="Public"
-                        name="status"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "Public");
-                        }}
-                      >
-                        {t("public")}
-                      </button>
-                    </div>
-                  </div>
-                  {formik.errors.status && formik.touched.status ? (
-                    <span className="error">{formik.errors.status}</span>
-                  ) : null}
-                </div> */}
-                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
-                  <label htmlFor="description" className="form-label">
-                    {t("settings.slider.columns.description")}
-                  </label>
-                  <textarea
-                    className="form-input"
-                    id="description"
-                    placeholder={t("settings.slider.columns.description")}
-                    name="description"
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                  ></textarea>
-                  {formik.errors.description && formik.touched.description ? (
-                    <span className="error">{formik.errors.description}</span>
+                  {formik.errors.titleAr && formik.touched.titleAr ? (
+                    <span className="error">{formik.errors.titleAr}</span>
                   ) : null}
                 </div>
               </Col>
+              <Col lg={6}>
+                <div
+                  className="form-group-container d-flex flex-column align-items-end mb-3"
+                  style={{ marginTop: "-4px" }}
+                >
+                  <label htmlFor="titleEn" className="form-label">
+                    {t("settings.slider.columns.title.en")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="titleEn"
+                    placeholder={t("settings.slider.columns.title.en")}
+                    name="titleEn"
+                    value={formik.values.titleEn}
+                    onChange={formik.handleChange}
+                  />
+                  {formik.errors.titleEn && formik.touched.titleEn ? (
+                    <span className="error">{formik.errors.titleEn}</span>
+                  ) : null}
+                </div>
+              </Col>
+            </Row>
+            <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                  <label htmlFor="descriptionAr" className="form-label">
+                    {t("settings.slider.columns.description.ar")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="descriptionAr"
+                    placeholder={t("settings.slider.columns.description.ar")}
+                    name="descriptionAr"
+                    value={formik.values.descriptionAr}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.descriptionAr &&
+                  formik.touched.descriptionAr ? (
+                    <span className="error">{formik.errors.descriptionAr}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                  <label htmlFor="descriptionEn" className="form-label">
+                    {t("settings.slider.columns.description.en")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="descriptionEn"
+                    placeholder={t("settings.slider.columns.description.en")}
+                    name="descriptionEn"
+                    value={formik.values.descriptionEn}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.descriptionEn &&
+                  formik.touched.descriptionEn ? (
+                    <span className="error">{formik.errors.descriptionEn}</span>
+                  ) : null}
+                </div>
+              </Col>
+            </Row>
+            <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                   <button type="submit" className="add-btn">
