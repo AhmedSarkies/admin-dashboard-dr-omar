@@ -1,54 +1,74 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Col, Row } from "reactstrap";
 
 import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { getProfileAdmin } from "../../store/slices/profileSlice";
 
 const Profile = () => {
   const { t } = useTranslation();
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const { profile, loading } = useSelector((state) => state.profile);
+
+  useEffect(() => {
+    dispatch(getProfileAdmin());
+  }, [dispatch]);
 
   return (
     <div className="profile-container">
       <Row className="justify-content-center">
         <Col xxl="4" xl="5" lg="6" md="7" sm="8">
-          <div className="profile">
-            <div className="profile-header d-flex justify-content-center align-items-start">
-              <img src={anonymous} alt="profile" />
-            </div>
-            <hr />
-            <div className="profile-body">
-              <p>
-                <span>{t("profile.name")}</span>
-                {": "}
-                {"محمد"}
-              </p>
-              <p className="email">
-                <span>{t("profile.email")}</span>
-                {": "}
-                {"admin@gmail.com"}
-              </p>
-              <p>
-                <span>{t("profile.phone")}</span>
-                {": "}
-                {"01234567890"}
-              </p>
-            </div>
-            <div className="profile-footer">
-              <button
-                className="change-password-btn"
-                onClick={() => navigate("/dr-omar/profile/change-password")}
-              >
-                {t("profile.changePassword")}
-              </button>
-              <button
-                className="add-btn"
-                onClick={() => navigate("/dr-omar/profile/edit-profile")}
-              >
-                {t("edit")}
-              </button>
-            </div>
+          <div className={`profile ${loading ? "align-items-center" : ""}`}>
+            {loading ? (
+              <div className="spinner-border" role="status">
+                <span className="visually-hidden">Loading...</span>
+              </div>
+            ) : (
+              <>
+                <div className="profile-header d-flex justify-content-center align-items-start">
+                  <img src={profile.image || anonymous} alt={profile.name} />
+                </div>
+                <hr />
+                <div className="profile-body">
+                  <p className="name">
+                    <span>{t("profile.name")}</span>
+                    {": "}
+                    {profile.name}
+                  </p>
+                  <p className="email">
+                    <span>{t("profile.email")}</span>
+                    {": "}
+                    {profile.email}
+                  </p>
+                  <p>
+                    <span>{t("profile.phone")}</span>
+                    {": "}
+                    {profile.phone}
+                  </p>
+                </div>
+                <div className="profile-footer">
+                  <button
+                    className="change-password-btn"
+                    onClick={() =>
+                      navigate(`/dr-omar/profile/change-password/${profile.id}`)
+                    }
+                  >
+                    {t("profile.changePassword")}
+                  </button>
+                  <button
+                    className="add-btn"
+                    onClick={() =>
+                      navigate(`/dr-omar/profile/edit-profile/${profile.id}`)
+                    }
+                  >
+                    {t("edit")}
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </Col>
       </Row>

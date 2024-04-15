@@ -12,6 +12,7 @@ export { default as ChangePassword } from "./ChangePassword/ChangePassword";
 export { default as EditProfile } from "./EditProfile/EditProfile";
 export { default as SubAdmins } from "./SubAdmins/SubAdmins";
 export { default as Users } from "./Users/Users";
+export { default as User } from "./Users/User";
 export { default as Messages } from "./Messages/Messages";
 export { default as Settings } from "./Settings/Settings";
 export { default as CodeContent } from "./CodeContent/CodeContent";
@@ -30,4 +31,3 @@ export { default as Books } from "./Books/Books";
 export { default as MostListening } from "./MostListening/MostListening";
 export { default as NewUsers } from "./NewUsers/NewUsers";
 export { default as Notifications } from "./Notifications/Notifications";
-

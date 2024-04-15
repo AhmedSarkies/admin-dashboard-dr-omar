@@ -72,29 +72,31 @@ const CategoriesImages = () => {
           updatePictureCategoryApi({ id: values.id, title: values.title })
         ).then((res) => {
           if (!res.error) {
-            dispatch(updatePictureCategory(res.meta.arg));
             setToggle({
               ...toggle,
               edit: !toggle.edit,
             });
             formik.handleReset();
             toast.success(t("toast.category.updatedSuccess"));
+            dispatch(getPicturesCategoriesApi());
           } else {
             toast.error(t("toast.category.updatedError"));
+            dispatch(getPicturesCategoriesApi());
           }
         });
       } else {
         dispatch(addPictureCategoryApi(values)).then((res) => {
           if (!res.error) {
-            dispatch(addPictureCategory(res.meta.arg));
             setToggle({
               ...toggle,
               add: !toggle.add,
             });
             formik.handleReset();
             toast.success(t("toast.category.addedSuccess"));
+            dispatch(getPicturesCategoriesApi());
           } else {
             toast.error(t("toast.category.addedError"));
+            dispatch(getPicturesCategoriesApi());
           }
         });
       }
@@ -125,7 +127,7 @@ const CategoriesImages = () => {
       if (result.isConfirmed) {
         dispatch(deletePictureCategoryApi(pictureCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deletePictureCategory(pictureCategory?.id));
+            dispatch(getPicturesCategoriesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${pictureCategory?.title}`,
               text: `${t("titleDeletedSuccess")} ${pictureCategory?.title} ${t(
@@ -136,6 +138,7 @@ const CategoriesImages = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.category.deletedSuccess")));
           } else {
+            dispatch(getPicturesCategoriesApi());
             toast.error(t("toast.category.deletedError"));
           }
         });

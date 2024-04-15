@@ -16,6 +16,7 @@ import {
   getSubAdmins,
   addSubAdmin,
   deleteSubAdmin,
+  updateSubAdmin,
 } from "../../store/slices/subAdminSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -35,6 +36,7 @@ const initialValues = {
   phone: "",
   status: "",
   password: "",
+  powers: "",
 };
 
 const SubAdmins = ({ dashboard }) => {
@@ -45,6 +47,9 @@ const SubAdmins = ({ dashboard }) => {
   const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({
     add: false,
+    imagePreview: false,
+    status: false,
+    powers: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -57,6 +62,7 @@ const SubAdmins = ({ dashboard }) => {
       name: true,
       email: true,
       phone: true,
+      powers: true,
       status: true,
       control: true,
     },
@@ -83,11 +89,25 @@ const SubAdmins = ({ dashboard }) => {
       formData.append("phone", values.phone);
       formData.append("active", values.status === "active" ? 1 : 0);
       formData.append("password", values.password);
+      formData.append("powers", values.powers);
       if (values.image.file !== "") {
         formData.append("image", values.image.file);
       }
       if (values.id) {
         formData.append("id", values.id);
+        dispatch(updateSubAdmin(formData)).then((res) => {
+          dispatch(getSubAdmins());
+          if (!res.error) {
+            toast.success(t("toast.subAdmin.updatedSuccess"));
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+          } else {
+            toast.error(t("toast.subAdmin.updatedError"));
+          }
+        });
       } else {
         dispatch(addSubAdmin(formData)).then((res) => {
           dispatch(getSubAdmins());
@@ -177,6 +197,7 @@ const SubAdmins = ({ dashboard }) => {
       email: subAdmin?.email,
       password: subAdmin?.password,
       phone: subAdmin?.phone,
+      powers: subAdmin?.powers,
       status: subAdmin?.active ? "active" : "inactive",
       image: {
         file: "",
@@ -196,8 +217,9 @@ const SubAdmins = ({ dashboard }) => {
     { id: 1, name: "name", label: t("subAdmin.columns.name") },
     { id: 2, name: "email", label: t("subAdmin.columns.email") },
     { id: 3, name: "phone", label: t("subAdmin.columns.phone") },
-    { id: 4, name: "status", label: t("status") },
-    { id: 5, name: "control", label: t("action") },
+    { id: 4, name: "powers", label: t("powers") },
+    { id: 5, name: "status", label: t("status") },
+    { id: 6, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -349,10 +371,22 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.powers && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("status")}
+                  {t("powers")}
                   {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -370,7 +404,7 @@ const SubAdmins = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -388,7 +422,7 @@ const SubAdmins = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -408,7 +442,7 @@ const SubAdmins = ({ dashboard }) => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -420,7 +454,7 @@ const SubAdmins = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="7">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -452,11 +486,20 @@ const SubAdmins = ({ dashboard }) => {
                         className="text-white"
                         href={`mailto:${result?.phone}`}
                       >
-                        ( result?.phone )
+                        {result?.phone}
                       </a>
                     ) : (
                       <span className="text-danger">{t("noPhone")}</span>
                     )}
+                  </td>
+                  <td className="table-td">
+                    <span
+                      className={`status ${
+                        result?.powers === "admin" ? "active" : "inactive"
+                      }`}
+                    >
+                      {result?.powers === "admin" ? t("admin") : t("supAdmin")}
+                    </span>
                   </td>
                   <td className="table-td">
                     <span
@@ -510,6 +553,8 @@ const SubAdmins = ({ dashboard }) => {
             setToggle({
               ...toggle,
               add: !toggle.add,
+              powers: false,
+              status: false,
             });
           }}
         >
@@ -520,6 +565,8 @@ const SubAdmins = ({ dashboard }) => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                powers: false,
+                status: false,
               });
             }}
           />
@@ -745,6 +792,74 @@ const SubAdmins = ({ dashboard }) => {
                         }}
                       >
                         {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="powers" className="form-label">
+                    {t("powers")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          powers: !toggle.powers,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.powers === "admin"
+                        ? t("admin")
+                        : formik.values.powers === "supAdmin"
+                        ? t("supAdmin")
+                        : t("powers")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.powers ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.powers ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.powers === "admin" ? "active" : ""
+                        }`}
+                        value="admin"
+                        name="powers"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            powers: !toggle.powers,
+                          });
+                          formik.setFieldValue("powers", "admin");
+                        }}
+                      >
+                        {t("admin")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.powers === "supAdmin" ? "active" : ""
+                        }`}
+                        value="supAdmin"
+                        name="powers"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            powers: !toggle.powers,
+                          });
+                          formik.setFieldValue("powers", "supAdmin");
+                        }}
+                      >
+                        {t("supAdmin")}
                       </button>
                     </div>
                   </div>

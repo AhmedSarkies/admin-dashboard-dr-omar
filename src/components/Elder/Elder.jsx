@@ -73,6 +73,9 @@ const Elder = ({ dashboard }) => {
       name: true,
       email: true,
       phone: true,
+      visits: true,
+      favorites: true,
+      downloads: true,
       status: true,
       control: true,
     },
@@ -244,8 +247,11 @@ const Elder = ({ dashboard }) => {
     { id: 2, name: "name", label: t("elders.columns.name") },
     { id: 3, name: "email", label: t("elders.columns.email") },
     { id: 4, name: "phone", label: t("elders.columns.phone") },
-    { id: 5, name: "status", label: t("status") },
-    { id: 6, name: "control", label: t("action") },
+    { id: 5, name: "visits", label: t("visits") },
+    { id: 6, name: "favorites", label: t("favorites") },
+    { id: 7, name: "downloads", label: t("downloads") },
+    { id: 8, name: "status", label: t("status") },
+    { id: 9, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -401,9 +407,9 @@ const Elder = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("status")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -413,10 +419,46 @@ const Elder = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("action")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -431,7 +473,7 @@ const Elder = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -449,7 +491,7 @@ const Elder = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -469,7 +511,7 @@ const Elder = ({ dashboard }) => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -481,7 +523,7 @@ const Elder = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -524,6 +566,21 @@ const Elder = ({ dashboard }) => {
                       <a className="text-white" href={`tel:${result?.phone}`}>
                         {result?.phone}
                       </a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.visits && (
+                    <td className="table-td">
+                      {0}
+                    </td>
+                  )}
+                  {toggle.toggleColumns.favorites && (
+                    <td className="table-td">
+                      {0}
+                    </td>
+                  )}
+                  {toggle.toggleColumns.downloads && (
+                    <td className="table-td">
+                      {0}
                     </td>
                   )}
                   {toggle.toggleColumns.status && (

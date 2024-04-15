@@ -71,7 +71,7 @@ const CategoriesBook = () => {
           updateBookCategoryApi({ id: values.id, title: values.title })
         ).then((res) => {
           if (!res.error) {
-            dispatch(updateBookCategory(res.meta.arg));
+            dispatch(getBooksCategoriesApi())
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -79,6 +79,7 @@ const CategoriesBook = () => {
             formik.handleReset();
             toast.success(t("toast.category.updatedSuccess"));
           } else {
+            dispatch(getBooksCategoriesApi())
             toast.error(t("toast.category.updatedError"));
           }
         });
@@ -93,6 +94,7 @@ const CategoriesBook = () => {
             formik.handleReset();
             toast.success(t("toast.category.addedSuccess"));
           } else {
+            dispatch(getBooksCategoriesApi())
             toast.error(t("toast.category.addedError"));
           }
         });
@@ -124,7 +126,7 @@ const CategoriesBook = () => {
       if (result.isConfirmed) {
         dispatch(deleteBookCategoryApi(bookCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteBookCategory(bookCategory?.id));
+            dispatch(getBooksCategoriesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${bookCategory?.title}`,
               text: `${t("titleDeletedSuccess")} ${bookCategory?.title} ${t(
@@ -135,6 +137,7 @@ const CategoriesBook = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.category.deletedSuccess")));
           } else {
+            dispatch(getBooksCategoriesApi());
             toast.error(t("toast.category.deletedError"));
           }
         });

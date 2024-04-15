@@ -1,43 +1,44 @@
-import React, { useState } from "react";
+import React from "react";
 import { useFormik } from "formik";
-import {
-  Col,
-  Row,
-} from "reactstrap";
-import { object, ref, string } from "yup";
+import { Col, Row } from "reactstrap";
 
 import { useTranslation } from "react-i18next";
-import { useNavigate } from "react-router-dom";
-import { changePassword } from "../../store/slices/subAdminSlice";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { changePassword } from "../../store/slices/profileSlice";
+import useSchema from "../../hooks/useSchema";
+
+const initialValues = {
+  current_password: "",
+  new_password: "",
+  new_password_confirmation: "",
+};
 
 const ChangePassword = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
-  const [toggle, setToggle] = useState({});
+  const { validationSchema } = useSchema();
   const navigate = useNavigate();
-  const changePasswordFormik = useFormik({
-    initialValues: {
-      current_password: "",
-      new_password: "",
-      new_password_confirmation: "",
-    },
-    validationSchema: object().shape({
-      current_password: string().required("يجب ادخال كلمة المرور القديمة"),
-      new_password: string()
-        .min(8, "يجب ادخال كلمة مرور لا تقل عن 8 احرف")
-        .required("يجب ادخال كلمة المرور الجديدة"),
-      new_password_confirmation: string()
-        .oneOf([ref("newPassword"), null], "كلمة المرور غير متطابقة")
-        .required("يجب ادخال تأكيد كلمة المرور"),
-    }),
+  const { id } = useParams();
+  const formik = useFormik({
+    initialValues,
+    validationSchema: validationSchema.ChangePassword,
     onSubmit: (values) => {
-      dispatch(changePassword(values));
+      dispatch(
+        changePassword({
+          id,
+          ...values,
+        })
+      );
     },
   });
 
-  const handleInputChangePassword = (e) => {
-    changePasswordFormik.handleChange(e);
+  const handleChange = (e) => {
+    formik.handleChange(e);
+  };
+
+  const cancelChangePassword = () => {
+    navigate("/dr-omar/profile");
   };
 
   return (
@@ -47,7 +48,7 @@ const ChangePassword = () => {
           <div className="profile">
             <form
               className="d-flex justify-content-center align-items-center flex-column gap-3 w-100"
-              onSubmit={changePasswordFormik.handleSubmit}
+              onSubmit={formik.handleSubmit}
             >
               <div className="form-group">
                 <input
@@ -56,18 +57,18 @@ const ChangePassword = () => {
                   id="current_password"
                   placeholder="*********"
                   name="current_password"
-                  value={changePasswordFormik.values.current_password}
-                  onChange={handleInputChangePassword}
+                  value={formik.values.current_password}
+                  onChange={handleChange}
                 />
                 <label htmlFor="current_password" className="label-form">
                   {t("profile.oldPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.current_password &&
-                changePasswordFormik.errors.current_password ? (
+                {formik.touched.current_password &&
+                formik.errors.current_password ? (
                   <span className="error">
-                    {changePasswordFormik.errors.current_password}
+                    {formik.errors.current_password}
                   </span>
                 ) : null}
               </div>
@@ -78,19 +79,16 @@ const ChangePassword = () => {
                   id="new_password"
                   placeholder="*********"
                   name="new_password"
-                  value={changePasswordFormik.values.new_password}
-                  onChange={handleInputChangePassword}
+                  value={formik.values.new_password}
+                  onChange={handleChange}
                 />
                 <label htmlFor="new_password" className="label-form">
                   {t("profile.newPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.new_password &&
-                changePasswordFormik.errors.new_password ? (
-                  <span className="error">
-                    {changePasswordFormik.errors.new_password}
-                  </span>
+                {formik.touched.new_password && formik.errors.new_password ? (
+                  <span className="error">{formik.errors.new_password}</span>
                 ) : null}
               </div>
               <div className="form-group">
@@ -100,39 +98,33 @@ const ChangePassword = () => {
                   id="new_password_confirmation"
                   placeholder="*********"
                   name="new_password_confirmation"
-                  value={changePasswordFormik.values.new_password_confirmation}
-                  onChange={handleInputChangePassword}
+                  value={formik.values.new_password_confirmation}
+                  onChange={handleChange}
                 />
-                <label htmlFor="new_password_confirmation" className="label-form">
+                <label
+                  htmlFor="new_password_confirmation"
+                  className="label-form"
+                >
                   {t("profile.confirmPassword")}
                 </label>
               </div>
               <div className="error-container">
-                {changePasswordFormik.touched.new_password_confirmation &&
-                changePasswordFormik.errors.new_password_confirmation ? (
+                {formik.touched.new_password_confirmation &&
+                formik.errors.new_password_confirmation ? (
                   <span className="error">
-                    {changePasswordFormik.errors.new_password_confirmation}
+                    {formik.errors.new_password_confirmation}
                   </span>
                 ) : null}
               </div>
               <div className="form-group d-flex justify-content-end gap-2">
-                <button
-                  className="change-password-btn"
-                  onClick={() => navigate("/dr-omar/profile")}
-                >
-                  {t("cancel")}
+                <button type="submit" className="add-btn">
+                  {t("update")}
                 </button>
                 <button
-                  type="submit"
-                  className="add-btn"
-                  onClick={() =>
-                    setToggle({
-                      ...toggle,
-                      changePassword: !toggle.changePassword,
-                    })
-                  }
+                  className="change-password-btn"
+                  onClick={cancelChangePassword}
                 >
-                  {t("update")}
+                  {t("cancel")}
                 </button>
               </div>
             </form>

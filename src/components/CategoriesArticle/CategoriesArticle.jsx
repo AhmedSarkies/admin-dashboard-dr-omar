@@ -70,7 +70,7 @@ const CategoriesArticle = () => {
           updateArticleCategoryApi({ id: values.id, title: values.title })
         ).then((res) => {
           if (!res.error) {
-            dispatch(updateArticleCategory(res.meta.arg));
+            dispatch(getArticlesCategoriesApi());
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -78,6 +78,7 @@ const CategoriesArticle = () => {
             formik.handleReset();
             toast.success(t("toast.category.updatedSuccess"));
           } else {
+            dispatch(getArticlesCategoriesApi());
             toast.error(t("toast.category.updatedError"));
           }
         });
@@ -92,6 +93,7 @@ const CategoriesArticle = () => {
             formik.handleReset();
             toast.success(t("toast.category.addedSuccess"));
           } else {
+            dispatch(getArticlesCategoriesApi());
             toast.error(t("toast.category.addedError"));
           }
         });
@@ -123,7 +125,7 @@ const CategoriesArticle = () => {
       if (result.isConfirmed) {
         dispatch(deleteArticleCategoryApi(articleCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteArticleCategory(articleCategory?.id));
+            dispatch(getArticlesCategoriesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${articleCategory?.title}`,
               text: `${t("titleDeletedSuccess")} ${articleCategory?.title} ${t(
@@ -134,6 +136,7 @@ const CategoriesArticle = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.category.deletedSuccess")));
           } else {
+            dispatch(getArticlesCategoriesApi());
             toast.error(t("toast.category.deletedError"));
           }
         });

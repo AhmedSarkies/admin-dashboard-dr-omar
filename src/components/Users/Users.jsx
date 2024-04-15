@@ -11,6 +11,7 @@ import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import { Modal, ModalBody, ModalHeader, Row, Col } from "reactstrap";
 import { IoMdClose } from "react-icons/io";
+import { Link } from "react-router-dom";
 
 const initialValues = {
   name: "",
@@ -41,6 +42,11 @@ const Users = () => {
       phone: true,
       created_at: true,
       control: true,
+      favorite_count_articles: true,
+      favorite_count_books: true,
+      favorite_count_audios: true,
+      favorite_count_images: true,
+      favorite_count_elders: true,
     },
   });
 
@@ -96,7 +102,7 @@ const Users = () => {
     { id: 2, name: "email", label: t("user.columns.email") },
     { id: 3, name: "phone", label: t("user.columns.phone") },
     { id: 4, name: "created_at", label: t("user.columns.created_at") },
-    { id: 5, name: "control", label: t("action") },
+    { id: 10, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -361,9 +367,16 @@ const Users = () => {
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   <td className="table-td id">{result?.id}</td>
-                  <td className="table-td name">{result?.name}</td>
+                  <td className="table-td name">
+                    <Link
+                      to={`/dr-omar/users/${result?.id}`}
+                      className="scholar-link"
+                    >
+                      {result?.name}
+                    </Link>
+                  </td>
                   <td className="table-td email">
-                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                    <a href={`mailto: ${result?.email}`}>{result?.email}</a>
                   </td>
                   <td className="table-td phone">
                     <a href={`mailto:${result?.phonenumber}`}>

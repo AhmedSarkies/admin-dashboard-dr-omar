@@ -15,6 +15,13 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
   // Logout Function
   const logout = () => {
     Cookies.remove("_auth");
+    Cookies.remove("_user");
+    Cookies.remove("_role");
+    Cookies.remove("_email");
+    Cookies.remove("_phone");
+    Cookies.remove("_image");
+    Cookies.remove("_active");
+    Cookies.remove("_id");
     window.location.href = "/dr-omar/login";
   };
 

@@ -24,9 +24,7 @@ import {
   deleteAudioApi,
   deleteAudio,
 } from "../../store/slices/audioSlice";
-import {
-  getApprovedScholarsApi,
-} from "../../store/slices/scholarSlice";
+import { getApprovedScholarsApi } from "../../store/slices/scholarSlice";
 import useFiltration from "../../hooks/useFiltration";
 import Swal from "sweetalert2";
 import { useTranslation } from "react-i18next";
@@ -80,6 +78,8 @@ const Audios = () => {
       title: true,
       audio: true,
       visits: true,
+      favorites: true,
+      downloads: true,
       status: true,
       control: true,
     },
@@ -110,8 +110,10 @@ const Audios = () => {
     { id: 4, name: "title", label: t("audios.columns.audio.title") },
     { id: 5, name: "audio", label: t("audios.columns.audio.audio") },
     { id: 6, name: "visits", label: t("visits") },
-    { id: 7, name: "status", label: t("status") },
-    { id: 8, name: "control", label: t("action") },
+    { id: 7, name: "favorites", label: t("favorites") },
+    { id: 8, name: "downloads", label: t("downloads") },
+    { id: 9, name: "status", label: t("status") },
+    { id: 10, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -502,9 +504,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("status")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -514,10 +516,34 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("action")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -532,7 +558,7 @@ const Audios = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -550,7 +576,7 @@ const Audios = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -570,7 +596,7 @@ const Audios = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -582,7 +608,7 @@ const Audios = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -638,6 +664,12 @@ const Audios = () => {
                   )}
                   {toggle.toggleColumns.visits && (
                     <td className="table-td">{result?.visits_count}</td>
+                  )}
+                  {toggle.toggleColumns.favorites && (
+                    <td className="table-td">{0}</td>
+                  )}
+                  {toggle.toggleColumns.downloads && (
+                    <td className="table-td">{0}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">

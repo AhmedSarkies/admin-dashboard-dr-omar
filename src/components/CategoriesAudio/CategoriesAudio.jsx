@@ -72,7 +72,7 @@ const CategoriesAudio = () => {
           updateAudioCategoryApi({ id: values.id, title: values.title })
         ).then((res) => {
           if (!res.error) {
-            dispatch(updateAudioCategory(res.meta.arg));
+            dispatch(getAudiosCategoriesApi());
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -80,6 +80,7 @@ const CategoriesAudio = () => {
             formik.handleReset();
             toast.success(t("toast.category.updatedSuccess"));
           } else {
+            dispatch(getAudiosCategoriesApi());
             toast.error(t("toast.category.updatedError"));
           }
         });
@@ -94,6 +95,7 @@ const CategoriesAudio = () => {
             formik.handleReset();
             toast.success(t("toast.category.addedSuccess"));
           } else {
+            dispatch(getAudiosCategoriesApi());
             toast.error(t("toast.category.addedError"));
           }
         });
@@ -125,7 +127,7 @@ const CategoriesAudio = () => {
       if (result.isConfirmed) {
         dispatch(deleteAudioCategoryApi(audioCategory?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteAudioCategory(audioCategory?.id));
+            dispatch(getAudiosCategoriesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${audioCategory?.title}`,
               text: `${t("titleDeletedSuccess")} ${audioCategory?.title} ${t(
@@ -136,6 +138,7 @@ const CategoriesAudio = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.category.deletedSuccess")));
           } else {
+            dispatch(getAudiosCategoriesApi());
             toast.error(t("toast.category.deletedError"));
           }
         });

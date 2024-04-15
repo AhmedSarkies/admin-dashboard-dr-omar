@@ -83,6 +83,7 @@ const Articles = () => {
       category: true,
       status: true,
       visitCount: true,
+      favorites: true,
       control: true,
     },
     sortColumn: "",
@@ -102,7 +103,8 @@ const Articles = () => {
     { id: 6, name: "category", label: t("articles.columns.category") },
     { id: 7, name: "status", label: t("status") },
     { id: 8, name: "visitCount", label: t("visits") },
-    { id: 9, name: "control", label: t("action") },
+    { id: 9, name: "favorites", label: t("favorites") },
+    { id: 10, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -473,10 +475,22 @@ const Articles = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("action")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -491,7 +505,7 @@ const Articles = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -509,7 +523,7 @@ const Articles = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -529,7 +543,7 @@ const Articles = () => {
           {searchResults.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -541,7 +555,7 @@ const Articles = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -619,6 +633,9 @@ const Articles = () => {
                   )}
                   {toggle.toggleColumns.visitCount && (
                     <td className="table-td">{result?.visit_count}</td>
+                  )}
+                  {toggle.toggleColumns.favorites && (
+                    <td className="table-td">{0}</td>
                   )}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">

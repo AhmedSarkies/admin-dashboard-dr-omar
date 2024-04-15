@@ -78,6 +78,9 @@ const Books = () => {
       image: true,
       title: true,
       book: true,
+      visits: true,
+      favorites: true,
+      downloads: true,
       status: true,
       control: true,
     },
@@ -101,11 +104,12 @@ const Books = () => {
   });
   // Columns
   const columns = [
-    // { id: 1, name: "imageElder", label: t("books.columns.elder.image") },
-    // { id: 2, name: "nameElder", label: t("books.columns.elder.name") },
-    { id: 3, name: "image", label: t("books.columns.book.image") },
-    { id: 4, name: "title", label: t("books.columns.book.title") },
-    { id: 5, name: "book", label: t("books.columns.book.book") },
+    { id: 0, name: "image", label: t("books.columns.book.image") },
+    { id: 1, name: "title", label: t("books.columns.book.title") },
+    { id: 2, name: "book", label: t("books.columns.book.book") },
+    { id: 3, name: "visits", label: t("visits") },
+    { id: 4, name: "favorites", label: t("favorites") },
+    { id: 5, name: "downloads", label: t("downloads") },
     { id: 6, name: "status", label: t("status") },
     { id: 7, name: "control", label: t("action") },
   ];
@@ -403,31 +407,6 @@ const Books = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {/* Show and Hide Columns */}
-              {/*{toggle.toggleColumns.imageElder && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("books.columns.elder.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
-              {toggle.toggleColumns.nameElder && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("books.columns.elder.name")}
-                  {toggle.sortColumn === columns[1].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}*/}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("books.columns.book.image")}
@@ -464,9 +443,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("status")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -476,10 +455,46 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("action")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -494,7 +509,7 @@ const Books = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -512,7 +527,7 @@ const Books = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="8">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -532,7 +547,7 @@ const Books = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -544,7 +559,7 @@ const Books = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="8">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -604,6 +619,15 @@ const Books = () => {
                         <FaBookReader className="me-2" />
                       </a>
                     </td>
+                  )}
+                  {toggle.toggleColumns.visits && (
+                    <td className="table-td visits">{0}</td>
+                  )}
+                  {toggle.toggleColumns.favorites && (
+                    <td className="table-td favorites">{0}</td>
+                  )}
+                  {toggle.toggleColumns.downloads && (
+                    <td className="table-td downloads">{0}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">

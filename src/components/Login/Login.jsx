@@ -35,6 +35,42 @@ const Login = () => {
           sameSite: "strict",
           path: "/",
         });
+        Cookies.set("_role", response.data.data.powers, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_email", response.data.data.email, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_phone", response.data.data.phone, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_image", response.data.data.image, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_active", response.data.data.active, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_id", response.data.data.id, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
         setLoading(false);
         window.location.href = "/dr-omar/dashboard";
       }
