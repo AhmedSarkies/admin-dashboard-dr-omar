@@ -34,7 +34,12 @@ export const changePassword = createAsyncThunk(
       await Http({
         method: "POST",
         url: `/admin/changePassword`,
-        data,
+        data: {
+          current_password: data.current_password,
+          new_password: data.new_password,
+          new_password_confirmation: data.new_password_confirmation,
+        },
+        params: { id: data.id },
       }).then((response) => {
         return response.data;
       });
