@@ -5,6 +5,7 @@ import Http from "../../Http";
 const initialState = {
   scholars: [],
   approvedScholars: [],
+  dataById: [],
   loading: false,
   error: null,
 };
@@ -17,6 +18,23 @@ export const getScholarsApi = createAsyncThunk(
       const response = await Http({
         method: "GET",
         url: "/Elders/Get",
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Get Scholar by ID using Axios and Redux Thunk
+export const getScholarByIdApi = createAsyncThunk(
+  "scholar/getScholarByIdApi",
+  async (id, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "POST",
+        url: "/Elders/Get_Audio_Id_Elder",
+        params: { id },
       });
       return response.data;
     } catch (error) {
@@ -136,6 +154,21 @@ const scholarSlice = createSlice({
     });
     // Rejected
     builder.addCase(getScholarsApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Get Scholar by ID======
+    // Pending
+    builder.addCase(getScholarByIdApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getScholarByIdApi.fulfilled, (state, action) => {
+      state.dataById = action.payload;
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(getScholarByIdApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });

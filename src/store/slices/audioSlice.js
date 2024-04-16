@@ -72,11 +72,8 @@ export const deleteAudioApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/Elders/Delete?id=${id}`,
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-        },
+        url: `/Audios/Delete`,
+        params: { id },
       }).then((response) => {
         return response.data;
       });
