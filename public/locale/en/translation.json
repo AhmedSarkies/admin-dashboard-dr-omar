@@ -27,6 +27,7 @@
   "elder": "Elder",
   "action": "Actions",
   "chooseImage": "Choose Image",
+  "chooseBackground": "Choose Background",
   "status": "Status",
   "approve": "Approve",
   "pending": "Pending",
@@ -37,6 +38,9 @@
   "chooseCategory": "Choose Category",
   "columnsFilter": "Columns",
   "send": "Send",
+  "confirm": "Confirm",
+  "doneConfirm": "Done Confirm",
+  "areYouSure": "Are you sure?",
   "powers": "Powers",
   "admin": "Admin",
   "supAdmin": "Sub Admin",
@@ -140,6 +144,7 @@
       "name": "Name",
       "email": "Email",
       "phone": "Phone",
+      "subscription": "Subscription",
       "created_at": "Created",
       "favorite_count_books": "Books",
       "favorite_count_audios": "Audios",
@@ -169,6 +174,7 @@
   "settings": {
     "settingsApp": {
       "logo": "Logo",
+      "background": "Background",
       "prayer": {
         "time": "Prayer Time",
         "adhan": "Adhan",

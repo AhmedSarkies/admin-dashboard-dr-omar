@@ -21,6 +21,7 @@
   "shares": "المشاركات",
   "chooseElder": "اختر العالم",
   "chooseImage": "اختر صورة",
+  "chooseBackground": "اختر خلفية",
   "chooseBook": "اختر الكتاب",
   "chooseImageBook": "اختر صورة الكتاب",
   "chooseAudio": "اختر الصوتية",
@@ -29,6 +30,9 @@
   "elder": "العالم",
   "action": "الإجراءات",
   "send": "إرسال",
+  "confirm": "تأكيد",
+  "doneConfirm": "تم التأكيد",
+  "areYouSure": "هل أنت متأكد؟",
   "status": "الحالة",
   "powers": "الصلاحيات",
   "supAdmin": "مسؤول فرعي",
@@ -140,6 +144,7 @@
       "name": "الاسم",
       "email": "البريد الإلكتروني",
       "phone": "الهاتف",
+      "subscription": "الاشتراك",
       "created_at": "تاريخ الإنشاء",
       "favorite_count_books": "الكتب",
       "favorite_count_audios": "الصوتيات",
@@ -169,6 +174,7 @@
   "settings": {
     "settingsApp": {
       "logo": "الشعار",
+      "background": "الخلفية",
       "prayer": {
         "time": "أوقات الصلاة",
         "adhan": "الأذان",
