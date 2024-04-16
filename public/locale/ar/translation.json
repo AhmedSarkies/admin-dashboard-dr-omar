@@ -15,6 +15,7 @@
   "save": "حفظ",
   "delete": "حذف",
   "update": "تحديث",
+  "pages": "الصفحات",
   "visits": "الزيارات",
   "favorites": "المفضلة",
   "downloads": "التحميلات",
@@ -170,7 +171,12 @@
   },
   "notifications": {
     "title": "الإشعارات",
-    "addTitle": "إرسال إشعار"
+    "addTitle": "إرسال إشعار",
+    "columns": {
+      "id": "الرقم",
+      "title": "العنوان",
+      "body": "الوصف"
+    }
   },
   "settings": {
     "settingsApp": {
@@ -314,6 +320,7 @@
     }
   },
   "audios": {
+    "title": "الصوتيات",
     "addTitle": "إضافة صوتية",
     "editTitle": "تعديل صوتية",
     "columns": {
@@ -370,6 +377,7 @@
     }
   },
   "articles": {
+    "title": "المقالات",
     "addTitle": "إضافة مقال",
     "editTitle": "تعديل مقال",
     "columns": {

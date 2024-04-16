@@ -15,6 +15,7 @@
   "save": "Save",
   "delete": "Delete",
   "update": "Update",
+  "pages": "Pages",
   "visits": "Visits",
   "favorites": "Favorites",
   "downloads": "Downloads",
@@ -170,7 +171,12 @@
   },
   "notifications": {
     "title": "Notifications",
-    "addTitle": "Send Notification"
+    "addTitle": "Send Notification",
+    "columns": {
+      "id": "ID",
+      "title": "Title",
+      "body": "Body"
+    }
   },
   "settings": {
     "settingsApp": {
@@ -316,6 +322,7 @@
     }
   },
   "audios": {
+    "title": "Audios",
     "addTitle": "Add Audio",
     "editTitle": "Edit Audio",
     "columns": {
@@ -370,6 +377,7 @@
     }
   },
   "articles": {
+    "title": "Articles",
     "addTitle": "Add Article",
     "editTitle": "Edit Article",
     "columns": {
