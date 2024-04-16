@@ -116,7 +116,7 @@ const useSchema = () => {
       titleEn: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-        descriptionEn: string().required(t("validation.description")),
+      descriptionEn: string().required(t("validation.description")),
     }),
     category: object().shape({
       title: string()
@@ -230,6 +230,7 @@ const useSchema = () => {
     }),
     settings: object().shape({
       image: mixed().notRequired(),
+      background: mixed().notRequired(),
       prayerTime: boolean().notRequired(),
       adhan: boolean().notRequired(),
       facebook: string().url(t("validation.url")).notRequired(),
@@ -240,13 +241,10 @@ const useSchema = () => {
       appStore: string().url(t("validation.url")).notRequired(),
     }),
     codeContent: object().shape({
-      code: number()
-        .typeError(t("validation.code"))
-        .positive(t("validation.code"))
-        .integer(t("validation.code"))
-        .min(1000, t("validation.code"))
-        .max(9999, t("validation.code"))
-        .required(t("validation.codeContent")),
+      code: string()
+        .min(4, t("validation.code"))
+        .max(4, t("validation.code"))
+        .required(t("validation.code")),
     }),
   };
 
