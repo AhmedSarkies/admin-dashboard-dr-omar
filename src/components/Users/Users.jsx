@@ -10,8 +10,8 @@ import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { useFormik } from "formik";
 import { Modal, ModalBody, ModalHeader, Row, Col } from "reactstrap";
-import { IoMdClose } from "react-icons/io";
-import { Link } from "react-router-dom";
+import { IoMdClose, IoMdEye } from "react-icons/io";
+import { Link, useNavigate } from "react-router-dom";
 
 const initialValues = {
   name: "",
@@ -23,6 +23,7 @@ const initialValues = {
 const Users = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
@@ -40,13 +41,9 @@ const Users = () => {
       name: true,
       email: true,
       phone: true,
+      subscription: true,
       created_at: true,
       control: true,
-      favorite_count_articles: true,
-      favorite_count_books: true,
-      favorite_count_audios: true,
-      favorite_count_images: true,
-      favorite_count_elders: true,
     },
   });
 
@@ -101,8 +98,9 @@ const Users = () => {
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
     { id: 3, name: "phone", label: t("user.columns.phone") },
-    { id: 4, name: "created_at", label: t("user.columns.created_at") },
-    { id: 10, name: "control", label: t("action") },
+    { id: 4, name: "subscription", label: t("user.columns.subscription") },
+    { id: 5, name: "created_at", label: t("user.columns.created_at") },
+    { id: 6, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -284,10 +282,22 @@ const Users = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.created_at && (
+              {toggle.toggleColumns?.subscription && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("user.columns.created_at")}
+                  {t("user.columns.subscription")}
                   {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns?.created_at && (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  {t("user.columns.created_at")}
+                  {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -383,11 +393,24 @@ const Users = () => {
                       {result?.phonenumber}
                     </a>
                   </td>
+                  <td className="table-td subscription">
+                  <span
+                      className={`status ${
+                        result?.privacy === "private" ? "inactive" : "active"
+                      }`}
+                    >
+                      {result?.privacy === "private" ? t("private") : t("public")}
+                    </span>
+                  </td>
                   <td className="table-td created_at">
                     {new Date(result?.created_at).toLocaleDateString()}
                   </td>
                   <td className="table-td">
                     <span className="table-btn-container">
+                      <IoMdEye
+                        className="view-btn"
+                        onClick={() => navigate(`/dr-omar/users/${result?.id}`)}
+                      />
                       <MdDeleteOutline
                         className="delete-btn"
                         onClick={() => handleDelete(result)}
