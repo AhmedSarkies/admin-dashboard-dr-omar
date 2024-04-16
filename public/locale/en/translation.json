@@ -146,6 +146,7 @@
       "phone": "Phone",
       "subscription": "Subscription",
       "created_at": "Created",
+      "login_count": "Login Count",
       "favorite_count_books": "Books",
       "favorite_count_audios": "Audios",
       "favorite_count_articles": "Articles",

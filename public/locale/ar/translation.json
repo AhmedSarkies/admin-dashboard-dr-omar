@@ -146,6 +146,7 @@
       "phone": "الهاتف",
       "subscription": "الاشتراك",
       "created_at": "تاريخ الإنشاء",
+      "login_count": "تسجيل الدخول",
       "favorite_count_books": "الكتب",
       "favorite_count_audios": "الصوتيات",
       "favorite_count_articles": "المقالات",
