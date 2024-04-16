@@ -80,13 +80,19 @@ const Settings = () => {
   // const { validationSchema } = useSchema();
   const { settings, loading } = useSelector((state) => state.settings);
   const fileRef = useRef();
+  const fileBackgroundRef = useRef();
   const [toggle, setToggle] = useState({
     add: false,
     imagePreview: false,
+    backgroundPreview: false,
   });
   const formik = useFormik({
     initialValues: {
       image: {
+        file: "",
+        preview: "",
+      },
+      background: {
         file: "",
         preview: "",
       },
@@ -111,6 +117,9 @@ const Settings = () => {
       data.append("id", 2);
       if (values.image.file) {
         data.append("image", values.image.file);
+      }
+      if (values.background.file) {
+        data.append("background", values.background.file);
       }
       if (settings) {
         dispatch(updateSetting(data)).then((res) => {
@@ -156,6 +165,22 @@ const Settings = () => {
     }
   };
 
+  // Handle Background Change
+  const handleBackgroundChange = (e) => {
+    try {
+      const file = fileBackgroundRef.current.files[0];
+      formik.setValues({
+        ...formik.values,
+        background: {
+          file: file,
+          preview: URL.createObjectURL(file),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   // Handle Delete Image
   const handleDeleteImage = () => {
     fileRef.current.value = "";
@@ -170,6 +195,23 @@ const Settings = () => {
     setToggle({
       ...toggle,
       imagePreview: false,
+    });
+  };
+
+  // Handle Delete Background
+  const handleDeleteBackground = () => {
+    fileBackgroundRef.current.value = "";
+    fileBackgroundRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      background: {
+        file: fileBackgroundRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      backgroundPreview: false,
     });
   };
 
@@ -189,6 +231,10 @@ const Settings = () => {
         image: {
           file: "",
           preview: settings?.image,
+        },
+        background: {
+          file: "",
+          preview: settings?.background,
         },
         prayer_timings: settings?.prayer_timings === "true" ? true : false,
         facebook: settings?.facebook,
@@ -315,6 +361,145 @@ const Settings = () => {
               </div>
               {formik.errors.image && formik.touched.image ? (
                 <span className="error text-center">{formik.errors.image}</span>
+              ) : null}
+            </Col>
+          </Row>
+          <hr
+            style={{
+              margin: "3rem 0.75rem 0 0.75rem",
+            }}
+          />
+          {/* Background */}
+          <div className="table-header justify-content-end">
+            <h3
+              className="title"
+              style={{
+                color: "var(--main-color)",
+                marginBottom: "0 !important",
+              }}
+            >
+              {t("settings.settingsApp.background")}
+            </h3>
+          </div>
+          <Row>
+            <Col
+              md={12}
+              className="d-flex flex-column justify-content-center align-items-center"
+            >
+              <div
+                className="image-preview-container d-flex justify-content-center align-items-center"
+                style={{
+                  width: "100%",
+                  height: "100%",
+                }}
+              >
+                <label
+                  htmlFor={
+                    formik.values?.background?.preview ? "" : "background"
+                  }
+                  className="form-label d-flex justify-content-center align-items-center"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                  }}
+                >
+                  <img
+                    src={
+                      formik.values?.background &&
+                      formik.values?.background?.preview
+                        ? formik.values?.background?.preview
+                        : anonymous
+                    }
+                    alt="avatar"
+                    className="image-preview"
+                    onClick={() =>
+                      formik.values?.background &&
+                      formik.values?.background?.preview
+                        ? setToggle({
+                            ...toggle,
+                            backgroundPreview: !toggle.backgroundPreview,
+                          })
+                        : ""
+                    }
+                    style={{
+                      width: "90%",
+                      height: "150px",
+                      borderRadius: "0.5rem",
+                    }}
+                  />
+                  <Modal
+                    isOpen={toggle.backgroundPreview}
+                    toggle={() =>
+                      setToggle({
+                        ...toggle,
+                        backgroundPreview: !toggle.backgroundPreview,
+                      })
+                    }
+                    centered={true}
+                    keyboard={true}
+                    size={"md"}
+                    contentClassName="modal-preview-image modal-add-scholar"
+                  >
+                    <ModalHeader
+                      toggle={() =>
+                        setToggle({
+                          ...toggle,
+                          backgroundPreview: !toggle.backgroundPreview,
+                        })
+                      }
+                    >
+                      <IoMdClose
+                        onClick={() =>
+                          setToggle({
+                            ...toggle,
+                            backgroundPreview: !toggle.backgroundPreview,
+                          })
+                        }
+                      />
+                    </ModalHeader>
+                    <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                      <img
+                        src={
+                          (formik.values?.background &&
+                            formik.values?.background?.preview) ||
+                          toggle.background?.preview
+                            ? formik.values?.background?.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                      />
+                    </ModalBody>
+                    <ModalFooter className="p-md-4 p-2">
+                      <div className="form-group-container d-flex justify-content-center align-items-center">
+                        <button
+                          className="delete-btn cancel-btn"
+                          onClick={handleDeleteBackground}
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    </ModalFooter>
+                  </Modal>
+                </label>
+              </div>
+              <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                <label htmlFor="background" className="form-label">
+                  <ImUpload /> {t("chooseBackground")}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-input form-img-input"
+                  id="background"
+                  ref={fileBackgroundRef}
+                  onChange={handleBackgroundChange}
+                />
+              </div>
+              {formik.errors.background && formik.touched.background ? (
+                <span className="error text-center">
+                  {formik.errors.background}
+                </span>
               ) : null}
             </Col>
           </Row>
