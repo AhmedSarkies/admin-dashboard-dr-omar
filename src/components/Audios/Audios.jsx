@@ -680,13 +680,13 @@ const Audios = () => {
                     <td className="table-td">{result?.visits_count}</td>
                   )}
                   {toggle.toggleColumns.favorites && (
-                    <td className="table-td">{0}</td>
+                    <td className="table-td">{result?.favorites_count}</td>
                   )}
                   {toggle.toggleColumns.downloads && (
-                    <td className="table-td">{0}</td>
+                    <td className="table-td">{result?.downloads_count}</td>
                   )}
                   {toggle.toggleColumns.shares && (
-                    <td className="table-td">{0}</td>
+                    <td className="table-td">{result?.shares_count}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">

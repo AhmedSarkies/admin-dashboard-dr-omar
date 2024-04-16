@@ -9,7 +9,6 @@ import {
   getCodeContent,
   sendCodeContent,
   sendCodeContentAll,
-  updateCodeContent,
 } from "../../store/slices/codeContentSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
@@ -135,30 +134,55 @@ const CodeContent = () => {
     // eslint-disable-next-line
   }, [dispatch]);
 
-  // const selects = () => {
-  //   var ele = document.getElementsByName("chk");
-  //   for (var i = 0; i < ele.length; i++) {
-  //     if (ele[i].type === "checkbox") {
-  //       ele[i].checked = true;
-  //       setToggle({
-  //         ...toggle,
-  //         id: [...toggle.id, ele[i].value],
-  //       });
-  //     }
-  //   }
-  // };
-  // const deSelect = () => {
-  //   var ele = document.getElementsByName("chk");
-  //   for (var i = 0; i < ele.length; i++) {
-  //     if (ele[i].type === "checkbox") {
-  //       ele[i].checked = false;
-  //       setToggle({
-  //         ...toggle,
-  //         id: [],
-  //       });
-  //     }
-  //   }
-  // };
+  const selects = () => {
+    var ele = document.getElementsByName("chk");
+    for (var i = 0; i < ele.length; i++) {
+      if (ele[i].type === "checkbox") {
+        ele[i].checked = true;
+        // Get All Id From users
+        const ids = users?.map((user) => user?.id);
+        setToggle({
+          ...toggle,
+          id: [...toggle.id, ...ids],
+        });
+      }
+    }
+  };
+  const deSelect = () => {
+    var ele = document.getElementsByName("chk");
+    for (var i = 0; i < ele.length; i++) {
+      if (ele[i].type === "checkbox") {
+        ele[i].checked = false;
+        setToggle({
+          ...toggle,
+          id: [],
+        });
+      }
+    }
+  };
+
+  // save every id in array when i select it "multi-select"
+  const handleSelect = (e) => {
+    if (e.target.checked) {
+      setToggle({
+        ...toggle,
+        id: [...toggle.id, e.target.value],
+      });
+    } else {
+      setToggle({
+        ...toggle,
+        id: toggle.id.filter((id) => id !== e.target.value),
+      });
+    }
+  };
+  useEffect(() => {
+    if (toggle.checkedAll) {
+      selects();
+    } else {
+      deSelect();
+    }
+    // eslint-disable-next-line
+  }, [toggle.checkedAll]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
@@ -292,17 +316,19 @@ const CodeContent = () => {
           <thead>
             <tr>
               {/* Checkbox */}
-              {/* <th className="table-th">
+              <th className="table-th">
                 <input
                   type="checkbox"
                   className="checkbox"
                   checked={toggle.checkedAll}
                   readOnly
-                  onClick={() => {
+                  onChange={() => {
                     setToggle({
                       ...toggle,
                       checkedAll: !toggle.checkedAll,
                     });
+                  }}
+                  onClick={() => {
                     if (toggle.checkedAll === false) {
                       selects();
                     } else {
@@ -310,7 +336,7 @@ const CodeContent = () => {
                     }
                   }}
                 />
-              </th> */}
+              </th>
               {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("user.columns.id")}
@@ -370,7 +396,7 @@ const CodeContent = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -388,7 +414,7 @@ const CodeContent = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -408,7 +434,7 @@ const CodeContent = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -420,7 +446,7 @@ const CodeContent = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -431,7 +457,7 @@ const CodeContent = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {/* <td className="table-td">
+                  <td className="table-td">
                     <input
                       type="checkbox"
                       name="chk"
@@ -450,19 +476,21 @@ const CodeContent = () => {
                         }
                       }}
                     />
-                  </td> */}
+                  </td>
                   <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
                   <td className="table-td email">
                     <a href={`mailto:${result?.email}`}>{result?.email}</a>
                   </td>
                   <td className="table-td subscription">
-                  <span
+                    <span
                       className={`status ${
                         result?.privacy === "private" ? "inactive" : "active"
                       }`}
                     >
-                      {result?.privacy === "private" ? t("private") : t("public")}
+                      {result?.privacy === "private"
+                        ? t("private")
+                        : t("public")}
                     </span>
                   </td>
                   <td className="table-td send">
@@ -505,8 +533,7 @@ const CodeContent = () => {
             formik.handleReset();
           }}
         >
-          {toggle.add === true &&
-          toggle.edit === false
+          {toggle.add === true && toggle.edit === false
             ? t("settings.codeContent.addTitle")
             : t("settings.codeContent.editTitle")}
           <IoMdClose

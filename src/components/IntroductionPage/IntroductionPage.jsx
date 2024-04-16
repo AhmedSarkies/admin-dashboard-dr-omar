@@ -455,10 +455,14 @@ const IntroductionPage = () => {
                     </td>
                   )}
                   {toggle.toggleColumns.title && (
-                    <td className="table-td">{result?.title}</td>
+                    <td className="table-td">
+                      {lng === "ar" ? result?.titleAr : result?.titleEn}
+                    </td>
                   )}
                   {toggle.toggleColumns.description && (
-                    <td className="table-td">{result?.body}</td>
+                    <td className="table-td">
+                      {lng === "ar" ? result?.bodyAr : result?.bodyEn}
+                    </td>
                   )}
                   {/* {toggle.toggleColumns.order && (
                     <td className="table-td">{result?.order}</td>
@@ -683,7 +687,7 @@ const IntroductionPage = () => {
                   ) : null}
                 </div>
               </Col>
-            <Col lg={6}>
+              <Col lg={6}>
                 <div
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
@@ -707,7 +711,7 @@ const IntroductionPage = () => {
                   ) : null}
                 </div>
               </Col>
-              </Row>
+            </Row>
             <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
               <Col lg={6}>
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">

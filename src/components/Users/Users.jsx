@@ -43,6 +43,7 @@ const Users = () => {
       phone: true,
       subscription: true,
       created_at: true,
+      login_count: true,
       control: true,
     },
   });
@@ -100,7 +101,8 @@ const Users = () => {
     { id: 3, name: "phone", label: t("user.columns.phone") },
     { id: 4, name: "subscription", label: t("user.columns.subscription") },
     { id: 5, name: "created_at", label: t("user.columns.created_at") },
-    { id: 6, name: "control", label: t("action") },
+    { id: 6, name: "login_count", label: t("user.columns.login_count") },
+    { id: 7, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -306,6 +308,18 @@ const Users = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.login_count && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("user.columns.login_count")}
+                  {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
               {toggle.toggleColumns?.control && (
                 <th className="table-th">{t("action")}</th>
               )}
@@ -315,7 +329,7 @@ const Users = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -333,7 +347,7 @@ const Users = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -353,7 +367,7 @@ const Users = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -365,7 +379,7 @@ const Users = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -404,6 +418,9 @@ const Users = () => {
                   </td>
                   <td className="table-td created_at">
                     {new Date(result?.created_at).toLocaleDateString()}
+                  </td>
+                  <td className="table-td login_count">
+                    {result?.login_count}
                   </td>
                   <td className="table-td">
                     <span className="table-btn-container">

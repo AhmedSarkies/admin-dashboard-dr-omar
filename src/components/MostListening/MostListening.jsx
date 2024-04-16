@@ -4,9 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Spinner } from "reactstrap";
 
-import {
-  getMostListening,
-} from "../../store/slices/mostListeningSlice";
+import { getMostListening } from "../../store/slices/mostListeningSlice";
 
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
@@ -34,6 +32,10 @@ const MostListening = () => {
       title: true,
       audio: true,
       status: true,
+      shares: true,
+      visits: true,
+      favorites: true,
+      downloads: true,
       control: true,
     },
   });
@@ -50,7 +52,11 @@ const MostListening = () => {
     { id: 3, name: "image", label: t("mostListening.columns.audio.image") },
     { id: 4, name: "title", label: t("mostListening.columns.audio.title") },
     { id: 5, name: "audio", label: t("mostListening.columns.audio.audio") },
-    { id: 6, name: "status", label: t("status") },
+    { id: 6, name: "shares", label: t("shares") },
+    { id: 7, name: "visits", label: t("visits") },
+    { id: 8, name: "favorites", label: t("favorites") },
+    { id: 9, name: "downloads", label: t("downloads") },
+    { id: 10, name: "status", label: t("status") },
   ];
   const {
     PaginationUI,
@@ -202,10 +208,58 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("status")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.favorites && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("favorites")}
+                  {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.shares && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("shares")}
+                  {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -220,7 +274,7 @@ const MostListening = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -238,7 +292,7 @@ const MostListening = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -258,7 +312,7 @@ const MostListening = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -270,7 +324,7 @@ const MostListening = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -323,6 +377,18 @@ const MostListening = () => {
                         style={{ width: "250px" }}
                       />
                     </td>
+                  )}
+                  {toggle.toggleColumns.visits && (
+                    <td className="table-td">{result?.visits_count}</td>
+                  )}
+                  {toggle.toggleColumns.favorites && (
+                    <td className="table-td">{result?.favorites_count}</td>
+                  )}
+                  {toggle.toggleColumns.downloads && (
+                    <td className="table-td">{result?.downloads_count}</td>
+                  )}
+                  {toggle.toggleColumns.shares && (
+                    <td className="table-td">{result?.shares_count}</td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">

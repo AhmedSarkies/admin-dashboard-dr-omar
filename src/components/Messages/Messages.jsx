@@ -4,7 +4,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { Modal, ModalBody, ModalHeader, Spinner } from "reactstrap";
 
-import { MdRemoveRedEye } from "react-icons/md";
+import { MdRemoveRedEye, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 
 import { getMessagesApi, getMessages } from "../../store/slices/messagesSlice";
@@ -13,10 +13,12 @@ import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
+import { useNavigate } from "react-router-dom";
 
 const Messages = () => {
   const { t } = useTranslation();
   const lang = Cookies.get("i18next");
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.messages);
   const [toggle, setToggle] = useState({
@@ -283,15 +285,20 @@ const Messages = () => {
                       : result?.subject}
                   </td>
                   <td className="table-td read-more">
-                    <MdRemoveRedEye
-                      onClick={() =>
-                        setToggle({
-                          ...toggle,
-                          readMessage: !toggle.readMessage,
-                          message: result,
-                        })
-                      }
-                    />
+                    <span className="table-btn-container">
+                      <a href={`mailto:${result?.email}`} className="text-success">
+                        <MdSend  className="text-success"/>
+                      </a>
+                      <MdRemoveRedEye
+                        onClick={() =>
+                          setToggle({
+                            ...toggle,
+                            readMessage: !toggle.readMessage,
+                            message: result,
+                          })
+                        }
+                      />
+                    </span>
                   </td>
                 </tr>
               ))}
@@ -362,9 +369,7 @@ const Messages = () => {
                       {t("message.columns.content")}
                       {": "}
                       <br />
-                      <p className="text-center">
-                        {toggle.message?.subject}
-                      </p>
+                      <p className="text-center">{toggle.message?.subject}</p>
                     </div>
                   </div>
                 </ModalBody>

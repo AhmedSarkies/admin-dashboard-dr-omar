@@ -502,7 +502,10 @@ const Articles = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[10])}>
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
                   {t("action")}
                   {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
@@ -649,10 +652,10 @@ const Articles = () => {
                     <td className="table-td">{result?.visit_count}</td>
                   )}
                   {toggle.toggleColumns.favorites && (
-                    <td className="table-td">{0}</td>
+                    <td className="table-td">{result?.favorites_count}</td>
                   )}
                   {toggle.toggleColumns.shares && (
-                    <td className="table-td">{0}</td>
+                    <td className="table-td">{result?.shares_count}</td>
                   )}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
