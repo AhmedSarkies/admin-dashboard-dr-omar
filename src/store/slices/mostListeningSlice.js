@@ -15,7 +15,7 @@ export const getMostListening = createAsyncThunk(
     try {
       const response = await Http({
         method: "GET",
-        url: "/admin/MostListened",
+        url: "/Audios/Get",
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
