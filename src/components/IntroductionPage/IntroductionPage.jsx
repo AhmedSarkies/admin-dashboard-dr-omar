@@ -103,18 +103,18 @@ const IntroductionPage = () => {
         file: "",
         preview: "",
       },
-      titleAr: "",
+      title: "",
       titleEn: "",
       order: "",
       status: "",
-      descriptionAr: "",
+      description: "",
       descriptionEn: "",
     },
     validationSchema: validationSchema.introductionPage,
     onSubmit: (values) => {
       const formData = new FormData();
-      formData.append("titleAr", values.titleAr);
-      formData.append("bodyAr", values.descriptionAr);
+      formData.append("title", values.title);
+      formData.append("body", values.description);
       formData.append("titleEn", values.titleEn);
       formData.append("bodyEn", values.descriptionEn);
       if (values.image.file !== "") {
@@ -166,16 +166,17 @@ const IntroductionPage = () => {
 
   // Handle Edit Introduction Page
   const handleEdit = (introductionPage) => {
+    console.log(introductionPage);
     formik.setValues({
       ...formik.values,
-      id: introductionPage.id,
-      titleAr: introductionPage.titleAr,
-      titleEn: introductionPage.titleEn,
-      descriptionAr: introductionPage.bodyAr,
-      descriptionEn: introductionPage.bodyEn,
+      id: introductionPage?.id,
+      title: introductionPage?.title,
+      titleEn: introductionPage?.titleEn,
+      description: introductionPage?.body,
+      descriptionEn: introductionPage?.bodyEn,
       image: {
         file: "",
-        preview: introductionPage.image,
+        preview: introductionPage?.image,
       },
     });
     setToggle({
@@ -307,7 +308,6 @@ const IntroductionPage = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {/* Show and Hide Columns */}
               {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("settings.introductionPage.columns.image")}
@@ -346,30 +346,6 @@ const IntroductionPage = () => {
                   ) : null}
                 </th>
               )}
-              {/* {toggle.toggleColumns.order && (
-                <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("settings.introductionPage.columns.order")}
-                  {toggle.sortColumn === columns[3].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
-              {toggle.toggleColumns.status && (
-                <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("status")}
-                  {toggle.sortColumn === columns[4].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )} */}
               {toggle.toggleColumns.control && (
                 <th className="table-th">{t("action")}</th>
               )}
@@ -456,38 +432,14 @@ const IntroductionPage = () => {
                   )}
                   {toggle.toggleColumns.title && (
                     <td className="table-td">
-                      {lng === "ar" ? result?.titleAr : result?.titleEn}
+                      {lng === "ar" ? result?.title : result?.titleEn}
                     </td>
                   )}
                   {toggle.toggleColumns.description && (
                     <td className="table-td">
-                      {lng === "ar" ? result?.bodyAr : result?.bodyEn}
+                      {lng === "ar" ? result?.body : result?.bodyEn}
                     </td>
                   )}
-                  {/* {toggle.toggleColumns.order && (
-                    <td className="table-td">{result?.order}</td>
-                  )}
-                  {toggle.toggleColumns.status && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "Public"
-                              ? "green"
-                              : result?.status === "Private"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "Public"
-                          ? t("public")
-                          : result?.status === "Private"
-                          ? t("private")
-                          : t("private")}
-                      </span>
-                    </td>
-                  )} */}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
@@ -692,22 +644,22 @@ const IntroductionPage = () => {
                   className="form-group-container d-flex flex-column align-items-end mb-3"
                   style={{ marginTop: "-4px" }}
                 >
-                  <label htmlFor="titleAr" className="form-label">
+                  <label htmlFor="title" className="form-label">
                     {t("settings.introductionPage.columns.title.ar")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
-                    id="titleAr"
+                    id="title"
                     placeholder={t(
                       "settings.introductionPage.columns.title.ar"
                     )}
-                    name="titleAr"
-                    value={formik.values.titleAr}
+                    name="title"
+                    value={formik.values.title}
                     onChange={formik.handleChange}
                   />
-                  {formik.errors.titleAr && formik.touched.titleAr ? (
-                    <span className="error">{formik.errors.titleAr}</span>
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
                   ) : null}
                 </div>
               </Col>
@@ -736,22 +688,22 @@ const IntroductionPage = () => {
               </Col>
               <Col lg={6}>
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
-                  <label htmlFor="descriptionAr" className="form-label">
+                  <label htmlFor="description" className="form-label">
                     {t("settings.introductionPage.columns.description.ar")}
                   </label>
                   <textarea
                     className="form-input"
-                    id="descriptionAr"
+                    id="description"
                     placeholder={t(
                       "settings.introductionPage.columns.description.ar"
                     )}
-                    name="descriptionAr"
-                    value={formik.values.descriptionAr}
+                    name="description"
+                    value={formik.values.description}
                     onChange={formik.handleChange}
                   ></textarea>
-                  {formik.errors.descriptionAr &&
-                  formik.touched.descriptionAr ? (
-                    <span className="error">{formik.errors.descriptionAr}</span>
+                  {formik.errors.description &&
+                  formik.touched.description ? (
+                    <span className="error">{formik.errors.description}</span>
                   ) : null}
                 </div>
               </Col>

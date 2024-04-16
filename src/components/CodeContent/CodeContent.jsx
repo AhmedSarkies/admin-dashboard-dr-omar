@@ -134,56 +134,6 @@ const CodeContent = () => {
     // eslint-disable-next-line
   }, [dispatch]);
 
-  const selects = () => {
-    var ele = document.getElementsByName("chk");
-    for (var i = 0; i < ele.length; i++) {
-      if (ele[i].type === "checkbox") {
-        ele[i].checked = true;
-        // Get All Id From users
-        const ids = users?.map((user) => user?.id);
-        setToggle({
-          ...toggle,
-          id: [...toggle.id, ...ids],
-        });
-      }
-    }
-  };
-  const deSelect = () => {
-    var ele = document.getElementsByName("chk");
-    for (var i = 0; i < ele.length; i++) {
-      if (ele[i].type === "checkbox") {
-        ele[i].checked = false;
-        setToggle({
-          ...toggle,
-          id: [],
-        });
-      }
-    }
-  };
-
-  // save every id in array when i select it "multi-select"
-  const handleSelect = (e) => {
-    if (e.target.checked) {
-      setToggle({
-        ...toggle,
-        id: [...toggle.id, e.target.value],
-      });
-    } else {
-      setToggle({
-        ...toggle,
-        id: toggle.id.filter((id) => id !== e.target.value),
-      });
-    }
-  };
-  useEffect(() => {
-    if (toggle.checkedAll) {
-      selects();
-    } else {
-      deSelect();
-    }
-    // eslint-disable-next-line
-  }, [toggle.checkedAll]);
-
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
       <div className="table-header">
@@ -315,28 +265,6 @@ const CodeContent = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {/* Checkbox */}
-              <th className="table-th">
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={toggle.checkedAll}
-                  readOnly
-                  onChange={() => {
-                    setToggle({
-                      ...toggle,
-                      checkedAll: !toggle.checkedAll,
-                    });
-                  }}
-                  onClick={() => {
-                    if (toggle.checkedAll === false) {
-                      selects();
-                    } else {
-                      deSelect();
-                    }
-                  }}
-                />
-              </th>
               {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("user.columns.id")}
@@ -457,26 +385,6 @@ const CodeContent = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td">
-                    <input
-                      type="checkbox"
-                      name="chk"
-                      value={result?.id}
-                      onChange={(e) => {
-                        if (e.target.checked) {
-                          setToggle({
-                            ...toggle,
-                            id: [...toggle.id, e.target.value],
-                          });
-                        } else {
-                          setToggle({
-                            ...toggle,
-                            id: toggle.id.filter((id) => id !== e.target.value),
-                          });
-                        }
-                      }}
-                    />
-                  </td>
                   <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
                   <td className="table-td email">

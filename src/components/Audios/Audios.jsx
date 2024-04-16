@@ -22,7 +22,6 @@ import {
   addAudioApi,
   updateAudioApi,
   deleteAudioApi,
-  deleteAudio,
 } from "../../store/slices/audioSlice";
 import { getApprovedScholarsApi } from "../../store/slices/scholarSlice";
 import useFiltration from "../../hooks/useFiltration";
@@ -325,7 +324,7 @@ const Audios = () => {
       if (result.isConfirmed) {
         dispatch(deleteAudioApi(audio?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteAudio(audio?.id));
+            dispatch(getAudiosApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${audio?.title}`,
               text: `${t("titleDeletedSuccess")} ${audio?.title} ${t(
@@ -336,6 +335,7 @@ const Audios = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.audio.deletedSuccess")));
           } else {
+            dispatch(getAudiosApi());
             toast.error(t("toast.audio.deletedError"));
           }
         });

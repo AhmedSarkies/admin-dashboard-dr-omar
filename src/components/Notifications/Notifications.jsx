@@ -39,11 +39,10 @@ const Notifications = () => {
     pictureCategories: false,
     activeColumn: false,
     toggleColumns: {
-      image: true,
-      title: true,
-      description: true,
-      order: true,
-      status: true,
+      id: true,
+      name: true,
+      email: true,
+      phone: true,
       control: true,
     },
     sortColumn: "",
@@ -57,7 +56,8 @@ const Notifications = () => {
     { id: 0, name: "id", label: t("user.columns.id") },
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "send", label: t("settings.codeContent.columns.send") },
+    { id: 3, name: "phone", label: t("user.columns.phone") },
+    { id: 4, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -139,8 +139,7 @@ const Notifications = () => {
   const handleAdd = (user) => {
     formik.setValues({
       ...formik.values,
-      title: user?.name,
-      description: user?.email,
+      id: user?.id,
     });
     setToggle({
       ...toggle,
@@ -272,10 +271,20 @@ const Notifications = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.send && (
-                <th className="table-th">
-                  {t("settings.codeContent.columns.send")}
+              {toggle.toggleColumns?.phone && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                  {t("user.columns.phone")}
+                  {toggle.sortColumn === columns[3].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
                 </th>
+              )}
+              {toggle.toggleColumns?.control && (
+                <th className="table-th">{t("action")}</th>
               )}
             </tr>
           </thead>
@@ -344,28 +353,43 @@ const Notifications = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td id">{result?.id}</td>
-                  <td className="table-td name">{result?.name}</td>
-                  <td className="table-td email">
-                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
-                  </td>
-                  <td className="table-td send">
-                    <MdSend
-                      className="btn-edit"
-                      style={{
-                        color: "green",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleAdd(result)}
-                    />
-                  </td>
+                  {toggle.toggleColumns.id && (
+                    <td className="table-td id">{result?.id}</td>
+                  )}
+                  {toggle.toggleColumns.name && (
+                    <td className="table-td name">{result?.name}</td>
+                  )}
+                  {toggle.toggleColumns.email && (
+                    <td className="table-td email">
+                      <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.phone && (
+                    <td className="table-td phonenumber">
+                      <a href={`mailto:${result?.phonenumber}`}>
+                        {result?.phonenumber}
+                      </a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.control && (
+                    <td className="table-td send">
+                      <MdSend
+                        className="btn-edit"
+                        style={{
+                          color: "green",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleAdd(result)}
+                      />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
           )}
         </table>
       </div>
-      {/* Add introductionPage */}
+      {/* Add Notifications */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
@@ -389,9 +413,7 @@ const Notifications = () => {
             formik.handleReset();
           }}
         >
-          {formik.values.id
-            ? t("notifications.editTitle")
-            : t("notifications.addTitle")}
+          {t("notifications.addTitle")}
           <IoMdClose
             onClick={() => {
               setToggle({
@@ -518,13 +540,13 @@ const Notifications = () => {
                   style={{ marginTop: "-4px" }}
                 >
                   <label htmlFor="title" className="form-label">
-                    {t("settings.introductionPage.columns.title")}
+                    {t("notifications.columns.title")}
                   </label>
                   <input
                     type="text"
                     className="form-input w-100"
                     id="title"
-                    placeholder={t("settings.introductionPage.columns.title")}
+                    placeholder={t("notifications.columns.title")}
                     name="title"
                     value={formik.values.title}
                     onChange={formik.handleChange}
@@ -534,15 +556,13 @@ const Notifications = () => {
                   ) : null}
                 </div>
                 <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
-                  <label htmlFor="description" className="form-label">
-                    {t("settings.introductionPage.columns.description")}
+                  <label htmlFor="body" className="form-label">
+                    {t("notifications.columns.body")}
                   </label>
                   <textarea
                     className="form-input"
-                    id="description"
-                    placeholder={t(
-                      "settings.introductionPage.columns.description"
-                    )}
+                    id="body"
+                    placeholder={t("notifications.columns.body")}
                     name="description"
                     value={formik.values.description}
                     onChange={formik.handleChange}

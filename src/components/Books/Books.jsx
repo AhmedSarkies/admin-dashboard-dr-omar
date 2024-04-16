@@ -78,6 +78,7 @@ const Books = () => {
       image: true,
       title: true,
       book: true,
+      pages: true,
       visits: true,
       favorites: true,
       downloads: true,
@@ -108,12 +109,13 @@ const Books = () => {
     { id: 0, name: "image", label: t("books.columns.book.image") },
     { id: 1, name: "title", label: t("books.columns.book.title") },
     { id: 2, name: "book", label: t("books.columns.book.book") },
-    { id: 3, name: "visits", label: t("visits") },
-    { id: 4, name: "favorites", label: t("favorites") },
-    { id: 5, name: "downloads", label: t("downloads") },
-    { id: 6, name: "shares", label: t("shares") },
-    { id: 7, name: "status", label: t("status") },
-    { id: 8, name: "control", label: t("action") },
+    { id: 3, name: "pages", label: t("pages") },
+    { id: 4, name: "visits", label: t("visits") },
+    { id: 5, name: "favorites", label: t("favorites") },
+    { id: 6, name: "downloads", label: t("downloads") },
+    { id: 7, name: "shares", label: t("shares") },
+    { id: 8, name: "status", label: t("status") },
+    { id: 9, name: "control", label: t("action") },
   ];
 
   const onSubmit = (values) => {
@@ -445,9 +447,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.pages && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("visits")}
+                  {t("pages")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -457,9 +459,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("favorites")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -469,10 +471,22 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -482,20 +496,8 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.shares && (
-                <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("shares")}
-                  {toggle.sortColumn === columns[5].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
-              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("status")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -505,10 +507,22 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("action")}
+                  {t("status")}
                   {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -633,6 +647,9 @@ const Books = () => {
                         <FaBookReader className="me-2" />
                       </a>
                     </td>
+                  )}
+                  {toggle.toggleColumns.pages && (
+                    <td className="table-td">{result?.number_pages}</td>
                   )}
                   {toggle.toggleColumns.visits && (
                     <td className="table-td">{result?.visits_count}</td>
