@@ -56,7 +56,7 @@ const useSchema = () => {
       // Validation for image file must be uploaded with the form or just string
       image: mixed().test("fileSize", t("validation.imageElder"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
@@ -70,7 +70,7 @@ const useSchema = () => {
       status: string(),
       image: mixed().test("fileSize", t("validation.imageArticle"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
@@ -87,7 +87,7 @@ const useSchema = () => {
     image: object().shape({
       image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
@@ -103,16 +103,16 @@ const useSchema = () => {
     introductionPage: object().shape({
       image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
-        if (typeof value === "string") {
+        if (typeof value.preview === "string") {
           return true;
         }
       }),
-      titleAr: string()
+      title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      descriptionAr: string().required(t("validation.description")),
+      description: string().required(t("validation.description")),
       titleEn: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
@@ -144,7 +144,7 @@ const useSchema = () => {
       // Validation for image file must be uploaded with the form or just string
       image: mixed().test("fileSize", t("validation.image"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value.preview === "string") {
           return true;
@@ -207,7 +207,7 @@ const useSchema = () => {
       status: string(),
       image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
@@ -215,7 +215,7 @@ const useSchema = () => {
       }),
       audio: mixed().test("fileSize", t("validation.audio"), (value) => {
         if (value.file) {
-          return value.file.size <= 2097152;
+          return value.file.size > 0;
         }
         if (typeof value === "string") {
           return true;
