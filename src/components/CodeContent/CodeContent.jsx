@@ -6,21 +6,28 @@ import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdEdit, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import {
+  getCodeContent,
   sendCodeContent,
   sendCodeContentAll,
+  updateCodeContent,
 } from "../../store/slices/codeContentSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { getUsers } from "../../store/slices/userSlice";
+import Swal from "sweetalert2";
 
 const CodeContent = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
+  const { codeContent } = useSelector((state) => state.codeContent);
   const [toggle, setToggle] = useState({
     add: false,
+    checked: false,
+    checkedAll: false,
+    id: [],
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -32,6 +39,7 @@ const CodeContent = () => {
       id: true,
       name: true,
       email: true,
+      subscription: true,
       send: true,
     },
   });
@@ -44,36 +52,22 @@ const CodeContent = () => {
     },
     validationSchema: validationSchema.codeContent,
     onSubmit: (values) => {
-      if (toggle.everyOne) {
-        dispatch(sendCodeContentAll(values)).then((res) => {
-          if (!res.error) {
-            toast.success(t("toast.codeContent.addedSuccess"));
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              everyOne: false,
-            });
-            dispatch(getUsers());
-            formik.handleReset();
-          } else {
-            toast.error(t("toast.codeContent.addedError"));
-            dispatch(getUsers());
-          }
-        });
-      } else {
-        dispatch(sendCodeContent(values)).then((response) => {
-          if (sendCodeContent.fulfilled.match(response)) {
-            toast.success(t("toast.codeContent.addedSuccess"));
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-          } else if (sendCodeContent.rejected.match(response)) {
-            toast.error(t("toast.codeContent.addedError"));
-          }
-        });
-      }
+      dispatch(sendCodeContentAll(values)).then((res) => {
+        if (!res.error) {
+          setToggle({
+            ...toggle,
+            add: !toggle.add,
+          });
+          dispatch(getCodeContent());
+          dispatch(getUsers());
+          formik.handleReset();
+          toast.success(t("toast.codeContent.addedSuccess"));
+        } else {
+          dispatch(getCodeContent());
+          dispatch(getUsers());
+          toast.error(t("toast.codeContent.addedError"));
+        }
+      });
     },
   });
 
@@ -83,7 +77,8 @@ const CodeContent = () => {
     { id: 0, name: "id", label: t("user.columns.id") },
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "send", label: t("settings.codeContent.columns.send") },
+    { id: 3, name: "subscription", label: t("user.columns.subscription") },
+    { id: 4, name: "send", label: t("settings.codeContent.columns.send") },
   ];
   const {
     PaginationUI,
@@ -98,40 +93,109 @@ const CodeContent = () => {
   });
 
   // Handle Add
-  const handleAdd = (result) => {
-    setToggle({
-      ...toggle,
-      add: true,
-      everyOne: false,
+  const handleAddOne = (user) => {
+    Swal.fire({
+      title: t("areYouSure"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: t("confirm"),
+      cancelButtonText: t("cancel"),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(
+          sendCodeContent({ User_id: user?.id, code: codeContent[0].code })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            Swal.fire({
+              title: t("doneConfirm"),
+              icon: "success",
+            });
+          }
+        });
+      }
     });
-    formik.setFieldValue("User_id", result?.id);
   };
 
   // get data from api
   useEffect(() => {
     try {
       dispatch(getUsers());
+      dispatch(getCodeContent());
+      formik.setValues({
+        id: codeContent[0]?.id,
+        code: codeContent[0]?.code,
+      });
     } catch (error) {
       console.log(error);
     }
+    // eslint-disable-next-line
   }, [dispatch]);
+
+  // const selects = () => {
+  //   var ele = document.getElementsByName("chk");
+  //   for (var i = 0; i < ele.length; i++) {
+  //     if (ele[i].type === "checkbox") {
+  //       ele[i].checked = true;
+  //       setToggle({
+  //         ...toggle,
+  //         id: [...toggle.id, ele[i].value],
+  //       });
+  //     }
+  //   }
+  // };
+  // const deSelect = () => {
+  //   var ele = document.getElementsByName("chk");
+  //   for (var i = 0; i < ele.length; i++) {
+  //     if (ele[i].type === "checkbox") {
+  //       ele[i].checked = false;
+  //       setToggle({
+  //         ...toggle,
+  //         id: [],
+  //       });
+  //     }
+  //   }
+  // };
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
       <div className="table-header">
         <button
           className="add-btn send"
-          onClick={() =>
+          onClick={() => {
             setToggle({
               ...toggle,
               add: !toggle.add,
               everyOne: true,
               edit: true,
-            })
-          }
+            });
+            dispatch(getCodeContent());
+            formik.setValues({
+              id: codeContent[0]?.id,
+              code: codeContent[0]?.code,
+            });
+          }}
+          style={{
+            opacity: loading ? "0.5" : "1",
+            pointerEvents: loading ? "none" : "auto",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
         >
-          <MdEdit />
-          {t("settings.codeContent.editTitle")}
+          {loading ? (
+            <span
+              className="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          ) : (
+            <>
+              <MdEdit />
+              {t("settings.codeContent.editTitle")}
+            </>
+          )}
         </button>
         <button
           className="add-btn send"
@@ -143,9 +207,24 @@ const CodeContent = () => {
               edit: false,
             })
           }
+          style={{
+            opacity: loading ? "0.5" : "1",
+            pointerEvents: loading ? "none" : "auto",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
         >
-          <MdSend />
-          {t("settings.codeContent.addTitle")}
+          {loading ? (
+            <span
+              className="spinner-border spinner-border-sm"
+              role="status"
+              aria-hidden="true"
+            ></span>
+          ) : (
+            <>
+              <MdSend />
+              {t("settings.codeContent.addTitle")}
+            </>
+          )}
         </button>
       </div>
       <div className="scholar">
@@ -212,6 +291,26 @@ const CodeContent = () => {
         <table className="table-body">
           <thead>
             <tr>
+              {/* Checkbox */}
+              {/* <th className="table-th">
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={toggle.checkedAll}
+                  readOnly
+                  onClick={() => {
+                    setToggle({
+                      ...toggle,
+                      checkedAll: !toggle.checkedAll,
+                    });
+                    if (toggle.checkedAll === false) {
+                      selects();
+                    } else {
+                      deSelect();
+                    }
+                  }}
+                />
+              </th> */}
               {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("user.columns.id")}
@@ -248,6 +347,18 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.subscription && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                  {t("user.columns.subscription")}
+                  {toggle.sortColumn === columns[3].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
               {toggle.toggleColumns?.send && (
                 <th className="table-th">
                   {t("settings.codeContent.columns.send")}
@@ -259,7 +370,7 @@ const CodeContent = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -277,7 +388,7 @@ const CodeContent = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan="4">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -297,7 +408,7 @@ const CodeContent = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan="4">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -309,7 +420,7 @@ const CodeContent = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan="4">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -320,10 +431,39 @@ const CodeContent = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  {/* <td className="table-td">
+                    <input
+                      type="checkbox"
+                      name="chk"
+                      value={result?.id}
+                      onChange={(e) => {
+                        if (e.target.checked) {
+                          setToggle({
+                            ...toggle,
+                            id: [...toggle.id, e.target.value],
+                          });
+                        } else {
+                          setToggle({
+                            ...toggle,
+                            id: toggle.id.filter((id) => id !== e.target.value),
+                          });
+                        }
+                      }}
+                    />
+                  </td> */}
                   <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
                   <td className="table-td email">
                     <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                  </td>
+                  <td className="table-td subscription">
+                  <span
+                      className={`status ${
+                        result?.privacy === "private" ? "inactive" : "active"
+                      }`}
+                    >
+                      {result?.privacy === "private" ? t("private") : t("public")}
+                    </span>
                   </td>
                   <td className="table-td send">
                     <MdSend
@@ -332,7 +472,7 @@ const CodeContent = () => {
                         color: "green",
                         cursor: "pointer",
                       }}
-                      onClick={() => handleAdd(result)}
+                      onClick={() => handleAddOne(result)}
                     />
                   </td>
                 </tr>
@@ -365,12 +505,10 @@ const CodeContent = () => {
             formik.handleReset();
           }}
         >
-          {toggle.add === true && toggle.everyOne === true && toggle.edit === false
+          {toggle.add === true &&
+          toggle.edit === false
             ? t("settings.codeContent.addTitle")
-            : toggle.edit === true && toggle.everyOne === true && toggle.add === true
-            ? t("settings.codeContent.editTitle")
-            : t("settings.codeContent.sendTitle")
-            }
+            : t("settings.codeContent.editTitle")}
           <IoMdClose
             onClick={() => {
               setToggle({
@@ -416,8 +554,10 @@ const CodeContent = () => {
                         role="status"
                         aria-hidden="true"
                       ></span>
+                    ) : toggle.add === true && toggle.edit === false ? (
+                      t("settings.codeContent.addTitle")
                     ) : (
-                      t("settings.codeContent.columns.send")
+                      t("settings.codeContent.editTitle")
                     )}
                   </button>
                   <button
