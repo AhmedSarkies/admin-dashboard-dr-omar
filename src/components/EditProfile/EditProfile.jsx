@@ -126,12 +126,12 @@ const EditProfile = () => {
     if (id) {
       const data = subAdmins.filter((subAdmin) => subAdmin.id === parseInt(id));
       formik.setValues({
-        name: data[0].name,
-        email: data[0].email,
-        phone: data[0].phone,
+        name: data[0]?.name,
+        email: data[0]?.email,
+        phone: data[0]?.phone,
         image: {
           file: "",
-          preview: data[0].image,
+          preview: data[0]?.image,
         },
       });
     }
