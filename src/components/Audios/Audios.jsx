@@ -373,11 +373,16 @@ const Audios = () => {
       <div className="audio scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchAudio")}
               onChange={handleSearch}
             />
           </div>
@@ -555,7 +560,10 @@ const Audios = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[10])}>
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
                   {t("action")}
                   {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
