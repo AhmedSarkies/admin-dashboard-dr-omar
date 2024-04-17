@@ -13,12 +13,10 @@ import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
-import { useNavigate } from "react-router-dom";
 
 const Messages = () => {
   const { t } = useTranslation();
   const lang = Cookies.get("i18next");
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.messages);
   const [toggle, setToggle] = useState({
@@ -85,11 +83,16 @@ const Messages = () => {
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchMessage")}
               onChange={handleSearch}
             />
           </div>
@@ -286,8 +289,11 @@ const Messages = () => {
                   </td>
                   <td className="table-td read-more">
                     <span className="table-btn-container">
-                      <a href={`mailto:${result?.email}`} className="text-success">
-                        <MdSend  className="text-success"/>
+                      <a
+                        href={`mailto:${result?.email}`}
+                        className="text-success"
+                      >
+                        <MdSend className="text-success" />
                       </a>
                       <MdRemoveRedEye
                         onClick={() =>
