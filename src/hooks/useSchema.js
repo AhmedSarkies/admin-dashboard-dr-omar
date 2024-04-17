@@ -29,14 +29,20 @@ const useSchema = () => {
       //   userType: string().required("يجب اختيار نوع المستخدم"),
     }),
     termsAndConditions: object().shape({
-      titleArabic: string()
+      arabicTitle: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      titleEnglish: string()
+        englishTitle: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      descriptionArabic: string().required(t("validation.description")),
-      descriptionEnglish: string().required(t("validation.description")),
+        country: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+        country_en: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+        text: string().required(t("validation.description")),
+        text_en: string().required(t("validation.description")),
     }),
     elder: object().shape({
       name: string()
