@@ -49,8 +49,6 @@ const NewUsers = () => {
   const {
     PaginationUI,
     handleSort,
-    handleSearch,
-    handleToggleColumns,
     searchResults,
   } = useFiltration({
     rowData: newUsers,
@@ -73,66 +71,6 @@ const NewUsers = () => {
         <h2>{t("newUsers.title")}</h2>
       </div>
       <div className="scholar">
-        <div className="table-header">
-          {/* Search */}
-          <div className="search-container form-group-container form-input">
-            <input
-              type="text"
-              className="form-input"
-              placeholder={t("search")}
-              value={toggle.searchTerm}
-              onChange={handleSearch}
-            />
-          </div>
-          {/* Show and Hide Columns */}
-          <div className="dropdown columns form-input">
-            <button
-              type="button"
-              onClick={() => {
-                setToggle({
-                  ...toggle,
-                  activeColumn: !toggle.activeColumn,
-                });
-              }}
-              className="dropdown-btn d-flex justify-content-between align-items-center"
-            >
-              <span>{t("columnsFilter")}</span>
-              <TiArrowSortedUp
-                className={`dropdown-icon ${
-                  toggle.activeColumn ? "active" : ""
-                }`}
-              />
-            </button>
-            <div
-              className={`dropdown-content ${
-                toggle.activeColumn ? "active" : ""
-              }`}
-              style={{
-                width: "180px",
-                maxHeight: "160px",
-              }}
-            >
-              {columns.map((column) => (
-                <button
-                  type="button"
-                  key={column.id}
-                  className={`item filter`}
-                  onClick={() => handleToggleColumns(column.name)}
-                >
-                  <span className="d-flex justify-content-start align-items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox-column"
-                      checked={toggle.toggleColumns[column.name]}
-                      readOnly
-                    />
-                    <span>{column.label}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
         <table className="table-body">
           <thead>
             <tr>
