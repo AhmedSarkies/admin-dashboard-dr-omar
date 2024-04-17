@@ -265,7 +265,7 @@ const Images = () => {
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchImage")}
               onChange={handleSearch}
             />
           </div>
