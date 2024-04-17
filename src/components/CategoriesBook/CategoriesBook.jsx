@@ -10,8 +10,6 @@ import {
   addBookCategoryApi,
   updateBookCategoryApi,
   deleteBookCategoryApi,
-  updateBookCategory,
-  deleteBookCategory,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -71,7 +69,7 @@ const CategoriesBook = () => {
           updateBookCategoryApi({ id: values.id, title: values.title })
         ).then((res) => {
           if (!res.error) {
-            dispatch(getBooksCategoriesApi())
+            dispatch(getBooksCategoriesApi());
             setToggle({
               ...toggle,
               edit: !toggle.edit,
@@ -79,7 +77,7 @@ const CategoriesBook = () => {
             formik.handleReset();
             toast.success(t("toast.category.updatedSuccess"));
           } else {
-            dispatch(getBooksCategoriesApi())
+            dispatch(getBooksCategoriesApi());
             toast.error(t("toast.category.updatedError"));
           }
         });
@@ -94,7 +92,7 @@ const CategoriesBook = () => {
             formik.handleReset();
             toast.success(t("toast.category.addedSuccess"));
           } else {
-            dispatch(getBooksCategoriesApi())
+            dispatch(getBooksCategoriesApi());
             toast.error(t("toast.category.addedError"));
           }
         });
@@ -177,11 +175,16 @@ const CategoriesBook = () => {
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchMainCategoryBook")}
               onChange={handleSearch}
             />
           </div>
