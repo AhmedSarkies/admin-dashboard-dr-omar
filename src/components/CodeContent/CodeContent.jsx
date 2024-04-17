@@ -204,11 +204,16 @@ const CodeContent = () => {
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchUser")}
               value={toggle.searchTerm}
               onChange={handleSearch}
             />
