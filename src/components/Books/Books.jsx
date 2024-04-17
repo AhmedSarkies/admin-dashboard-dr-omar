@@ -355,7 +355,7 @@ const Books = () => {
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchBook")}
               onChange={handleSearch}
             />
           </div>
@@ -598,23 +598,6 @@ const Books = () => {
             <tbody>
               {searchResults?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {/*{toggle.toggleColumns.imageElder && (
-                    <td className="table-td">
-                      <img
-                        src={result?.elder?.image}
-                        alt={result?.elder || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.nameElder && (
-                    <td className="table-td name">{result?.elder?.name}</td>
-                  )}*/}
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
                       <img
@@ -643,7 +626,7 @@ const Books = () => {
                           color: "blue !important",
                         }}
                       >
-                        عرض الكتاب
+                        {t("viewBook")}
                         <FaBookReader className="me-2" />
                       </a>
                     </td>
