@@ -43,6 +43,7 @@ const Notifications = () => {
       name: true,
       email: true,
       phone: true,
+      subscription: true,
       control: true,
     },
     sortColumn: "",
@@ -57,7 +58,8 @@ const Notifications = () => {
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
     { id: 3, name: "phone", label: t("user.columns.phone") },
-    { id: 4, name: "control", label: t("action") },
+    { id: 4, name: "subscription", label: t("user.columns.subscription") },
+    { id: 5, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -175,11 +177,16 @@ const Notifications = () => {
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
-              placeholder={t("search")}
+              placeholder={t("searchUser")}
               onChange={handleSearch}
             />
           </div>
@@ -283,6 +290,18 @@ const Notifications = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.subscription && (
+                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                  {t("user.columns.subscription")}
+                  {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
               {toggle.toggleColumns?.control && (
                 <th className="table-th">{t("action")}</th>
               )}
@@ -369,6 +388,19 @@ const Notifications = () => {
                       <a href={`mailto:${result?.phonenumber}`}>
                         {result?.phonenumber}
                       </a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.subscription && (
+                    <td className="table-td subscription">
+                      <span
+                        className={`status ${
+                          result?.privacy === "private" ? "inactive" : "active"
+                        }`}
+                      >
+                        {result?.privacy === "private"
+                          ? t("private")
+                          : t("public")}
+                      </span>
                     </td>
                   )}
                   {toggle.toggleColumns.control && (
