@@ -81,10 +81,12 @@ const Settings = () => {
   const { settings, loading } = useSelector((state) => state.settings);
   const fileRef = useRef();
   const fileBackgroundRef = useRef();
+  const fileLogoRef = useRef();
   const [toggle, setToggle] = useState({
     add: false,
     imagePreview: false,
     backgroundPreview: false,
+    logoPreview: false,
   });
   const formik = useFormik({
     initialValues: {
@@ -96,7 +98,13 @@ const Settings = () => {
         file: "",
         preview: "",
       },
+      logo: {
+        file: "",
+        preview: "",
+      },
       prayer_timings: false,
+      code_phone: false,
+      code_email: false,
       facebook: "",
       whatsapp: "",
       messenger: "",
@@ -108,6 +116,8 @@ const Settings = () => {
     onSubmit: (values) => {
       const data = new FormData();
       data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
+      data.append("code_phone", values.code_phone === true ? 1 : 0);
+      data.append("code_email", values.code_email === true ? 1 : 0);
       data.append("facebook", values.facebook);
       data.append("whatsapp", values.whatsapp);
       data.append("messenger", values.messenger);
@@ -120,6 +130,9 @@ const Settings = () => {
       }
       if (values.background.file) {
         data.append("background", values.background.file);
+      }
+      if (values.logo.file) {
+        data.append("logo", values.logo.file);
       }
       if (settings) {
         dispatch(updateSetting(data)).then((res) => {
@@ -136,6 +149,8 @@ const Settings = () => {
           addSetting({
             image: values.image.file,
             prayer_timings: values.prayer_timings === true ? 1 : 0,
+            code_phone: values.code_phone === true ? 1 : 0,
+            code_email: values.code_email === true ? 1 : 0,
             facebook: values.facebook,
             whatsapp: values.whatsapp,
             messenger: values.messenger,
@@ -152,7 +167,7 @@ const Settings = () => {
   // Handle Image Change
   const handleImageChange = (e) => {
     try {
-      const file = fileRef.current.files[0];
+      const file = fileRef?.current?.files[0];
       formik.setValues({
         ...formik.values,
         image: {
@@ -172,6 +187,22 @@ const Settings = () => {
       formik.setValues({
         ...formik.values,
         background: {
+          file: file,
+          preview: URL.createObjectURL(file),
+        },
+      });
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // Handle Logo Change
+  const handleLogoChange = (e) => {
+    try {
+      const file = fileLogoRef.current.files[0];
+      formik.setValues({
+        ...formik.values,
+        logo: {
           file: file,
           preview: URL.createObjectURL(file),
         },
@@ -215,6 +246,23 @@ const Settings = () => {
     });
   };
 
+  // Handle Delete Logo
+  const handleDeleteLogo = () => {
+    fileLogoRef.current.value = "";
+    fileLogoRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      logo: {
+        file: fileLogoRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      logoPreview: false,
+    });
+  };
+
   const handleInputChange = (e) => {
     formik.handleChange(e);
   };
@@ -236,7 +284,13 @@ const Settings = () => {
           file: "",
           preview: settings?.background,
         },
+        logo: {
+          file: "",
+          preview: settings?.logo,
+        },
         prayer_timings: settings?.prayer_timings === "true" ? true : false,
+        code_phone: settings?.code_phone === 1 ? true : false,
+        code_email: settings?.code_email === 1 ? true : false,
         facebook: settings?.facebook,
         whatsapp: settings?.whatsapp,
         messenger: settings?.messenger,
@@ -252,6 +306,7 @@ const Settings = () => {
     <>
       <div className="scholar-container mt-4 mb-5 m-3">
         <form className="w-100" onSubmit={formik.handleSubmit}>
+          {/* Logo */}
           <div className="table-header justify-content-end">
             <h3
               className="title"
@@ -261,6 +316,125 @@ const Settings = () => {
               }}
             >
               {t("settings.settingsApp.logo")}
+            </h3>
+          </div>
+          <Row>
+            <Col
+              md={12}
+              className="d-flex flex-column justify-content-center align-items-center"
+            >
+              <div className="image-preview-container d-flex justify-content-center align-items-center">
+                <label
+                  htmlFor={formik.values?.logo?.preview ? "" : "logo"}
+                  className="form-label d-flex justify-content-center align-items-center"
+                >
+                  <img
+                    src={
+                      formik.values?.logo && formik.values?.logo?.preview
+                        ? formik.values?.logo?.preview
+                        : anonymous
+                    }
+                    alt="avatar"
+                    className="image-preview"
+                    onClick={() =>
+                      formik.values?.logo && formik.values?.logo?.preview
+                        ? setToggle({
+                            ...toggle,
+                            logoPreview: !toggle.logoPreview,
+                          })
+                        : ""
+                    }
+                  />
+                  <Modal
+                    isOpen={toggle.logoPreview}
+                    toggle={() =>
+                      setToggle({
+                        ...toggle,
+                        logoPreview: !toggle.logoPreview,
+                      })
+                    }
+                    centered={true}
+                    keyboard={true}
+                    size={"md"}
+                    contentClassName="modal-preview-image modal-add-scholar"
+                  >
+                    <ModalHeader
+                      toggle={() =>
+                        setToggle({
+                          ...toggle,
+                          logoPreview: !toggle.logoPreview,
+                        })
+                      }
+                    >
+                      <IoMdClose
+                        onClick={() =>
+                          setToggle({
+                            ...toggle,
+                            logoPreview: !toggle.logoPreview,
+                          })
+                        }
+                      />
+                    </ModalHeader>
+                    <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                      <img
+                        src={
+                          (formik.values?.logo &&
+                            formik.values?.logo?.preview) ||
+                          toggle.logo?.preview
+                            ? formik.values?.logo?.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                      />
+                    </ModalBody>
+                    <ModalFooter className="p-md-4 p-2">
+                      <div className="form-group-container d-flex justify-content-center align-items-center">
+                        <button
+                          className="delete-btn cancel-btn"
+                          onClick={handleDeleteLogo}
+                        >
+                          حذف
+                        </button>
+                      </div>
+                    </ModalFooter>
+                  </Modal>
+                </label>
+              </div>
+              <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                <label htmlFor="logo" className="form-label">
+                  <ImUpload /> {t("chooseImageLogo")}
+                </label>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="form-input form-img-input"
+                  id="logo"
+                  name="logo"
+                  ref={fileLogoRef}
+                  onChange={handleLogoChange}
+                />
+              </div>
+              {formik.errors.logo && formik.touched.logo ? (
+                <span className="error text-center">{formik.errors.logo}</span>
+              ) : null}
+            </Col>
+          </Row>
+          <hr
+            style={{
+              margin: "3rem 0.75rem 0 0.75rem",
+            }}
+          />
+          {/* Elder */}
+          <div className="table-header justify-content-end">
+            <h3
+              className="title"
+              style={{
+                color: "var(--main-color)",
+                marginBottom: "0 !important",
+              }}
+            >
+              {t("settings.settingsApp.elder")}
             </h3>
           </div>
           <Row>
@@ -348,7 +522,7 @@ const Settings = () => {
               </div>
               <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
                 <label htmlFor="image" className="form-label">
-                  <ImUpload /> {t("chooseImage")}
+                  <ImUpload /> {t("chooseImageElder")}
                 </label>
                 <input
                   type="file"
@@ -508,6 +682,7 @@ const Settings = () => {
               margin: "3rem 0.75rem 0 0.75rem",
             }}
           />
+          {/* Time Prayer */}
           <div className="table-header justify-content-end mt-4">
             <h3
               className="title"
@@ -532,6 +707,57 @@ const Settings = () => {
                   name="prayer_timings"
                   value={formik.values.prayer_timings}
                   checked={formik.values.prayer_timings}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </Col>
+          </Row>
+          <hr
+            style={{
+              margin: "3rem 0.75rem 0 0.75rem",
+            }}
+          />
+          {/* Activation */}
+          <div className="table-header justify-content-end mt-4">
+            <h3
+              className="title"
+              style={{
+                color: "var(--main-color)",
+                marginBottom: "0 !important",
+              }}
+            >
+              {t("settings.settingsApp.activationCode")}
+            </h3>
+          </div>
+          <Row>
+            <Col sm={6}>
+              <div className="form-group d-flex justify-content-end mb-4">
+                <label htmlFor="code_phone" className="form-label">
+                  {t("settings.settingsApp.code.phone")}
+                </label>
+                <input
+                  type="checkbox"
+                  className="prayer-time-input me-3 ms-3"
+                  id="code_phone"
+                  name="code_phone"
+                  value={formik.values.code_phone}
+                  checked={formik.values.code_phone}
+                  onChange={handleInputChange}
+                />
+              </div>
+            </Col>
+            <Col sm={6}>
+              <div className="form-group d-flex justify-content-end mb-4">
+                <label htmlFor="code_email" className="form-label">
+                  {t("settings.settingsApp.code.email")}
+                </label>
+                <input
+                  type="checkbox"
+                  className="prayer-time-input me-3 ms-3"
+                  id="code_email"
+                  name="code_email"
+                  value={formik.values.code_email}
+                  checked={formik.values.code_email}
                   onChange={handleInputChange}
                 />
               </div>
