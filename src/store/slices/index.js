@@ -13,3 +13,4 @@ export { default as settingsSlice } from "./settingsSlice";
 export { default as termsConditionsSlice } from "./termsConditionsSlice";
 export { default as dashboardSlice } from "./dashboardSlice";
 export { default as profileSlice } from "./profileSlice";
+export { default as notificationSlice } from "./notificationSlice";
