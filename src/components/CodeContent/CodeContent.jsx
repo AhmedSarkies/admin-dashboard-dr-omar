@@ -9,6 +9,7 @@ import {
   getCodeContent,
   sendCodeContent,
   sendCodeContentAll,
+  sendCodeContentArray,
 } from "../../store/slices/codeContentSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
@@ -80,16 +81,29 @@ const CodeContent = () => {
     { id: 4, name: "send", label: t("settings.codeContent.columns.send") },
   ];
   const {
-    PaginationUI,
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
   } = useFiltration({
     rowData: users,
     toggle,
     setToggle,
   });
+
+  // Filter Results
+  const results =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? users?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : users;
 
   // Handle Add
   const handleAddOne = (user) => {
@@ -119,6 +133,34 @@ const CodeContent = () => {
     });
   };
 
+  // Send Array
+  const sendArray = (idsList) => {
+    Swal.fire({
+      title: t("areYouSure"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: t("confirm"),
+      cancelButtonText: t("cancel"),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(
+          sendCodeContentArray({ user_ids: idsList, code: codeContent[0].code })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            Swal.fire({
+              title: t("doneConfirm"),
+              icon: "success",
+            });
+          }
+        });
+      }
+    });
+  };
+
   // get data from api
   useEffect(() => {
     try {
@@ -133,6 +175,50 @@ const CodeContent = () => {
     }
     // eslint-disable-next-line
   }, [dispatch]);
+
+  // Add just selected users to the list
+  const [ids, setIds] = useState([]);
+  const handleAddSelected = (e) => {
+    const userId = +e.target.value;
+    const isChecked = e.target.checked;
+    if (isChecked) {
+      setIds([...ids, userId]);
+    } else {
+      setIds(ids.filter((id) => id !== userId));
+    }
+  };
+
+  // Add All id users to the list
+  const handleAddAll = () => {
+    if (ids.length === users.length) {
+      setIds([]);
+      // Make All checkboxes Not checked
+      const checkboxes = document.querySelectorAll(".checked");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = false;
+      });
+      return;
+    } else {
+      const allIds = users.map((user) => user.id);
+      setIds(allIds);
+      // Make All checkboxes checked
+      const checkboxes = document.querySelectorAll(".checked");
+      checkboxes.forEach((checkbox) => {
+        checkbox.checked = true;
+      });
+    }
+  };
+
+  // Remove Any id not checked from the list
+  useEffect(() => {
+    const checkboxes = document.querySelectorAll(".checked");
+    checkboxes.forEach((checkbox) => {
+      const userId = +checkbox.value;
+      if (!ids.includes(userId)) {
+        checkbox.checked = false;
+      }
+    });
+  }, [ids]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
@@ -202,12 +288,12 @@ const CodeContent = () => {
         </button>
       </div>
       <div className="scholar">
-        <div className="table-header">
+        <div className={`table-header ${ids.length > 0 ? "mb-3" : "mb-4"}`}>
           {/* Search */}
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "40%",
             }}
           >
             <input
@@ -267,9 +353,46 @@ const CodeContent = () => {
             </div>
           </div>
         </div>
+        {/* Send Selected Users */}
+        {ids.length > 0 && (
+          <div className="table-header justify-content-start m-0">
+            <button
+              className="add-btn send"
+              onClick={() => sendArray(ids)}
+              style={{
+                opacity: loading ? "0.5" : "1",
+                pointerEvents: loading ? "none" : "auto",
+                cursor: loading ? "not-allowed" : "pointer",
+                fontSize: "0.8rem",
+                padding: "0.2rem 0.75rem",
+              }}
+            >
+              {loading ? (
+                <span
+                  className="spinner-border spinner-border-sm"
+                  role="status"
+                  aria-hidden="true"
+                ></span>
+              ) : (
+                <>
+                  <MdSend />
+                  {t("send")}
+                </>
+              )}
+            </button>
+          </div>
+        )}
         <table className="table-body">
           <thead>
             <tr>
+              <th className="table-th" onClick={handleAddAll}>
+                <input
+                  type="checkbox"
+                  className="checkbox"
+                  checked={ids.length === users.length}
+                  readOnly
+                />
+              </th>
               {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("user.columns.id")}
@@ -329,7 +452,7 @@ const CodeContent = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -347,7 +470,7 @@ const CodeContent = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -364,10 +487,10 @@ const CodeContent = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
+          {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -379,17 +502,25 @@ const CodeContent = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
+          {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {results?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  <td className="table-td">
+                    <input
+                      type="checkbox"
+                      className={`checked-${result?.id} checked`}
+                      value={result?.id}
+                      onChange={handleAddSelected}
+                    />
+                  </td>
                   <td className="table-td id">{result?.id}</td>
                   <td className="table-td name">{result?.name}</td>
                   <td className="table-td email">
@@ -519,10 +650,6 @@ const CodeContent = () => {
           </form>
         </ModalBody>
       </Modal>
-      {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
     </div>
   );
 };
