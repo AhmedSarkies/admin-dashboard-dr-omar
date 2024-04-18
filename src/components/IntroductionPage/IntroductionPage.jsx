@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { FaEdit } from "react-icons/fa";
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose, IoMdEye } from "react-icons/io";
 import { ImUpload } from "react-icons/im";
 import {
   getIntroductionPageApi,
@@ -38,9 +38,11 @@ const IntroductionPage = () => {
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
+    view: false,
     imagePreview: false,
     status: false,
     elders: false,
+    searchTerm: "",
     pictureCategories: false,
     activeColumn: false,
     toggleColumns: {
@@ -443,6 +445,17 @@ const IntroductionPage = () => {
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
+                        <IoMdEye
+                          className="view-btn"
+                          onClick={() => {
+                            handleEdit(result);
+                            setToggle({
+                              ...toggle,
+                              add: !toggle.add,
+                              view: !toggle.view,
+                            });
+                          }}
+                        />
                         <FaEdit
                           className="edit-btn"
                           onClick={() => {
@@ -473,6 +486,7 @@ const IntroductionPage = () => {
           setToggle({
             ...toggle,
             add: !toggle.add,
+            view: false,
           });
           formik.handleReset();
         }}
@@ -486,18 +500,24 @@ const IntroductionPage = () => {
             setToggle({
               ...toggle,
               add: !toggle.add,
+              view: false,
             });
             formik.handleReset();
           }}
         >
-          {formik.values.id
+          {formik.values.id && !toggle.view
             ? t("settings.introductionPage.editTitle")
-            : t("settings.introductionPage.addTitle")}
+            : !toggle.view
+            ? t("settings.introductionPage.addTitle")
+            : lng === "ar" && toggle.view && formik.values.id
+            ? formik.values.title
+            : formik.values.titleEn}
           <IoMdClose
             onClick={() => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                view: false,
               });
               formik.handleReset();
             }}
@@ -573,40 +593,44 @@ const IntroductionPage = () => {
                           className="image-preview"
                         />
                       </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={() => {
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              });
-                              formik.setFieldValue("image", {
-                                file: "",
-                                preview: "",
-                              });
-                            }}
-                          >
-                            {t("delete")}
-                          </button>
-                        </div>
-                      </ModalFooter>
+                      {!toggle.view && (
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      )}
                     </Modal>
                   </label>
                 </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    onChange={handleImageChange}
-                  />
-                </div>
+                {!toggle.view && (
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImage")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                )}
                 {formik.errors.image && formik.touched.image ? (
                   <span className="error text-center">
                     {formik.errors.image}
@@ -631,6 +655,7 @@ const IntroductionPage = () => {
                       "settings.introductionPage.columns.title.en"
                     )}
                     name="titleEn"
+                    disabled={toggle.view}
                     value={formik.values.titleEn}
                     onChange={formik.handleChange}
                   />
@@ -655,6 +680,7 @@ const IntroductionPage = () => {
                       "settings.introductionPage.columns.title.ar"
                     )}
                     name="title"
+                    disabled={toggle.view}
                     value={formik.values.title}
                     onChange={formik.handleChange}
                   />
@@ -677,6 +703,7 @@ const IntroductionPage = () => {
                       "settings.introductionPage.columns.description.en"
                     )}
                     name="descriptionEn"
+                    disabled={toggle.view}
                     value={formik.values.descriptionEn}
                     onChange={formik.handleChange}
                   ></textarea>
@@ -698,11 +725,11 @@ const IntroductionPage = () => {
                       "settings.introductionPage.columns.description.ar"
                     )}
                     name="description"
+                    disabled={toggle.view}
                     value={formik.values.description}
                     onChange={formik.handleChange}
                   ></textarea>
-                  {formik.errors.description &&
-                  formik.touched.description ? (
+                  {formik.errors.description && formik.touched.description ? (
                     <span className="error">{formik.errors.description}</span>
                   ) : null}
                 </div>
@@ -711,20 +738,22 @@ const IntroductionPage = () => {
             <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : formik.values.id ? (
-                      t("edit")
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
+                  {!toggle.view && (
+                    <button type="submit" className="add-btn">
+                      {/* loading */}
+                      {loading ? (
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : formik.values.id ? (
+                        t("edit")
+                      ) : (
+                        t("add")
+                      )}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="cancel-btn"
@@ -732,6 +761,7 @@ const IntroductionPage = () => {
                       setToggle({
                         ...toggle,
                         add: !toggle.add,
+                        view: false,
                       });
                       formik.handleReset();
                     }}
