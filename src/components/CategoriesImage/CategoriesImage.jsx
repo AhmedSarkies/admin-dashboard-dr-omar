@@ -29,6 +29,7 @@ const CategoriesImages = () => {
     add: false,
     edit: false,
     activeColumn: false,
+    searchTerm: "",
     toggleColumns: {
       title: true,
       control: true,
