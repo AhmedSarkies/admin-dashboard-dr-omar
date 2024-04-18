@@ -9,7 +9,7 @@ import { IoMdClose } from "react-icons/io";
 import Swal from "sweetalert2";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
-import { useFiltration } from "../../hooks";
+import { useFiltration, useSchema } from "../../hooks";
 import Cookies from "js-cookie";
 import {
   getTermsAndConditionsApi,
@@ -21,6 +21,7 @@ import {
 const TermsAndConditions = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
+  const { validationSchema } = useSchema();
   const { termsAndConditions, loading, error } = useSelector(
     (state) => state.termsAndConditions
   );
@@ -50,22 +51,23 @@ const TermsAndConditions = () => {
 
   const formik = useFormik({
     initialValues: {
-      arabicTitle: "",
-      englishTitle: "",
+      title: "",
+      title_en: "",
       country: "",
       country_en: "",
       text: "",
       text_en: "",
       isEditing: false,
     },
+    validationSchema: validationSchema.termsAndConditions,
     onSubmit: (values) => {
       if (values.id) {
         // Edit
         dispatch(
           updateTermAndConditionApi({
             id: values.id,
-            title: values.arabicTitle.toLowerCase(),
-            title_en: values.englishTitle.toLowerCase(),
+            title: values.title.toLowerCase(),
+            title_en: values.title_en.toLowerCase(),
             country: values.country.toLowerCase(),
             country_en: values.country_en.toLowerCase(),
             text: values.text.toLowerCase(),
@@ -89,8 +91,8 @@ const TermsAndConditions = () => {
         // Add
         dispatch(
           addTermAndConditionApi({
-            title: values.arabicTitle.toLowerCase(),
-            title_en: values.englishTitle.toLowerCase(),
+            title: values.title.toLowerCase(),
+            title_en: values.title_en.toLowerCase(),
             country: values.country.toLowerCase(),
             country_en: values.country_en.toLowerCase(),
             text: values.text.toLowerCase(),
@@ -516,22 +518,21 @@ const TermsAndConditions = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="arabicTitle"
-                      name="arabicTitle"
+                      id="title"
+                      name="title"
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.title"
                       )}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="arabicTitle" className="label-form">
+                    <label htmlFor="title" className="label-form">
                       {t("settings.termsAndConditions.columns.ar.title")}
                     </label>
                   </div>
                   <div className="error-container">
-                    {formik.errors.arabicTitle &&
-                      formik.touched.arabicTitle && (
-                        <p className="error">{formik.errors.arabicTitle}</p>
-                      )}
+                    {formik.errors.title && formik.touched.title && (
+                      <p className="error">{formik.errors.title}</p>
+                    )}
                   </div>
                 </Col>
                 <Col lg={6} className="mb-3">
@@ -586,22 +587,21 @@ const TermsAndConditions = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="englishTitle"
-                      name="englishTitle"
+                      id="title_en"
+                      name="title_en"
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.title"
                       )}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="englishTitle" className="label-form">
+                    <label htmlFor="title_en" className="label-form">
                       {t("settings.termsAndConditions.columns.en.title")}
                     </label>
                   </div>
                   <div className="error-container">
-                    {formik.errors.englishTitle &&
-                      formik.touched.englishTitle && (
-                        <p className="error">{formik.errors.englishTitle}</p>
-                      )}
+                    {formik.errors.title_en && formik.touched.title_en && (
+                      <p className="error">{formik.errors.title_en}</p>
+                    )}
                   </div>
                 </Col>
                 <Col lg={6} className="mb-3">
@@ -727,22 +727,22 @@ const TermsAndConditions = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="arabicTitle"
-                      name="arabicTitle"
+                      id="title"
+                      name="title"
+                      value={formik.values.title}
                       placeholder={t(
                         "settings.termsAndConditions.columns.ar.title"
                       )}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="arabicTitle" className="label-form">
+                    <label htmlFor="title" className="label-form">
                       {t("settings.termsAndConditions.columns.ar.title")}
                     </label>
                   </div>
                   <div className="error-container">
-                    {formik.errors.arabicTitle &&
-                      formik.touched.arabicTitle && (
-                        <p className="error">{formik.errors.arabicTitle}</p>
-                      )}
+                    {formik.errors.title && formik.touched.title && (
+                      <p className="error">{formik.errors.title}</p>
+                    )}
                   </div>
                 </Col>
                 <Col lg={6} className="mb-3">
@@ -797,22 +797,22 @@ const TermsAndConditions = () => {
                     <input
                       type="text"
                       className="form-control"
-                      id="englishTitle"
-                      name="englishTitle"
+                      id="title_en"
+                      name="title_en"
+                      value={formik.values.title_en}
                       placeholder={t(
                         "settings.termsAndConditions.columns.en.title"
                       )}
                       onChange={handleInputChange}
                     />
-                    <label htmlFor="englishTitle" className="label-form">
+                    <label htmlFor="title_en" className="label-form">
                       {t("settings.termsAndConditions.columns.en.title")}
                     </label>
                   </div>
                   <div className="error-container">
-                    {formik.errors.englishTitle &&
-                      formik.touched.englishTitle && (
-                        <p className="error">{formik.errors.englishTitle}</p>
-                      )}
+                    {formik.errors.title_en && formik.touched.title_en && (
+                      <p className="error">{formik.errors.title_en}</p>
+                    )}
                   </div>
                 </Col>
                 <Col lg={6} className="mb-3">
