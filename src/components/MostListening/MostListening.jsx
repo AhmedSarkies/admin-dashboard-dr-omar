@@ -36,6 +36,7 @@ const MostListening = () => {
       visits: true,
       favorites: true,
       downloads: true,
+      activation: true,
       control: true,
     },
   });
@@ -56,7 +57,8 @@ const MostListening = () => {
     { id: 7, name: "visits", label: t("visits") },
     { id: 8, name: "favorites", label: t("favorites") },
     { id: 9, name: "downloads", label: t("downloads") },
-    { id: 10, name: "status", label: t("status") },
+    { id: 10, name: "activation", label: t("activation") },
+    { id: 11, name: "status", label: t("status") },
   ];
   const {
     PaginationUI,
@@ -261,10 +263,25 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.activation && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("status")}
+                  {t("activation")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("status")}
+                  {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -394,6 +411,19 @@ const MostListening = () => {
                   )}
                   {toggle.toggleColumns.shares && (
                     <td className="table-td">{result?.shares_count}</td>
+                  )}
+                  {toggle.toggleColumns.activation && (
+                    <td className="table-td">
+                      <span
+                        className="table-status badge"
+                        style={{
+                          backgroundColor:
+                            result?.is_active === 1 ? "green" : "red",
+                        }}
+                      >
+                        {result?.is_active === 1 ? t("active") : t("inactive")}
+                      </span>
+                    </td>
                   )}
                   {toggle.toggleColumns.status && (
                     <td className="table-td">
