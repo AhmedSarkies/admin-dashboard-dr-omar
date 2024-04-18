@@ -48,20 +48,27 @@
   "search": "Search",
   "searchSubAdmin": "Search Sub Admin by Name, Email or Phone",
   "searchMessage": "Search Message by Name, Email or Phone",
-  "searchUser": "Search User by Name, Email, Phone or Subscription",
+  "searchUser": "Search User by Name, Email or Phone",
   "searchElder": "Search Elder by Name, Email or Phone",
-  "searchAudio": "Search Audio by Title, Category Name or Elder Name",
-  "searchArticle": "Search Article by Title, Category Name or Elder Name",
-  "searchBook": "Search Book",
-  "searchImage": "Search Image by Category Name",
+  "searchAudio": "Search Audio by Title, Category or Elder Name",
+  "searchArticle": "Search Article by Title, Category or Writer",
+  "searchBook": "Search Book by Title, Category",
+  "searchImage": "Search Image by Category",
   "searchSubCategoryBook": "Search Sub Category Book",
   "searchMainCategoryBook": "Search Main Category Book",
   "searchCategoryImage": "Search Category Image",
   "searchCategoryAudio": "Search Category Audio",
   "searchCategoryArticle": "Search Category Article",
   "viewBook": "View Book",
+  "activation": "Activation",
+  "chooseImageElder": "Choose Image Elder",
+  "chooseImageLogo": "Choose Image Logo",
+  "searchNotification": "Search Notification by Title",
   "noPhone": "No Phone",
   "noData": "No Data",
+  "show": "Show",
+  "hide": "Hide",
+  "showWriter": "Status Writer",
   "noColumns": "No Columns",
   "networkError": "Network Error",
   "serverError": "Server Error",
@@ -155,6 +162,7 @@
     "favorite_data_images": "Favorite Images",
     "favorite_data_elders": "Favorite Elders",
     "columns": {
+      "selectAll": "Select All",
       "id": "ID",
       "name": "Name",
       "email": "Email",
@@ -189,13 +197,20 @@
     "columns": {
       "id": "ID",
       "title": "Title",
-      "body": "Body"
+      "body": "Body",
+      "image": "Image"
     }
   },
   "settings": {
     "settingsApp": {
       "logo": "Logo",
       "background": "Background",
+      "elder": "Elder",
+      "activationCode": "Activation Code",
+      "code": {
+        "email": "Email",
+        "phone": "Phone"
+      },
       "prayer": {
         "time": "Prayer Time",
         "adhan": "Adhan",
@@ -207,6 +222,7 @@
       "sendTitle": "Send Code Content",
       "addTitle": "Add Code Content",
       "editTitle": "Edit Code Content",
+      "sendSelectedUser": "Send To Selected Used",
       "columns": {
         "code": "Code",
         "name": "Name",
@@ -331,7 +347,9 @@
       "book": {
         "image": "Image Book",
         "title": "Title Book",
-        "book": "Book"
+        "book": "Book",
+        "number_pages": "Number Pages",
+        "category": "Category"
       }
     }
   },
@@ -378,6 +396,7 @@
       "created_at": "Created",
       "updated_at": "Updated",
       "email_verified_at": "Email Verified",
+      "phone_verified_at": "Phone Verified",
       "notVerified": "Not Verified",
       "verified": "Verified"
     }
@@ -399,6 +418,7 @@
         "image": "Image Elder",
         "name": "Name Elder"
       },
+      "writer": "Writer",
       "image": "Image",
       "title": "Title",
       "article": "Article",
@@ -486,6 +506,12 @@
       "deletedSuccess": "Terms and Conditions deleted successfully",
       "deletedError": "An error occurred while deleting terms and conditions"
     },
+    "notifications": {
+      "addedSuccess": "Notification added successfully",
+      "addedError": "An error occurred while adding notification",
+      "deletedSuccess": "Notification deleted successfully",
+      "deletedError": "An error occurred while deleting notification"
+    },
     "codeContent": {
       "addedSuccess": "Code Content added successfully",
       "addedError": "An error occurred while adding code content",
@@ -515,12 +541,15 @@
     "phone": "Please enter a valid phone number 11 digits (Ex: 01234567890)",
     "image": "Please choose an image",
     "imageElder": "Please choose an image elder",
+    "activation": "Please Choose Activation Status",
     "imageBook": "Please choose an image book",
+    "showWriter": "Please choose a status writer",
     "imageAudio": "Please choose an image audio",
     "imageArticle": "Please choose an image article",
     "audio": "Please choose an audio",
     "book": "Please choose a book",
     "article": "Please choose an article",
+    "writer": "Please enter a writer",
     "category": "Please choose a category",
     "elder": "Please choose an elder",
     "title": "Please enter a title",
@@ -536,6 +565,7 @@
     "maxCharacters": "Please enter a maximum of 40 characters",
     "powers": "Please choose a power",
     "oldPassword": "Please enter a old password",
-    "newPassword": "Please enter a new password"
+    "newPassword": "Please enter a new password",
+    "status": "Please choose a status"
   }
 }
