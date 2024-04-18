@@ -42,8 +42,10 @@ const Images = () => {
     imagePreview: false,
     status: false,
     elders: false,
+    is_active: false,
     pictureCategories: false,
     activeColumn: false,
+    searchTerm: "",
     toggleColumns: {
       image: true,
       category: true,
@@ -52,6 +54,7 @@ const Images = () => {
       downloads: true,
       shares: true,
       status: true,
+      activation: true,
       control: true,
     },
     sortColumn: "",
@@ -66,7 +69,7 @@ const Images = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
+    searchResultsImagesCategory,
   } = useFiltration({
     rowData: pictures,
     toggle,
@@ -81,7 +84,8 @@ const Images = () => {
     { id: 5, name: "downloads", label: t("downloads") },
     { id: 6, name: "shares", label: t("shares") },
     { id: 7, name: "status", label: t("status") },
-    { id: 8, name: "control", label: t("action") },
+    { id: 8, name: "activation", label: t("activation") },
+    { id: 9, name: "control", label: t("action") },
   ];
 
   // Formik
@@ -92,6 +96,7 @@ const Images = () => {
         preview: "",
       },
       status: "",
+      is_active: "",
       pictureCategory: {
         title: "",
         id: "",
@@ -111,6 +116,7 @@ const Images = () => {
             category_id: values.pictureCategory?.id,
             image: values.image.file,
             status: values.status,
+            is_active: values.is_active,
           })
         ).then((res) => {
           if (!res.error) {
@@ -132,6 +138,7 @@ const Images = () => {
             image_categories_id: values.pictureCategory?.id,
             image: values.image.file,
             status: values.status,
+            is_active: values.is_active,
           })
         ).then((res) => {
           if (!res.error) {
@@ -185,6 +192,7 @@ const Images = () => {
       ...picture,
       image: picture?.image,
       status: picture?.status,
+      is_active: picture?.is_active,
       pictureCategory: {
         title: picture?.image_category?.title,
         id: picture?.image_category?.id,
@@ -261,7 +269,12 @@ const Images = () => {
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
-          <div className="search-container form-group-container form-input">
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
             <input
               type="text"
               className="form-input"
@@ -406,10 +419,22 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.activation && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("action")}
+                  {t("activation")}
                   {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -424,7 +449,7 @@ const Images = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -442,7 +467,7 @@ const Images = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -459,109 +484,132 @@ const Images = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
+          {searchResultsImagesCategory?.length === 0 &&
+            error === null &&
+            !loading && (
+              <tbody>
+                <tr className="no-data-container">
+                  <td className="table-td" colSpan="9">
+                    <p className="no-data mb-0">{t("noData")}</p>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           {/* There is no any columns */}
           {Object.values(toggle.toggleColumns).every(
             (column) => column === false
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {searchResults?.map((result) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.image && (
-                    <td className="table-td">
-                      <img
-                        src={result?.image === "" ? anonymous : result?.image}
-                        alt="scholar"
-                        className="scholar-img"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.category && (
-                    <td className="table-td name">
-                      {result?.image_category?.title}
-                    </td>
-                  )}
-                  {toggle.toggleColumns.visits && (
-                    <td className="table-td">{result?.visits_count}</td>
-                  )}
-                  {toggle.toggleColumns.favorites && (
-                    <td className="table-td">{result?.favorites_count}</td>
-                  )}
-                  {toggle.toggleColumns.downloads && (
-                    <td className="table-td">{result?.downloads_count}</td>
-                  )}
-                  {toggle.toggleColumns.shares && (
-                    <td className="table-td">{result?.shares_count}</td>
-                  )}
-                  {toggle.toggleColumns.status && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "Public"
-                              ? "green"
-                              : result?.status === "Private"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "Public"
-                          ? t("public")
-                          : result?.status === "Private"
-                          ? t("private")
-                          : t("private")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              edit: !toggle.edit,
-                            });
+          {searchResultsImagesCategory?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsImagesCategory?.map((result) => (
+                  <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns.image && (
+                      <td className="table-td">
+                        <img
+                          src={result?.image === "" ? anonymous : result?.image}
+                          alt="scholar"
+                          className="scholar-img"
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
                           }}
                         />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+                      </td>
+                    )}
+                    {toggle.toggleColumns.category && (
+                      <td className="table-td name">
+                        {result?.image_category?.title}
+                      </td>
+                    )}
+                    {toggle.toggleColumns.visits && (
+                      <td className="table-td">{result?.visits_count}</td>
+                    )}
+                    {toggle.toggleColumns.favorites && (
+                      <td className="table-td">{result?.favorites_count}</td>
+                    )}
+                    {toggle.toggleColumns.downloads && (
+                      <td className="table-td">{result?.downloads_count}</td>
+                    )}
+                    {toggle.toggleColumns.shares && (
+                      <td className="table-td">{result?.shares_count}</td>
+                    )}
+                    {toggle.toggleColumns.status && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.status === "Public"
+                                ? "green"
+                                : result?.status === "Private"
+                                ? "red"
+                                : "red",
+                          }}
+                        >
+                          {result?.status === "Public"
+                            ? t("public")
+                            : result?.status === "Private"
+                            ? t("private")
+                            : t("private")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.activation && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.is_active === 1 ? "green" : "red",
+                          }}
+                        >
+                          {result?.is_active === 1
+                            ? t("active")
+                            : t("inactive")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          <FaEdit
+                            className="edit-btn"
+                            onClick={() => {
+                              handleEdit(result);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
+                            }}
+                          />
+                          <MdDeleteOutline
+                            className="delete-btn"
+                            onClick={() => handleDelete(result)}
+                          />
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            )}
         </table>
+        {/* Pagination */}
+        {searchResultsImagesCategory?.length > 0 &&
+          error === null &&
+          loading === false && <PaginationUI />}
       </div>
       {/* Add Image */}
       <Modal
@@ -842,6 +890,74 @@ const Images = () => {
                   {formik.errors.status && formik.touched.status ? (
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </Col>
               <Col lg={12}>
@@ -1196,6 +1312,74 @@ const Images = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
@@ -1230,10 +1414,6 @@ const Images = () => {
           </form>
         </ModalBody>
       </Modal>
-      {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
     </div>
   );
 };
