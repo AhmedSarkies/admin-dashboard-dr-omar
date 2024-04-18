@@ -18,6 +18,7 @@ const initialValues = {
   email: "",
   phone: "",
   password: "",
+  is_active: "",
 };
 
 const Users = () => {
@@ -29,6 +30,7 @@ const Users = () => {
   const [toggle, setToggle] = useState({
     add: false,
     readMessage: false,
+    is_active: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -44,6 +46,7 @@ const Users = () => {
       subscription: true,
       created_at: true,
       login_count: true,
+      activation: true,
       control: true,
     },
   });
@@ -68,6 +71,7 @@ const Users = () => {
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("phonenumber", values.phone);
+      formData.append("is_active", values.is_active);
       if (values.password) {
         formData.append("password", values.password);
       }
@@ -102,7 +106,8 @@ const Users = () => {
     { id: 4, name: "subscription", label: t("user.columns.subscription") },
     { id: 5, name: "created_at", label: t("user.columns.created_at") },
     { id: 6, name: "login_count", label: t("user.columns.login_count") },
-    { id: 7, name: "control", label: t("action") },
+    { id: 7, name: "activation", label: t("activation") },
+    { id: 8, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -153,11 +158,13 @@ const Users = () => {
       name: user?.name,
       email: user?.email,
       phone: user?.phonenumber,
+      is_active: user?.is_active,
       password: user?.password,
     });
     setToggle({
       ...toggle,
       add: !toggle.add,
+      is_active: false,
     });
   };
 
@@ -325,6 +332,9 @@ const Users = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.activation && (
+                <th className="table-th">{t("activation")}</th>
+              )}
               {toggle.toggleColumns?.control && (
                 <th className="table-th">{t("action")}</th>
               )}
@@ -428,6 +438,17 @@ const Users = () => {
                   </td>
                   <td className="table-td login_count">
                     {result?.login_count}
+                  </td>
+                  <td className="table-td">
+                    <span
+                      className="table-status badge"
+                      style={{
+                        backgroundColor:
+                          result?.is_active === 1 ? "green" : "red",
+                      }}
+                    >
+                      {result?.is_active === 1 ? t("active") : t("inactive")}
+                    </span>
                   </td>
                   <td className="table-td">
                     <span className="table-btn-container">
@@ -547,6 +568,74 @@ const Users = () => {
                   {formik.errors.phone && formik.touched.phone ? (
                     <span className="error">{formik.errors.phone}</span>
                   ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
                 </div>
                 <div className="form-group-container d-flex flex-column align-items-end mb-3">
                   <label htmlFor="password" className="form-label">

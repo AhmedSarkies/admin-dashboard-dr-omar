@@ -81,9 +81,9 @@ const User = () => {
 
   return (
     <div className="scholar-container mt-4 mb-5 pb-3 m-sm-3 m-0">
-    <div className="table-header justify-content-end">
-          <h2>{toggle?.user?.name}</h2>
-        </div>
+      <div className="table-header justify-content-end">
+        <h2>{toggle?.user?.name}</h2>
+      </div>
       {/* Download */}
       <div className="scholar">
         <div className="table-header justify-content-end">
