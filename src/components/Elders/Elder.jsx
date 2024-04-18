@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { getScholarByIdApi } from "../../store/slices/scholarSlice";
 
 import { Modal, ModalBody, ModalHeader, Spinner } from "reactstrap";
-import { IoMdClose, IoMdEye } from "react-icons/io";
+import { IoMdClose } from "react-icons/io";
 
 const Elder = () => {
   const { t } = useTranslation();
@@ -67,6 +67,7 @@ const Elder = () => {
               <th className="table-th">{t("favorites")}</th>
               <th className="table-th">{t("downloads")}</th>
               <th className="table-th">{t("shares")}</th>
+              <th className="table-th">{t("activation")}</th>
               <th className="table-th">{t("status")}</th>
             </tr>
           </thead>
@@ -189,170 +190,29 @@ const Elder = () => {
                         }}
                       >
                         {result?.status === "public"
-                          ? "عام"
+                          ? t("public")
                           : result?.status === "private"
-                          ? "خاص"
-                          : "خاص"}
+                          ? t("private")
+                          : t("private")}
                       </span>
                     </td>
-                  </tr>
-                ))}
-              </tbody>
-            )}
-        </table>
-      </div>
-      <div className="audio scholar mt-4">
-        <div className="table-header justify-content-end">
-          <h2>{t("articles.title")}</h2>
-        </div>
-        <table className="table-body">
-          <thead>
-            <tr>
-              <th className="table-th">{t("articles.columns.elder.image")}</th>
-              <th className="table-th">{t("articles.columns.elder.name")}</th>
-              <th className="table-th">{t("articles.columns.image")}</th>
-              <th className="table-th">{t("articles.columns.title")}</th>
-              <th className="table-th">{t("articles.columns.article")}</th>
-              <th className="table-th">{t("articles.columns.category")}</th>
-              <th className="table-th">{t("status")}</th>
-              <th className="table-th">{t("visits")}</th>
-              <th className="table-th">{t("favorites")}</th>
-              <th className="table-th">{t("shares")}</th>
-              <th className="table-th"> {t("action")}</th>
-            </tr>
-          </thead>
-          {/* Error */}
-          {error !== null && loading === false && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
-                  <p className="no-data mb-0">
-                    {error === "Network Error"
-                      ? t("networkError")
-                      : error === "Request failed with status code 404"
-                      ? t("noData")
-                      : error === "Request failed with status code 500"
-                      ? t("serverError")
-                      : t("someError")}
-                  </p>
-                </td>
-              </tr>
-            </tbody>
-          )}
-          {/* Loading */}
-          {loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
-                  <div className="no-data mb-0">
-                    <Spinner
-                      color="primary"
-                      style={{
-                        height: "3rem",
-                        width: "3rem",
-                      }}
-                    >
-                      Loading...
-                    </Spinner>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          )}
-          {/* No Data */}
-          {dataById?.articles?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
-          {/* There is no any columns */}
-          {Object.values(toggle.toggleColumns).every(
-            (column) => column === false
-          ) && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
-                  <p className="no-data no-columns mb-0">{t("noColumns")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
-          {/* Data */}
-          {dataById?.articles?.length > 0 &&
-            error === null &&
-            loading === false && (
-              <tbody>
-                {dataById?.articles?.map((result) => (
-                  <tr key={result?.id + new Date().getDate()}>
-                    <td className="table-td">
-                      <img
-                        src={result?.elder.image}
-                        alt={result?.elder.name || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                    <td className="table-td title">{result?.elder.name}</td>
-                    <td className="table-td">
-                      <img
-                        src={result?.image}
-                        alt={result?.title || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                    <td className="table-td title">{result?.title}</td>
-                    <td className="table-td article">
-                      {result?.content?.length >= 50
-                        ? result?.content?.slice(0, 50) + "..."
-                        : result?.content}
-                    </td>
-                    <td className="table-td title">{result?.Category.title}</td>
                     <td className="table-td">
                       <span
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.status === "Public"
+                            result?.is_active === 1
                               ? "green"
-                              : result?.status === "Private"
+                              : result?.is_active === 0
                               ? "red"
                               : "red",
                         }}
                       >
-                        {result?.status === "Public"
-                          ? t("public")
-                          : result?.status === "Public"
-                          ? t("private")
-                          : t("private")}
-                      </span>
-                    </td>
-                    <td className="table-td">{result?.visit_count}</td>
-                    <td className="table-td">{result?.favorites_count}</td>
-                    <td className="table-td">{result?.shares_count}</td>
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <IoMdEye
-                          onClick={() => {
-                            setToggle({
-                              ...toggle,
-                              readMore: !toggle.readMore,
-                              article: result,
-                            });
-                          }}
-                        />
+                        {result?.is_active === 1
+                          ? t("active")
+                          : result?.is_active === 0
+                          ? t("inactive")
+                          : t("inactive")}
                       </span>
                     </td>
                   </tr>
