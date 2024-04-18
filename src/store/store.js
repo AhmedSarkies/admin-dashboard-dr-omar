@@ -16,6 +16,7 @@ import {
   termsConditionsSlice,
   dashboardSlice,
   profileSlice,
+  notificationSlice,
 } from "./slices";
 
 const store = configureStore({
@@ -35,6 +36,7 @@ const store = configureStore({
     termsAndConditions: termsConditionsSlice,
     dashboard: dashboardSlice,
     profile: profileSlice,
+    notification: notificationSlice,
   },
 });
 
