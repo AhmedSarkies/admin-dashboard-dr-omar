@@ -28,6 +28,7 @@ const CategoriesArticle = () => {
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
+    searchTerm: "",
     activeColumn: false,
     toggleColumns: {
       category: true,
