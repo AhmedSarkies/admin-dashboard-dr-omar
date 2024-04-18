@@ -41,6 +41,7 @@ const initialValues = {
     preview: "",
   },
   status: "",
+  is_active: "",
   elder: {
     name: "",
     id: "",
@@ -64,8 +65,10 @@ const Audios = () => {
     add: false,
     edit: false,
     imagePreview: false,
+    searchTerm: "",
     readMore: false,
     status: false,
+    is_active: false,
     elders: false,
     audioCategories: false,
     duration: "00:00",
@@ -75,12 +78,14 @@ const Audios = () => {
       nameElder: true,
       image: true,
       title: true,
+      category: true,
       audio: true,
       visits: true,
       favorites: true,
       downloads: true,
       shares: true,
       status: true,
+      activation: true,
       control: true,
     },
     sortColumn: "",
@@ -89,32 +94,42 @@ const Audios = () => {
     currentPage: 1,
   });
 
+  // convert categories array to object and return all data
+  const allDataWithCategoriesObj = audios?.map((audio) => {
+    return {
+      ...audio,
+      categories: audio?.categories[0],
+    };
+  });
+
   // Filtration, Sorting, Pagination
   const {
     PaginationUI,
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
+    searchResultsAudioSCategoryAndTitleAndAuthor,
   } = useFiltration({
-    rowData: audios,
+    rowData: allDataWithCategoriesObj,
     toggle,
     setToggle,
   });
 
   // Columns
   const columns = [
-    { id: 1, name: "imageElder", label: t("audios.columns.elder.image") },
-    { id: 2, name: "nameElder", label: t("audios.columns.elder.name") },
-    { id: 3, name: "image", label: t("audios.columns.audio.image") },
-    { id: 4, name: "title", label: t("audios.columns.audio.title") },
+    { id: 0, name: "imageElder", label: t("audios.columns.elder.image") },
+    { id: 1, name: "nameElder", label: t("audios.columns.elder.name") },
+    { id: 2, name: "image", label: t("audios.columns.audio.image") },
+    { id: 3, name: "title", label: t("audios.columns.audio.title") },
+    { id: 4, name: "category", label: t("audios.columns.audio.category") },
     { id: 5, name: "audio", label: t("audios.columns.audio.audio") },
     { id: 6, name: "visits", label: t("visits") },
     { id: 7, name: "favorites", label: t("favorites") },
     { id: 8, name: "downloads", label: t("downloads") },
     { id: 9, name: "shares", label: t("shares") },
     { id: 10, name: "status", label: t("status") },
-    { id: 11, name: "control", label: t("action") },
+    { id: 11, name: "activation", label: t("activation") },
+    { id: 12, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -164,6 +179,7 @@ const Audios = () => {
             audio: values.audio.file,
             status: values.status,
             elder_id: values.elder.id,
+            is_active: values.is_active,
             Audio_category: values.audioCategory.id,
           })
         ).then((res) => {
@@ -187,6 +203,7 @@ const Audios = () => {
           title: values.title,
           status: values.status === "Public" ? "public" : "private",
           Audio_category: values.audioCategory.id,
+          is_active: values.is_active,
           tag_name: ["tag 1", "tag 2"],
         };
         if (values.image.file) {
@@ -293,13 +310,14 @@ const Audios = () => {
       image: audio.image,
       audio: audio.audio,
       status: audio.status,
+      is_active: audio.is_active,
       elder: {
         name: audio.elder?.name,
         id: audio.elder?.id,
       },
       audioCategory: {
-        title: audio.audioCategory?.title,
-        id: audio.audioCategory?.id,
+        title: audio.categories?.title,
+        id: audio.categories?.id,
       },
       tag_name: ["tag 1", "tag 2"],
     });
@@ -487,9 +505,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.audio && (
+              {toggle.toggleColumns.category && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("audios.columns.audio.audio")}
+                  {t("audios.columns.audio.category")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -499,9 +517,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.audio && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("visits")}
+                  {t("audios.columns.audio.audio")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -511,9 +529,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("favorites")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -523,9 +541,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -535,9 +553,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("shares")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -547,10 +565,37 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("status")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[10])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[10].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.activation && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[11])}
+                >
+                  {t("activation")}
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -562,10 +607,10 @@ const Audios = () => {
               {toggle.toggleColumns.control && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[12])}
                 >
                   {t("action")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[12].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -580,7 +625,7 @@ const Audios = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="13">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -598,7 +643,7 @@ const Audios = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="13">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -615,10 +660,10 @@ const Audios = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
+          {searchResultsAudioSCategoryAndTitleAndAuthor?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="13">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -630,16 +675,16 @@ const Audios = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="13">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
+          {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResultsAudioSCategoryAndTitleAndAuthor?.map((result) => (
                 <tr key={result?.id + new Date().getDate()}>
                   {toggle.toggleColumns.imageElder && (
                     <td className="table-td">
@@ -674,6 +719,9 @@ const Audios = () => {
                   )}
                   {toggle.toggleColumns.title && (
                     <td className="table-td">{result?.title}</td>
+                  )}
+                  {toggle.toggleColumns.category && (
+                    <td className="table-td">{result?.categories.title}</td>
                   )}
                   {toggle.toggleColumns.audio && (
                     <td className="table-td">
@@ -714,6 +762,19 @@ const Audios = () => {
                           : result?.status === "private"
                           ? "خاص"
                           : "خاص"}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.activation && (
+                    <td className="table-td">
+                      <span
+                        className="table-status badge"
+                        style={{
+                          backgroundColor:
+                            result?.is_active === 1 ? "green" : "red",
+                        }}
+                      >
+                        {result?.is_active === 1 ? t("active") : t("inactive")}
                       </span>
                     </td>
                   )}
@@ -1079,7 +1140,7 @@ const Audios = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="elder" className="form-label">
                     {t("audios.columns.elder.name")}
                   </label>
@@ -1142,6 +1203,74 @@ const Audios = () => {
                   {formik.errors.elder?.name && formik.touched.elder?.name ? (
                     <span className="error">{formik.errors.elder?.name}</span>
                   ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
                 </div>
               </Col>
               <Col lg={12}>
@@ -1550,7 +1679,7 @@ const Audios = () => {
                     <span className="error">{formik.errors.status}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="elder" className="form-label">
                     {t("audios.columns.elder.name")}
                   </label>
@@ -1614,6 +1743,74 @@ const Audios = () => {
                     <span className="error">{formik.errors.elder}</span>
                   ) : null}
                 </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
@@ -1649,7 +1846,7 @@ const Audios = () => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
+      {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>
