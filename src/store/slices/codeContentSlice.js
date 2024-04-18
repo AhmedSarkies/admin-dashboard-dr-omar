@@ -65,6 +65,27 @@ export const sendCodeContentAll = createAsyncThunk(
   }
 );
 
+// Send Code Content Array of IDS using Axios and Redux Thunk
+export const sendCodeContentArray = createAsyncThunk(
+  "codeContent/sendCodeContentArray",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Settings/sendCodeAll`,
+        params: {
+          code: data.code,
+          user_ids: data.user_ids,
+        },
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Update Code Content using Axios and Redux Thunk
 export const updateCodeContent = createAsyncThunk(
   "codeContent/updateCodeContent",
