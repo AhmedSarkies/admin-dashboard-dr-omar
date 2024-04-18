@@ -28,6 +28,7 @@ const NewUsers = () => {
       created_at: true,
       updated_at: true,
       email_verified_at: true,
+      phone_verified_at: true,
     },
   });
 
@@ -45,12 +46,13 @@ const NewUsers = () => {
       name: "email_verified_at",
       label: t("newUsers.columns.email_verified_at"),
     },
+    {
+      id: 7,
+      name: "phone_verified_at",
+      label: t("newUsers.columns.phone_verified_at"),
+    },
   ];
-  const {
-    PaginationUI,
-    handleSort,
-    searchResults,
-  } = useFiltration({
+  const { PaginationUI, handleSort, searchResults } = useFiltration({
     rowData: newUsers,
     toggle,
     setToggle,
@@ -158,6 +160,18 @@ const NewUsers = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.phone_verified_at && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("newUsers.columns.phone_verified_at")}
+                  {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
             </tr>
           </thead>
           {/* Error */}
@@ -243,11 +257,50 @@ const NewUsers = () => {
                   </td>
                   <td className="table-td email_verified_at">
                     {result?.email_verified_at === null ? (
-                      <span className="text-danger">
+                      <span
+                        style={{
+                          color: "#fff",
+                          backgroundColor: "#dc3545",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "0.2rem",
+                        }}
+                      >
                         {t("newUsers.columns.notVerified")}
                       </span>
                     ) : (
-                      <span className="text-success">
+                      <span
+                        style={{
+                          color: "#fff",
+                          backgroundColor: "#28a745",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "0.2rem",
+                        }}
+                      >
+                        {t("newUsers.columns.verified")}
+                      </span>
+                    )}
+                  </td>
+                  <td className="table-td phone_verified_at">
+                    {result?.phone_verified_at === null ? (
+                      <span
+                        style={{
+                          color: "#fff",
+                          backgroundColor: "#dc3545",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "0.2rem",
+                        }}
+                      >
+                        {t("newUsers.columns.notVerified")}
+                      </span>
+                    ) : (
+                      <span
+                        style={{
+                          color: "#fff",
+                          backgroundColor: "#28a745",
+                          padding: "0.2rem 0.5rem",
+                          borderRadius: "0.2rem",
+                        }}
+                      >
                         {t("newUsers.columns.verified")}
                       </span>
                     )}
