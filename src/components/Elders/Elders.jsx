@@ -48,6 +48,7 @@ const initialValues = {
   email: "",
   phone: "",
   status: "",
+  is_active: "",
 };
 
 const Elders = ({ dashboard }) => {
@@ -62,6 +63,7 @@ const Elders = ({ dashboard }) => {
     edit: false,
     imagePreview: false,
     status: false,
+    is_active: false,
     searchTerm: "",
     activeColumn: false,
     activeRows: false,
@@ -80,6 +82,7 @@ const Elders = ({ dashboard }) => {
       downloads: true,
       shares: true,
       status: true,
+      activation: true,
       control: true,
     },
   });
@@ -110,6 +113,7 @@ const Elders = ({ dashboard }) => {
       formData.append("name", formik.values.name);
       formData.append("email", formik.values.email);
       formData.append("phone", formik.values.phone);
+      formData.append("is_active", formik.values.is_active);
       formData.append(
         "status",
         formik.values.status === "Pending"
@@ -255,7 +259,8 @@ const Elders = ({ dashboard }) => {
     { id: 7, name: "downloads", label: t("downloads") },
     { id: 8, name: "shares", label: t("shares") },
     { id: 9, name: "status", label: t("status") },
-    { id: 10, name: "control", label: t("action") },
+    { id: 10, name: "activation", label: t("activation") },
+    { id: 11, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -475,10 +480,25 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.activation && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("action")}
+                  {t("activation")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("action")}
+                  {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -493,7 +513,7 @@ const Elders = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="11">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -511,7 +531,7 @@ const Elders = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="11">
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -531,7 +551,7 @@ const Elders = ({ dashboard }) => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="11">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -543,7 +563,7 @@ const Elders = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="11">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -622,6 +642,23 @@ const Elders = ({ dashboard }) => {
                           : result?.status === "Pending"
                           ? t("pending")
                           : t("pending")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.activation && (
+                    <td className="table-td">
+                      <span
+                        className="table-status badge"
+                        style={{
+                          backgroundColor:
+                            result?.is_active === 1
+                              ? "green"
+                              : result?.is_active === 0
+                              ? "red"
+                              : "red",
+                        }}
+                      >
+                        {result?.is_active === 1 ? t("active") : t("inactive")}
                       </span>
                     </td>
                   )}
@@ -849,7 +886,7 @@ const Elders = ({ dashboard }) => {
                     <span className="error">{formik.errors.phone}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
@@ -913,6 +950,74 @@ const Elders = ({ dashboard }) => {
                         }}
                       >
                         {t("approve")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
                       </button>
                     </div>
                   </div>
@@ -1218,6 +1323,74 @@ const Elders = ({ dashboard }) => {
                         }}
                       >
                         {t("approve")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
                       </button>
                     </div>
                   </div>
