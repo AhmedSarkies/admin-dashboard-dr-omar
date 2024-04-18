@@ -29,20 +29,34 @@ const useSchema = () => {
       //   userType: string().required("يجب اختيار نوع المستخدم"),
     }),
     termsAndConditions: object().shape({
-      arabicTitle: string()
+      title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-        englishTitle: string()
+      title_en: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-        country: string()
+      country: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-        country_en: string()
+      country_en: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-        text: string().required(t("validation.description")),
-        text_en: string().required(t("validation.description")),
+      text: string().required(t("validation.description")),
+      text_en: string().required(t("validation.description")),
+    }),
+    notifications: object().shape({
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size > 0;
+        }
+        if (typeof value.preview === "string") {
+          return true;
+        }
+      }),
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+      description: string().required(t("validation.description")),
     }),
     elder: object().shape({
       name: string()
@@ -73,7 +87,7 @@ const useSchema = () => {
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      status: string(),
+      status: string().required(t("validation.status")),
       image: mixed().test("fileSize", t("validation.imageArticle"), (value) => {
         if (value.file) {
           return value.file.size > 0;
@@ -83,12 +97,12 @@ const useSchema = () => {
         }
       }),
       content: string().required(t("validation.description")),
-      elder: object().shape({
-        name: string().required(t("validation.elder")),
-      }),
+      writer: string().required(t("validation.writer")),
       articleCategories: object().shape({
         title: string().required(t("validation.category")),
       }),
+      is_active: string().required(t("validation.activation")),
+      showWriter: string().required(t("validation.showWriter")),
     }),
     image: object().shape({
       image: mixed().test("fileSize", t("validation.image"), (value) => {
@@ -100,6 +114,10 @@ const useSchema = () => {
         }
       }),
       status: string(),
+      is_active: string().required(t("validation.activation")),
+      pictureCategory: object().shape({
+        title: string().required(t("validation.category")),
+      }),
     }),
     pictureCategory: object().shape({
       title: string()
@@ -185,6 +203,13 @@ const useSchema = () => {
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
+      number_pages: number()
+        .typeError(t("validation.pages"))
+        .positive(t("validation.pages"))
+        .integer(t("validation.pages"))
+        .min(1, t("validation.pages"))
+        .required(t("validation.pages")),
+      is_active: string().required(t("validation.activation")),
       status: string(),
       image: mixed().test("fileSize", t("validation.imageBook"), (value) => {
         if (value?.file) {
