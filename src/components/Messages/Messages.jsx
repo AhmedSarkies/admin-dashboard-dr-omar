@@ -30,6 +30,7 @@ const Messages = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      id: true,
       first_name: true,
       subject: true,
       email: true,
@@ -47,11 +48,12 @@ const Messages = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "first_name", label: t("message.columns.name") },
-    { id: 1, name: "phone", label: t("message.columns.phone") },
-    { id: 2, name: "email", label: t("message.columns.email") },
-    { id: 3, name: "subject", label: t("message.columns.content") },
-    { id: 4, name: "readMessage", label: t("message.columns.read") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "first_name", label: t("message.columns.name") },
+    { id: 2, name: "phone", label: t("message.columns.phone") },
+    { id: 3, name: "email", label: t("message.columns.email") },
+    { id: 4, name: "subject", label: t("message.columns.content") },
+    { id: 5, name: "readMessage", label: t("message.columns.read") },
   ];
   const {
     PaginationUI,
@@ -148,21 +150,12 @@ const Messages = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns?.first_name && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("message.columns.name")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns?.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns?.phone && (
+              {toggle.toggleColumns?.first_name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("message.columns.phone")}
+                  {t("message.columns.name")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -172,9 +165,9 @@ const Messages = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.email && (
+              {toggle.toggleColumns?.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("message.columns.email")}
+                  {t("message.columns.phone")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -184,9 +177,9 @@ const Messages = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.subject && (
+              {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("message.columns.content")}
+                  {t("message.columns.email")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -196,9 +189,9 @@ const Messages = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.readMessage && (
+              {toggle.toggleColumns?.subject && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("message.columns.read")}
+                  {t("message.columns.content")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -208,13 +201,16 @@ const Messages = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.readMessage && (
+                <th className="table-th">{t("message.columns.read")}</th>
+              )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -232,7 +228,7 @@ const Messages = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -252,7 +248,7 @@ const Messages = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -264,7 +260,7 @@ const Messages = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="5">
+                <td className="table-td" colSpan="6">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -273,39 +269,52 @@ const Messages = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td name">{result?.first_name}</td>
-                  <td className="table-td phone">
-                    <a href={`tel${result?.phone}`}>{result?.phone}</a>
-                  </td>
-                  <td className="table-td email">
-                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
-                  </td>
-                  <td className="table-td subject">
-                    {result?.subject.length > 20
-                      ? result?.subject.slice(0, 20) + "..."
-                      : result?.subject}
-                  </td>
-                  <td className="table-td read-more">
-                    <span className="table-btn-container">
-                      <a
-                        href={`mailto:${result?.email}`}
-                        className="text-success"
-                      >
-                        <MdSend className="text-success" />
-                      </a>
-                      <MdRemoveRedEye
-                        onClick={() =>
-                          setToggle({
-                            ...toggle,
-                            readMessage: !toggle.readMessage,
-                            message: result,
-                          })
-                        }
-                      />
-                    </span>
-                  </td>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
+                  {toggle.toggleColumns?.first_name && (
+                    <td className="table-td name">{result?.first_name}</td>
+                  )}
+                  {toggle.toggleColumns?.phone && (
+                    <td className="table-td phone">
+                      <a href={`tel${result?.phone}`}>{result?.phone}</a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.email && (
+                    <td className="table-td email">
+                      <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.subject && (
+                    <td className="table-td subject">
+                      {result?.subject.length > 20
+                        ? result?.subject.slice(0, 20) + "..."
+                        : result?.subject}
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.readMessage && (
+                    <td className="table-td read-more">
+                      <span className="table-btn-container">
+                        <a
+                          href={`mailto:${result?.email}`}
+                          className="text-success"
+                        >
+                          <MdSend className="text-success" />
+                        </a>
+                        <MdRemoveRedEye
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              readMessage: !toggle.readMessage,
+                              message: result,
+                            })
+                          }
+                        />
+                      </span>
+                    </td>
+                  )}
                 </tr>
               ))}
               {/* Read Message*/}
