@@ -162,9 +162,14 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
   const searchResultsImagesCategory =
     toggle.searchTerm && toggle.searchTerm !== ""
       ? rowData?.filter((dataRow) => {
-          return dataRow?.image_category?.title
-            ?.toLowerCase()
-            .includes(toggle.searchTerm?.toLowerCase());
+          return (
+            dataRow?.image_category?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
         })
       : results;
 
@@ -177,6 +182,12 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase())
           );
@@ -195,6 +206,12 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.elder?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase())
           );
@@ -249,17 +266,78 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
         })
       : results;
 
-      // Search Notifications using title
+  // Search Notifications using title
   const searchResultsNotifications =
-  toggle.searchTerm && toggle.searchTerm !== ""
-    ? rowData?.filter((dataRow) => {
-        return (
-          dataRow?.notification?.title
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return dataRow?.notification?.title
             ?.toLowerCase()
-            .includes(toggle.searchTerm?.toLowerCase())
-        );
-      })
-    : results;
+            .includes(toggle.searchTerm?.toLowerCase());
+        })
+      : results;
+
+  const searchResultsAudioSCategoryAndTitle =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.categories?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
+  const searchResultsElders =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.phone
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.address
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
+  const searchResultsBooks =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.author
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
 
   return {
     PaginationUI,
@@ -268,13 +346,15 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
     handleSearchUser,
     handleToggleColumns,
     searchResults,
+    searchResultsElders,
     searchResultsUsersSNameAndEmail,
     searchResultsUsers,
     searchResultsImagesCategory,
     searchResultsBookSCategoryAndTitle,
     searchResultsAudioSCategoryAndTitleAndAuthor,
+    searchResultsAudioSCategoryAndTitle,
     searchResultsArticleSCategoryAndTitleAndAuthor,
-    searchResultsNotifications
+    searchResultsNotifications,
   };
 };
 
