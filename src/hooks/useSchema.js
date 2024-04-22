@@ -45,14 +45,7 @@ const useSchema = () => {
       text_en: string().required(t("validation.description")),
     }),
     notifications: object().shape({
-      image: mixed().test("fileSize", t("validation.image"), (value) => {
-        if (value.file) {
-          return value.file.size > 0;
-        }
-        if (typeof value.preview === "string") {
-          return true;
-        }
-      }),
+      image: mixed(),
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
@@ -92,7 +85,7 @@ const useSchema = () => {
         if (value.file) {
           return value.file.size > 0;
         }
-        if (typeof value === "string") {
+        if (typeof value.preview === "string") {
           return true;
         }
       }),
@@ -154,8 +147,42 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
+      password: string().min(8, t("validation.password")).required(t("validation.password")),
+      // Match password with confirm password
+      confirmPassword: string()
+        .oneOf([ref("password")], t("validation.confirmPassword"))
+        .required(t("validation.confirmPassword")),
+      phone: number()
+        .typeError(t("validation.phone"))
+        .positive(t("validation.phone"))
+        .integer(t("validation.phone"))
+        .min(1000000000, t("validation.phone"))
+        .max(9999999999, t("validation.phone"))
+        .required(t("validation.phone")),
+      status: string(),
+      powers: string().required(t("validation.powers")),
+      // Validation for image file must be uploaded with the form or just string
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size > 0;
+        }
+        if (typeof value.preview === "string") {
+          return true;
+        }
+      }),
+    }),
+    subAdminsEdit: object().shape({
+      name: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.name")),
+      email: string()
+        .email(t("validation.email"))
+        .required(t("validation.email")),
       // make password required when creating new subAdmin and not required when updating
       password: string().min(8, t("validation.password")).notRequired(),
+      confirmPassword: string()
+        .oneOf([ref("password")], t("validation.confirmPassword"))
+        .notRequired(),
       phone: number()
         .typeError(t("validation.phone"))
         .positive(t("validation.phone"))
@@ -215,7 +242,7 @@ const useSchema = () => {
         if (value?.file) {
           return value?.file.size <= 2097152;
         }
-        if (typeof value === "string") {
+        if (typeof value.preview === "string") {
           return true;
         }
       }),
@@ -254,6 +281,31 @@ const useSchema = () => {
       }),
       elder: object().shape({
         name: string().required(t("validation.elder")),
+      }),
+      audioCategory: object().shape({
+        title: string().required(t("validation.category")),
+      }),
+    }),
+    audioElder: object().shape({
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
+      status: string(),
+      image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
+        if (value.file) {
+          return value.file.size > 0;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
+      }),
+      audio: mixed().test("fileSize", t("validation.audio"), (value) => {
+        if (value.file) {
+          return value.file.size > 0;
+        }
+        if (typeof value === "string") {
+          return true;
+        }
       }),
       audioCategory: object().shape({
         title: string().required(t("validation.category")),
