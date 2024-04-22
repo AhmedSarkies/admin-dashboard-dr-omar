@@ -73,6 +73,7 @@ const Elders = ({ dashboard }) => {
     sortOrder: "asc",
     elder: scholars,
     toggleColumns: {
+      id: true,
       image: true,
       name: true,
       email: true,
@@ -211,7 +212,11 @@ const Elders = ({ dashboard }) => {
 
   // Handle Edit Scholar
   const handleEdit = (scholar) => {
-    formik.setValues(scholar);
+    formik.setValues({
+      ...scholar,
+      status: scholar.status === t("approve") ? "Approve" : "Pending",
+      is_active: scholar.is_active === t("active") ? 1 : 0,
+    });
   };
 
   // Delete Scholar
@@ -247,14 +252,24 @@ const Elders = ({ dashboard }) => {
     });
   };
 
+  // Data
+  const data = scholars?.map((item) => {
+    return {
+      ...item,
+      status: item.status === "Approve" ? t("approve") : t("pending"),
+      is_active: item.is_active === 1 ? t("active") : t("inactive"),
+    };
+  });
+
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     { id: 1, name: "image", label: t("elders.columns.image") },
     { id: 2, name: "name", label: t("elders.columns.name") },
     { id: 3, name: "email", label: t("elders.columns.email") },
     { id: 4, name: "phone", label: t("elders.columns.phone") },
-    { id: 5, name: "visits", label: t("visits") },
+    { id: 5, name: "audiosCount", label: t("audiosCount") },
     { id: 6, name: "favorites", label: t("favorites") },
     { id: 7, name: "downloads", label: t("downloads") },
     { id: 8, name: "shares", label: t("shares") },
@@ -267,9 +282,9 @@ const Elders = ({ dashboard }) => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
+    searchResultsElders,
   } = useFiltration({
-    rowData: scholars,
+    rowData: data,
     toggle,
     setToggle,
   });
@@ -372,21 +387,12 @@ const Elders = ({ dashboard }) => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("elders.columns.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.name && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("elders.columns.name")}
+                  {t("elders.columns.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -396,9 +402,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.email && (
+              {toggle.toggleColumns.name && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("elders.columns.email")}
+                  {t("elders.columns.name")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -408,9 +414,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.phone && (
+              {toggle.toggleColumns.email && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("elders.columns.phone")}
+                  {t("elders.columns.email")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -420,9 +426,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("visits")}
+                  {t("elders.columns.phone")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -432,9 +438,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("favorites")}
+                  {t("audiosCount")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -444,9 +450,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -456,9 +462,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("shares")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -468,9 +474,9 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("status")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -480,10 +486,25 @@ const Elders = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.activation && (
+              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("activation")}
+                  {t("status")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.activation && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("activation")}
+                  {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -495,10 +516,10 @@ const Elders = ({ dashboard }) => {
               {toggle.toggleColumns.control && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[11])}
                 >
                   {t("action")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -513,7 +534,7 @@ const Elders = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="12">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -531,7 +552,7 @@ const Elders = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="12">
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -548,10 +569,10 @@ const Elders = ({ dashboard }) => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
+          {searchResultsElders?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="12">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -563,135 +584,144 @@ const Elders = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
+                <td className="table-td" colSpan="12">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {searchResults?.map((result) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.image && (
-                    <td className="table-td">
-                      <img
-                        src={result?.image === "" ? anonymous : result?.image}
-                        alt="scholar"
-                        className="scholar-img"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.name && (
-                    <td className="table-td name">
-                      <Link to={`/dr-omar/elders/${result?.id}`}>
-                        {result?.name}
-                      </Link>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.email && (
-                    <td className="table-td">
-                      <a
-                        className="text-white"
-                        href={`mailto:${result?.email}`}
-                      >
-                        {result?.email}
-                      </a>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.phone && (
-                    <td className="table-td">
-                      <a className="text-white" href={`tel:${result?.phone}`}>
-                        {result?.phone}
-                      </a>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.visits && (
-                    <td className="table-td">{result?.visits_count}</td>
-                  )}
-                  {toggle.toggleColumns.favorites && (
-                    <td className="table-td">{result?.favorites_count}</td>
-                  )}
-                  {toggle.toggleColumns.downloads && (
-                    <td className="table-td">{result?.downloads_count}</td>
-                  )}
-                  {toggle.toggleColumns.shares && (
-                    <td className="table-td">{result?.shares_count}</td>
-                  )}
-                  {toggle.toggleColumns.status && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "Approve"
-                              ? "green"
-                              : result?.status === "Pending"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "Approve"
-                          ? t("approve")
-                          : result?.status === "Pending"
-                          ? t("pending")
-                          : t("pending")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.activation && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.is_active === 1
-                              ? "green"
-                              : result?.is_active === 0
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.is_active === 1 ? t("active") : t("inactive")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <IoMdEye
-                          className="edit-btn"
-                          onClick={() => {
-                            navigate(`/dr-omar/elders/${result?.id}`);
+          {searchResultsElders?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsElders?.map((result, idx) => (
+                  <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
+                    {toggle.toggleColumns.image && (
+                      <td className="table-td">
+                        <img
+                          src={result?.image === "" ? anonymous : result?.image}
+                          alt="scholar"
+                          className="scholar-img"
+                          style={{
+                            width: "50px",
+                            height: "50px",
+                            objectFit: "cover",
                           }}
                         />
-                        <FaPen
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              edit: !toggle.edit,
-                            });
+                      </td>
+                    )}
+                    {toggle.toggleColumns.name && (
+                      <td className="table-td name">
+                        <Link to={`/dr-omar/elders/${result?.id}`}>
+                          {result?.name}
+                        </Link>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.email && (
+                      <td className="table-td">
+                        <a
+                          className="text-white"
+                          href={`mailto:${result?.email}`}
+                        >
+                          {result?.email}
+                        </a>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.phone && (
+                      <td className="table-td">
+                        <a className="text-white" href={`tel:${result?.phone}`}>
+                          {result?.phone}
+                        </a>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.visits && (
+                      <td className="table-td">{result?.audios_count}</td>
+                    )}
+                    {toggle.toggleColumns.favorites && (
+                      <td className="table-td">{result?.favorites_count}</td>
+                    )}
+                    {toggle.toggleColumns.downloads && (
+                      <td className="table-td">{result?.downloads_count}</td>
+                    )}
+                    {toggle.toggleColumns.shares && (
+                      <td className="table-td">{result?.shares_count}</td>
+                    )}
+                    {toggle.toggleColumns.status && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.status === t("approve")
+                                ? "green"
+                                : result?.status === t("pending")
+                                ? "red"
+                                : "red",
                           }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+                        >
+                          {result?.status === t("approve")
+                            ? t("approve")
+                            : result?.status === t("pending")
+                            ? t("pending")
+                            : t("pending")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.activation && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.is_active === t("active")
+                                ? "green"
+                                : result?.is_active === t("inactive")
+                                ? "red"
+                                : "red",
+                          }}
+                        >
+                          {result?.is_active === t("active")
+                            ? t("active")
+                            : result?.is_active === t("inactive")
+                            ? t("inactive")
+                            : t("inactive")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          <IoMdEye
+                            className="edit-btn"
+                            onClick={() => {
+                              navigate(`/dr-omar/elders/${result?.id}`);
+                            }}
+                          />
+                          <FaPen
+                            className="edit-btn"
+                            onClick={() => {
+                              handleEdit(result);
+                              setToggle({
+                                ...toggle,
+                                edit: !toggle.edit,
+                              });
+                            }}
+                          />
+                          <MdDeleteOutline
+                            className="delete-btn"
+                            onClick={() => handleDelete(result)}
+                          />
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            )}
         </table>
       </div>
       {/* Add Elder */}
@@ -1259,7 +1289,7 @@ const Elders = ({ dashboard }) => {
                     <span className="error">{formik.errors.phone}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
@@ -1430,9 +1460,9 @@ const Elders = ({ dashboard }) => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
+      {searchResultsElders?.length > 0 &&
+        error === null &&
+        loading === false && <PaginationUI />}
     </div>
   );
 };

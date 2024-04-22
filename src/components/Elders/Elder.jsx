@@ -1,16 +1,64 @@
-import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getScholarByIdApi } from "../../store/slices/scholarSlice";
 
-import { Modal, ModalBody, ModalHeader, Spinner } from "reactstrap";
 import { IoMdClose } from "react-icons/io";
+
+import React, { useState, useEffect, useRef } from "react";
+import {
+  Col,
+  Modal,
+  ModalBody,
+  ModalFooter,
+  ModalHeader,
+  Row,
+  Spinner,
+} from "reactstrap";
+import { MdAdd, MdDeleteOutline } from "react-icons/md";
+import { FaEdit, FaFileUpload } from "react-icons/fa";
+import { ImUpload } from "react-icons/im";
+import anonymous from "../../assets/images/anonymous.png";
+import { useFormik } from "formik";
+import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import {
+  getAudiosApi,
+  getAudiosCategoriesApi,
+  addAudioApi,
+  updateAudioApi,
+  deleteAudioApi,
+} from "../../store/slices/audioSlice";
+import { getApprovedScholarsApi } from "../../store/slices/scholarSlice";
+import useFiltration from "../../hooks/useFiltration";
+import Swal from "sweetalert2";
+import { toast } from "react-toastify";
+import { useSchema } from "../../hooks";
+
+const initialValues = {
+  title: "",
+  image: {
+    file: "",
+    preview: "",
+  },
+  audio: {
+    file: "",
+    preview: "",
+  },
+  status: "",
+  is_active: "",
+  audioCategory: {
+    title: "",
+    id: "",
+  },
+};
 
 const Elder = () => {
   const { t } = useTranslation();
   const { id } = useParams();
+  const { validationSchema } = useSchema();
+  const fileRef = useRef();
   const dispatch = useDispatch();
+  const { audioCategories } = useSelector((state) => state.audio);
   const { dataById, error, loading } = useSelector((state) => state.scholar);
   const [toggle, setToggle] = useState({
     add: false,
@@ -24,15 +72,18 @@ const Elder = () => {
     duration: "00:00",
     activeColumn: false,
     toggleColumns: {
+      id: true,
       imageElder: true,
       nameElder: true,
       image: true,
       title: true,
       audio: true,
+      category: true,
       visits: true,
       favorites: true,
       downloads: true,
       shares: true,
+      activation: true,
       status: true,
       control: true,
     },
@@ -42,33 +93,478 @@ const Elder = () => {
     currentPage: 1,
   });
 
+  const data = dataById?.Audio?.map((item) => {
+    return {
+      ...item,
+      categories: {
+        title: item.categories[0]?.title,
+        id: item.categories[0]?.id,
+      },
+      status: item.status === "public" ? t("public") : t("private"),
+      is_active: item.is_active === 1 ? t("active") : t("inactive"),
+    };
+  });
+
+  const formik = useFormik({
+    initialValues,
+    validationSchema: validationSchema.audioElder,
+    onSubmit: (values) => {
+      // Add Audio
+      if (!values.id) {
+        dispatch(
+          addAudioApi({
+            title: values.title,
+            image: values.image.file,
+            audio: values.audio.file,
+            status: values.status,
+            elder_id: id,
+            is_active: values.is_active,
+            Audio_category: values.audioCategory.id,
+          })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getAudiosApi());
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+            dispatch(getScholarByIdApi(id));
+            toast.success(t("toast.audio.addedSuccess"));
+          } else {
+            toast.error(t("toast.audio.addedError"));
+            dispatch(getScholarByIdApi(id));
+          }
+        });
+      } else {
+        // Update Audio
+        const formDate = {
+          id: values.id,
+          title: values.title,
+          status: values.status === "Public" ? "public" : "private",
+          Audio_category: values.audioCategory.id,
+          is_active: values.is_active,
+          tag_name: ["tag 1", "tag 2"],
+        };
+        if (values.image.file) {
+          formDate.image = values.image.file;
+        }
+        if (values.audio.file) {
+          formDate.audio = values.audio.file;
+        }
+        dispatch(updateAudioApi(formDate)).then((res) => {
+          if (!res.error) {
+            dispatch(getAudiosApi());
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            dispatch(getScholarByIdApi(id));
+            toast.success(t("toast.audio.updatedSuccess"));
+          } else {
+            toast.error(t("toast.audio.updatedError"));
+            dispatch(getScholarByIdApi(id));
+          }
+        });
+      }
+    },
+  });
+
+  // Filtration, Sorting, Pagination
+  const {
+    PaginationUI,
+    handleSort,
+    handleSearch,
+    handleToggleColumns,
+    searchResultsAudioSCategoryAndTitle,
+  } = useFiltration({
+    rowData: data,
+    toggle,
+    setToggle,
+  });
+
+  // Columns
+  const columns = [
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "image", label: t("audios.columns.audio.image") },
+    { id: 2, name: "title", label: t("audios.columns.audio.title") },
+    { id: 3, name: "category", label: t("audios.columns.audio.category") },
+    { id: 4, name: "audio", label: t("audios.columns.audio.audio") },
+    { id: 5, name: "listening", label: t("listening") },
+    { id: 6, name: "favorites", label: t("favorites") },
+    { id: 7, name: "downloads", label: t("downloads") },
+    { id: 8, name: "shares", label: t("shares") },
+    { id: 9, name: "status", label: t("status") },
+    { id: 10, name: "activation", label: t("activation") },
+    { id: 11, name: "control", label: t("action") },
+  ];
+
+  // Handle Image Change
+  const handleImageChange = (e) => {
+    const file = e.currentTarget.files[0];
+    if (file) {
+      formik.setFieldValue("image", {
+        file: file,
+        preview: URL.createObjectURL(file),
+      });
+    }
+  };
+
+  // Handle Delete Image
+  const handleDeleteImage = () => {
+    fileRef.current.value = "";
+    fileRef.current.files = null;
+    formik.setValues({
+      ...formik.values,
+      image: {
+        file: fileRef.current.files[0],
+        preview: "",
+      },
+    });
+    setToggle({
+      ...toggle,
+      imagePreview: false,
+    });
+  };
+
+  const handleDurationAudio = (e) => {
+    e.preventDefault();
+    try {
+      const file = e.target.files[0];
+      if (file) {
+        formik.setFieldValue("audio", {
+          file: file,
+          preview: URL.createObjectURL(file),
+        });
+        // Use the Web Audio API to get audio file duration
+        const audioContext = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        const fileReader = new FileReader();
+        fileReader.onload = function (e) {
+          const arrayBuffer = e.target.result;
+          audioContext.decodeAudioData(arrayBuffer, function (buffer) {
+            const durationInSeconds = buffer.duration;
+            // Convert seconds to minutes oh hours using date-time library
+            const hours = Math.floor(durationInSeconds / 3600);
+            const minutes = Math.floor((durationInSeconds - hours * 3600) / 60);
+            const seconds = Math.floor(
+              durationInSeconds - hours * 3600 - minutes * 60
+            );
+            setToggle({
+              ...toggle,
+              duration: `
+              ${hours < 10 ? `0${hours}` : hours}:${
+                minutes < 10 ? `0${minutes}` : minutes
+              }:${seconds < 10 ? `0${seconds}` : seconds}`,
+            });
+          });
+        };
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  // handle Input Using Formik
+  const handleInput = (e) => {
+    formik.handleChange(e);
+  };
+
+  // handle Edit
+  const handleEdit = (audio) => {
+    formik.handleReset();
+    formik.setValues({
+      id: audio.id,
+      title: audio.title,
+      image: audio.image,
+      audio: audio.audio,
+      status: audio.status === t("public") ? "Public" : "Private",
+      is_active: audio.is_active === t("active") ? 1 : 0,
+      elder: {
+        name: audio.elder?.name,
+        id: audio.elder?.id,
+      },
+      audioCategory: {
+        title: audio.categories?.title,
+        id: audio.categories?.id,
+      },
+      tag_name: ["tag 1", "tag 2"],
+    });
+    setToggle({
+      ...toggle,
+      edit: !toggle.edit,
+    });
+  };
+
+  // Delete Audio
+  const handleDelete = (audio) => {
+    Swal.fire({
+      title: t("titleDeleteAlert") + audio?.title + "?",
+      text: t("textDeleteAlert"),
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#0d1d34",
+      confirmButtonText: t("confirmButtonText"),
+      cancelButtonText: t("cancel"),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        dispatch(deleteAudioApi(audio?.id)).then((res) => {
+          if (!res.error) {
+            dispatch(getScholarByIdApi(id));
+            Swal.fire({
+              title: `${t("titleDeletedSuccess")} ${audio?.title}`,
+              text: `${t("titleDeletedSuccess")} ${audio?.title} ${t(
+                "textDeletedSuccess"
+              )}`,
+              icon: "success",
+              confirmButtonColor: "#0d1d34",
+              confirmButtonText: t("doneDeletedSuccess"),
+            }).then(() => toast.success(t("toast.audio.deletedSuccess")));
+          } else {
+            dispatch(getScholarByIdApi(id));
+            toast.error(t("toast.audio.deletedError"));
+          }
+        });
+      }
+    });
+  };
+
   useEffect(() => {
     dispatch(getScholarByIdApi(id));
+    dispatch(getAudiosCategoriesApi());
   }, [dispatch, id]);
 
   return (
     <div className="audio-container scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header justify-content-end">
-        <h2>{dataById?.name}</h2>
+      <div className="table-header">
+        <button
+          className="add-btn"
+          onClick={() =>
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            })
+          }
+        >
+          <MdAdd />
+          {t("audios.addTitle")}
+        </button>
       </div>
       <div className="audio scholar">
         <div className="table-header justify-content-end">
-          <h2>{t("audios.title")}</h2>
+          <h2>{dataById?.name}</h2>
+        </div>
+        <div className="table-header">
+          {/* Search */}
+          <div
+            className="search-container form-group-container form-input"
+            style={{
+              width: "30%",
+            }}
+          >
+            <input
+              type="text"
+              className="form-input"
+              placeholder={t("searchAudioElder")}
+              onChange={handleSearch}
+            />
+          </div>
+          {/* Show and Hide Columns */}
+          <div className="dropdown columns form-input">
+            <button
+              type="button"
+              onClick={() => {
+                setToggle({
+                  ...toggle,
+                  activeColumn: !toggle.activeColumn,
+                });
+              }}
+              className="dropdown-btn d-flex justify-content-between align-items-center"
+            >
+              <span>{t("columnsFilter")}</span>
+              <TiArrowSortedUp
+                className={`dropdown-icon ${
+                  toggle.activeColumn ? "active" : ""
+                }`}
+              />
+            </button>
+            <div
+              className={`dropdown-content ${
+                toggle.activeColumn ? "active" : ""
+              }`}
+              style={{
+                width: "180px",
+                maxHeight: "160px",
+              }}
+            >
+              {columns.map((column) => (
+                <button
+                  type="button"
+                  key={column.id}
+                  className={`item filter`}
+                  onClick={() => handleToggleColumns(column.name)}
+                >
+                  <span className="d-flex justify-content-start align-items-center gap-2">
+                    <input
+                      type="checkbox"
+                      className="checkbox-column"
+                      checked={toggle.toggleColumns[column.name]}
+                      readOnly
+                    />
+                    <span>{column.label}</span>
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
         <table className="table-body">
           <thead>
             <tr>
-              <th className="table-th">{t("audios.columns.elder.image")}</th>
-              <th className="table-th">{t("audios.columns.elder.name")}</th>
-              <th className="table-th">{t("audios.columns.audio.image")}</th>
-              <th className="table-th">{t("audios.columns.audio.title")}</th>
-              <th className="table-th">{t("audios.columns.audio.audio")}</th>
-              <th className="table-th">{t("visits")}</th>
-              <th className="table-th">{t("favorites")}</th>
-              <th className="table-th">{t("downloads")}</th>
-              <th className="table-th">{t("shares")}</th>
-              <th className="table-th">{t("activation")}</th>
-              <th className="table-th">{t("status")}</th>
+              {/* Show and Hide Columns */}
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
+              )}
+              {toggle.toggleColumns.image && (
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                  {t("audios.columns.audio.image")}
+                  {toggle.sortColumn === columns[1].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.title && (
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
+                  {t("audios.columns.audio.title")}
+                  {toggle.sortColumn === columns[2].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.category && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
+                  {t("audios.columns.audio.category")}
+                  {toggle.sortColumn === columns[3].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.audio && (
+                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                  {t("audios.columns.audio.audio")}
+                  {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.visits && (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  {t("listening")}
+                  {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.favorites && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("favorites")}
+                  {toggle.sortColumn === columns[6].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.shares && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("shares")}
+                  {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.activation && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("activation")}
+                  {toggle.sortColumn === columns[10].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[11])}
+                >
+                  {t("action")}
+                  {toggle.sortColumn === columns[11].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
             </tr>
           </thead>
           {/* Error */}
@@ -110,15 +606,17 @@ const Elder = () => {
             </tbody>
           )}
           {/* No Data */}
-          {dataById?.Audio?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="11">
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
+          {searchResultsAudioSCategoryAndTitle?.length === 0 &&
+            error === null &&
+            !loading && (
+              <tbody>
+                <tr className="no-data-container">
+                  <td className="table-td" colSpan="11">
+                    <p className="no-data mb-0">{t("noData")}</p>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           {/* There is no any columns */}
           {Object.values(toggle.toggleColumns).every(
             (column) => column === false
@@ -132,17 +630,20 @@ const Elder = () => {
             </tbody>
           )}
           {/* Data */}
-          {dataById?.Audio?.length > 0 &&
+          {searchResultsAudioSCategoryAndTitle?.length > 0 &&
             error === null &&
             loading === false && (
               <tbody>
-                {dataById?.Audio?.map((result) => (
+                {searchResultsAudioSCategoryAndTitle?.map((result, idx) => (
                   <tr key={result?.id + new Date().getDate()}>
-                    {toggle.toggleColumns.imageElder && (
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
+                    {toggle.toggleColumns.image && (
                       <td className="table-td">
                         <img
-                          src={result?.elder?.image}
-                          alt={result?.elder || "avatar"}
+                          src={result?.image}
+                          alt={result?.image?.name || "avatar"}
                           className="table-avatar"
                           style={{
                             width: "50px",
@@ -152,122 +653,1016 @@ const Elder = () => {
                         />
                       </td>
                     )}
-                    <td className="table-td name">{result?.elder?.name}</td>
-                    <td className="table-td">
-                      <img
-                        src={result?.image}
-                        alt={result?.image?.name || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                    <td className="table-td">{result?.title}</td>
-                    <td className="table-td">
-                      <audio
-                        controls
-                        src={result?.audio}
-                        style={{ width: "250px" }}
-                      />
-                    </td>
-                    <td className="table-td">{result?.visits_count}</td>
-                    <td className="table-td">{result?.favorites_count}</td>
-                    <td className="table-td">{result?.downloads_count}</td>
-                    <td className="table-td">{result?.shares_count}</td>
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "public"
-                              ? "green"
-                              : result?.status === "private"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "public"
-                          ? t("public")
-                          : result?.status === "private"
-                          ? t("private")
-                          : t("private")}
-                      </span>
-                    </td>
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.is_active === 1
-                              ? "green"
-                              : result?.is_active === 0
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.is_active === 1
-                          ? t("active")
-                          : result?.is_active === 0
-                          ? t("inactive")
-                          : t("inactive")}
-                      </span>
-                    </td>
+                    {toggle.toggleColumns.title && (
+                      <td className="table-td">{result?.title}</td>
+                    )}
+                    {toggle.toggleColumns.category && (
+                      <td className="table-td">{result?.categories?.title}</td>
+                    )}
+                    {toggle.toggleColumns.audio && (
+                      <td className="table-td">
+                        <audio
+                          controls
+                          src={result?.audio}
+                          style={{ width: "250px" }}
+                        />
+                      </td>
+                    )}
+                    {toggle.toggleColumns.visits && (
+                      <td className="table-td">{result?.visits_count}</td>
+                    )}
+                    {toggle.toggleColumns.favorites && (
+                      <td className="table-td">{result?.favorites_count}</td>
+                    )}
+                    {toggle.toggleColumns.downloads && (
+                      <td className="table-td">{result?.downloads_count}</td>
+                    )}
+                    {toggle.toggleColumns.shares && (
+                      <td className="table-td">{result?.shares_count}</td>
+                    )}
+                    {toggle.toggleColumns.status && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.status === t("public")
+                                ? "green"
+                                : result?.status === t("private")
+                                ? "red"
+                                : "red",
+                          }}
+                        >
+                          {result?.status === t("public")
+                            ? t("public")
+                            : result?.status === t("private")
+                            ? t("private")
+                            : t("private")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.activation && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.is_active === t("active")
+                                ? "green"
+                                : result?.is_active === t("inactive")
+                                ? "red"
+                                : "red",
+                          }}
+                        >
+                          {result?.is_active === t("active")
+                            ? t("active")
+                            : result?.is_active === t("inactive")
+                            ? t("inactive")
+                            : t("inactive")}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          <FaEdit
+                            className="edit-btn"
+                            onClick={() => {
+                              handleEdit(result);
+                            }}
+                          />
+                          <MdDeleteOutline
+                            className="delete-btn"
+                            onClick={() => handleDelete(result)}
+                          />
+                        </span>
+                      </td>
+                    )}
                   </tr>
                 ))}
               </tbody>
             )}
         </table>
       </div>
-      {/* Read More */}
+      {/* Pagination */}
+      {searchResultsAudioSCategoryAndTitle?.length > 0 &&
+        error === null &&
+        loading === false && <PaginationUI />}
+      {/* Add Audio */}
       <Modal
-        isOpen={toggle.readMore}
-        toggle={() =>
+        isOpen={toggle.add}
+        toggle={() => {
           setToggle({
             ...toggle,
-            readMore: !toggle.readMore,
-          })
-        }
+            add: !toggle.add,
+            elders: false,
+            audioCategory: false,
+            status: false,
+          });
+          formik.handleReset();
+        }}
         centered={true}
         keyboard={true}
         size={"md"}
-        contentClassName="modal-read-more modal-add-scholar"
+        contentClassName="modal-add-audio modal-add-scholar"
       >
         <ModalHeader
-          toggle={() =>
+          toggle={() => {
             setToggle({
               ...toggle,
-              readMore: !toggle.readMore,
-            })
-          }
+              add: !toggle.add,
+            });
+            formik.handleReset();
+          }}
         >
-          {toggle?.article?.title}
+          {t("audios.addTitle")}
           <IoMdClose
-            onClick={() =>
+            onClick={() => {
               setToggle({
                 ...toggle,
-                readMore: !toggle.readMore,
-              })
-            }
+                add: !toggle.add,
+              });
+            }}
           />
         </ModalHeader>
         <ModalBody>
-          <div className="read-more-container text-center">
-            <h3 className="text-center mb-3">{toggle?.article?.title}</h3>
-            <img
-              src={toggle?.article?.image}
-              alt={toggle?.article?.title || "avatar"}
-              className="read-more-image mb-3"
-              style={{
-                maxWidth: "700px",
-                maxHeight: "400px",
-                objectFit: "cover",
-              }}
-            />
-            <div className="content text-end">{toggle?.article?.content}</div>
-          </div>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
+              >
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image?.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values?.image && formik.values.image?.preview
+                            ? formik.values.image?.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values?.image && formik.values.image?.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image &&
+                              formik.values?.image?.preview
+                                ? formik.values?.image?.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={handleDeleteImage}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImageAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      ref={fileRef}
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center mt-4"
+                >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label
+                      htmlFor={
+                        formik.values.audio?.file !== "" &&
+                        formik.values.audio?.preview !== ""
+                          ? ""
+                          : "audio"
+                      }
+                      className="form-label mt-4"
+                    >
+                      <audio controls src={formik.values.audio?.preview} />
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="audio" className="form-label">
+                      <FaFileUpload /> {t("chooseAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="form-input form-img-input"
+                      id="audio"
+                      onChange={handleDurationAudio}
+                    />
+                  </div>
+                  {formik.errors.audio && formik.touched.audio ? (
+                    <span className="error">{formik.errors.audio}</span>
+                  ) : null}
+                </Col>
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title" className="form-label">
+                    {t("audios.columns.audio.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="title"
+                    placeholder={t("audios.columns.audio.title")}
+                    name="title"
+                    value={formik.values.title}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="audioCategory" className="form-label">
+                    {t("audios.columns.audio.category")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.audioCategory ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          audioCategory: !toggle.audioCategory,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.audioCategory?.title
+                        ? formik.values.audioCategory?.title
+                        : t("chooseCategory")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.audioCategory ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.audioCategory ? "active" : ""
+                      }`}
+                    >
+                      {audioCategories?.map((category) => (
+                        <button
+                          type="button"
+                          key={category?.id}
+                          className={`item ${
+                            formik.values.audioCategory?.id === category?.id
+                              ? "active"
+                              : ""
+                          }`}
+                          value={category?.id}
+                          name="audioCategory"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              audioCategory: !toggle.audioCategory,
+                            });
+                            formik.setFieldValue("audioCategory", {
+                              title: category.title,
+                              id: category?.id,
+                            });
+                          }}
+                        >
+                          {category.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.audioCategory?.title &&
+                  formik.touched.audioCategory?.title ? (
+                    <span className="error">
+                      {formik.errors.audioCategory?.title}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
+                    <div
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.status === "Private"
+                        ? t("private")
+                        : formik.values.status === "Public"
+                        ? t("public")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </div>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <div
+                        className={`item ${
+                          formik.values.status === "Private" ? "active" : ""
+                        }`}
+                        value="Private"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Private");
+                        }}
+                      >
+                        {t("private")}
+                      </div>
+                      <div
+                        className={`item ${
+                          formik.values.status === "Public" ? "active" : ""
+                        }`}
+                        value="Public"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Public");
+                        }}
+                      >
+                        {t("public")}
+                      </div>
+                    </div>
+                  </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("add")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setToggle({
+                        ...toggle,
+                        add: !toggle.add,
+                      });
+                      formik.handleReset();
+                    }}
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
+        </ModalBody>
+      </Modal>
+      {/* Edit audio */}
+      <Modal
+        isOpen={toggle.edit}
+        toggle={() => {
+          setToggle({
+            ...toggle,
+            edit: !toggle.edit,
+            audioCategory: false,
+            status: false,
+            elders: false,
+          });
+          formik.handleReset();
+        }}
+        centered={true}
+        keyboard={true}
+        size={"md"}
+        contentClassName="modal-add-scholar modal-add-scholar"
+      >
+        <ModalHeader
+          toggle={() => {
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            formik.handleReset();
+          }}
+        >
+          {t("audios.editTitle")}
+          <IoMdClose
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                edit: !toggle.edit,
+              });
+              formik.handleReset();
+            }}
+          />
+        </ModalHeader>
+        <ModalBody>
+          <form className="overlay-form" onSubmit={formik.handleSubmit}>
+            <Row className="d-flex justify-content-center align-items-center p-3">
+              <Col
+                lg={5}
+                className="d-flex flex-column justify-content-center align-items-center"
+              >
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={
+                        formik.values.image.file === undefined
+                          ? ""
+                          : formik.values.image.file === ""
+                          ? "image"
+                          : ""
+                      }
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values?.image?.preview
+                            ? formik.values.image?.preview
+                            : formik.values.image?.preview === undefined
+                            ? formik.values.image
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values.image.file
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : formik.values.image.file === ""
+                            ? ""
+                            : setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image
+                                ? formik.values.image?.preview
+                                  ? formik.values.image?.preview
+                                  : formik.values.image
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={handleDeleteImage}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImageAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      ref={fileRef}
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center mt-4"
+                >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label
+                      htmlFor={
+                        formik.values.audio?.file !== "" &&
+                        formik.values.audio?.preview !== ""
+                          ? ""
+                          : "audio"
+                      }
+                      className="form-label mt-4"
+                    >
+                      <audio
+                        controls
+                        src={
+                          formik.values.audio?.preview
+                            ? formik.values.audio?.preview
+                            : formik.values.audio
+                        }
+                      />
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="audio" className="form-label">
+                      <FaFileUpload /> {t("chooseAudio")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="audio/*"
+                      className="form-input form-img-input"
+                      id="audio"
+                      onChange={handleDurationAudio}
+                    />
+                  </div>
+                  {formik.errors.audio && formik.touched.audio ? (
+                    <span className="error">{formik.errors.audio}</span>
+                  ) : null}
+                </Col>
+              </Col>
+              <Col lg={7} className="mb-5">
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title" className="form-label">
+                    {t("audios.columns.audio.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input"
+                    id="title"
+                    placeholder={t("audios.columns.audio.title")}
+                    name="title"
+                    value={formik.values?.title}
+                    onChange={handleInput}
+                  />
+                  {formik.errors?.title && formik.touched?.title ? (
+                    <span className="error">{formik.errors?.title}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="audioCategory" className="form-label">
+                    {t("audios.columns.audio.category")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.audioCategory ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          audioCategory: !toggle.audioCategory,
+                        });
+                      }}
+                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.audioCategory?.title
+                        ? formik.values.audioCategory?.title
+                        : t("chooseCategory")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.audioCategory ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.audioCategory ? "active" : ""
+                      }`}
+                    >
+                      {audioCategories?.map((category) => (
+                        <button
+                          type="button"
+                          key={category?.id}
+                          className={`item ${
+                            formik.values.audioCategory?.id === category?.id
+                              ? "active"
+                              : ""
+                          }`}
+                          value={category?.id}
+                          name="audioCategory"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              audioCategory: !toggle.audioCategory,
+                            });
+                            formik.setFieldValue("audioCategory", {
+                              title: category?.title,
+                              id: category?.id,
+                            });
+                          }}
+                        >
+                          {category?.title}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {formik.errors.audioCategory?.title &&
+                  formik.touched.audioCategory?.title ? (
+                    <span className="error">
+                      {formik.errors.audioCategory?.title}
+                    </span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <label htmlFor="status" className="form-label">
+                    {t("status")}
+                  </label>
+                  <div
+                    className={`dropdown form-input ${
+                      toggle.status ? "active" : ""
+                    }`}
+                  >
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          status: !toggle.status,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.status === "Private" ||
+                      formik.values.status === "private"
+                        ? t("private")
+                        : formik.values.status === "Public" ||
+                          formik.values.status === "public"
+                        ? t("public")
+                        : t("status")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.status ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.status ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Private" ||
+                          formik.values.status === "private"
+                            ? "active"
+                            : ""
+                        }`}
+                        value="Private"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Private");
+                        }}
+                      >
+                        {t("private")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.status === "Public" ||
+                          formik.values.status === "public"
+                            ? "active"
+                            : ""
+                        }`}
+                        value="Public"
+                        name="status"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: false,
+                          });
+                          formik.setFieldValue("status", "Public");
+                        }}
+                      >
+                        {t("public")}
+                      </button>
+                    </div>
+                  </div>
+                  {formik.errors.status && formik.touched.status ? (
+                    <span className="error">{formik.errors.status}</span>
+                  ) : null}
+                </div>
+                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                  <label htmlFor="activation" className="form-label">
+                    {t("activation")}
+                  </label>
+                  <div className="dropdown form-input">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          is_active: !toggle.is_active,
+                        });
+                      }}
+                      className="dropdown-btn d-flex justify-content-between align-items-center"
+                    >
+                      {formik.values.is_active === 1
+                        ? t("active")
+                        : formik.values.is_active === 0
+                        ? t("inactive")
+                        : t("activation")}
+                      <TiArrowSortedUp
+                        className={`dropdown-icon ${
+                          toggle.is_active ? "active" : ""
+                        }`}
+                      />
+                    </button>
+                    <div
+                      className={`dropdown-content ${
+                        toggle.is_active ? "active" : ""
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 0 ? "active" : ""
+                        }`}
+                        value="inactive"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 0);
+                        }}
+                      >
+                        {t("inactive")}
+                      </button>
+                      <button
+                        type="button"
+                        className={`item ${
+                          formik.values.is_active === 1 ? "active" : ""
+                        }`}
+                        value="active"
+                        name="activation"
+                        onClick={(e) => {
+                          setToggle({
+                            ...toggle,
+                            is_active: !toggle.is_active,
+                          });
+                          formik.setFieldValue("is_active", 1);
+                        }}
+                      >
+                        {t("active")}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </Col>
+              <Col lg={12}>
+                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                  <button type="submit" className="add-btn">
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("save")
+                    )}
+                  </button>
+                  <button
+                    type="button"
+                    className="cancel-btn"
+                    onClick={() => {
+                      setToggle({
+                        ...toggle,
+                        edit: !toggle.edit,
+                      });
+                      formik.handleReset();
+                    }}
+                  >
+                    {t("cancel")}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          </form>
         </ModalBody>
       </Modal>
     </div>
