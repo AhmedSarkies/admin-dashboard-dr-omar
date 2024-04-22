@@ -10,6 +10,7 @@ import {
   sendCodeContent,
   sendCodeContentAll,
   sendCodeContentArray,
+  updateCodeContent,
 } from "../../store/slices/codeContentSlice";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { toast } from "react-toastify";
@@ -36,6 +37,7 @@ const CodeContent = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      checkboxes: true,
       id: true,
       name: true,
       email: true,
@@ -52,39 +54,55 @@ const CodeContent = () => {
     },
     validationSchema: validationSchema.codeContent,
     onSubmit: (values) => {
-      dispatch(sendCodeContentAll(values)).then((res) => {
-        if (!res.error) {
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-          dispatch(getCodeContent());
-          dispatch(getUsers());
-          formik.handleReset();
-          toast.success(t("toast.codeContent.addedSuccess"));
-        } else {
-          dispatch(getCodeContent());
-          dispatch(getUsers());
-          toast.error(t("toast.codeContent.addedError"));
-        }
-      });
+      if (values?.id) {
+        dispatch(updateCodeContent(values)).then((res) => {
+          if (!res.error) {
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            formik.handleReset();
+            toast.success(t("toast.codeContent.updatedSuccess"));
+          } else {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            toast.error(t("toast.codeContent.updatedError"));
+          }
+        });
+      } else {
+        dispatch(sendCodeContentAll(values)).then((res) => {
+          if (!res.error) {
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            formik.handleReset();
+            toast.success(t("toast.codeContent.addedSuccess"));
+          } else {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            toast.error(t("toast.codeContent.addedError"));
+          }
+        });
+      }
     },
   });
 
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "id", label: t("user.columns.id") },
-    { id: 1, name: "name", label: t("user.columns.name") },
-    { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "subscription", label: t("user.columns.subscription") },
-    { id: 4, name: "send", label: t("settings.codeContent.columns.send") },
+    { id: 0, name: "checkboxes", label: t("checkboxes") },
+    { id: 1, name: "id", label: t("index") },
+    { id: 2, name: "name", label: t("user.columns.name") },
+    { id: 3, name: "email", label: t("user.columns.email") },
+    { id: 4, name: "subscription", label: t("user.columns.subscription") },
+    { id: 5, name: "send", label: t("settings.codeContent.columns.send") },
   ];
-  const {
-    handleSort,
-    handleSearch,
-    handleToggleColumns,
-  } = useFiltration({
+  const { handleSort, handleSearch, handleToggleColumns } = useFiltration({
     rowData: users,
     toggle,
     setToggle,
@@ -385,29 +403,19 @@ const CodeContent = () => {
         <table className="table-body">
           <thead>
             <tr>
-              <th className="table-th" onClick={handleAddAll}>
-                <input
-                  type="checkbox"
-                  className="checkbox"
-                  checked={ids.length === users.length}
-                  readOnly
-                />
-              </th>
-              {toggle.toggleColumns?.id && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("user.columns.id")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
+              {toggle.toggleColumns?.checkboxes && (
+                <th className="table-th" onClick={handleAddAll}>
+                  <input
+                    type="checkbox"
+                    className="checkbox"
+                    checked={ids.length === users.length}
+                    readOnly
+                  />
                 </th>
               )}
-              {toggle.toggleColumns?.name && (
+              {toggle.toggleColumns?.id && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("user.columns.name")}
+                  {t("index")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -417,9 +425,9 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.email && (
+              {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("user.columns.email")}
+                  {t("user.columns.name")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -429,10 +437,22 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.subscription && (
+              {toggle.toggleColumns?.email && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("user.columns.subscription")}
+                  {t("user.columns.email")}
                   {toggle.sortColumn === columns[3].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns?.subscription && (
+                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                  {t("user.columns.subscription")}
+                  {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -511,42 +531,54 @@ const CodeContent = () => {
           {/* Data */}
           {results?.length > 0 && error === null && loading === false && (
             <tbody>
-              {results?.map((result) => (
+              {results?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td">
-                    <input
-                      type="checkbox"
-                      className={`checked-${result?.id} checked`}
-                      value={result?.id}
-                      onChange={handleAddSelected}
-                    />
-                  </td>
-                  <td className="table-td id">{result?.id}</td>
-                  <td className="table-td name">{result?.name}</td>
-                  <td className="table-td email">
-                    <a href={`mailto:${result?.email}`}>{result?.email}</a>
-                  </td>
-                  <td className="table-td subscription">
-                    <span
-                      className={`status ${
-                        result?.privacy === "private" ? "inactive" : "active"
-                      }`}
-                    >
-                      {result?.privacy === "private"
-                        ? t("private")
-                        : t("public")}
-                    </span>
-                  </td>
-                  <td className="table-td send">
-                    <MdSend
-                      className="btn-edit"
-                      style={{
-                        color: "green",
-                        cursor: "pointer",
-                      }}
-                      onClick={() => handleAddOne(result)}
-                    />
-                  </td>
+                  {toggle.toggleColumns?.checkboxes && (
+                    <td className="table-td">
+                      <input
+                        type="checkbox"
+                        className={`checked-${result?.id} checked`}
+                        value={result?.id}
+                        onChange={handleAddSelected}
+                      />
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
+                  {toggle.toggleColumns?.name && (
+                    <td className="table-td name">{result?.name}</td>
+                  )}
+                  {toggle.toggleColumns?.email && (
+                    <td className="table-td email">
+                      <a href={`mailto:${result?.email}`}>{result?.email}</a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.subscription && (
+                    <td className="table-td subscription">
+                      <span
+                        className={`status ${
+                          result?.privacy === "private" ? "inactive" : "active"
+                        }`}
+                      >
+                        {result?.privacy === "private"
+                          ? t("private")
+                          : t("public")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.send && (
+                    <td className="table-td send">
+                      <MdSend
+                        className="btn-edit"
+                        style={{
+                          color: "green",
+                          cursor: "pointer",
+                        }}
+                        onClick={() => handleAddOne(result)}
+                      />
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
