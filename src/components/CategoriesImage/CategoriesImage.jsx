@@ -31,6 +31,7 @@ const CategoriesImages = () => {
     activeColumn: false,
     searchTerm: "",
     toggleColumns: {
+      id: true,
       title: true,
       control: true,
     },
@@ -43,8 +44,9 @@ const CategoriesImages = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "title", label: t("categories.columns.category") },
-    { id: 1, name: "control", label: t("action") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "title", label: t("categories.columns.category") },
+    { id: 2, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -240,10 +242,15 @@ const CategoriesImages = () => {
         <table className="table-body">
           <thead>
             <tr>
+              {toggle.toggleColumns.id && 
+                <th className="table-th">
+                  {t("index")}
+                  </th>
+              }
               {toggle.toggleColumns.title && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("categories.columns.category")}
-                  {toggle.sortColumn === columns[0].name ? (
+                  {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -253,9 +260,9 @@ const CategoriesImages = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
                   {t("action")}
-                  {toggle.sortColumn === columns[1].name ? (
+                  {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -270,7 +277,7 @@ const CategoriesImages = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -288,7 +295,7 @@ const CategoriesImages = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -308,7 +315,7 @@ const CategoriesImages = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -320,7 +327,7 @@ const CategoriesImages = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -329,8 +336,11 @@ const CategoriesImages = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
                   {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
                   )}
