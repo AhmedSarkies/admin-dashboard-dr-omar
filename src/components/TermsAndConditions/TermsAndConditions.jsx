@@ -37,6 +37,7 @@ const TermsAndConditions = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      id: true,
       title: true,
       country: true,
       text: true,
@@ -119,6 +120,7 @@ const TermsAndConditions = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     {
       id: 1,
       name: "title",
@@ -307,13 +309,28 @@ const TermsAndConditions = () => {
           <table className="table-body">
             <thead>
               <tr>
-                {toggle.toggleColumns?.title && (
+                {toggle.toggleColumns?.id && (
                   <th
                     className="table-th"
                     onClick={() => handleSort(columns[0])}
                   >
-                    {t("settings.termsAndConditions.columns.title")}
+                    {t("index")}
                     {toggle.sortColumn === columns[0].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
+                {toggle.toggleColumns?.title && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[1])}
+                  >
+                    {t("settings.termsAndConditions.columns.title")}
+                    {toggle.sortColumn === columns[1].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -325,10 +342,10 @@ const TermsAndConditions = () => {
                 {toggle.toggleColumns?.country && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[1])}
+                    onClick={() => handleSort(columns[2])}
                   >
                     {t("settings.termsAndConditions.columns.country")}
-                    {toggle.sortColumn === columns[1].name ? (
+                    {toggle.sortColumn === columns[2].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -340,10 +357,10 @@ const TermsAndConditions = () => {
                 {toggle.toggleColumns.text && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[2])}
+                    onClick={() => handleSort(columns[3])}
                   >
                     {t("settings.termsAndConditions.columns.text")}
-                    {toggle.sortColumn === columns[2].name ? (
+                    {toggle.sortColumn === columns[3].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -355,10 +372,10 @@ const TermsAndConditions = () => {
                 {toggle.toggleColumns.control && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[3])}
+                    onClick={() => handleSort(columns[4])}
                   >
                     {t("action")}
-                    {toggle.sortColumn === columns[3].name ? (
+                    {toggle.sortColumn === columns[4].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -373,7 +390,7 @@ const TermsAndConditions = () => {
             {error !== null && loading === false && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="4">
+                  <td className="table-td" colSpan="5">
                     <p className="no-data mb-0">
                       {error === "Network Error"
                         ? t("networkError")
@@ -391,7 +408,7 @@ const TermsAndConditions = () => {
             {loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="4">
+                  <td className="table-td" colSpan="5">
                     <div className="no-data mb-0">
                       <Spinner
                         color="primary"
@@ -411,7 +428,7 @@ const TermsAndConditions = () => {
             {searchResults?.length === 0 && error === null && !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="4">
+                  <td className="table-td" colSpan="5">
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -423,7 +440,7 @@ const TermsAndConditions = () => {
             ) && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="4">
+                  <td className="table-td" colSpan="5">
                     <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                   </td>
                 </tr>
@@ -434,8 +451,11 @@ const TermsAndConditions = () => {
               error === null &&
               loading === false && (
                 <tbody>
-                  {searchResults?.map((result) => (
-                    <tr key={result?.id + new Date().getDate()}>
+                  {searchResults?.map((result, idx) => (
+                <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
                       {toggle.toggleColumns?.title && (
                         <td className="table-td title">
                           {lng === "ar" ? result?.title : result?.title_en}
