@@ -74,6 +74,7 @@ const Audios = () => {
     duration: "00:00",
     activeColumn: false,
     toggleColumns: {
+      id: true,
       imageElder: true,
       nameElder: true,
       image: true,
@@ -98,7 +99,12 @@ const Audios = () => {
   const allDataWithCategoriesObj = audios?.map((audio) => {
     return {
       ...audio,
-      categories: audio?.categories[0],
+      categories: {
+        title: audio.categories[0]?.title,
+        id: audio.categories[0]?.id,
+      },
+      status: audio.status === "public" ? t("public") : t("private"),
+      is_active: audio.is_active === 1 ? t("active") : t("inactive"),
     };
   });
 
@@ -117,19 +123,20 @@ const Audios = () => {
 
   // Columns
   const columns = [
-    { id: 0, name: "imageElder", label: t("audios.columns.elder.image") },
-    { id: 1, name: "nameElder", label: t("audios.columns.elder.name") },
-    { id: 2, name: "image", label: t("audios.columns.audio.image") },
-    { id: 3, name: "title", label: t("audios.columns.audio.title") },
-    { id: 4, name: "category", label: t("audios.columns.audio.category") },
-    { id: 5, name: "audio", label: t("audios.columns.audio.audio") },
-    { id: 6, name: "visits", label: t("visits") },
-    { id: 7, name: "favorites", label: t("favorites") },
-    { id: 8, name: "downloads", label: t("downloads") },
-    { id: 9, name: "shares", label: t("shares") },
-    { id: 10, name: "status", label: t("status") },
-    { id: 11, name: "activation", label: t("activation") },
-    { id: 12, name: "control", label: t("action") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "imageElder", label: t("audios.columns.elder.image") },
+    { id: 2, name: "nameElder", label: t("audios.columns.elder.name") },
+    { id: 3, name: "image", label: t("audios.columns.audio.image") },
+    { id: 4, name: "title", label: t("audios.columns.audio.title") },
+    { id: 5, name: "category", label: t("audios.columns.audio.category") },
+    { id: 6, name: "audio", label: t("audios.columns.audio.audio") },
+    { id: 7, name: "listening", label: t("listening") },
+    { id: 8, name: "favorites", label: t("favorites") },
+    { id: 9, name: "downloads", label: t("downloads") },
+    { id: 10, name: "shares", label: t("shares") },
+    { id: 11, name: "status", label: t("status") },
+    { id: 12, name: "activation", label: t("activation") },
+    { id: 13, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -309,8 +316,8 @@ const Audios = () => {
       title: audio.title,
       image: audio.image,
       audio: audio.audio,
-      status: audio.status,
-      is_active: audio.is_active,
+      status: audio.status === t("public") ? "Public" : "Private",
+      is_active: audio.is_active === t("active") ? 1 : 0,
       elder: {
         name: audio.elder?.name,
         id: audio.elder?.id,
@@ -457,21 +464,12 @@ const Audios = () => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.imageElder && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("audios.columns.elder.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.nameElder && (
+              {toggle.toggleColumns.imageElder && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("audios.columns.elder.name")}
+                  {t("audios.columns.elder.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -481,9 +479,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.image && (
+              {toggle.toggleColumns.nameElder && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("audios.columns.audio.image")}
+                  {t("audios.columns.elder.name")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -493,9 +491,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.title && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("audios.columns.audio.title")}
+                  {t("audios.columns.audio.image")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -505,9 +503,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("audios.columns.audio.category")}
+                  {t("audios.columns.audio.title")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -517,9 +515,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.audio && (
+              {toggle.toggleColumns.category && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("audios.columns.audio.audio")}
+                  {t("audios.columns.audio.category")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -529,9 +527,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.audio && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("visits")}
+                  {t("audios.columns.audio.audio")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -541,9 +539,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("favorites")}
+                  {t("listening")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -553,9 +551,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -565,9 +563,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("shares")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -577,10 +575,28 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
-                <th className="table-th" onClick={() => handleSort(columns[10])}>
-                  {t("status")}
+              {toggle.toggleColumns.shares && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("shares")}
                   {toggle.sortColumn === columns[10].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[11])}
+                >
+                  {t("status")}
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -592,10 +608,10 @@ const Audios = () => {
               {toggle.toggleColumns.activation && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[11])}
+                  onClick={() => handleSort(columns[12])}
                 >
                   {t("activation")}
-                  {toggle.sortColumn === columns[11].name ? (
+                  {toggle.sortColumn === columns[12].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -607,10 +623,10 @@ const Audios = () => {
               {toggle.toggleColumns.control && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[12])}
+                  onClick={() => handleSort(columns[13])}
                 >
                   {t("action")}
-                  {toggle.sortColumn === columns[12].name ? (
+                  {toggle.sortColumn === columns[13].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -625,7 +641,7 @@ const Audios = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="13">
+                <td className="table-td" colSpan="14">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -643,7 +659,7 @@ const Audios = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="13">
+                <td className="table-td" colSpan="14">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -660,144 +676,213 @@ const Audios = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResultsAudioSCategoryAndTitleAndAuthor?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan="13">
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
+          {searchResultsAudioSCategoryAndTitleAndAuthor?.length === 0 &&
+            error === null &&
+            !loading && (
+              <tbody>
+                <tr className="no-data-container">
+                  <td className="table-td" colSpan="14">
+                    <p className="no-data mb-0">{t("noData")}</p>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           {/* There is no any columns */}
           {Object.values(toggle.toggleColumns).every(
             (column) => column === false
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="13">
+                <td className="table-td" colSpan="14">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {searchResultsAudioSCategoryAndTitleAndAuthor?.map((result) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns.imageElder && (
-                    <td className="table-td">
-                      <img
-                        src={result?.elder?.image}
-                        alt={result?.elder || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.nameElder && (
-                    <td className="table-td name">{result?.elder?.name}</td>
-                  )}
-                  {toggle.toggleColumns.image && (
-                    <td className="table-td">
-                      <img
-                        src={result?.image}
-                        alt={result?.image?.name || "avatar"}
-                        className="table-avatar"
-                        style={{
-                          width: "50px",
-                          height: "50px",
-                          objectFit: "cover",
-                        }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.title && (
-                    <td className="table-td">{result?.title}</td>
-                  )}
-                  {toggle.toggleColumns.category && (
-                    <td className="table-td">{result?.categories.title}</td>
-                  )}
-                  {toggle.toggleColumns.audio && (
-                    <td className="table-td">
-                      <audio
-                        controls
-                        src={result?.audio}
-                        style={{ width: "250px" }}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns.visits && (
-                    <td className="table-td">{result?.visits_count}</td>
-                  )}
-                  {toggle.toggleColumns.favorites && (
-                    <td className="table-td">{result?.favorites_count}</td>
-                  )}
-                  {toggle.toggleColumns.downloads && (
-                    <td className="table-td">{result?.downloads_count}</td>
-                  )}
-                  {toggle.toggleColumns.shares && (
-                    <td className="table-td">{result?.shares_count}</td>
-                  )}
-                  {toggle.toggleColumns.status && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.status === "public"
-                              ? "green"
-                              : result?.status === "private"
-                              ? "red"
-                              : "red",
-                        }}
-                      >
-                        {result?.status === "public"
-                          ? "عام"
-                          : result?.status === "private"
-                          ? "خاص"
-                          : "خاص"}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.activation && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.is_active === 1 ? "green" : "red",
-                        }}
-                      >
-                        {result?.is_active === 1 ? t("active") : t("inactive")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+          {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsAudioSCategoryAndTitleAndAuthor?.map(
+                  (result, idx) => (
+                    <tr key={result?.id + new Date().getDate()}>
+                      {toggle.toggleColumns?.id && (
+                        <td className="table-td">{idx + 1}#</td>
+                      )}
+                      {toggle.toggleColumns.imageElder && (
+                        <td className="table-td">
+                          <img
+                            src={result?.elder?.image}
+                            alt={result?.elder || "avatar"}
+                            className="table-avatar"
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </td>
+                      )}
+                      {toggle.toggleColumns.nameElder && (
+                        <td className="table-td name">{result?.elder?.name}</td>
+                      )}
+                      {toggle.toggleColumns.image && (
+                        <td className="table-td">
+                          <img
+                            src={result?.image}
+                            alt={result?.image?.name || "avatar"}
+                            className="table-avatar"
+                            style={{
+                              width: "50px",
+                              height: "50px",
+                              objectFit: "cover",
+                            }}
+                          />
+                        </td>
+                      )}
+                      {toggle.toggleColumns.title && (
+                        <td className="table-td">{result?.title}</td>
+                      )}
+                      {toggle.toggleColumns.category && (
+                        <td className="table-td">{result?.categories.title}</td>
+                      )}
+                      {toggle.toggleColumns.audio && (
+                        <td className="table-td">
+                          <audio
+                            controls
+                            src={result?.audio}
+                            style={{ width: "250px" }}
+                          />
+                        </td>
+                      )}
+                      {toggle.toggleColumns.visits && (
+                        <td className="table-td">{result?.visits_count}</td>
+                      )}
+                      {toggle.toggleColumns.favorites && (
+                        <td className="table-td">{result?.favorites_count}</td>
+                      )}
+                      {toggle.toggleColumns.downloads && (
+                        <td className="table-td">{result?.downloads_count}</td>
+                      )}
+                      {toggle.toggleColumns.shares && (
+                        <td className="table-td">{result?.shares_count}</td>
+                      )}
+                      {toggle.toggleColumns.status && (
+                        <td className="table-td">
+                          <span
+                            className="table-status badge"
+                            style={{
+                              backgroundColor:
+                                result?.status === t("public")
+                                  ? "green"
+                                  : result?.status === t("private")
+                                  ? "red"
+                                  : "red",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              const data = {
+                                id: result.id,
+                                title: result.title,
+                                status:
+                                  result?.status === t("public")
+                                    ? "private"
+                                    : "public",
+                                Audio_category: result.categories.id,
+                                is_active:
+                                  result.is_active === t("active") ? 1 : 0,
+                                tag_name: ["tag 1", "tag 2"],
+                              };
+                              dispatch(updateAudioApi(data)).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getAudiosApi());
+                                  toast.success(
+                                    t("toast.audio.updatedSuccess")
+                                  );
+                                } else {
+                                  dispatch(getAudiosApi());
+                                  toast.error(t("toast.audio.updatedError"));
+                                }
+                              });
+                            }}
+                          >
+                            {result?.status === t("public")
+                              ? t("public")
+                              : result?.status === t("private")
+                              ? t("private")
+                              : t("private")}
+                          </span>
+                        </td>
+                      )}
+                      {toggle.toggleColumns.activation && (
+                        <td className="table-td">
+                          <span
+                            className="table-status badge"
+                            style={{
+                              backgroundColor:
+                                result?.is_active === t("active")
+                                  ? "green"
+                                  : result?.is_active === t("inactive")
+                                  ? "red"
+                                  : "red",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => {
+                              const data = {
+                                id: result.id,
+                                title: result.title,
+                                status:
+                                  result?.status === t("public")
+                                    ? "public"
+                                    : "private",
+                                Audio_category: result.categories.id,
+                                is_active:
+                                  result.is_active === t("active") ? 0 : 1,
+                                tag_name: ["tag 1", "tag 2"],
+                              };
+                              dispatch(updateAudioApi(data)).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getAudiosApi());
+                                  toast.success(
+                                    t("toast.audio.updatedSuccess")
+                                  );
+                                } else {
+                                  dispatch(getAudiosApi());
+                                  toast.error(t("toast.audio.updatedError"));
+                                }
+                              });
+                            }}
+                          >
+                            {result?.is_active === t("active")
+                              ? t("active")
+                              : result?.is_active === t("inactive")
+                              ? t("inactive")
+                              : t("inactive")}
+                          </span>
+                        </td>
+                      )}
+                      {toggle.toggleColumns.control && (
+                        <td className="table-td">
+                          <span className="table-btn-container">
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                              }}
+                            />
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          </span>
+                        </td>
+                      )}
+                    </tr>
+                  )
+                )}
+              </tbody>
+            )}
         </table>
       </div>
       {/* Add Audio */}
@@ -1846,9 +1931,9 @@ const Audios = () => {
         </ModalBody>
       </Modal>
       {/* Pagination */}
-      {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
+      {searchResultsAudioSCategoryAndTitleAndAuthor?.length > 0 &&
+        error === null &&
+        loading === false && <PaginationUI />}
     </div>
   );
 
