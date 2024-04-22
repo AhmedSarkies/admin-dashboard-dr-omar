@@ -73,13 +73,14 @@ const Notifications = () => {
 
   // Filtration, Sorting, Pagination
   const columns = [
-    { id: 0, name: "name", label: t("user.columns.name") },
-    { id: 1, name: "email", label: t("user.columns.email") },
-    { id: 2, name: "phone", label: t("user.columns.phone") },
-    { id: 3, name: "image", label: t("notifications.columns.image") },
-    { id: 4, name: "title", label: t("notifications.columns.title") },
-    { id: 5, name: "body", label: t("notifications.columns.body") },
-    { id: 6, name: "control", label: t("action") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "name", label: t("user.columns.name") },
+    { id: 2, name: "email", label: t("user.columns.email") },
+    { id: 3, name: "phone", label: t("user.columns.phone") },
+    { id: 4, name: "image", label: t("notifications.columns.image") },
+    { id: 6, name: "title", label: t("notifications.columns.title") },
+    { id: 6, name: "body", label: t("notifications.columns.body") },
+    { id: 7, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -111,7 +112,9 @@ const Notifications = () => {
       const formData = new FormData();
       formData.append("title", values.title);
       formData.append("body", values.description);
-      formData.append("image", values.image.file);
+      if (values.image.file) {
+        formData.append("image", values.image.file);
+      }
       if (toggle.sendOne) {
         formData.append("user_id", values.user_id);
         dispatch(sendNotification(formData)).then((res) => {
@@ -133,14 +136,15 @@ const Notifications = () => {
         });
       }
       if (toggle.sendSelected && ids.length > 0) {
-        dispatch(
-          sendNotificationSelectedUsers({
-            user_ids: ids,
-            title: values.title,
-            body: values.description,
-            image: values.image.file,
-          })
-        ).then((res) => {
+        const data = {
+          user_ids: ids,
+          title: values.title,
+          body: values.description,
+        };
+        if (values.image.file) {
+          data.image = values.image.file;
+        }
+        dispatch(sendNotificationSelectedUsers(data)).then((res) => {
           if (!res.error) {
             setToggle({
               ...toggle,
@@ -406,13 +410,16 @@ const Notifications = () => {
           <table className="table-body">
             <thead>
               <tr>
+                {toggle.toggleColumns?.id && (
+                  <th className="table-th">{t("index")}</th>
+                )}
                 {toggle.toggleColumns?.name && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[0])}
+                    onClick={() => handleSort(columns[1])}
                   >
                     {t("user.columns.name")}
-                    {toggle.sortColumn === columns[0].name ? (
+                    {toggle.sortColumn === columns[1].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -424,10 +431,10 @@ const Notifications = () => {
                 {toggle.toggleColumns?.email && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[1])}
+                    onClick={() => handleSort(columns[2])}
                   >
                     {t("user.columns.email")}
-                    {toggle.sortColumn === columns[1].name ? (
+                    {toggle.sortColumn === columns[2].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -439,10 +446,10 @@ const Notifications = () => {
                 {toggle.toggleColumns?.phone && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[2])}
+                    onClick={() => handleSort(columns[3])}
                   >
                     {t("user.columns.phone")}
-                    {toggle.sortColumn === columns[2].name ? (
+                    {toggle.sortColumn === columns[3].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -454,10 +461,10 @@ const Notifications = () => {
                 {toggle.toggleColumns?.image && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[3])}
+                    onClick={() => handleSort(columns[4])}
                   >
                     {t("notifications.columns.image")}
-                    {toggle.sortColumn === columns[3].name ? (
+                    {toggle.sortColumn === columns[4].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -469,10 +476,10 @@ const Notifications = () => {
                 {toggle.toggleColumns?.title && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[4])}
+                    onClick={() => handleSort(columns[5])}
                   >
                     {t("notifications.columns.title")}
-                    {toggle.sortColumn === columns[4].name ? (
+                    {toggle.sortColumn === columns[5].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -484,10 +491,10 @@ const Notifications = () => {
                 {toggle.toggleColumns?.body && (
                   <th
                     className="table-th"
-                    onClick={() => handleSort(columns[5])}
+                    onClick={() => handleSort(columns[6])}
                   >
                     {t("notifications.columns.body")}
-                    {toggle.sortColumn === columns[5].name ? (
+                    {toggle.sortColumn === columns[6].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
                       ) : (
@@ -505,7 +512,7 @@ const Notifications = () => {
             {error !== null && loading === false && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="7">
+                  <td className="table-td" colSpan="8">
                     <p className="no-data mb-0">
                       {error === "Network Error"
                         ? t("networkError")
@@ -523,7 +530,7 @@ const Notifications = () => {
             {loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="7">
+                  <td className="table-td" colSpan="8">
                     <div className="no-data mb-0">
                       <Spinner
                         color="primary"
@@ -545,7 +552,7 @@ const Notifications = () => {
               !loading && (
                 <tbody>
                   <tr className="no-data-container">
-                    <td className="table-td" colSpan="7">
+                    <td className="table-td" colSpan="8">
                       <p className="no-data mb-0">{t("noData")}</p>
                     </td>
                   </tr>
@@ -557,7 +564,7 @@ const Notifications = () => {
             ) && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="7">
+                  <td className="table-td" colSpan="8">
                     <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                   </td>
                 </tr>
@@ -568,8 +575,11 @@ const Notifications = () => {
               error === null &&
               loading === false && (
                 <tbody>
-                  {searchResultsNotifications?.map((result) => (
-                    <tr key={result?.notification?.id + new Date().getDate()}>
+                  {searchResultsNotifications?.map((result, idx) => (
+                    <tr key={result?.id + new Date().getDate()}>
+                      {toggle.toggleColumns?.id && (
+                        <td className="table-td">{idx + 1}#</td>
+                      )}
                       {toggle.toggleColumns.name && (
                         <td className="table-td name">{result?.user?.name}</td>
                       )}
@@ -768,7 +778,7 @@ const Notifications = () => {
               error === null &&
               loading === false && (
                 <tbody>
-                  {searchResultsUsers?.map((result) => (
+                  {searchResultsUsers?.map((result, idx) => (
                     <tr key={result?.id + new Date().getDate()}>
                       <td className="table-td">
                         <input
@@ -778,7 +788,7 @@ const Notifications = () => {
                           onChange={handleAddSelected}
                         />
                       </td>
-                      <td className="table-td id">{result?.id}</td>
+                      <td className="table-td id">{1 + idx}</td>
                       <td className="table-td name">{result?.name}</td>
                       <td className="table-td email">
                         <a href={`mailto: ${result?.email}`}>{result?.email}</a>
