@@ -46,6 +46,8 @@ const Users = () => {
       subscription: true,
       created_at: true,
       login_count: true,
+      register_method: true,
+      last_login: true,
       activation: true,
       control: true,
     },
@@ -99,15 +101,21 @@ const Users = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "id", label: t("user.columns.id") },
+    { id: 0, name: "id", label: t("index") },
     { id: 1, name: "name", label: t("user.columns.name") },
     { id: 2, name: "email", label: t("user.columns.email") },
     { id: 3, name: "phone", label: t("user.columns.phone") },
     { id: 4, name: "subscription", label: t("user.columns.subscription") },
     { id: 5, name: "created_at", label: t("user.columns.created_at") },
     { id: 6, name: "login_count", label: t("user.columns.login_count") },
-    { id: 7, name: "activation", label: t("activation") },
-    { id: 8, name: "control", label: t("action") },
+    {
+      id: 7,
+      name: "register_method",
+      label: t("user.columns.register_method"),
+    },
+    { id: 8, name: "last_login", label: t("user.columns.last_login") },
+    { id: 9, name: "activation", label: t("activation") },
+    { id: 10, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -249,16 +257,7 @@ const Users = () => {
           <thead>
             <tr>
               {toggle.toggleColumns?.id && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("user.columns.id")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+                <th className="table-th">{t("index")}</th>
               )}
               {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
@@ -332,6 +331,30 @@ const Users = () => {
                   ) : null}
                 </th>
               )}
+              {toggle.toggleColumns?.register_method && (
+                <th className="table-th" onClick={() => handleSort(columns[7])}>
+                  {t("user.columns.register_method")}
+                  {toggle.sortColumn === columns[7].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns?.last_login && (
+                <th className="table-th" onClick={() => handleSort(columns[8])}>
+                  {t("user.columns.last_login")}
+                  {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
               {toggle.toggleColumns?.activation && (
                 <th className="table-th">{t("activation")}</th>
               )}
@@ -344,7 +367,7 @@ const Users = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -362,7 +385,7 @@ const Users = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -382,7 +405,7 @@ const Users = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -394,7 +417,7 @@ const Users = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -403,69 +426,99 @@ const Users = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td id">{result?.id}</td>
-                  <td className="table-td name">
-                    <Link
-                      to={`/dr-omar/users/${result?.id}`}
-                      className="scholar-link"
-                    >
-                      {result?.name}
-                    </Link>
-                  </td>
-                  <td className="table-td email">
-                    <a href={`mailto: ${result?.email}`}>{result?.email}</a>
-                  </td>
-                  <td className="table-td phone">
-                    <a href={`mailto:${result?.phonenumber}`}>
-                      {result?.phonenumber}
-                    </a>
-                  </td>
-                  <td className="table-td subscription">
-                    <span
-                      className={`status ${
-                        result?.privacy === "private" ? "inactive" : "active"
-                      }`}
-                    >
-                      {result?.privacy === "private"
-                        ? t("private")
-                        : t("public")}
-                    </span>
-                  </td>
-                  <td className="table-td created_at">
-                    {new Date(result?.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="table-td login_count">
-                    {result?.login_count}
-                  </td>
-                  <td className="table-td">
-                    <span
-                      className="table-status badge"
-                      style={{
-                        backgroundColor:
-                          result?.is_active === 1 ? "green" : "red",
-                      }}
-                    >
-                      {result?.is_active === 1 ? t("active") : t("inactive")}
-                    </span>
-                  </td>
-                  <td className="table-td">
-                    <span className="table-btn-container">
-                      <IoMdEye
-                        className="view-btn"
-                        onClick={() => navigate(`/dr-omar/users/${result?.id}`)}
-                      />
-                      <MdDeleteOutline
-                        className="delete-btn"
-                        onClick={() => handleDelete(result)}
-                      />
-                      <MdEdit
-                        className="edit-btn"
-                        onClick={() => handleEdit(result)}
-                      />
-                    </span>
-                  </td>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
+                  {toggle.toggleColumns?.name && (
+                    <td className="table-td name">
+                      <Link
+                        to={`/dr-omar/users/${result?.id}`}
+                        className="scholar-link"
+                      >
+                        {result?.name}
+                      </Link>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.email && (
+                    <td className="table-td email">
+                      <a href={`mailto: ${result?.email}`}>{result?.email}</a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.phone && (
+                    <td className="table-td phone">
+                      <a href={`mailto:${result?.phonenumber}`}>
+                        {result?.phonenumber}
+                      </a>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.subscription && (
+                    <td className="table-td subscription">
+                      <span
+                        className={`status ${
+                          result?.privacy === "private" ? "inactive" : "active"
+                        }`}
+                      >
+                        {result?.privacy === "private"
+                          ? t("private")
+                          : t("public")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.created_at && (
+                    <td className="table-td created_at">
+                      {new Date(result?.created_at).toLocaleDateString()}
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.login_count && (
+                    <td className="table-td login_count">
+                      {result?.login_count}
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.register_method && (
+                    <td className="table-td register_method">
+                      {result?.register_method}
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.last_login && (
+                    <td className="table-td last_login">
+                      {new Date(result?.last_login).toLocaleDateString()}
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.activation && (
+                    <td className="table-td">
+                      <span
+                        className="table-status badge"
+                        style={{
+                          backgroundColor:
+                            result?.is_active === 1 ? "green" : "red",
+                        }}
+                      >
+                        {result?.is_active === 1 ? t("active") : t("inactive")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns?.control && (
+                    <td className="table-td">
+                      <span className="table-btn-container">
+                        <IoMdEye
+                          className="view-btn"
+                          onClick={() =>
+                            navigate(`/dr-omar/users/${result?.id}`)
+                          }
+                        />
+                        <MdDeleteOutline
+                          className="delete-btn"
+                          onClick={() => handleDelete(result)}
+                        />
+                        <MdEdit
+                          className="edit-btn"
+                          onClick={() => handleEdit(result)}
+                        />
+                      </span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -666,7 +719,7 @@ const Users = () => {
                         aria-hidden="true"
                       ></span>
                     ) : (
-                      t("add")
+                      t("edit")
                     )}
                   </button>
                   <button
