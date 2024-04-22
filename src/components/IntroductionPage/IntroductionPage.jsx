@@ -46,6 +46,7 @@ const IntroductionPage = () => {
     pictureCategories: false,
     activeColumn: false,
     toggleColumns: {
+      id: true,
       image: true,
       title: true,
       description: true,
@@ -78,6 +79,7 @@ const IntroductionPage = () => {
   });
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     {
       id: 1,
       name: "image",
@@ -310,21 +312,12 @@ const IntroductionPage = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("settings.introductionPage.columns.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.title && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("settings.introductionPage.columns.title.title")}
+                  {t("settings.introductionPage.columns.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -334,12 +327,24 @@ const IntroductionPage = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.description && (
+              {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
+                  {t("settings.introductionPage.columns.title.title")}
+                  {toggle.sortColumn === columns[2].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.description && (
+                <th className="table-th" onClick={() => handleSort(columns[3])}>
                   {t(
                     "settings.introductionPage.columns.description.description"
                   )}
-                  {toggle.sortColumn === columns[2].name ? (
+                  {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -357,7 +362,7 @@ const IntroductionPage = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -375,7 +380,7 @@ const IntroductionPage = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -395,7 +400,7 @@ const IntroductionPage = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -407,7 +412,7 @@ const IntroductionPage = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td className="table-td" colSpan="5">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -416,8 +421,11 @@ const IntroductionPage = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
                   {toggle.toggleColumns.image && (
                     <td className="table-td">
                       <img
