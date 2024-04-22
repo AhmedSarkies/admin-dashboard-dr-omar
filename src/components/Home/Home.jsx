@@ -40,16 +40,6 @@ const Home = () => {
       icon: <HiUsers />,
     },
     {
-      title: t("linkItems.messages"),
-      path: "/dr-omar/messages",
-      icon: <MdOutlineMarkunread />,
-    },
-    {
-      title: t("linkItems.notifications"),
-      path: "/dr-omar/notifications",
-      icon: <FaBell />,
-    },
-    {
       title: t("linkItems.settingsApp"),
       path: "/dr-omar/settings",
     },
@@ -117,6 +107,16 @@ const Home = () => {
       title: t("linkItems.articles"),
       path: "/dr-omar/articles",
       icon: <MdArticle />,
+    },
+    {
+      title: t("linkItems.notifications"),
+      path: "/dr-omar/notifications",
+      icon: <FaBell />,
+    },
+    {
+      title: t("linkItems.messages"),
+      path: "/dr-omar/messages",
+      icon: <MdOutlineMarkunread />,
     },
     // {
     //   title: t("linkItems.mostListening"),
