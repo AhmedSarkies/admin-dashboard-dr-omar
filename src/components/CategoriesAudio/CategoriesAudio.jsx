@@ -35,6 +35,7 @@ const CategoriesAudio = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      id: true,
       category: true,
       control: true,
     },
@@ -43,6 +44,7 @@ const CategoriesAudio = () => {
   // Filtration, Pagination and Sorting
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     { id: 1, name: "category", label: t("categories.columns.category") },
     { id: 2, name: "control", label: t("action") },
   ];
@@ -237,10 +239,13 @@ const CategoriesAudio = () => {
         <table className="table-body">
           <thead>
             <tr>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
+              )}
               {toggle.toggleColumns.category && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("categories.columns.category")}
-                  {toggle.sortColumn === columns[0].name ? (
+                  {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -250,9 +255,9 @@ const CategoriesAudio = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[1])}>
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
                   {t("action")}
-                  {toggle.sortColumn === columns[1].name ? (
+                  {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -267,7 +272,7 @@ const CategoriesAudio = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -285,7 +290,7 @@ const CategoriesAudio = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -305,7 +310,7 @@ const CategoriesAudio = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -317,7 +322,7 @@ const CategoriesAudio = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="2">
+                <td className="table-td" colSpan="3">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -326,8 +331,11 @@ const CategoriesAudio = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
                   )}
