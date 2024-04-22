@@ -26,6 +26,7 @@ const MostListening = () => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      id: true,
       imageElder: true,
       nameElder: true,
       image: true,
@@ -44,6 +45,7 @@ const MostListening = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     {
       id: 1,
       name: "imageElder",
@@ -155,6 +157,9 @@ const MostListening = () => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
+              )}
               {toggle.toggleColumns.imageElder && (
                 <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("mostListening.columns.elder.image")}
@@ -296,7 +301,7 @@ const MostListening = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="12">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -314,7 +319,7 @@ const MostListening = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="12">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -334,7 +339,7 @@ const MostListening = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="12">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -346,7 +351,7 @@ const MostListening = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="10">
+                <td className="table-td" colSpan="12">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -355,8 +360,11 @@ const MostListening = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
                   {toggle.toggleColumns.imageElder && (
                     <td className="table-td">
                       <img
