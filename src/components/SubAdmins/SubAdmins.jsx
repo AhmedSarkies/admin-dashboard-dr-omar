@@ -36,6 +36,7 @@ const initialValues = {
   phone: "",
   status: "",
   password: "",
+  confirmPassword: "",
   powers: "",
 };
 
@@ -58,6 +59,7 @@ const SubAdmins = ({ dashboard }) => {
     sortColumn: "",
     sortOrder: "asc",
     toggleColumns: {
+      id: true,
       image: true,
       name: true,
       email: true,
@@ -71,7 +73,9 @@ const SubAdmins = ({ dashboard }) => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema: validationSchema.subAdmins,
+    validationSchema: toggle.edit
+      ? validationSchema.subAdminsEdit
+      : validationSchema.subAdmins,
     onSubmit: (values) => {
       // if email and phone is already exist with another subAdmin if just i change them to new values
       if (subAdmins.length > 0) {
@@ -207,19 +211,21 @@ const SubAdmins = ({ dashboard }) => {
     setToggle({
       ...toggle,
       add: !toggle.add,
+      edit: true,
     });
   };
 
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "image", label: t("subAdmin.columns.image") },
-    { id: 1, name: "name", label: t("subAdmin.columns.name") },
-    { id: 2, name: "email", label: t("subAdmin.columns.email") },
-    { id: 3, name: "phone", label: t("subAdmin.columns.phone") },
-    { id: 4, name: "powers", label: t("powers") },
-    { id: 5, name: "status", label: t("status") },
-    { id: 6, name: "control", label: t("action") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "image", label: t("subAdmin.columns.image") },
+    { id: 2, name: "name", label: t("subAdmin.columns.name") },
+    { id: 3, name: "email", label: t("subAdmin.columns.email") },
+    { id: 4, name: "phone", label: t("subAdmin.columns.phone") },
+    { id: 5, name: "powers", label: t("powers") },
+    { id: 6, name: "status", label: t("status") },
+    { id: 7, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -328,21 +334,12 @@ const SubAdmins = ({ dashboard }) => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("subAdmin.columns.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.name && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("subAdmin.columns.name")}
+                  {t("subAdmin.columns.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -352,9 +349,9 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.email && (
+              {toggle.toggleColumns.name && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("subAdmin.columns.email")}
+                  {t("subAdmin.columns.name")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -364,9 +361,9 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.phone && (
+              {toggle.toggleColumns.email && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("subAdmin.columns.phone")}
+                  {t("subAdmin.columns.email")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -376,9 +373,9 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.powers && (
+              {toggle.toggleColumns.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("powers")}
+                  {t("subAdmin.columns.phone")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -388,10 +385,22 @@ const SubAdmins = ({ dashboard }) => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.powers && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("status")}
+                  {t("powers")}
                   {toggle.sortColumn === columns[5].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                  {t("status")}
+                  {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -409,7 +418,7 @@ const SubAdmins = ({ dashboard }) => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -427,7 +436,7 @@ const SubAdmins = ({ dashboard }) => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -447,7 +456,7 @@ const SubAdmins = ({ dashboard }) => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -459,7 +468,7 @@ const SubAdmins = ({ dashboard }) => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -468,65 +477,87 @@ const SubAdmins = ({ dashboard }) => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td">
-                    <img
-                      src={result?.image}
-                      alt={result?.name}
-                      className="table-img"
-                      width="50"
-                      height="50"
-                    />
-                  </td>
-                  <td className="table-td name">{result?.name}</td>
-                  <td className="table-td">
-                    <a className="text-white" href={`mailto:${result?.email}`}>
-                      {result?.email}
-                    </a>
-                  </td>
-                  <td className="table-td">
-                    {result?.phone ? (
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
+                  {toggle.toggleColumns.image && (
+                    <td className="table-td">
+                      <img
+                        src={result?.image}
+                        alt={result?.name}
+                        className="table-img"
+                        width="50"
+                        height="50"
+                      />
+                    </td>
+                  )}
+                  {toggle.toggleColumns.name && (
+                    <td className="table-td name">{result?.name}</td>
+                  )}
+                  {toggle.toggleColumns.email && (
+                    <td className="table-td">
                       <a
                         className="text-white"
-                        href={`mailto:${result?.phone}`}
+                        href={`mailto:${result?.email}`}
                       >
-                        {result?.phone}
+                        {result?.email}
                       </a>
-                    ) : (
-                      <span className="text-danger">{t("noPhone")}</span>
-                    )}
-                  </td>
-                  <td className="table-td">
-                    <span
-                      className={`status ${
-                        result?.powers === "admin" ? "active" : "inactive"
-                      }`}
-                    >
-                      {result?.powers === "admin" ? t("admin") : t("supAdmin")}
-                    </span>
-                  </td>
-                  <td className="table-td">
-                    <span
-                      className={`status ${
-                        result?.active ? "active" : "inactive"
-                      }`}
-                    >
-                      {result?.active ? t("active") : t("inactive")}
-                    </span>
-                  </td>
-                  <td className="table-td">
-                    <span className="table-btn-container">
-                      <MdDeleteOutline
-                        className="delete-btn"
-                        onClick={() => handleDelete(result)}
-                      />
-                      <MdEdit
-                        className="edit-btn"
-                        onClick={() => handleEdit(result)}
-                      />
-                    </span>
-                  </td>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.phone && (
+                    <td className="table-td">
+                      {result?.phone ? (
+                        <a
+                          className="text-white"
+                          href={`mailto:${result?.phone}`}
+                        >
+                          {result?.phone}
+                        </a>
+                      ) : (
+                        <span className="text-danger">{t("noPhone")}</span>
+                      )}
+                    </td>
+                  )}
+                  {toggle.toggleColumns.powers && (
+                    <td className="table-td">
+                      <span
+                        className={`status ${
+                          result?.powers === "admin" ? "active" : "inactive"
+                        }`}
+                      >
+                        {result?.powers === "admin"
+                          ? t("admin")
+                          : t("supAdmin")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.status && (
+                    <td className="table-td">
+                      <span
+                        className={`status ${
+                          result?.active ? "active" : "inactive"
+                        }`}
+                      >
+                        {result?.active ? t("active") : t("inactive")}
+                      </span>
+                    </td>
+                  )}
+                  {toggle.toggleColumns.control && (
+                    <td className="table-td">
+                      <span className="table-btn-container">
+                        <MdDeleteOutline
+                          className="delete-btn"
+                          onClick={() => handleDelete(result)}
+                        />
+                        <MdEdit
+                          className="edit-btn"
+                          onClick={() => handleEdit(result)}
+                        />
+                      </span>
+                    </td>
+                  )}
                 </tr>
               ))}
             </tbody>
@@ -545,6 +576,9 @@ const SubAdmins = ({ dashboard }) => {
           setToggle({
             ...toggle,
             add: !toggle.add,
+            powers: false,
+            status: false,
+            edit: false,
           });
         }}
         centered={true}
@@ -560,10 +594,11 @@ const SubAdmins = ({ dashboard }) => {
               add: !toggle.add,
               powers: false,
               status: false,
+              edit: false,
             });
           }}
         >
-          {t("subAdmin.addTitle")}
+          {toggle.edit ? t("subAdmin.editTitle") : t("subAdmin.addTitle")}
           <IoMdClose
             onClick={() => {
               formik.handleReset();
@@ -572,6 +607,7 @@ const SubAdmins = ({ dashboard }) => {
                 add: !toggle.add,
                 powers: false,
                 status: false,
+                edit: false,
               });
             }}
           />
@@ -868,6 +904,9 @@ const SubAdmins = ({ dashboard }) => {
                       </button>
                     </div>
                   </div>
+                  {formik.errors.powers && formik.touched.powers ? (
+                    <span className="error">{formik.errors.powers}</span>
+                  ) : null}
                 </div>
                 <div className="form-group-container d-flex flex-column align-items-end mb-3">
                   <label htmlFor="password" className="form-label">
@@ -886,6 +925,26 @@ const SubAdmins = ({ dashboard }) => {
                     <span className="error">{formik.errors.password}</span>
                   ) : null}
                 </div>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="confirmPassword" className="form-label">
+                    {t("auth.login.confirmPassword")}
+                  </label>
+                  <input
+                    type="confirmPassword"
+                    className="form-input"
+                    id="confirmPassword"
+                    placeholder="********"
+                    name="confirmPassword"
+                    value={formik.values.confirmPassword}
+                    onChange={handleInput}
+                  />
+                  {formik.errors.confirmPassword &&
+                  formik.touched.confirmPassword ? (
+                    <span className="error">
+                      {formik.errors.confirmPassword}
+                    </span>
+                  ) : null}
+                </div>
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
@@ -897,6 +956,8 @@ const SubAdmins = ({ dashboard }) => {
                         role="status"
                         aria-hidden="true"
                       ></span>
+                    ) : toggle.edit ? (
+                      t("edit")
                     ) : (
                       t("add")
                     )}
@@ -908,6 +969,9 @@ const SubAdmins = ({ dashboard }) => {
                       setToggle({
                         ...toggle,
                         add: !toggle.add,
+                        powers: false,
+                        status: false,
+                        edit: false,
                       });
                       formik.handleReset();
                     }}
