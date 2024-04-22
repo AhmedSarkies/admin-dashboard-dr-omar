@@ -47,6 +47,7 @@ const Images = () => {
     activeColumn: false,
     searchTerm: "",
     toggleColumns: {
+      id: true,
       image: true,
       category: true,
       visits: true,
@@ -63,6 +64,18 @@ const Images = () => {
     currentPage: 1,
   });
 
+  const data = pictures?.map((picture) => {
+    return {
+      ...picture,
+      image_category: {
+        title: picture?.image_category?.title,
+        id: picture?.image_category?.id,
+      },
+      is_active: picture?.is_active === 1 ? t("active") : t("inactive"),
+      status: picture?.status === "Public" ? t("public") : t("private"),
+    };
+  });
+
   // Filtration, Sorting, Pagination
   const {
     PaginationUI,
@@ -71,19 +84,21 @@ const Images = () => {
     handleToggleColumns,
     searchResultsImagesCategory,
   } = useFiltration({
-    rowData: pictures,
+    rowData: data,
     toggle,
     setToggle,
   });
+
   // Columns
   const columns = [
+    { id: 0, name: "id", label: t("index") },
     { id: 1, name: "image", label: t("images.columns.image") },
     { id: 2, name: "category", label: t("images.columns.category") },
-    { id: 3, name: "visits", label: t("visits") },
+    { id: 3, name: "views", label: t("views") },
     { id: 4, name: "favorites", label: t("favorites") },
     { id: 5, name: "downloads", label: t("downloads") },
     { id: 6, name: "shares", label: t("shares") },
-    { id: 7, name: "status", label: t("status") },
+    { id: 7, name: "content", label: t("content") },
     { id: 8, name: "activation", label: t("activation") },
     { id: 9, name: "control", label: t("action") },
   ];
@@ -191,8 +206,8 @@ const Images = () => {
     formik.setValues({
       ...picture,
       image: picture?.image,
-      status: picture?.status,
-      is_active: picture?.is_active,
+      status: picture?.status === t("public") ? "Public" : "Private",
+      is_active: picture?.is_active === t("active") ? 1 : 0,
       pictureCategory: {
         title: picture?.image_category?.title,
         id: picture?.image_category?.id,
@@ -335,21 +350,12 @@ const Images = () => {
           <thead>
             <tr>
               {/* Show and Hide Columns */}
-              {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("images.columns.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("images.columns.category")}
+                  {t("images.columns.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -359,9 +365,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.category && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("visits")}
+                  {t("images.columns.category")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -371,9 +377,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("favorites")}
+                  {t("views")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -383,9 +389,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -395,9 +401,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("shares")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -407,9 +413,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("status")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -419,9 +425,9 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.activation && (
+              {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("activation")}
+                  {t("content")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -431,10 +437,22 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {toggle.toggleColumns.activation && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("action")}
+                  {t("activation")}
                   {toggle.sortColumn === columns[8].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.control && (
+                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                  {t("action")}
+                  {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -449,7 +467,7 @@ const Images = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -467,7 +485,7 @@ const Images = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -489,7 +507,7 @@ const Images = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="9">
+                  <td className="table-td" colSpan="10">
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -501,7 +519,7 @@ const Images = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -512,8 +530,11 @@ const Images = () => {
             error === null &&
             loading === false && (
               <tbody>
-                {searchResultsImagesCategory?.map((result) => (
+                {searchResultsImagesCategory?.map((result, idx) => (
                   <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
                     {toggle.toggleColumns.image && (
                       <td className="table-td">
                         <img
@@ -551,16 +572,39 @@ const Images = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.status === "Public"
+                              result?.status === t("public")
                                 ? "green"
-                                : result?.status === "Private"
+                                : result?.status === t("private")
                                 ? "red"
                                 : "red",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            dispatch(
+                              updatePictureApi({
+                                id: result.id,
+                                category_id: result.image_category.id,
+                                status:
+                                  result.status === t("public")
+                                    ? "Private"
+                                    : "Public",
+                                is_active:
+                                  result.is_active === t("active") ? 1 : 0,
+                              })
+                            ).then((res) => {
+                              if (!res.error) {
+                                dispatch(getPicturesApi());
+                                toast.success(t("toast.image.updatedSuccess"));
+                              } else {
+                                toast.error(t("toast.image.updatedError"));
+                                dispatch(getPicturesApi());
+                              }
+                            });
                           }}
                         >
-                          {result?.status === "Public"
+                          {result?.status === t("public")
                             ? t("public")
-                            : result?.status === "Private"
+                            : result?.status === t("private")
                             ? t("private")
                             : t("private")}
                         </span>
@@ -572,11 +616,40 @@ const Images = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.is_active === 1 ? "green" : "red",
+                              result?.is_active === t("active")
+                                ? "green"
+                                : result?.is_active === t("inactive")
+                                ? "red"
+                                : "red",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            dispatch(
+                              updatePictureApi({
+                                id: result.id,
+                                category_id: result.image_category.id,
+                                status:
+                                  result.status === t("public")
+                                    ? "Public"
+                                    : "Private",
+                                is_active:
+                                  result.is_active === t("active") ? 0 : 1,
+                              })
+                            ).then((res) => {
+                              if (!res.error) {
+                                dispatch(getPicturesApi());
+                                toast.success(t("toast.image.updatedSuccess"));
+                              } else {
+                                toast.error(t("toast.image.updatedError"));
+                                dispatch(getPicturesApi());
+                              }
+                            });
                           }}
                         >
-                          {result?.is_active === 1
+                          {result?.is_active === t("active")
                             ? t("active")
+                            : result?.is_active === t("inactive")
+                            ? t("inactive")
                             : t("inactive")}
                         </span>
                       </td>
