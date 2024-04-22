@@ -13,7 +13,7 @@ import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { FaBookReader, FaEdit, FaFileUpload } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose, IoMdEye } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
 import {
   getBooksApi,
@@ -77,6 +77,7 @@ const Books = () => {
     searchTerm: "",
     books,
     toggleColumns: {
+      id: true,
       // imageElder: true,
       // nameElder: true,
       image: true,
@@ -103,6 +104,8 @@ const Books = () => {
     return {
       ...book,
       categories: book?.categories[0],
+      status: book?.status === "public" ? t("public") : t("private"),
+      is_active: book?.is_active === 1 ? t("active") : t("inactive"),
     };
   });
 
@@ -120,18 +123,19 @@ const Books = () => {
   });
   // Columns
   const columns = [
-    { id: 0, name: "image", label: t("books.columns.book.image") },
-    { id: 1, name: "title", label: t("books.columns.book.title") },
-    { id: 2, name: "category", label: t("books.columns.book.category") },
-    { id: 3, name: "book", label: t("books.columns.book.book") },
-    { id: 4, name: "pages", label: t("pages") },
-    { id: 5, name: "visits", label: t("visits") },
-    { id: 6, name: "favorites", label: t("favorites") },
-    { id: 7, name: "downloads", label: t("downloads") },
-    { id: 8, name: "shares", label: t("shares") },
-    { id: 9, name: "status", label: t("status") },
-    { id: 10, name: "activation", label: t("activation") },
-    { id: 11, name: "control", label: t("action") },
+    { id: 0, name: "id", label: t("index") },
+    { id: 1, name: "image", label: t("books.columns.book.image") },
+    { id: 2, name: "title", label: t("books.columns.book.title") },
+    { id: 3, name: "category", label: t("books.columns.book.category") },
+    { id: 4, name: "book", label: t("books.columns.book.book") },
+    { id: 5, name: "pages", label: t("pages") },
+    { id: 6, name: "visits", label: t("visits") },
+    { id: 7, name: "favorites", label: t("favorites") },
+    { id: 8, name: "downloads", label: t("downloads") },
+    { id: 9, name: "shares", label: t("shares") },
+    { id: 10, name: "status", label: t("status") },
+    { id: 11, name: "activation", label: t("activation") },
+    { id: 12, name: "control", label: t("action") },
   ];
 
   const onSubmit = (values) => {
@@ -285,7 +289,12 @@ const Books = () => {
   const handleEdit = (book) => {
     formik.setValues(book);
     formik.setFieldValue("title", book?.name);
-    formik.setFieldValue("status", book?.status);
+    formik.setFieldValue(
+      "status",
+      book?.status === t("public") ? "public" : "private"
+    );
+    formik.setFieldValue("number_pages", book?.number_pages);
+    formik.setFieldValue("is_active", book?.is_active === t("active") ? 1 : 0);
     formik.setFieldValue("bookCategory", {
       title: book?.categories?.title,
       id: book?.category?.id,
@@ -442,21 +451,12 @@ const Books = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.image && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("books.columns.book.image")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+              {toggle.toggleColumns?.id && (
+                <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns.title && (
+              {toggle.toggleColumns.image && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
-                  {t("books.columns.book.title")}
+                  {t("books.columns.book.image")}
                   {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -466,9 +466,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.category && (
+              {toggle.toggleColumns.title && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("books.columns.book.category")}
+                  {t("books.columns.book.title")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -478,9 +478,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.book && (
+              {toggle.toggleColumns.category && (
                 <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("books.columns.book.book")}
+                  {t("books.columns.book.category")}
                   {toggle.sortColumn === columns[3].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -598,7 +598,7 @@ const Books = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="13">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -616,7 +616,7 @@ const Books = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="13">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -638,7 +638,7 @@ const Books = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="12">
+                  <td className="table-td" colSpan="13">
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -650,7 +650,7 @@ const Books = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="13">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -661,8 +661,11 @@ const Books = () => {
             error === null &&
             loading === false && (
               <tbody>
-                {searchResultsBookSCategoryAndTitle?.map((result) => (
+                {searchResultsBookSCategoryAndTitle?.map((result, idx) => (
                   <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
                     {toggle.toggleColumns.image && (
                       <td className="table-td">
                         <img
@@ -682,22 +685,6 @@ const Books = () => {
                     )}
                     {toggle.toggleColumns.category && (
                       <td className="table-td">{result?.categories?.title}</td>
-                    )}
-                    {toggle.toggleColumns.book && (
-                      <td className="table-td">
-                        <a
-                          href={result?.Book}
-                          target="_blank"
-                          rel="noreferrer"
-                          style={{
-                            cursor: "pointer",
-                            color: "blue !important",
-                          }}
-                        >
-                          {t("viewBook")}
-                          <FaBookReader className="me-2" />
-                        </a>
-                      </td>
                     )}
                     {toggle.toggleColumns.pages && (
                       <td className="table-td">{result?.number_pages}</td>
@@ -720,16 +707,40 @@ const Books = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.status === "public"
+                              result?.status === t("public")
                                 ? "green"
-                                : result?.status === "private"
+                                : result?.status === t("private")
                                 ? "red"
                                 : "red",
+                                cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            const data = {
+                              id: result.id,
+                              name: result.name,
+                              pages: result.number_pages,
+                              status:
+                                result?.status === t("public")
+                                  ? "Private"
+                                  : "Public",
+                              categories_id: result.categories.id,
+                              is_active:
+                                result.is_active === t("active") ? 1 : 0,
+                            };
+                            dispatch(updateBookApi(data)).then((res) => {
+                              if (!res.error) {
+                                dispatch(getBooksApi());
+                                toast.success(t("toast.book.updatedSuccess"));
+                              } else {
+                                dispatch(getBooksApi());
+                                toast.error(t("toast.book.updatedError"));
+                              }
+                            });
                           }}
                         >
-                          {result?.status === "public"
+                          {result?.status === t("public")
                             ? t("public")
-                            : result?.status === "private"
+                            : result?.status === t("private")
                             ? t("private")
                             : t("private")}
                         </span>
@@ -741,11 +752,41 @@ const Books = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.is_active === 1 ? "green" : "red",
+                              result?.is_active === t("active")
+                                ? "green"
+                                : result?.is_active === t("inactive")
+                                ? "red"
+                                : "red",
+                            cursor: "pointer",
+                          }}
+                          onClick={() => {
+                            const data = {
+                              id: result.id,
+                              name: result.name,
+                              pages: result.number_pages,
+                              status:
+                                result?.status === t("public")
+                                  ? "Public"
+                                  : "Private",
+                              categories_id: result.categories.id,
+                              is_active:
+                                result.is_active === t("active") ? 0 : 1,
+                            };
+                            dispatch(updateBookApi(data)).then((res) => {
+                              if (!res.error) {
+                                dispatch(getBooksApi());
+                                toast.success(t("toast.book.updatedSuccess"));
+                              } else {
+                                dispatch(getBooksApi());
+                                toast.error(t("toast.book.updatedError"));
+                              }
+                            });
                           }}
                         >
-                          {result?.is_active === 1
+                          {result?.is_active === t("active")
                             ? t("active")
+                            : result?.is_active === t("inactive")
+                            ? t("inactive")
                             : t("inactive")}
                         </span>
                       </td>
@@ -753,6 +794,17 @@ const Books = () => {
                     {toggle.toggleColumns.control && (
                       <td className="table-td">
                         <span className="table-btn-container">
+                          <a
+                            href={result?.Book}
+                            target="_blank"
+                            rel="noreferrer"
+                            style={{
+                              cursor: "pointer",
+                              color: "blue !important",
+                            }}
+                          >
+                            <IoMdEye className="view-btn" />
+                          </a>
                           <FaEdit
                             className="edit-btn"
                             onClick={() => handleEdit(result)}
@@ -778,6 +830,8 @@ const Books = () => {
             ...toggle,
             add: !toggle.add,
             edit: false,
+            is_active: false,
+            status: false,
             pdf: null,
           });
           formik.handleReset();
@@ -793,6 +847,8 @@ const Books = () => {
               ...toggle,
               add: !toggle.add,
               edit: false,
+              is_active: false,
+              status: false,
               pdf: null,
             });
             formik.handleReset();
@@ -807,6 +863,8 @@ const Books = () => {
                 ...toggle,
                 add: !toggle.add,
                 edit: false,
+                is_active: false,
+                status: false,
                 pdf: null,
               });
             }}
@@ -1245,6 +1303,8 @@ const Books = () => {
                         ...toggle,
                         add: !toggle.add,
                         edit: false,
+                        is_active: false,
+                        status: false,
                         pdf: null,
                       });
                       formik.handleReset();
