@@ -35,7 +35,7 @@ const NewUsers = () => {
   // Filtration, Sorting, Pagination
   // Columns
   const columns = [
-    { id: 0, name: "id", label: t("newUsers.columns.id") },
+    { id: 0, name: "id", label: t("index") },
     { id: 1, name: "name", label: t("newUsers.columns.name") },
     { id: 2, name: "email", label: t("newUsers.columns.email") },
     { id: 3, name: "phone", label: t("newUsers.columns.phone") },
@@ -76,18 +76,11 @@ const NewUsers = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns?.id && (
-                <th className="table-th" onClick={() => handleSort(columns[0])}>
-                  {t("newUsers.columns.id")}
-                  {toggle.sortColumn === columns[0].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+            {
+              toggle.toggleColumns?.id && (
+              <th className="table-th">{t("index")}</th>
+              )
+            }
               {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("newUsers.columns.name")}
@@ -178,7 +171,7 @@ const NewUsers = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -196,7 +189,7 @@ const NewUsers = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -216,7 +209,7 @@ const NewUsers = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -228,7 +221,7 @@ const NewUsers = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="7">
+                <td className="table-td" colSpan="8">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -237,24 +230,43 @@ const NewUsers = () => {
           {/* Data */}
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
-              {searchResults?.map((result) => (
+              {searchResults?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  <td className="table-td id">{result?.id}</td>
+                  {toggle.toggleColumns?.id && (
+                    <td className="table-td">{idx + 1}#</td>
+                  )}
+                  {
+                    toggle.toggleColumns?.name &&
                   <td className="table-td name">{result?.name}</td>
+                  }
+                  {
+                    toggle.toggleColumns?.email &&
                   <td className="table-td email">
                     <a href={`mailto:${result?.email}`}>{result?.email}</a>
                   </td>
+                  }
+                  {
+                    toggle.toggleColumns?.phone &&
                   <td className="table-td phone">
                     <a href={`mailto:${result?.phonenumber}`}>
                       {result?.phonenumber}
                     </a>
                   </td>
+                  }
+                  {
+                    toggle.toggleColumns?.created_at &&
                   <td className="table-td created_at">
                     {new Date(result?.created_at).toLocaleDateString()}
                   </td>
+                  }
+                  {
+                    toggle.toggleColumns?.updated_at &&
                   <td className="table-td updated_at">
                     {new Date(result?.updated_at).toLocaleDateString()}
                   </td>
+                  }
+                  {
+                    toggle.toggleColumns?.email_verified_at &&
                   <td className="table-td email_verified_at">
                     {result?.email_verified_at === null ? (
                       <span
@@ -280,6 +292,9 @@ const NewUsers = () => {
                       </span>
                     )}
                   </td>
+                  }
+                  {
+                    toggle.toggleColumns?.phone_verified_at &&
                   <td className="table-td phone_verified_at">
                     {result?.phone_verified_at === null ? (
                       <span
@@ -305,6 +320,7 @@ const NewUsers = () => {
                       </span>
                     )}
                   </td>
+                  }
                 </tr>
               ))}
             </tbody>
