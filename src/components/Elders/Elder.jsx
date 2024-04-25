@@ -382,9 +382,11 @@ const Elder = () => {
         </div>
       )}
       <div className="audio scholar">
-        <div className="table-header justify-content-end mb-3">
-          <h2>{dataById?.name}</h2>
-        </div>
+        {!loading && (
+          <div className="table-header justify-content-end mb-3">
+            <h2>{dataById?.name}</h2>
+          </div>
+        )}
         <div className="table-header">
           {/* Search */}
           <div
