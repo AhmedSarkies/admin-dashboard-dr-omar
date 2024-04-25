@@ -130,6 +130,12 @@ const CategoriesBook = () => {
         if (result.isConfirmed) {
           dispatch(deleteBookCategoryApi(bookCategory?.id)).then((res) => {
             if (!res.error) {
+              if (searchResults.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getBooksCategoriesApi());
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${bookCategory?.title}`,
