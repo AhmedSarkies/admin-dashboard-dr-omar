@@ -312,6 +312,12 @@ const Elder = () => {
       if (result.isConfirmed) {
         dispatch(deleteAudioApi(audio?.id)).then((res) => {
           if (!res.error) {
+            if (searchResultsAudioSCategoryAndTitleElder.length === 1) {
+              setToggle({
+                ...toggle,
+                currentPage: 1,
+              });
+            }
             dispatch(getScholarByIdApi(id));
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${audio?.title}`,
