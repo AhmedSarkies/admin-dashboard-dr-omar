@@ -128,6 +128,9 @@ const Elder = () => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                elders: false,
+                audioCategory: false,
+                status: false,
               });
               dispatch(getScholarByIdApi(id));
               toast.success(t("toast.audio.addedSuccess"));
@@ -156,8 +159,10 @@ const Elder = () => {
             if (!res.error) {
               formik.handleReset();
               setToggle({
-                ...toggle,
                 edit: !toggle.edit,
+                audioCategory: false,
+                status: false,
+                elders: false,
               });
               dispatch(getScholarByIdApi(id));
               toast.success(t("toast.audio.updatedSuccess"));
@@ -849,6 +854,9 @@ const Elder = () => {
                 setToggle({
                   ...toggle,
                   add: !toggle.add,
+                  elders: false,
+                  audioCategory: false,
+                  status: false,
                 });
                 formik.handleReset();
               }}
@@ -859,6 +867,9 @@ const Elder = () => {
                   setToggle({
                     ...toggle,
                     add: !toggle.add,
+                    elders: false,
+                    audioCategory: false,
+                    status: false,
                   });
                 }}
               />
@@ -1105,7 +1116,8 @@ const Elder = () => {
                           toggle.status ? "active" : ""
                         }`}
                       >
-                        <div
+                        <button
+                          type="button"
                           onClick={() => {
                             setToggle({
                               ...toggle,
@@ -1124,13 +1136,14 @@ const Elder = () => {
                               toggle.status ? "active" : ""
                             }`}
                           />
-                        </div>
+                        </button>
                         <div
                           className={`dropdown-content ${
                             toggle.status ? "active" : ""
                           }`}
                         >
-                          <div
+                          <button
+                            type="button"
                             className={`item ${
                               formik.values.status === "Private" ? "active" : ""
                             }`}
@@ -1145,8 +1158,9 @@ const Elder = () => {
                             }}
                           >
                             {t("private")}
-                          </div>
-                          <div
+                          </button>
+                          <button
+                            type="button"
                             className={`item ${
                               formik.values.status === "Public" ? "active" : ""
                             }`}
@@ -1161,7 +1175,7 @@ const Elder = () => {
                             }}
                           >
                             {t("public")}
-                          </div>
+                          </button>
                         </div>
                       </div>
                       {formik.errors.status && formik.touched.status ? (
@@ -1274,6 +1288,9 @@ const Elder = () => {
                           setToggle({
                             ...toggle,
                             add: !toggle.add,
+                            elders: false,
+                            audioCategory: false,
+                            status: false,
                           });
                           formik.handleReset();
                         }}
@@ -1309,6 +1326,9 @@ const Elder = () => {
                 setToggle({
                   ...toggle,
                   edit: !toggle.edit,
+                  audioCategory: false,
+                  status: false,
+                  elders: false,
                 });
                 formik.handleReset();
               }}
@@ -1319,6 +1339,9 @@ const Elder = () => {
                   setToggle({
                     ...toggle,
                     edit: !toggle.edit,
+                    audioCategory: false,
+                    status: false,
+                    elders: false,
                   });
                   formik.handleReset();
                 }}
@@ -1595,11 +1618,9 @@ const Elder = () => {
                           }}
                           className="dropdown-btn d-flex justify-content-between align-items-center"
                         >
-                          {formik.values.status === "Private" ||
-                          formik.values.status === "private"
+                          {formik.values.status === "Private"
                             ? t("private")
-                            : formik.values.status === "Public" ||
-                              formik.values.status === "public"
+                            : formik.values.status === "Public"
                             ? t("public")
                             : t("content")}
                           <TiArrowSortedUp
@@ -1616,10 +1637,7 @@ const Elder = () => {
                           <button
                             type="button"
                             className={`item ${
-                              formik.values.status === "Private" ||
-                              formik.values.status === "private"
-                                ? "active"
-                                : ""
+                              formik.values.status === "Private" ? "active" : ""
                             }`}
                             value="Private"
                             name="status"
@@ -1636,10 +1654,7 @@ const Elder = () => {
                           <button
                             type="button"
                             className={`item ${
-                              formik.values.status === "Public" ||
-                              formik.values.status === "public"
-                                ? "active"
-                                : ""
+                              formik.values.status === "Public" ? "active" : ""
                             }`}
                             value="Public"
                             name="status"
@@ -1765,6 +1780,9 @@ const Elder = () => {
                           setToggle({
                             ...toggle,
                             edit: !toggle.edit,
+                            audioCategory: false,
+                            status: false,
+                            elders: false,
                           });
                           formik.handleReset();
                         }}
