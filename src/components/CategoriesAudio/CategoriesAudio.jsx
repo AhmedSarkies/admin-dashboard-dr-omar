@@ -132,6 +132,12 @@ const CategoriesAudio = () => {
         if (result.isConfirmed) {
           dispatch(deleteAudioCategoryApi(audioCategory?.id)).then((res) => {
             if (!res.error) {
+              if (searchResults.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getAudiosCategoriesApi());
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${audioCategory?.title}`,
