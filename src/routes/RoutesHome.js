@@ -26,6 +26,7 @@ import {
   Notifications,
   User,
   Elder,
+  SubSubCategoriesBook,
 } from "../components";
 
 const RoutesHome = () => (
@@ -39,8 +40,8 @@ const RoutesHome = () => (
       <Route path="*" element={<Dashboard />} />
       <Route path="dashboard" element={<Dashboard />} />
       <Route path="profile" element={<Profile />} />
-      <Route path="profile/change-password/:id" element={<ChangePassword />} />
-      <Route path="profile/edit-profile/:id" element={<EditProfile />} />
+      <Route path="profile/change-password" element={<ChangePassword />} />
+      <Route path="profile/edit-profile" element={<EditProfile />} />
       <Route path="sub-admins" element={<SubAdmins />} />
       <Route path="users" element={<Users />} />
       <Route path="users/:id" element={<User />} />
@@ -54,7 +55,8 @@ const RoutesHome = () => (
       <Route path="categories-image" element={<CategoriesImage />} />
       <Route path="categories-audio" element={<CategoriesAudio />} />
       <Route path="main-categories-book" element={<CategoriesBook />} />
-      <Route path="sub-categories-book" element={<SubCategoriesBook />} />
+      <Route path="sub-main-categories-book" element={<SubCategoriesBook />} />
+      <Route path="sub-sub-categories-book" element={<SubSubCategoriesBook />} />
       <Route path="elders" element={<Elders />} />
       <Route path="elders/:id" element={<Elder />} />
       <Route path="articles" element={<Articles />} />
