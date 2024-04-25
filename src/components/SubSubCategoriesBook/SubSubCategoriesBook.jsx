@@ -158,6 +158,12 @@ const SubSubCategoriesBook = () => {
           dispatch(deleteBookSubSubCategoryApi(bookSubCategory?.id)).then(
             (res) => {
               if (!res.error) {
+                if (searchResultsSubSubBookCategories.length === 1) {
+                  setToggle({
+                    ...toggle,
+                    currentPage: 1,
+                  });
+                }
                 dispatch(getBooksSubSubCategoriesApi());
                 Swal.fire({
                   title: `${t("titleDeletedSuccess")} ${
