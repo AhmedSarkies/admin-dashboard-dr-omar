@@ -94,6 +94,7 @@ const userSlice = createSlice({
     builder.addCase(getUsers.fulfilled, (state, action) => {
       state.users = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getUsers.rejected, (state, action) => {
@@ -109,6 +110,7 @@ const userSlice = createSlice({
     builder.addCase(getNewUsers.fulfilled, (state, action) => {
       state.newUsers = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getNewUsers.rejected, (state, action) => {
