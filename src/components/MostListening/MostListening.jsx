@@ -38,8 +38,17 @@ const MostListening = () => {
       favorites: true,
       downloads: true,
       activation: true,
-      control: true,
+      control: false,
     },
+  });
+
+  const data = mostListening?.map((item) => {
+    return {
+      ...item,
+      categories: item?.categories[0],
+      is_active: item?.is_active === 1 ? t("active") : t("inactive"),
+      status: item?.status === "public" ? t("public") : t("private"),
+    };
   });
 
   // Filtration, Sorting, Pagination
@@ -60,7 +69,7 @@ const MostListening = () => {
     { id: 8, name: "favorites", label: t("favorites") },
     { id: 9, name: "downloads", label: t("downloads") },
     { id: 10, name: "activation", label: t("activation") },
-    { id: 11, name: "status", label: t("status") },
+    { id: 11, name: "status", label: t("content") },
   ];
   const {
     PaginationUI,
@@ -69,7 +78,7 @@ const MostListening = () => {
     handleToggleColumns,
     searchResults,
   } = useFiltration({
-    rowData: mostListening,
+    rowData: data,
     toggle,
     setToggle,
   });
@@ -285,7 +294,7 @@ const MostListening = () => {
                   className="table-th"
                   onClick={() => handleSort(columns[10])}
                 >
-                  {t("status")}
+                  {t("content")}
                   {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -426,10 +435,10 @@ const MostListening = () => {
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.is_active === 1 ? "green" : "red",
+                            result?.is_active === t("active") ? "green" : "red",
                         }}
                       >
-                        {result?.is_active === 1 ? t("active") : t("inactive")}
+                        {result?.is_active}
                       </span>
                     </td>
                   )}
@@ -439,18 +448,10 @@ const MostListening = () => {
                         className="table-status badge"
                         style={{
                           backgroundColor:
-                            result?.status === "public"
-                              ? "green"
-                              : result?.status === "private"
-                              ? "red"
-                              : "red",
+                            result?.status === t("public") ? "green" : "red",
                         }}
                       >
-                        {result?.status === "public"
-                          ? "عام"
-                          : result?.status === "private"
-                          ? "خاص"
-                          : "خاص"}
+                        {result?.status}
                       </span>
                     </td>
                   )}
@@ -461,7 +462,7 @@ const MostListening = () => {
         </table>
       </div>
       {/* Pagination */}
-      {searchResults.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>
