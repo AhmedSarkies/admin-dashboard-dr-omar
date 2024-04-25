@@ -50,8 +50,8 @@ const IntroductionPage = () => {
       image: true,
       title: true,
       description: true,
-      order: true,
-      status: true,
+      order: false,
+      status: false,
       control: true,
     },
     sortColumn: "",
@@ -59,6 +59,7 @@ const IntroductionPage = () => {
     rowsPerPage: 5,
     currentPage: 1,
   });
+  const role = Cookies.get("_role");
   const lng = Cookies.get("i18next") || "ar";
   // Change Language
   useEffect(() => {
@@ -116,43 +117,45 @@ const IntroductionPage = () => {
     },
     validationSchema: validationSchema.introductionPage,
     onSubmit: (values) => {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("body", values.description);
-      formData.append("titleEn", values.titleEn);
-      formData.append("bodyEn", values.descriptionEn);
-      if (values.image.file !== "") {
-        formData.append("image", values.image.file);
-      }
-      if (values.id) {
-        formData.append("id", values.id);
-        dispatch(updateIntroductionPageApi(formData)).then((res) => {
-          if (!res.error) {
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-            toast.success(t("toast.introductionPage.updatedSuccess"));
-            dispatch(getIntroductionPageApi());
-          } else {
-            toast.error(t("toast.introductionPage.updatedError"));
-          }
-        });
-      } else {
-        dispatch(addIntroductionPageApi(formData)).then((res) => {
-          if (!res.error) {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-            toast.success(t("toast.introductionPage.addedSuccess"));
-            dispatch(getIntroductionPageApi());
-          } else {
-            toast.error(t("toast.introductionPage.addedError"));
-          }
-        });
+      if (role === "admin") {
+        const formData = new FormData();
+        formData.append("title", values.title);
+        formData.append("body", values.description);
+        formData.append("titleEn", values.titleEn);
+        formData.append("bodyEn", values.descriptionEn);
+        if (values.image.file !== "") {
+          formData.append("image", values.image.file);
+        }
+        if (values.id) {
+          formData.append("id", values.id);
+          dispatch(updateIntroductionPageApi(formData)).then((res) => {
+            if (!res.error) {
+              setToggle({
+                ...toggle,
+                edit: !toggle.edit,
+              });
+              formik.handleReset();
+              toast.success(t("toast.introductionPage.updatedSuccess"));
+              dispatch(getIntroductionPageApi());
+            } else {
+              toast.error(t("toast.introductionPage.updatedError"));
+            }
+          });
+        } else {
+          dispatch(addIntroductionPageApi(formData)).then((res) => {
+            if (!res.error) {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+              formik.handleReset();
+              toast.success(t("toast.introductionPage.addedSuccess"));
+              dispatch(getIntroductionPageApi());
+            } else {
+              toast.error(t("toast.introductionPage.addedError"));
+            }
+          });
+        }
       }
     },
   });
@@ -191,37 +194,39 @@ const IntroductionPage = () => {
 
   // Delete Picture
   const handleDelete = (picture) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + picture?.title + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteIntroductionPageApi(picture?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getIntroductionPageApi());
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${picture?.title}`,
-              text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() =>
-              toast.success(t("toast.introductionPage.deletedSuccess"))
-            );
-          } else {
-            toast.error(t("toast.introductionPage.deletedError"));
-          }
-        });
-      }
-    });
+    if (role === "admin") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + picture?.title + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteIntroductionPageApi(picture?.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getIntroductionPageApi());
+              Swal.fire({
+                title: `${t("titleDeletedSuccess")} ${picture?.title}`,
+                text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
+                  "textDeletedSuccess"
+                )}`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+                confirmButtonText: t("doneDeletedSuccess"),
+              }).then(() =>
+                toast.success(t("toast.introductionPage.deletedSuccess"))
+              );
+            } else {
+              toast.error(t("toast.introductionPage.deletedError"));
+            }
+          });
+        }
+      });
+    }
   };
 
   // get data from api
@@ -235,20 +240,22 @@ const IntroductionPage = () => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("settings.introductionPage.addTitle")}
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("settings.introductionPage.addTitle")}
+          </button>
+        </div>
+      )}
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
@@ -464,20 +471,24 @@ const IntroductionPage = () => {
                             });
                           }}
                         />
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              add: !toggle.add,
-                            });
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
+                        {role === "admin" && (
+                          <>
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                                setToggle({
+                                  ...toggle,
+                                  add: !toggle.add,
+                                });
+                              }}
+                            />
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          </>
+                        )}
                       </span>
                     </td>
                   )}
@@ -747,7 +758,10 @@ const IntroductionPage = () => {
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                   {!toggle.view && (
-                    <button type="submit" className="add-btn">
+                    <button
+                      type="submit"
+                      className={`add-btn${loading ? " loading-btn" : ""}`}
+                    >
                       {/* loading */}
                       {loading ? (
                         <span
