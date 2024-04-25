@@ -34,7 +34,7 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
   };
 
   useEffect(() => {
-    document.documentElement.lang = t("lng");
+    document.documentElement.lang = t("lng") === "EN" ? "en" : "ar";
   }, [t]);
 
   return (
