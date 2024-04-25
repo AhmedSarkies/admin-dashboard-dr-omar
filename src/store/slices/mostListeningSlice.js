@@ -43,6 +43,7 @@ const mostListeningSlice = createSlice({
     builder.addCase(getMostListening.fulfilled, (state, action) => {
       state.mostListening = action.payload.data;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getMostListening.rejected, (state, action) => {
