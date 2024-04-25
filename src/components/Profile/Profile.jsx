@@ -43,26 +43,33 @@ const Profile = () => {
                     {": "}
                     {profile.email}
                   </p>
-                  <p>
-                    <span>{t("profile.phone")}</span>
-                    {": "}
-                    {profile.phone}
-                  </p>
+                  {t("lng") === "EN" ? (
+                    <p
+                      className="d-flex justify-content-center align-content-center"
+                      dir="ltr"
+                    >
+                      <span>{t("profile.phone")}</span>
+                      {": "}
+                      {profile.phone}
+                    </p>
+                  ) : (
+                    <p className="d-flex justify-content-center align-content-center">
+                      {profile.phone}
+                      {" :"}
+                      <span>{t("profile.phone")}</span>
+                    </p>
+                  )}
                 </div>
                 <div className="profile-footer">
                   <button
                     className="change-password-btn"
-                    onClick={() =>
-                      navigate(`/dr-omar/profile/change-password`)
-                    }
+                    onClick={() => navigate(`/dr-omar/profile/change-password`)}
                   >
                     {t("profile.changePassword")}
                   </button>
                   <button
                     className="add-btn"
-                    onClick={() =>
-                      navigate(`/dr-omar/profile/edit-profile`)
-                    }
+                    onClick={() => navigate(`/dr-omar/profile/edit-profile`)}
                   >
                     {t("edit")}
                   </button>
