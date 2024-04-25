@@ -260,7 +260,7 @@ body {
   outline: none !important;
   border-radius: 10px !important;
   background: #00000038 !important;
-  cursor: pointer !important;
+  cursor: pointer;
   transition: all 0.3s ease-in-out !important;
 }
 .form-group .prayer-time-input:checked {
