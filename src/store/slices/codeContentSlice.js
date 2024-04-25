@@ -122,6 +122,7 @@ const codeContentSlice = createSlice({
     builder.addCase(getCodeContent.fulfilled, (state, action) => {
       state.loading = false;
       state.codeContent = action.payload;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getCodeContent.rejected, (state, action) => {
