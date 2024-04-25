@@ -237,6 +237,12 @@ const Elders = () => {
         if (result.isConfirmed) {
           dispatch(deleteScholarApi(elder?.id)).then((res) => {
             if (!res.error) {
+              if (searchResultsElders.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getScholarsApi());
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${elder?.name}`,
