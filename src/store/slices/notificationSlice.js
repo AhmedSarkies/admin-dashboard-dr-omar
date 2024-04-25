@@ -112,6 +112,7 @@ const notificationSlice = createSlice({
     builder.addCase(getNotification.fulfilled, (state, action) => {
       state.loading = false;
       state.notifications = action.payload;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getNotification.rejected, (state, action) => {
