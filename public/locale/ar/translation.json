@@ -1,5 +1,7 @@
 {
   "headerLogout": "تسجيل الخروج",
+  "lng": "ع",
+  "loading": "...جاري الخروج",
   "titleDeleteAlert": "هل انت متأكد من حذف ",
   "textDeleteAlert": "لن تتمكن من التراجع عن هذا الاجراء!",
   "confirmButtonText": "نعم, احذفه!",

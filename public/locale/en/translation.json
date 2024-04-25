@@ -1,5 +1,7 @@
 {
   "headerLogout": "Logout",
+  "lng": "EN",
+  "loading": "...Loading",
   "titleDeleteAlert": "Are you sure to delete ",
   "textDeleteAlert": "You will not be able to undo this action!",
   "confirmButtonText": "Yes, delete it!",
