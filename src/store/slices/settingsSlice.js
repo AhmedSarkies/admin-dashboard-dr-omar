@@ -80,6 +80,7 @@ const settingsSlice = createSlice({
     builder.addCase(getSettings.fulfilled, (state, action) => {
       state.settings = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getSettings.rejected, (state, action) => {
