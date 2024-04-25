@@ -169,13 +169,14 @@ const Login = () => {
         </div>*/}
         <button
           type="submit"
-          className="btn submit-btn w-100"
+          className={`btn submit-btn w-100${loading ? " loading-btn" : ""}`}
           disabled={loading ? true : false}
           style={{
             opacity: 1,
             background: `${
               loading ? "rgb(11 28 48 / 85%)" : "rgb(11 28 48 / 93%)"
             }`,
+            color: "#fff",
           }}
         >
           {loading ? (
