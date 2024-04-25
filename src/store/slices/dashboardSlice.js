@@ -43,6 +43,7 @@ const dashboardSlice = createSlice({
     builder.addCase(getCounts.fulfilled, (state, action) => {
       state.counts = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getCounts.rejected, (state, action) => {
