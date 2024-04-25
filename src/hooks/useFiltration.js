@@ -168,6 +168,9 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.status
               ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
+              ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase())
           );
         })
@@ -237,14 +240,9 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
   const searchResultsUsers =
     toggle.searchTermUser && toggle.searchTermUser !== ""
       ? rowDataUser?.filter((dataRow) => {
-          return (
-            dataRow?.name
-              ?.toLowerCase()
-              .includes(toggle.searchTermUser?.toLowerCase()) ||
-            dataRow?.email
-              ?.toLowerCase()
-              .includes(toggle.searchTermUser?.toLowerCase())
-          );
+          return dataRow?.email
+            ?.toLowerCase()
+            .includes(toggle.searchTermUser?.toLowerCase());
         })
       : rowDataUser;
 
@@ -261,6 +259,12 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.writer
               ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
+              ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase())
           );
         })
@@ -276,7 +280,7 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
         })
       : results;
 
-  const searchResultsAudioSCategoryAndTitle =
+  const searchResultsAudioSCategoryAndTitleElder =
     toggle.searchTerm && toggle.searchTerm !== ""
       ? rowData?.filter((dataRow) => {
           return (
@@ -287,6 +291,9 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.status
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase())
           );
@@ -339,6 +346,78 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
         })
       : results;
 
+  const searchResultsUser =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.phone
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.register_method
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.privacy
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
+  const searchResultsSubSubBookCategories =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.BooksCategories?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
+  const searchResultsNewUsers =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.phonenumber
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.type
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.privacy
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.is_active
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.type
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email_verified_at
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.phone_verified_at
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
   return {
     PaginationUI,
     handleSort,
@@ -349,11 +428,15 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
     searchResultsElders,
     searchResultsUsersSNameAndEmail,
     searchResultsUsers,
+    searchResultsUser,
+    searchResultsNewUsers,
     searchResultsImagesCategory,
     searchResultsBookSCategoryAndTitle,
+    searchResultsSubSubBookCategories,
     searchResultsAudioSCategoryAndTitleAndAuthor,
-    searchResultsAudioSCategoryAndTitle,
+    searchResultsAudioSCategoryAndTitleElder,
     searchResultsArticleSCategoryAndTitleAndAuthor,
+    searchResultsBooks,
     searchResultsNotifications,
   };
 };
