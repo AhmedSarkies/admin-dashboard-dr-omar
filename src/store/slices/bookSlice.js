@@ -5,7 +5,7 @@ import Http from "../../Http";
 const initialState = {
   books: [],
   bookCategories: [],
-  bookSubCategories: [],
+  bookSubSubCategories: [],
   loading: false,
   error: null,
 };
@@ -248,72 +248,93 @@ export const deleteBookSubCategoryApi = createAsyncThunk(
   }
 );
 
+// Get Books Sub Category using Axios and Redux Thunk
+export const getBooksSubSubCategoriesApi = createAsyncThunk(
+  "book/getBooksSubSubCategoriesApi",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "GET",
+        url: "/Sub-Categories-Books/Get",
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Add Book sub Category using Axios and Redux Thunk
+export const addBookSubSubCategoryApi = createAsyncThunk(
+  "book/addBookSubSubCategoryApi",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Sub-Categories-Books/Insert`,
+        params: {
+          ...data,
+        },
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Update Book Sub Category using Axios and Redux Thunk
+export const updateBookSubSubCategoryApi = createAsyncThunk(
+  "book/updateBookSubSubCategoryApi",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Sub-Categories-Books/Update`,
+        params: {
+          ...data,
+        },
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Delete Book Sub Category using Axios and Redux Thunk
+export const deleteBookSubSubCategoryApi = createAsyncThunk(
+  "book/deleteBookSubSubCategoryApi",
+  async (sub_category_id, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: `/Sub-Categories-Books/Delete`,
+        params: { sub_category_id },
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+        },
+      }).then((response) => {
+        return response.data;
+      });
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Books Slice
 const bookSlice = createSlice({
   name: "book",
   initialState,
-  reducers: {
-    // Get Books
-    getBooks: (state, action) => {
-      state.books = action.payload.data;
-    },
-    // Add Book
-    addBook: (state, action) => {
-      state.books.push(action.payload);
-    },
-    // Update Book
-    updateBook: (state, action) => {
-      state.books = state.books.map((books) =>
-        books.id === action.payload.id ? action.payload : books
-      );
-    },
-    // Delete Book
-    deleteBook: (state, action) => {
-      state.books = state.books.filter(
-        (picture) => picture.id !== action.payload
-      );
-    },
-    // Get Books Category
-    getBooksCategories: (state, action) => {
-      state.bookCategories = action.payload;
-    },
-    // Add Book Category
-    addBookCategory: (state, action) => {
-      state.bookCategories.push(action.payload);
-    },
-    // Update Book Category
-    updateBookCategory: (state, action) => {
-      state.bookCategories = state.bookCategories.map((category) =>
-        category.id === action.payload.id ? action.payload : category
-      );
-    },
-    // Delete Book Category
-    deleteBookCategory: (state, action) => {
-      state.bookCategories = state.bookCategories.filter(
-        (category) => category.id !== action.payload
-      );
-    },
-    // Get Books Sub Category
-    getBooksSubCategories: (state, action) => {
-      state.bookSubCategories = action.payload;
-    },
-    // Add Book Sub Category
-    addBookSubCategory: (state, action) => {
-      state.bookSubCategories.push(action.payload);
-    },
-    // Update Book Sub Category
-    updateBookSubCategory: (state, action) => {
-      state.bookSubCategories = state.bookSubCategories.map((category) =>
-        category.id === action.payload.id ? action.payload : category
-      );
-    },
-    // Delete Book Sub Category
-    deleteBookSubCategory: (state, action) => {
-      state.bookSubCategories = state.bookSubCategories.filter(
-        (category) => category.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Books======
     // Pending
@@ -324,6 +345,7 @@ const bookSlice = createSlice({
     builder.addCase(getBooksApi.fulfilled, (state, action) => {
       state.books = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getBooksApi.rejected, (state, action) => {
@@ -381,6 +403,7 @@ const bookSlice = createSlice({
     builder.addCase(getBooksCategoriesApi.fulfilled, (state, action) => {
       state.bookCategories = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getBooksCategoriesApi.rejected, (state, action) => {
@@ -438,6 +461,7 @@ const bookSlice = createSlice({
     builder.addCase(getBooksSubCategoriesApi.fulfilled, (state, action) => {
       state.bookSubCategories = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getBooksSubCategoriesApi.rejected, (state, action) => {
@@ -486,21 +510,65 @@ const bookSlice = createSlice({
       state.loading = false;
       state.error = action.payload;
     });
+    // ======Get Books Sub Sub Category======
+    // Pending
+    builder.addCase(getBooksSubSubCategoriesApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getBooksSubSubCategoriesApi.fulfilled, (state, action) => {
+      state.bookSubSubCategories = action.payload;
+      state.loading = false;
+      state.error = null;
+    });
+    // Rejected
+    builder.addCase(getBooksSubSubCategoriesApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Add Book Sub Sub Category======
+    // Pending
+    builder.addCase(addBookSubSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(addBookSubSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(addBookSubSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Update Book Sub Sub Category======
+    // Pending
+    builder.addCase(updateBookSubSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(updateBookSubSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(updateBookSubSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Delete Book Sub Sub Category======
+    // Pending
+    builder.addCase(deleteBookSubSubCategoryApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(deleteBookSubSubCategoryApi.fulfilled, (state, action) => {
+      state.loading = false;
+    });
+    // Rejected
+    builder.addCase(deleteBookSubSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
   },
 });
 
-export const {
-  getBooks,
-  addBook,
-  updateBook,
-  deleteBook,
-  getBooksCategories,
-  addBookCategory,
-  updateBookCategory,
-  deleteBookCategory,
-  getBooksSubCategories,
-  addBookSubCategory,
-  updateBookSubCategory,
-  deleteBookSubCategory,
-} = bookSlice.actions;
 export default bookSlice.reducer;
