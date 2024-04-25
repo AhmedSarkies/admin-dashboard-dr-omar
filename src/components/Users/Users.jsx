@@ -75,11 +75,21 @@ const Users = () => {
             return;
           }
         }
+        if (users.length > 0) {
+          const phoneExist = users.find(
+            (user) => user.phonenumber === formik.values.phone
+          );
+          if (phoneExist && phoneExist.id !== formik.values.id) {
+            toast.error(t("phoneExisted"));
+            return;
+          }
+        }
         const formData = new FormData();
         formData.append("id", values.id);
         formData.append("name", values.name);
         formData.append("email", values.email);
         formData.append("phonenumber", values.phone);
+        formData.append("type", values.type);
         formData.append("is_active", values.is_active);
         if (values.password) {
           formData.append("password", values.password);
@@ -162,6 +172,12 @@ const Users = () => {
         if (result.isConfirmed) {
           dispatch(deleteUser(user.id)).then((res) => {
             if (!res.error) {
+              if (searchResultsUser.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getUsers());
               Swal.fire({
                 title: `تم حذف ${user?.name}`,
@@ -187,6 +203,7 @@ const Users = () => {
       phone: user?.phonenumber,
       is_active: user?.is_active === t("active") ? 1 : 0,
       password: user?.password,
+      type: user?.type,
     });
     setToggle({
       ...toggle,
