@@ -19,6 +19,27 @@ const useSchema = () => {
         .oneOf([ref("new_password")], t("validation.confirmPassword"))
         .required(t("validation.confirmPassword")),
     }),
+    editProfile: object().shape({
+      name: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.name")),
+      email: string()
+        .email(t("validation.email"))
+        .required(t("validation.email")),
+      phone: string()
+        .matches(/^\+[1-9]{1}[0-9]{6,14}$/, t("validation.phone"))
+        .required(t("validation.phone")),
+      status: string(),
+      // Validation for image file must be uploaded with the form or just string
+      image: mixed().test("fileSize", t("validation.image"), (value) => {
+        if (value.file) {
+          return value.file.size > 0;
+        }
+        if (typeof value.preview === "string") {
+          return true;
+        }
+      }),
+    }),
     login: object().shape({
       email: string()
         .email(t("validation.email"))
@@ -58,12 +79,8 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
-      phone: number()
-        .typeError(t("validation.phone"))
-        .positive(t("validation.phone"))
-        .integer(t("validation.phone"))
-        .min(100000000, t("validation.phone"))
-        .max(9999999999, t("validation.phone"))
+      phone: string()
+        .matches(/^\+[1-9]{1}[0-9]{6,14}$/, t("validation.phone"))
         .required(t("validation.phone")),
       status: string(),
       // Validation for image file must be uploaded with the form or just string
@@ -147,17 +164,15 @@ const useSchema = () => {
       email: string()
         .email(t("validation.email"))
         .required(t("validation.email")),
-      password: string().min(8, t("validation.password")).required(t("validation.password")),
+      password: string()
+        .min(8, t("validation.password"))
+        .required(t("validation.password")),
       // Match password with confirm password
       confirmPassword: string()
         .oneOf([ref("password")], t("validation.confirmPassword"))
         .required(t("validation.confirmPassword")),
-      phone: number()
-        .typeError(t("validation.phone"))
-        .positive(t("validation.phone"))
-        .integer(t("validation.phone"))
-        .min(1000000000, t("validation.phone"))
-        .max(9999999999, t("validation.phone"))
+      phone: string()
+        .matches(/^\+[1-9]{1}[0-9]{6,14}$/, t("validation.phone"))
         .required(t("validation.phone")),
       status: string(),
       powers: string().required(t("validation.powers")),
@@ -183,12 +198,8 @@ const useSchema = () => {
       confirmPassword: string()
         .oneOf([ref("password")], t("validation.confirmPassword"))
         .notRequired(),
-      phone: number()
-        .typeError(t("validation.phone"))
-        .positive(t("validation.phone"))
-        .integer(t("validation.phone"))
-        .min(1000000000, t("validation.phone"))
-        .max(9999999999, t("validation.phone"))
+      phone: string()
+        .matches(/^\+[1-9]{1}[0-9]{6,14}$/, t("validation.phone"))
         .required(t("validation.phone")),
       status: string(),
       powers: string().required(t("validation.powers")),
@@ -210,12 +221,12 @@ const useSchema = () => {
         .email(t("validation.email"))
         .required(t("validation.email")),
       password: string().min(8, t("validation.password")).notRequired(),
-      phone: number()
-        .typeError(t("validation.phone"))
-        .positive(t("validation.phone"))
-        .integer(t("validation.phone"))
-        .min(1000000000, t("validation.phone"))
-        .max(9999999999, t("validation.phone"))
+      confirmPassword: string()
+        .oneOf([ref("password")], t("validation.confirmPassword"))
+        .notRequired(),
+      // phone must start with code of country
+      phone: string()
+        .matches(/^\+[1-9]{1}[0-9]{6,14}$/, t("validation.phone"))
         .required(t("validation.phone")),
     }),
     bookSubCategory: object().shape({
@@ -225,6 +236,11 @@ const useSchema = () => {
       bookCategory: object().shape({
         title: string().required(t("validation.mainCategory")),
       }),
+    }),
+    editBookSubCategory: object().shape({
+      title: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.subCategory")),
     }),
     book: object().shape({
       title: string()
@@ -290,7 +306,7 @@ const useSchema = () => {
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      status: string(),
+      status: string().required(t("validation.status")),
       image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
         if (value.file) {
           return value.file.size > 0;
@@ -310,6 +326,7 @@ const useSchema = () => {
       audioCategory: object().shape({
         title: string().required(t("validation.category")),
       }),
+      is_active: string().required(t("validation.activation")),
     }),
     settings: object().shape({
       image: mixed().notRequired(),
