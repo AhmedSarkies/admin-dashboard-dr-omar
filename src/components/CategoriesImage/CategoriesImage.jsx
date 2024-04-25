@@ -132,6 +132,12 @@ const CategoriesImages = () => {
           dispatch(deletePictureCategoryApi(pictureCategory?.id)).then(
             (res) => {
               if (!res.error) {
+                if (searchResults.length === 1) {
+                  setToggle({
+                    ...toggle,
+                    currentPage: 1,
+                  });
+                }
                 dispatch(getPicturesCategoriesApi());
                 Swal.fire({
                   title: `${t("titleDeletedSuccess")} ${
