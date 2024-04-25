@@ -23,6 +23,7 @@ export { default as CategoriesImage } from "./CategoriesImage/CategoriesImage";
 export { default as CategoriesAudio } from "./CategoriesAudio/CategoriesAudio";
 export { default as CategoriesBook } from "./CategoriesBook/CategoriesBook";
 export { default as SubCategoriesBook } from "./SubCategoriesBook/SubCategoriesBook";
+export { default as SubSubCategoriesBook } from "./SubSubCategoriesBook/SubSubCategoriesBook";
 export { default as Elders } from "./Elders/Elders";
 export { default as Elder } from "./Elders/Elder";
 export { default as Images } from "./Images/Images";
