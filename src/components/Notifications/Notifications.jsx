@@ -205,6 +205,12 @@ const Notifications = () => {
         dispatch(deleteNotification(notification?.notification?.id)).then(
           (res) => {
             if (!res.error) {
+              if (searchResultsNotifications.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getNotification());
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${
