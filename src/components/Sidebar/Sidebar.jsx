@@ -69,7 +69,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                   </span>
                 </AccordionHeader>
                 <AccordionBody accordionId="1">
-                  {linkItems.slice(8, 13).map((item, index) => (
+                  {linkItems.slice(8, 14).map((item, index) => (
                     <li key={index} className="ps-0 pe-0 mb-3">
                       <NavLink
                         className={({ isActive }) =>
@@ -85,7 +85,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
               </AccordionItem>
             </UncontrolledAccordion>
           </div>
-          {linkItems.slice(13).map((item, index) => (
+          {linkItems.slice(14).map((item, index) => (
             <li className="sidebar-item" key={index}>
               <NavLink
                 className={({ isActive }) =>
