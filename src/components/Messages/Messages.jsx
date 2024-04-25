@@ -7,7 +7,7 @@ import { Modal, ModalBody, ModalHeader, Spinner } from "reactstrap";
 import { MdRemoveRedEye, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 
-import { getMessagesApi, getMessages } from "../../store/slices/messagesSlice";
+import { getMessagesApi } from "../../store/slices/messagesSlice";
 
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useFiltration } from "../../hooks";
@@ -70,11 +70,7 @@ const Messages = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getMessagesApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getMessages(res.payload));
-        }
-      });
+      dispatch(getMessagesApi());
     } catch (error) {
       console.log(error);
     }
@@ -394,7 +390,7 @@ const Messages = () => {
         </table>
       </div>
       {/* Pagination */}
-      {searchResults.length > 0 && error === null && loading === false && (
+      {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
     </div>
