@@ -6,7 +6,6 @@ import { FaEdit } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import {
   getArticlesCategoriesApi,
-  getArticlesCategories,
   addArticleCategoryApi,
   updateArticleCategoryApi,
   deleteArticleCategoryApi,
@@ -17,9 +16,11 @@ import { useFiltration, useSchema } from "../../hooks";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
 
 const CategoriesArticle = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { articleCategories, loading, error } = useSelector(
@@ -56,7 +57,7 @@ const CategoriesArticle = () => {
   // Columns
   const columns = [
     { id: 0, name: "id", label: t("index") },
-    { id: 1, name: "title", label: t("categories.columns.category") },
+    { id: 1, name: "category", label: t("categories.columns.category") },
     { id: 2, name: "control", label: t("action") },
   ];
   // Formik
@@ -66,38 +67,40 @@ const CategoriesArticle = () => {
     },
     validationSchema: validationSchema.category,
     onSubmit: (values) => {
-      if (values.isEditing) {
-        dispatch(
-          updateArticleCategoryApi({ id: values.id, title: values.title })
-        ).then((res) => {
-          if (!res.error) {
-            dispatch(getArticlesCategoriesApi());
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-            toast.success(t("toast.category.updatedSuccess"));
-          } else {
-            dispatch(getArticlesCategoriesApi());
-            toast.error(t("toast.category.updatedError"));
-          }
-        });
-      } else {
-        dispatch(addArticleCategoryApi(values)).then((res) => {
-          if (!res.error) {
-            dispatch(getArticlesCategoriesApi());
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-            toast.success(t("toast.category.addedSuccess"));
-          } else {
-            dispatch(getArticlesCategoriesApi());
-            toast.error(t("toast.category.addedError"));
-          }
-        });
+      if (role === "admin") {
+        if (values.isEditing) {
+          dispatch(
+            updateArticleCategoryApi({ id: values.id, title: values.title })
+          ).then((res) => {
+            if (!res.error) {
+              dispatch(getArticlesCategoriesApi());
+              setToggle({
+                ...toggle,
+                edit: !toggle.edit,
+              });
+              formik.handleReset();
+              toast.success(t("toast.category.updatedSuccess"));
+            } else {
+              dispatch(getArticlesCategoriesApi());
+              toast.error(t("toast.category.updatedError"));
+            }
+          });
+        } else {
+          dispatch(addArticleCategoryApi(values)).then((res) => {
+            if (!res.error) {
+              dispatch(getArticlesCategoriesApi());
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+              formik.handleReset();
+              toast.success(t("toast.category.addedSuccess"));
+            } else {
+              dispatch(getArticlesCategoriesApi());
+              toast.error(t("toast.category.addedError"));
+            }
+          });
+        }
       }
     },
   });
@@ -113,67 +116,83 @@ const CategoriesArticle = () => {
 
   // Delete Article Category
   const handleDelete = (articleCategory) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + articleCategory?.title + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteArticleCategoryApi(articleCategory?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getArticlesCategoriesApi());
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${articleCategory?.title}`,
-              text: `${t("titleDeletedSuccess")} ${articleCategory?.title} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.category.deletedSuccess")));
-          } else {
-            dispatch(getArticlesCategoriesApi());
-            toast.error(t("toast.category.deletedError"));
-          }
-        });
-      }
-    });
+    if (role === "admin") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + articleCategory?.title + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteArticleCategoryApi(articleCategory?.id)).then(
+            (res) => {
+              if (!res.error) {
+                dispatch(getArticlesCategoriesApi());
+                Swal.fire({
+                  title: `${t("titleDeletedSuccess")} ${
+                    articleCategory?.title
+                  }`,
+                  text: `${t("titleDeletedSuccess")} ${
+                    articleCategory?.title
+                  } ${t("textDeletedSuccess")}`,
+                  icon: "success",
+                  confirmButtonColor: "#0d1d34",
+                  confirmButtonText: t("doneDeletedSuccess"),
+                }).then(() =>
+                  toast.success(t("toast.category.deletedSuccess"))
+                );
+              } else {
+                dispatch(getArticlesCategoriesApi());
+                toast.error(t("toast.category.deletedError"));
+              }
+            }
+          );
+        }
+      });
+    }
   };
 
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getArticlesCategoriesApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getArticlesCategories(res.payload));
-        }
-      });
+      dispatch(getArticlesCategoriesApi());
+      if (role !== "admin") {
+        setToggle({
+          ...toggle,
+          toggleColumns: {
+            ...toggle.toggleColumns,
+            control: false,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+    // eslint-disable-next-line
+  }, [dispatch, role]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("categories.addTitle")}
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("categories.addTitle")}
+          </button>
+        </div>
+      )}
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
@@ -218,36 +237,38 @@ const CategoriesArticle = () => {
                 maxHeight: "160px",
               }}
             >
-              {columns.map((column) => (
-                <button
-                  type="button"
-                  key={column.id}
-                  className={`item filter`}
-                  onClick={() => handleToggleColumns(column.name)}
-                >
-                  <span className="d-flex justify-content-start align-items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox-column"
-                      checked={toggle.toggleColumns[column.name]}
-                      readOnly
-                    />
-                    <span>{column.label}</span>
-                  </span>
-                </button>
-              ))}
+              {columns
+                .filter((column) =>
+                  role === "admin" ? column : column.name !== "control"
+                )
+                .map((column) => (
+                  <button
+                    type="button"
+                    key={column.id}
+                    className={`item filter`}
+                    onClick={() => handleToggleColumns(column.name)}
+                  >
+                    <span className="d-flex justify-content-start align-items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox-column"
+                        checked={toggle.toggleColumns[column.name]}
+                        readOnly
+                      />
+                      <span>{column.label}</span>
+                    </span>
+                  </button>
+                ))}
             </div>
           </div>
         </div>
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns.id && 
-                <th className="table-th">
-                  {t("index")}
-                  </th>
-              }
-              {toggle.toggleColumns.title && (
+              {toggle.toggleColumns.id && (
+                <th className="table-th">{t("index")}</th>
+              )}
+              {toggle.toggleColumns.category && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("categories.columns.category")}
                   {toggle.sortColumn === columns[1].name ? (
@@ -259,7 +280,7 @@ const CategoriesArticle = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
+              {role === "admin" && toggle.toggleColumns.control && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
                   {t("action")}
                   {toggle.sortColumn === columns[2].name ? (
@@ -277,7 +298,7 @@ const CategoriesArticle = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -295,7 +316,7 @@ const CategoriesArticle = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -315,7 +336,7 @@ const CategoriesArticle = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -327,7 +348,7 @@ const CategoriesArticle = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="3">
+                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -344,7 +365,7 @@ const CategoriesArticle = () => {
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
                   )}
-                  {toggle.toggleColumns.control && (
+                  {role === "admin" && toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
                         <FaEdit
@@ -370,192 +391,202 @@ const CategoriesArticle = () => {
           )}
         </table>
       </div>
-      {/* Add Audio Category */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-          formik.handleReset();
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            formik.handleReset();
-          }}
-        >
-          {t("categories.addTitle")}
-          <IoMdClose
-            onClick={() => {
+      {role === "admin" && (
+        <>
+          {/* Add Audio Category */}
+          <Modal
+            isOpen={toggle.add}
+            toggle={() => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
               });
               formik.handleReset();
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12} className="mb-5">
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="title" className="form-label">
-                    {t("categories.columns.category")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="title"
-                    placeholder={t("categories.columns.category")}
-                    name="title"
-                    value={formik.values.title}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
-      {/* Edit Audio Category */}
-      <Modal
-        isOpen={toggle.edit}
-        toggle={() => {
-          setToggle({
-            ...toggle,
-            edit: !toggle.edit,
-          });
-          formik.handleReset();
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-            formik.handleReset();
-          }}
-        >
-          {t("categories.editTitle")}
-          <IoMdClose
-            onClick={() => {
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                });
+                formik.handleReset();
+              }}
+            >
+              {t("categories.addTitle")}
+              <IoMdClose
+                onClick={() => {
+                  setToggle({
+                    ...toggle,
+                    add: !toggle.add,
+                  });
+                  formik.handleReset();
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12} className="mb-5">
+                    <div
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      <label htmlFor="title" className="form-label">
+                        {t("categories.columns.category")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input w-100"
+                        id="title"
+                        placeholder={t("categories.columns.category")}
+                        name="title"
+                        value={formik.values.title}
+                        onChange={formik.handleChange}
+                      />
+                      {formik.errors.title && formik.touched.title ? (
+                        <span className="error">{formik.errors.title}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : (
+                          t("add")
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            add: !toggle.add,
+                          });
+                          formik.handleReset();
+                        }}
+                      >
+                        {t("cancel")}
+                      </button>
+                    </div>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+          {/* Edit Audio Category */}
+          <Modal
+            isOpen={toggle.edit}
+            toggle={() => {
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
               });
               formik.handleReset();
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12} className="mb-5">
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="title" className="form-label">
-                    {t("categories.columns.category")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="title"
-                    placeholder={t("categories.columns.category")}
-                    name="title"
-                    value={formik.values?.title}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("save")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        edit: !toggle.edit,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                setToggle({
+                  ...toggle,
+                  edit: !toggle.edit,
+                });
+                formik.handleReset();
+              }}
+            >
+              {t("categories.editTitle")}
+              <IoMdClose
+                onClick={() => {
+                  setToggle({
+                    ...toggle,
+                    edit: !toggle.edit,
+                  });
+                  formik.handleReset();
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12} className="mb-5">
+                    <div
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      <label htmlFor="title" className="form-label">
+                        {t("categories.columns.category")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input w-100"
+                        id="title"
+                        placeholder={t("categories.columns.category")}
+                        name="title"
+                        value={formik.values?.title}
+                        onChange={formik.handleChange}
+                      />
+                      {formik.errors.title && formik.touched.title ? (
+                        <span className="error">{formik.errors.title}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : (
+                          t("save")
+                        )}
+                      </button>
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            edit: !toggle.edit,
+                          });
+                          formik.handleReset();
+                        }}
+                      >
+                        {t("cancel")}
+                      </button>
+                    </div>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+        </>
+      )}
       {/* Pagination */}
       {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
