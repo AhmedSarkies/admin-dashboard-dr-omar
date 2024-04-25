@@ -22,11 +22,9 @@ import anonymous from "../../assets/images/anonymous.png";
 
 import {
   deleteScholarApi,
-  getScholars,
   getScholarsApi,
   addScholarApi,
   updateScholarApi,
-  deleteScholar,
 } from "../../store/slices/scholarSlice";
 
 import { useFormik } from "formik";
@@ -38,6 +36,7 @@ import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
+import Cookies from "js-cookie";
 
 const initialValues = {
   image: {
@@ -51,8 +50,9 @@ const initialValues = {
   is_active: "",
 };
 
-const Elders = ({ dashboard }) => {
+const Elders = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { validationSchema } = useSchema();
@@ -93,86 +93,88 @@ const Elders = ({ dashboard }) => {
     initialValues,
     validationSchema: validationSchema.elder,
     onSubmit: (values) => {
-      // if email and phone is already exist with another scholar if just i change them to new values
-      if (scholars.length > 0) {
-        const emailExist = scholars.find(
-          (scholar) => scholar.email === formik.values.email
-        );
-        const phoneExist = scholars.find(
-          (scholar) => scholar.phone === formik.values.phone
-        );
-        if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error(t("emailExisted"));
-          return;
-        }
-        if (phoneExist && phoneExist.id !== formik.values.id) {
-          toast.error(t("phoneExisted"));
-          return;
-        }
-      }
-      const formData = new FormData();
-      formData.append("name", formik.values.name);
-      formData.append("email", formik.values.email);
-      formData.append("phone", formik.values.phone);
-      formData.append("is_active", formik.values.is_active);
-      formData.append(
-        "status",
-        formik.values.status === "Pending"
-          ? "Pending"
-          : formik.values.status === "Approve"
-          ? "Approve"
-          : "Pending"
-      );
-      if (values.id) {
-        // if the scholar don't change anything even the image
-        const scholar = scholars.find((scholar) => scholar.id === values.id);
-        if (
-          scholar.name === values.name &&
-          scholar.email === values.email &&
-          scholar.phone === values.phone &&
-          scholar.status === values.status &&
-          scholar.image === values.image
-        ) {
-          setToggle({
-            ...toggle,
-            edit: !toggle.edit,
-          });
-          toast.error(t("noChange"));
-          return;
-        } else {
-          formData.append("id", values.id);
-          if (values.image.file !== undefined) {
-            formData.append("image", values.image.file);
+      if (role === "admin") {
+        // if email and phone is already exist with another scholar if just i change them to new values
+        if (scholars.length > 0) {
+          const emailExist = scholars.find(
+            (scholar) => scholar.email === formik.values.email
+          );
+          const phoneExist = scholars.find(
+            (scholar) => scholar.phone === formik.values.phone
+          );
+          if (emailExist && emailExist.id !== formik.values.id) {
+            toast.error(t("emailExisted"));
+            return;
           }
-          dispatch(updateScholarApi(formData)).then((res) => {
+          if (phoneExist && phoneExist.id !== formik.values.id) {
+            toast.error(t("phoneExisted"));
+            return;
+          }
+        }
+        const formData = new FormData();
+        formData.append("name", formik.values.name);
+        formData.append("email", formik.values.email);
+        formData.append("phone", formik.values.phone);
+        formData.append("is_active", formik.values.is_active);
+        formData.append(
+          "status",
+          formik.values.status === "Pending"
+            ? "Pending"
+            : formik.values.status === "Approve"
+            ? "Approve"
+            : "Pending"
+        );
+        if (values.id) {
+          // if the scholar don't change anything even the image
+          const scholar = scholars.find((scholar) => scholar.id === values.id);
+          if (
+            scholar.name === values.name &&
+            scholar.email === values.email &&
+            scholar.phone === values.phone &&
+            scholar.status === values.status &&
+            scholar.image === values.image
+          ) {
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+            });
+            toast.error(t("noChange"));
+            return;
+          } else {
+            formData.append("id", values.id);
+            if (values.image.file !== undefined) {
+              formData.append("image", values.image.file);
+            }
+            dispatch(updateScholarApi(formData)).then((res) => {
+              dispatch(getScholarsApi());
+              if (!res.error) {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  edit: !toggle.edit,
+                });
+                toast.success(t("toast.elder.updatedSuccess"));
+              } else {
+                toast.error(t("toast.elder.updatedError"));
+              }
+            });
+          }
+        } else {
+          formData.append("image", formik.values.image.file);
+          dispatch(addScholarApi(formData)).then((res) => {
             dispatch(getScholarsApi());
             if (!res.error) {
               formik.handleReset();
               setToggle({
                 ...toggle,
-                edit: !toggle.edit,
+                add: !toggle.add,
               });
-              toast.success(t("toast.elder.updatedSuccess"));
+              toast.success(t("toast.elder.addedSuccess"));
             } else {
-              toast.error(t("toast.elder.updatedError"));
+              toast.error(t("toast.elder.addedError"));
             }
           });
         }
-      } else {
-        formData.append("image", formik.values.image.file);
-        dispatch(addScholarApi(formData)).then((res) => {
-          dispatch(getScholarsApi());
-          if (!res.error) {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            toast.success(t("toast.elder.addedSuccess"));
-          } else {
-            toast.error(t("toast.elder.addedError"));
-          }
-        });
       }
     },
   });
@@ -221,35 +223,37 @@ const Elders = ({ dashboard }) => {
 
   // Delete Scholar
   const handleDelete = (elder) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + elder?.name + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteScholarApi(elder?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(deleteScholar(elder?.id));
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${elder?.name}`,
-              text: `${t("titleDeletedSuccess")} ${elder?.name} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.elder.deletedSuccess")));
-          } else {
-            toast.error(t("toast.elder.deletedError"));
-          }
-        });
-      }
-    });
+    if(role === "admin") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + elder?.name + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteScholarApi(elder?.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getScholarsApi());
+              Swal.fire({
+                title: `${t("titleDeletedSuccess")} ${elder?.name}`,
+                text: `${t("titleDeletedSuccess")} ${elder?.name} ${t(
+                  "textDeletedSuccess"
+                )}`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+                confirmButtonText: t("doneDeletedSuccess"),
+              }).then(() => toast.success(t("toast.elder.deletedSuccess")));
+            } else {
+              toast.error(t("toast.elder.deletedError"));
+            }
+          });
+        }
+      });
+    }
   };
 
   // Data
@@ -269,7 +273,7 @@ const Elders = ({ dashboard }) => {
     { id: 2, name: "name", label: t("elders.columns.name") },
     { id: 3, name: "email", label: t("elders.columns.email") },
     { id: 4, name: "phone", label: t("elders.columns.phone") },
-    { id: 5, name: "audiosCount", label: t("audiosCount") },
+    { id: 5, name: "visits", label: t("audiosCount") },
     { id: 6, name: "favorites", label: t("favorites") },
     { id: 7, name: "downloads", label: t("downloads") },
     { id: 8, name: "shares", label: t("shares") },
@@ -292,11 +296,7 @@ const Elders = ({ dashboard }) => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getScholarsApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getScholars(res.payload));
-        }
-      });
+      dispatch(getScholarsApi());
     } catch (error) {
       console.log(error);
     }
@@ -304,27 +304,29 @@ const Elders = ({ dashboard }) => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("elders.addTitle")}
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("elders.addTitle")}
+          </button>
+        </div>
+      )}
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "35%",
             }}
           >
             <input
@@ -656,18 +658,39 @@ const Elders = ({ dashboard }) => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.status === t("approve")
-                                ? "green"
-                                : result?.status === t("pending")
-                                ? "red"
-                                : "red",
+                              result?.status === t("approve") ? "green" : "red",
+                            cursor: role === "admin" ? "pointer" : "default",
+                          }}
+                          onClick={() => {
+                            if (role === "admin") {
+                              dispatch(
+                                updateScholarApi({
+                                  name: result?.name,
+                                  email: result?.email,
+                                  phone: result?.phone,
+                                  id: result.id,
+                                  status:
+                                    result.status === t("approve")
+                                      ? "Pending"
+                                      : "Approve",
+                                  is_active:
+                                    result.is_active === t("active") ? 1 : 0,
+                                })
+                              ).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getScholarsApi());
+                                  toast.success(
+                                    t("toast.elder.updatedSuccess")
+                                  );
+                                } else {
+                                  toast.error(t("toast.elder.updatedError"));
+                                  dispatch(getScholarsApi());
+                                }
+                              });
+                            }
                           }}
                         >
-                          {result?.status === t("approve")
-                            ? t("approve")
-                            : result?.status === t("pending")
-                            ? t("pending")
-                            : t("pending")}
+                          {result?.status}
                         </span>
                       </td>
                     )}
@@ -679,16 +702,39 @@ const Elders = ({ dashboard }) => {
                             backgroundColor:
                               result?.is_active === t("active")
                                 ? "green"
-                                : result?.is_active === t("inactive")
-                                ? "red"
                                 : "red",
+                            cursor: role === "admin" ? "pointer" : "default",
+                          }}
+                          onClick={() => {
+                            if (role === "admin") {
+                              dispatch(
+                                updateScholarApi({
+                                  name: result?.name,
+                                  email: result?.email,
+                                  phone: result?.phone,
+                                  id: result.id,
+                                  status:
+                                    result.status === t("approve")
+                                      ? "Approve"
+                                      : "Pending",
+                                  is_active:
+                                    result.is_active === t("active") ? 0 : 1,
+                                })
+                              ).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getScholarsApi());
+                                  toast.success(
+                                    t("toast.elder.updatedSuccess")
+                                  );
+                                } else {
+                                  toast.error(t("toast.elder.updatedError"));
+                                  dispatch(getScholarsApi());
+                                }
+                              });
+                            }
                           }}
                         >
-                          {result?.is_active === t("active")
-                            ? t("active")
-                            : result?.is_active === t("inactive")
-                            ? t("inactive")
-                            : t("inactive")}
+                          {result?.is_active}
                         </span>
                       </td>
                     )}
@@ -701,20 +747,24 @@ const Elders = ({ dashboard }) => {
                               navigate(`/dr-omar/elders/${result?.id}`);
                             }}
                           />
-                          <FaPen
-                            className="edit-btn"
-                            onClick={() => {
-                              handleEdit(result);
-                              setToggle({
-                                ...toggle,
-                                edit: !toggle.edit,
-                              });
-                            }}
-                          />
-                          <MdDeleteOutline
-                            className="delete-btn"
-                            onClick={() => handleDelete(result)}
-                          />
+                          {role === "admin" && (
+                            <>
+                              <FaPen
+                                className="edit-btn"
+                                onClick={() => {
+                                  handleEdit(result);
+                                  setToggle({
+                                    ...toggle,
+                                    edit: !toggle.edit,
+                                  });
+                                }}
+                              />
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                            </>
+                          )}
                         </span>
                       </td>
                     )}
@@ -724,101 +774,59 @@ const Elders = ({ dashboard }) => {
             )}
         </table>
       </div>
-      {/* Add Elder */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          formik.handleReset();
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          }}
-        >
-          {t("elders.addTitle")}
-          <IoMdClose
-            onClick={() => {
+      {/* Pagination */}
+      {searchResultsElders?.length > 0 &&
+        error === null &&
+        loading === false && <PaginationUI />}
+      {role === "admin" && (
+        <>
+          {/* Add Elder */}
+          <Modal
+            isOpen={toggle.add}
+            toggle={() => {
               formik.handleReset();
               setToggle({
                 ...toggle,
                 add: !toggle.add,
               });
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col
-                lg={5}
-                className="d-flex flex-column justify-content-center align-items-center"
-              >
-                <div className="image-preview-container d-flex justify-content-center align-items-center">
-                  <label
-                    htmlFor={formik.values.image.preview ? "" : "image"}
-                    className="form-label d-flex justify-content-center align-items-center"
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                });
+              }}
+            >
+              {t("elders.addTitle")}
+              <IoMdClose
+                onClick={() => {
+                  formik.handleReset();
+                  setToggle({
+                    ...toggle,
+                    add: !toggle.add,
+                  });
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col
+                    lg={5}
+                    className="d-flex flex-column justify-content-center align-items-center"
                   >
-                    <img
-                      src={
-                        formik.values.image && formik.values.image.preview
-                          ? formik.values.image.preview
-                          : anonymous
-                      }
-                      alt="avatar"
-                      className="image-preview"
-                      onClick={() =>
-                        formik.values.image && formik.values.image.preview
-                          ? setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          : ""
-                      }
-                    />
-                    <Modal
-                      isOpen={toggle.imagePreview}
-                      toggle={() =>
-                        setToggle({
-                          ...toggle,
-                          imagePreview: !toggle.imagePreview,
-                        })
-                      }
-                      centered={true}
-                      keyboard={true}
-                      size={"md"}
-                      contentClassName="modal-preview-image modal-add-scholar"
-                    >
-                      <ModalHeader
-                        toggle={() =>
-                          setToggle({
-                            ...toggle,
-                            imagePreview: !toggle.imagePreview,
-                          })
-                        }
+                    <div className="image-preview-container d-flex justify-content-center align-items-center">
+                      <label
+                        htmlFor={formik.values.image.preview ? "" : "image"}
+                        className="form-label d-flex justify-content-center align-items-center"
                       >
-                        <IoMdClose
-                          onClick={() =>
-                            setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          }
-                        />
-                      </ModalHeader>
-                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
                         <img
                           src={
                             formik.values.image && formik.values.image.preview
@@ -827,642 +835,700 @@ const Elders = ({ dashboard }) => {
                           }
                           alt="avatar"
                           className="image-preview"
+                          onClick={() =>
+                            formik.values.image && formik.values.image.preview
+                              ? setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                              : ""
+                          }
                         />
-                      </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={handleDeleteImage}
+                        <Modal
+                          isOpen={toggle.imagePreview}
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                          centered={true}
+                          keyboard={true}
+                          size={"md"}
+                          contentClassName="modal-preview-image modal-add-scholar"
+                        >
+                          <ModalHeader
+                            toggle={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
                           >
-                            {t("delete")}
+                            <IoMdClose
+                              onClick={() =>
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                              }
+                            />
+                          </ModalHeader>
+                          <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                            <img
+                              src={
+                                formik.values.image &&
+                                formik.values.image.preview
+                                  ? formik.values.image.preview
+                                  : anonymous
+                              }
+                              alt="avatar"
+                              className="image-preview"
+                            />
+                          </ModalBody>
+                          <ModalFooter className="p-md-4 p-2">
+                            <div className="form-group-container d-flex justify-content-center align-items-center">
+                              <button
+                                className="delete-btn cancel-btn"
+                                onClick={handleDeleteImage}
+                              >
+                                {t("delete")}
+                              </button>
+                            </div>
+                          </ModalFooter>
+                        </Modal>
+                      </label>
+                    </div>
+                    <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                      <label htmlFor="image" className="form-label">
+                        <ImUpload /> {t("chooseImage")}
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-input form-img-input"
+                        id="image"
+                        ref={fileRef}
+                        onChange={handleImageChange}
+                      />
+                    </div>
+                    {formik.errors.image && formik.touched.image ? (
+                      <span className="error text-center">
+                        {formik.errors.image}
+                      </span>
+                    ) : null}
+                  </Col>
+                  <Col lg={7} className="mb-5">
+                    <div
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      <label htmlFor="name" className="form-label">
+                        {t("elders.columns.name")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="name"
+                        placeholder={t("elders.columns.name")}
+                        name="name"
+                        value={formik.values.name}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.name && formik.touched.name ? (
+                        <span className="error">{formik.errors.name}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="email" className="form-label">
+                        {t("elders.columns.email")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="email"
+                        placeholder={t("elders.columns.email")}
+                        name="email"
+                        value={formik.values.email}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.email && formik.touched.email ? (
+                        <span className="error">{formik.errors.email}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="phone" className="form-label">
+                        {t("elders.columns.phone")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="test"
+                        placeholder={t("elders.columns.phone")}
+                        name="phone"
+                        value={formik.values.phone}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.phone && formik.touched.phone ? (
+                        <span className="error">{formik.errors.phone}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                      <label htmlFor="status" className="form-label">
+                        {t("status")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.status === "Pending"
+                            ? t("pending")
+                            : formik.values.status === "Approve"
+                            ? t("approve")
+                            : t("status")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.status ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "Pending" ? "active" : ""
+                            }`}
+                            value="Pending"
+                            name="status"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Pending");
+                            }}
+                          >
+                            {t("pending")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "Approve" ? "active" : ""
+                            }`}
+                            value="Approve"
+                            name="status"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Approve");
+                            }}
+                          >
+                            {t("approve")}
                           </button>
                         </div>
-                      </ModalFooter>
-                    </Modal>
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    ref={fileRef}
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {formik.errors.image && formik.touched.image ? (
-                  <span className="error text-center">
-                    {formik.errors.image}
-                  </span>
-                ) : null}
-              </Col>
-              <Col lg={7} className="mb-5">
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="name" className="form-label">
-                    {t("elders.columns.name")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("elders.columns.name")}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("elders.columns.email")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="email"
-                    placeholder={t("elders.columns.email")}
-                    name="email"
-                    value={formik.values.email}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("elders.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="test"
-                    placeholder={t("elders.columns.phone")}
-                    name="phone"
-                    value={formik.values.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "Pending"
-                        ? t("pending")
-                        : formik.values.status === "Approve"
-                        ? t("approve")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
+                      </div>
+                    </div>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                      <label htmlFor="activation" className="form-label">
+                        {t("activation")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: !toggle.is_active,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.is_active === 1
+                            ? t("active")
+                            : formik.values.is_active === 0
+                            ? t("inactive")
+                            : t("activation")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.is_active ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.is_active ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 0 ? "active" : ""
+                            }`}
+                            value="inactive"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 0);
+                            }}
+                          >
+                            {t("inactive")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 1 ? "active" : ""
+                            }`}
+                            value="active"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 1);
+                            }}
+                          >
+                            {t("active")}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                       <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "Pending" ? "active" : ""
-                        }`}
-                        value="Pending"
-                        name="status"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "Pending");
-                        }}
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
                       >
-                        {t("pending")}
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : (
+                          t("add")
+                        )}
                       </button>
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values.status === "Approve" ? "active" : ""
-                        }`}
-                        value="Approve"
-                        name="status"
-                        onClick={(e) => {
+                        className="cancel-btn"
+                        onClick={() => {
                           setToggle({
                             ...toggle,
-                            status: !toggle.status,
+                            add: !toggle.add,
                           });
-                          formik.setFieldValue("status", "Approve");
+                          formik.handleReset();
                         }}
                       >
-                        {t("approve")}
+                        {t("cancel")}
                       </button>
                     </div>
-                  </div>
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                  <label htmlFor="activation" className="form-label">
-                    {t("activation")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          is_active: !toggle.is_active,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.is_active === 1
-                        ? t("active")
-                        : formik.values.is_active === 0
-                        ? t("inactive")
-                        : t("activation")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.is_active ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.is_active ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 0 ? "active" : ""
-                        }`}
-                        value="inactive"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 0);
-                        }}
-                      >
-                        {t("inactive")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 1 ? "active" : ""
-                        }`}
-                        value="active"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 1);
-                        }}
-                      >
-                        {t("active")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
-      {/* Edit Elder */}
-      <Modal
-        isOpen={toggle.edit}
-        toggle={() => {
-          formik.handleReset();
-          setToggle({
-            ...toggle,
-            edit: !toggle.edit,
-          });
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-            });
-          }}
-        >
-          {t("elders.editTitle")}
-          <IoMdClose
-            onClick={() => {
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+          {/* Edit Elder */}
+          <Modal
+            isOpen={toggle.edit}
+            toggle={() => {
               formik.handleReset();
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
               });
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col
-                lg={5}
-                className="d-flex flex-column justify-content-center align-items-center"
-              >
-                <div className="image-preview-container d-flex justify-content-center align-items-center">
-                  <label
-                    htmlFor={
-                      formik.values?.image
-                        ? formik.values?.image.file === ""
-                          ? "image"
-                          : ""
-                        : "image"
-                    }
-                    className="form-label d-flex justify-content-center align-items-center"
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  edit: !toggle.edit,
+                });
+              }}
+            >
+              {t("elders.editTitle")}
+              <IoMdClose
+                onClick={() => {
+                  formik.handleReset();
+                  setToggle({
+                    ...toggle,
+                    edit: !toggle.edit,
+                  });
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col
+                    lg={5}
+                    className="d-flex flex-column justify-content-center align-items-center"
                   >
-                    <img
-                      src={
-                        formik.values?.image.file === undefined
-                          ? formik.values?.image
-                          : formik.values?.image.file === ""
-                          ? anonymous
-                          : formik.values?.image.preview
-                      }
-                      alt="avatar"
-                      className="image-preview"
-                      onClick={() =>
-                        formik.values?.image && formik.values?.image.file === ""
-                          ? ""
-                          : setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                      }
-                    />
-                    <Modal
-                      isOpen={toggle.imagePreview}
-                      toggle={() =>
-                        setToggle({
-                          ...toggle,
-                          imagePreview: !toggle.imagePreview,
-                        })
-                      }
-                      centered={true}
-                      keyboard={true}
-                      size={"md"}
-                      contentClassName="modal-preview-image modal-add-scholar"
-                    >
-                      <ModalHeader
-                        toggle={() =>
-                          setToggle({
-                            ...toggle,
-                            imagePreview: !toggle.imagePreview,
-                          })
+                    <div className="image-preview-container d-flex justify-content-center align-items-center">
+                      <label
+                        htmlFor={
+                          formik.values?.image
+                            ? formik.values?.image.file === ""
+                              ? "image"
+                              : ""
+                            : "image"
                         }
+                        className="form-label d-flex justify-content-center align-items-center"
                       >
-                        <IoMdClose
+                        <img
+                          src={
+                            formik.values?.image.file === undefined
+                              ? formik.values?.image
+                              : formik.values?.image.file === ""
+                              ? anonymous
+                              : formik.values?.image.preview
+                          }
+                          alt="avatar"
+                          className="image-preview"
                           onClick={() =>
+                            formik.values?.image &&
+                            formik.values?.image.file === ""
+                              ? ""
+                              : setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                          }
+                        />
+                        <Modal
+                          isOpen={toggle.imagePreview}
+                          toggle={() =>
                             setToggle({
                               ...toggle,
                               imagePreview: !toggle.imagePreview,
                             })
                           }
-                        />
-                      </ModalHeader>
-                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                        <img
-                          src={
-                            formik.values?.image.file
-                              ? formik.values?.image.preview
-                              : formik.values?.image
-                          }
-                          alt="avatar"
-                          className="image-preview"
-                        />
-                      </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={handleDeleteImage}
+                          centered={true}
+                          keyboard={true}
+                          size={"md"}
+                          contentClassName="modal-preview-image modal-add-scholar"
+                        >
+                          <ModalHeader
+                            toggle={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
                           >
-                            {t("delete")}
+                            <IoMdClose
+                              onClick={() =>
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                              }
+                            />
+                          </ModalHeader>
+                          <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                            <img
+                              src={
+                                formik.values?.image.file
+                                  ? formik.values?.image.preview
+                                  : formik.values?.image
+                              }
+                              alt="avatar"
+                              className="image-preview"
+                            />
+                          </ModalBody>
+                          <ModalFooter className="p-md-4 p-2">
+                            <div className="form-group-container d-flex justify-content-center align-items-center">
+                              <button
+                                className="delete-btn cancel-btn"
+                                onClick={handleDeleteImage}
+                              >
+                                {t("delete")}
+                              </button>
+                            </div>
+                          </ModalFooter>
+                        </Modal>
+                      </label>
+                    </div>
+                    <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                      <label htmlFor="image" className="form-label">
+                        <ImUpload /> {t("chooseImage")}
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-input form-img-input"
+                        id="image"
+                        ref={fileRef}
+                        onChange={handleImageChange}
+                      />
+                    </div>
+                    {formik.values?.image?.file ? (
+                      formik.errors.image && formik.touched.image ? (
+                        <span className="error">{formik.errors.image}</span>
+                      ) : (
+                        formik.values.image.file === undefined &&
+                        formik.values?.image.includes("https")
+                      )
+                    ) : null}
+                  </Col>
+                  <Col lg={7} className="mb-5">
+                    <div
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      <label htmlFor="name" className="form-label">
+                        {t("elders.columns.name")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="name"
+                        placeholder={t("elders.columns.name")}
+                        name="name"
+                        value={formik.values?.name}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.name && formik.touched.name ? (
+                        <span className="error">{formik.errors.name}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="email" className="form-label">
+                        {t("elders.columns.email")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="email"
+                        placeholder={t("elders.columns.email")}
+                        name="email"
+                        value={formik.values?.email}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.email && formik.touched.email ? (
+                        <span className="error">{formik.errors.email}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="phone" className="form-label">
+                        {t("elders.columns.phone")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="phone"
+                        placeholder={t("elders.columns.phone")}
+                        name="phone"
+                        value={formik.values?.phone}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.phone && formik.touched.phone ? (
+                        <span className="error">{formik.errors.phone}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                      <label htmlFor="status" className="form-label">
+                        {t("status")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values?.status === "Pending"
+                            ? t("pending")
+                            : formik.values?.status === "Approve"
+                            ? t("approve")
+                            : t("status")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.status ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values?.status === "Pending"
+                                ? "active"
+                                : ""
+                            }`}
+                            value="Pending"
+                            name="status"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Pending");
+                            }}
+                          >
+                            {t("pending")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values?.status === "Approve"
+                                ? "active"
+                                : ""
+                            }`}
+                            value="Approve"
+                            name="status"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Approve");
+                            }}
+                          >
+                            {t("approve")}
                           </button>
                         </div>
-                      </ModalFooter>
-                    </Modal>
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    ref={fileRef}
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {formik.values?.image?.file ? (
-                  formik.errors.image && formik.touched.image ? (
-                    <span className="error">{formik.errors.image}</span>
-                  ) : (
-                    formik.values.image.file === undefined &&
-                    formik.values?.image.includes("https")
-                  )
-                ) : null}
-              </Col>
-              <Col lg={7} className="mb-5">
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="name" className="form-label">
-                    {t("elders.columns.name")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("elders.columns.name")}
-                    name="name"
-                    value={formik.values?.name}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("elders.columns.email")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="email"
-                    placeholder={t("elders.columns.email")}
-                    name="email"
-                    value={formik.values?.email}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("elders.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="phone"
-                    placeholder={t("elders.columns.phone")}
-                    name="phone"
-                    value={formik.values?.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values?.status === "Pending"
-                        ? t("pending")
-                        : formik.values?.status === "Approve"
-                        ? t("approve")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.status ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
+                      </div>
+                    </div>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                      <label htmlFor="activation" className="form-label">
+                        {t("activation")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: !toggle.is_active,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.is_active === 1
+                            ? t("active")
+                            : formik.values.is_active === 0
+                            ? t("inactive")
+                            : t("activation")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.is_active ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.is_active ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 0 ? "active" : ""
+                            }`}
+                            value="inactive"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 0);
+                            }}
+                          >
+                            {t("inactive")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 1 ? "active" : ""
+                            }`}
+                            value="active"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 1);
+                            }}
+                          >
+                            {t("active")}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : (
+                          t("save")
+                        )}
+                      </button>
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values?.status === "Pending" ? "active" : ""
-                        }`}
-                        value="Pending"
-                        name="status"
+                        className="cancel-btn"
                         onClick={() => {
                           setToggle({
                             ...toggle,
-                            status: !toggle.status,
+                            edit: !toggle.edit,
                           });
-                          formik.setFieldValue("status", "Pending");
+                          formik.handleReset();
                         }}
                       >
-                        {t("pending")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values?.status === "Approve" ? "active" : ""
-                        }`}
-                        value="Approve"
-                        name="status"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "Approve");
-                        }}
-                      >
-                        {t("approve")}
+                        {t("cancel")}
                       </button>
                     </div>
-                  </div>
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                  <label htmlFor="activation" className="form-label">
-                    {t("activation")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          is_active: !toggle.is_active,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.is_active === 1
-                        ? t("active")
-                        : formik.values.is_active === 0
-                        ? t("inactive")
-                        : t("activation")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.is_active ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.is_active ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 0 ? "active" : ""
-                        }`}
-                        value="inactive"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 0);
-                        }}
-                      >
-                        {t("inactive")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 1 ? "active" : ""
-                        }`}
-                        value="active"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 1);
-                        }}
-                      >
-                        {t("active")}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("save")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        edit: !toggle.edit,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
-      {/* Pagination */}
-      {searchResultsElders?.length > 0 &&
-        error === null &&
-        loading === false && <PaginationUI />}
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+        </>
+      )}
     </div>
   );
 };
