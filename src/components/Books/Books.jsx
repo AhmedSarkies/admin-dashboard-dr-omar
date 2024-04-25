@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { FaBookReader, FaEdit, FaFileUpload } from "react-icons/fa";
+import { FaEdit, FaFileUpload } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose, IoMdEye } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
@@ -20,7 +20,7 @@ import {
   addBookApi,
   updateBookApi,
   deleteBookApi,
-  getBooksSubCategoriesApi,
+  getBooksSubSubCategoriesApi,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -29,6 +29,7 @@ import useFiltration from "../../hooks/useFiltration";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-toastify";
 import useSchema from "../../hooks/useSchema";
+import Cookies from "js-cookie";
 
 const initialValues = {
   title: "",
@@ -58,7 +59,8 @@ const Books = () => {
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
-  const { books, bookSubCategories, loading, error } = useSelector(
+  const role = Cookies.get("_role");
+  const { books, bookSubSubCategories, loading, error } = useSelector(
     (state) => state.book
   );
   const [toggle, setToggle] = useState({
@@ -83,7 +85,7 @@ const Books = () => {
       image: true,
       title: true,
       category: true,
-      book: true,
+      // book: true,
       pages: true,
       visits: true,
       favorites: true,
@@ -103,9 +105,10 @@ const Books = () => {
   const allDataWithCategoriesObj = books?.map((book) => {
     return {
       ...book,
-      categories: book?.categories[0],
+      categories: book?.Sup_Sup_categories[0],
       status: book?.status === "public" ? t("public") : t("private"),
       is_active: book?.is_active === 1 ? t("active") : t("inactive"),
+      number_pages: book?.number_pages === null ? 0 : book?.number_pages,
     };
   });
 
@@ -127,83 +130,84 @@ const Books = () => {
     { id: 1, name: "image", label: t("books.columns.book.image") },
     { id: 2, name: "title", label: t("books.columns.book.title") },
     { id: 3, name: "category", label: t("books.columns.book.category") },
-    { id: 4, name: "book", label: t("books.columns.book.book") },
-    { id: 5, name: "pages", label: t("pages") },
-    { id: 6, name: "visits", label: t("visits") },
-    { id: 7, name: "favorites", label: t("favorites") },
-    { id: 8, name: "downloads", label: t("downloads") },
-    { id: 9, name: "shares", label: t("shares") },
-    { id: 10, name: "status", label: t("status") },
-    { id: 11, name: "activation", label: t("activation") },
-    { id: 12, name: "control", label: t("action") },
+    { id: 4, name: "pages", label: t("pages") },
+    { id: 5, name: "visits", label: t("visits") },
+    { id: 6, name: "favorites", label: t("favorites") },
+    { id: 7, name: "downloads", label: t("downloads") },
+    { id: 8, name: "shares", label: t("shares") },
+    { id: 9, name: "status", label: t("content") },
+    { id: 10, name: "activation", label: t("activation") },
+    { id: 11, name: "control", label: t("action") },
   ];
 
   const onSubmit = (values) => {
-    // Add Book
-    if (!values.id) {
-      dispatch(
-        addBookApi({
-          name: values.title,
-          number_pages: values.number_pages,
-          file: values.book.file,
-          image: values.image.file,
-          categories_id: values.bookCategory.id,
-          status: values.status === "private" ? "Private" : "Public",
-          is_active: values.is_active,
-        })
-      ).then((res) => {
-        if (!res.error) {
-          dispatch(getBooksApi());
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-            edit: false,
-            is_active: false,
-            status: false,
-          });
-          formik.handleReset();
-          toast.success(t("toast.book.addedSuccess"));
-        } else {
-          toast.error(t("toast.book.addedError"));
-          dispatch(getBooksApi());
-        }
-      });
-    }
-    // Edit Book
-    else {
-      const formDate = new FormData();
-      formDate.append("id", values.id);
-      formDate.append("name", values.title);
-      formDate.append("number_pages", values.number_pages);
-      formDate.append("categories_id", values.bookCategory.id);
-      formDate.append(
-        "status",
-        values.status === "private" ? "Private" : "Public"
-      );
-      formDate.append("is_active", values.is_active);
-      if (values.image.file) {
-        formDate.append("image", values.image.file);
+    if (role === "admin") {
+      if (!values.id) {
+        // Add Book
+        dispatch(
+          addBookApi({
+            name: values.title,
+            number_pages: values.number_pages,
+            file: values.book.file,
+            image: values.image.file,
+            sub_categories_id: values.bookCategory.id,
+            status: values.status === "private" ? "Private" : "Public",
+            is_active: values.is_active,
+          })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getBooksApi());
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              edit: false,
+              is_active: false,
+              status: false,
+            });
+            formik.handleReset();
+            toast.success(t("toast.book.addedSuccess"));
+          } else {
+            toast.error(t("toast.book.addedError"));
+            dispatch(getBooksApi());
+          }
+        });
       }
-      if (values.book.file) {
-        formDate.append("file", values.book.file);
-      }
-      dispatch(updateBookApi(formDate)).then((res) => {
-        if (!res.error) {
-          dispatch(getBooksApi());
-          setToggle({
-            ...toggle,
-            edit: !toggle.edit,
-            add: !toggle.add,
-            is_active: false,
-            status: false,
-          });
-          formik.handleReset();
-          toast.success(t("toast.book.updatedSuccess"));
-        } else {
-          toast.error(t("toast.book.updatedError"));
-          dispatch(getBooksApi());
+      // Edit Book
+      else {
+        const formDate = new FormData();
+        formDate.append("id", values.id);
+        formDate.append("name", values.title);
+        formDate.append("number_pages", values.number_pages);
+        formDate.append("sub_categories_id", values.bookCategory.id);
+        formDate.append(
+          "status",
+          values.status === "private" ? "Private" : "Public"
+        );
+        formDate.append("is_active", values.is_active);
+        if (values.image.file) {
+          formDate.append("image", values.image.file);
         }
-      });
+        if (values.book.file) {
+          formDate.append("file", values.book.file);
+        }
+        dispatch(updateBookApi(formDate)).then((res) => {
+          if (!res.error) {
+            dispatch(getBooksApi());
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+              add: !toggle.add,
+              is_active: false,
+              status: false,
+            });
+            formik.handleReset();
+            toast.success(t("toast.book.updatedSuccess"));
+          } else {
+            toast.error(t("toast.book.updatedError"));
+            dispatch(getBooksApi());
+          }
+        });
+      }
     }
   };
 
@@ -315,47 +319,51 @@ const Books = () => {
 
   // Delete Book
   const handleDelete = (book) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + book?.name + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteBookApi(book?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${book?.name}`,
-              text: `${t("titleDeletedSuccess")} ${book?.name} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.book.deletedSuccess")));
-          } else {
-            toast.error(t("toast.book.deletedError"));
-            dispatch(getBooksApi());
-          }
-        });
-      }
-    });
+    if (role === "admin") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + book?.name + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteBookApi(book?.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getBooksApi());
+              Swal.fire({
+                title: `${t("titleDeletedSuccess")} ${book?.name}`,
+                text: `${t("titleDeletedSuccess")} ${book?.name} ${t(
+                  "textDeletedSuccess"
+                )}`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+                confirmButtonText: t("doneDeletedSuccess"),
+              }).then(() => toast.success(t("toast.book.deletedSuccess")));
+            } else {
+              toast.error(t("toast.book.deletedError"));
+              dispatch(getBooksApi());
+            }
+          });
+        }
+      });
+    }
   };
 
   // get data from api
   useEffect(() => {
     try {
       dispatch(getBooksApi());
-      dispatch(getBooksSubCategoriesApi());
+      if (role === "admin") {
+        dispatch(getBooksSubSubCategoriesApi());
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, role]);
 
   // Formik
   const formik = useFormik({
@@ -366,30 +374,32 @@ const Books = () => {
 
   return (
     <div className="book-container scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              is_active: false,
-              status: false,
-              pdf: null,
-            })
-          }
-        >
-          <MdAdd />
-          {t("books.addTitle")}
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+                is_active: false,
+                status: false,
+                pdf: null,
+              })
+            }
+          >
+            <MdAdd />
+            {t("books.addTitle")}
+          </button>
+        </div>
+      )}
       <div className="book scholar">
         <div className="table-header">
           {/* Search */}
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "40%",
             }}
           >
             <input
@@ -552,7 +562,7 @@ const Books = () => {
               )}
               {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("status")}
+                  {t("content")}
                   {toggle.sortColumn === columns[9].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -712,30 +722,32 @@ const Books = () => {
                                 : result?.status === t("private")
                                 ? "red"
                                 : "red",
-                                cursor: "pointer",
+                            cursor: role === "admin" ? "pointer" : "default",
                           }}
                           onClick={() => {
-                            const data = {
-                              id: result.id,
-                              name: result.name,
-                              pages: result.number_pages,
-                              status:
-                                result?.status === t("public")
-                                  ? "Private"
-                                  : "Public",
-                              categories_id: result.categories.id,
-                              is_active:
-                                result.is_active === t("active") ? 1 : 0,
-                            };
-                            dispatch(updateBookApi(data)).then((res) => {
-                              if (!res.error) {
-                                dispatch(getBooksApi());
-                                toast.success(t("toast.book.updatedSuccess"));
-                              } else {
-                                dispatch(getBooksApi());
-                                toast.error(t("toast.book.updatedError"));
-                              }
-                            });
+                            if (role === "admin") {
+                              const data = {
+                                id: result.id,
+                                name: result.name,
+                                pages: result.number_pages,
+                                status:
+                                  result?.status === t("public")
+                                    ? "Private"
+                                    : "Public",
+                                categories_id: result.categories.id,
+                                is_active:
+                                  result.is_active === t("active") ? 1 : 0,
+                              };
+                              dispatch(updateBookApi(data)).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getBooksApi());
+                                  toast.success(t("toast.book.updatedSuccess"));
+                                } else {
+                                  dispatch(getBooksApi());
+                                  toast.error(t("toast.book.updatedError"));
+                                }
+                              });
+                            }
                           }}
                         >
                           {result?.status === t("public")
@@ -757,30 +769,32 @@ const Books = () => {
                                 : result?.is_active === t("inactive")
                                 ? "red"
                                 : "red",
-                            cursor: "pointer",
+                            cursor: role === "admin" ? "pointer" : "default",
                           }}
                           onClick={() => {
-                            const data = {
-                              id: result.id,
-                              name: result.name,
-                              pages: result.number_pages,
-                              status:
-                                result?.status === t("public")
-                                  ? "Public"
-                                  : "Private",
-                              categories_id: result.categories.id,
-                              is_active:
-                                result.is_active === t("active") ? 0 : 1,
-                            };
-                            dispatch(updateBookApi(data)).then((res) => {
-                              if (!res.error) {
-                                dispatch(getBooksApi());
-                                toast.success(t("toast.book.updatedSuccess"));
-                              } else {
-                                dispatch(getBooksApi());
-                                toast.error(t("toast.book.updatedError"));
-                              }
-                            });
+                            if (role === "admin") {
+                              const data = {
+                                id: result.id,
+                                name: result.name,
+                                pages: result.number_pages,
+                                status:
+                                  result?.status === t("public")
+                                    ? "Public"
+                                    : "Private",
+                                categories_id: result.categories.id,
+                                is_active:
+                                  result.is_active === t("active") ? 0 : 1,
+                              };
+                              dispatch(updateBookApi(data)).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getBooksApi());
+                                  toast.success(t("toast.book.updatedSuccess"));
+                                } else {
+                                  dispatch(getBooksApi());
+                                  toast.error(t("toast.book.updatedError"));
+                                }
+                              });
+                            }
                           }}
                         >
                           {result?.is_active === t("active")
@@ -805,14 +819,18 @@ const Books = () => {
                           >
                             <IoMdEye className="view-btn" />
                           </a>
-                          <FaEdit
-                            className="edit-btn"
-                            onClick={() => handleEdit(result)}
-                          />
-                          <MdDeleteOutline
-                            className="delete-btn"
-                            onClick={() => handleDelete(result)}
-                          />
+                          {role === "admin" && (
+                            <>
+                              <FaEdit
+                                className="edit-btn"
+                                onClick={() => handleEdit(result)}
+                              />
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                            </>
+                          )}
                         </span>
                       </td>
                     )}
@@ -822,26 +840,10 @@ const Books = () => {
             )}
         </table>
       </div>
-      {/* Add Book */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-            edit: false,
-            is_active: false,
-            status: false,
-            pdf: null,
-          });
-          formik.handleReset();
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-book modal-add-scholar"
-      >
-        <ModalHeader
+      {/* Add/Edit Book */}
+      {role === "admin" && (
+        <Modal
+          isOpen={toggle.add}
           toggle={() => {
             setToggle({
               ...toggle,
@@ -853,12 +855,13 @@ const Books = () => {
             });
             formik.handleReset();
           }}
+          centered={true}
+          keyboard={true}
+          size={"md"}
+          contentClassName="modal-add-book modal-add-scholar"
         >
-          {toggle.edit && formik.values.id
-            ? t("books.editTitle")
-            : t("books.addTitle")}
-          <IoMdClose
-            onClick={() => {
+          <ModalHeader
+            toggle={() => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
@@ -867,457 +870,480 @@ const Books = () => {
                 status: false,
                 pdf: null,
               });
+              formik.handleReset();
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col
-                lg={12}
-                className="d-flex flex-column justify-content-center align-items-center"
-              >
-                <div className="image-preview-container d-flex justify-content-center align-items-center">
-                  <label
-                    htmlFor={formik.values.image?.preview ? "" : "image"}
-                    className="form-label d-flex justify-content-center align-items-center"
-                  >
-                    <img
-                      src={
-                        formik.values?.image && formik.values?.image?.preview
-                          ? formik.values?.image?.preview
-                          : anonymous
-                      }
-                      alt="avatar"
-                      className="image-preview"
-                      style={{
-                        width: "90px",
-                        height: "90px",
-                        objectFit: "cover",
-                      }}
-                      onClick={() =>
-                        formik.values?.image && formik.values.image?.preview
-                          ? setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          : ""
-                      }
-                    />
-                    <Modal
-                      isOpen={toggle.imagePreview}
-                      toggle={() =>
-                        setToggle({
-                          ...toggle,
-                          imagePreview: !toggle.imagePreview,
-                        })
-                      }
-                      centered={true}
-                      keyboard={true}
-                      size={"md"}
-                      contentClassName="modal-preview-image modal-add-scholar"
+          >
+            {toggle.edit && formik.values.id
+              ? t("books.editTitle")
+              : t("books.addTitle")}
+            <IoMdClose
+              onClick={() => {
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                  edit: false,
+                  is_active: false,
+                  status: false,
+                  pdf: null,
+                });
+              }}
+            />
+          </ModalHeader>
+          <ModalBody>
+            <form className="overlay-form" onSubmit={formik.handleSubmit}>
+              <Row className="d-flex justify-content-center align-items-center p-3">
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image?.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
                     >
-                      <ModalHeader
+                      <img
+                        src={
+                          formik.values?.image && formik.values?.image?.preview
+                            ? formik.values?.image?.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        style={{
+                          width: "90px",
+                          height: "90px",
+                          objectFit: "cover",
+                        }}
+                        onClick={() =>
+                          formik.values?.image && formik.values.image?.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
                         toggle={() =>
                           setToggle({
                             ...toggle,
                             imagePreview: !toggle.imagePreview,
                           })
                         }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
                       >
-                        <IoMdClose
-                          onClick={() =>
+                        <ModalHeader
+                          toggle={() =>
                             setToggle({
                               ...toggle,
                               imagePreview: !toggle.imagePreview,
                             })
                           }
-                        />
-                      </ModalHeader>
-                      <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
-                        <img
-                          src={
-                            formik.values?.image &&
-                            formik.values?.image?.preview
-                              ? formik.values?.image?.preview
-                              : anonymous
-                          }
-                          alt="avatar"
-                          className="image-preview"
-                        />
-                      </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={handleDeleteImage}
-                          >
-                            {t("delete")}
-                          </button>
-                        </div>
-                      </ModalFooter>
-                    </Modal>
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImageBook")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    ref={fileRef}
-                    onChange={handleImageChange}
-                  />
-                </div>
-                {formik.errors.image && formik.touched.image ? (
-                  <span className="error text-center">
-                    {formik.errors.image}
-                  </span>
-                ) : null}
-              </Col>
-              <Col
-                lg={12}
-                className="d-flex flex-column justify-content-center align-items-center mt-4"
-              >
-                <div className="form-group-container d-flex flex-column align-items-end mb-3 w-100">
-                  <label
-                    htmlFor={
-                      formik.values?.book?.file !== "" &&
-                      formik.values?.book?.preview !== ""
-                        ? ""
-                        : "book"
-                    }
-                    className="form-label mt-4"
-                  >
-                    {formik.values.id ? (
-                      <iframe
-                        src={formik.values.book}
-                        title={formik.values.title}
-                        width="100%"
-                        height={"500px"}
-                      />
-                    ) : (
-                      <iframe
-                        src={toggle?.pdf?.preview}
-                        title={toggle?.pdf?.file?.name}
-                        width="100%"
-                        height={toggle.pdf?.preview ? "500px" : "0"}
-                      />
-                    )}
-                  </label>
-                </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="book" className="form-label">
-                    <FaFileUpload /> {t("chooseBook")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="application/pdf"
-                    className="form-input form-img-input"
-                    name="book"
-                    id="book"
-                    onChange={handlePDFChange}
-                  />
-                </div>
-                {formik.errors.book && formik.touched.book ? (
-                  <span className="error">{formik.errors.book}</span>
-                ) : null}
-              </Col>
-              <Col lg={12} className="mb-5">
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="title" className="form-label">
-                    {t("books.columns.book.title")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="title"
-                    placeholder={t("books.columns.book.title")}
-                    name="title"
-                    value={formik.values.title}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values?.image &&
+                              formik.values?.image?.preview
+                                ? formik.values?.image?.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={handleDeleteImage}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImageBook")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      ref={fileRef}
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
                   ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="number_pages" className="form-label">
-                    {t("books.columns.book.number_pages")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="number_pages"
-                    placeholder={t("books.columns.book.number_pages")}
-                    name="number_pages"
-                    value={formik.values.number_pages}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.number_pages && formik.touched.number_pages ? (
-                    <span className="error">{formik.errors.number_pages}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="bookCategory" className="form-label">
-                    {t("chooseCategory")}
-                  </label>
-                  <div
-                    className={`dropdown form-input w-100 ${
-                      toggle.bookCategory ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          bookCategory: !toggle.bookCategory,
-                        });
-                      }}
-                      className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
+                </Col>
+                <Col
+                  lg={12}
+                  className="d-flex flex-column justify-content-center align-items-center mt-4"
+                >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3 w-100">
+                    <label
+                      htmlFor={
+                        formik.values?.book?.file !== "" &&
+                        formik.values?.book?.preview !== ""
+                          ? ""
+                          : "book"
+                      }
+                      className="form-label mt-4"
                     >
-                      {formik.values.bookCategory?.title
-                        ? formik.values.bookCategory?.title
-                        : t("chooseCategory")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.bookCategory ? "active" : ""
-                        }`}
-                      />
-                    </button>
+                      {formik.values.id ? (
+                        <iframe
+                          src={formik.values.book}
+                          title={formik.values.title}
+                          width="100%"
+                          height={"500px"}
+                        />
+                      ) : (
+                        <iframe
+                          src={toggle?.pdf?.preview}
+                          title={toggle?.pdf?.file?.name}
+                          width="100%"
+                          height={toggle.pdf?.preview ? "500px" : "0"}
+                        />
+                      )}
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="book" className="form-label">
+                      <FaFileUpload /> {t("chooseBook")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="application/pdf"
+                      className="form-input form-img-input"
+                      name="book"
+                      id="book"
+                      onChange={handlePDFChange}
+                    />
+                  </div>
+                  {formik.errors.book && formik.touched.book ? (
+                    <span className="error">{formik.errors.book}</span>
+                  ) : null}
+                </Col>
+                <Col lg={12} className="mb-5">
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="title" className="form-label">
+                      {t("books.columns.book.title")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input w-100"
+                      id="title"
+                      placeholder={t("books.columns.book.title")}
+                      name="title"
+                      value={formik.values.title}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.title && formik.touched.title ? (
+                      <span className="error">{formik.errors.title}</span>
+                    ) : null}
+                  </div>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="number_pages" className="form-label">
+                      {t("books.columns.book.number_pages")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input w-100"
+                      id="number_pages"
+                      placeholder={t("books.columns.book.number_pages")}
+                      name="number_pages"
+                      value={formik.values.number_pages}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.number_pages &&
+                    formik.touched.number_pages ? (
+                      <span className="error">
+                        {formik.errors.number_pages}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="bookCategory" className="form-label">
+                      {t("chooseCategory")}
+                    </label>
                     <div
-                      className={`dropdown-content ${
+                      className={`dropdown form-input w-100 ${
                         toggle.bookCategory ? "active" : ""
                       }`}
                     >
-                      {bookSubCategories?.map((category) => (
-                        <button
-                          type="button"
-                          key={category?.id}
-                          className={`item ${
-                            formik.values.bookCategory?.id === category?.id
-                              ? "active"
-                              : ""
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            bookCategory: !toggle.bookCategory,
+                          });
+                        }}
+                        className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
+                      >
+                        {formik.values.bookCategory?.title
+                          ? formik.values.bookCategory?.title
+                          : t("chooseCategory")}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.bookCategory ? "active" : ""
                           }`}
-                          value={category?.id}
-                          name="bookCategory"
-                          onClick={() => {
-                            setToggle({
-                              ...toggle,
-                              bookCategory: !toggle.bookCategory,
-                            });
-                            formik.setFieldValue("bookCategory", {
-                              title: category.title,
-                              id: category?.id,
-                            });
-                          }}
-                        >
-                          {category.title}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                  {formik.errors.bookCategory?.title &&
-                  formik.touched.bookCategory?.title ? (
-                    <span className="error">
-                      {formik.errors.bookCategory?.title}
-                    </span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div
-                    className={`dropdown form-input w-100 ${
-                      toggle.status ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "private"
-                        ? t("private")
-                        : formik.values.status === "public"
-                        ? t("public")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.status ? "active" : ""
+                        />
+                      </button>
+                      <div
+                        className={`dropdown-content ${
+                          toggle.bookCategory ? "active" : ""
                         }`}
-                      />
-                    </button>
+                      >
+                        {bookSubSubCategories?.map((category) => (
+                          <button
+                            type="button"
+                            key={category?.id}
+                            className={`item ${
+                              formik.values.bookCategory?.id === category?.id
+                                ? "active"
+                                : ""
+                            }`}
+                            value={category?.id}
+                            name="bookCategory"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                bookCategory: !toggle.bookCategory,
+                              });
+                              formik.setFieldValue("bookCategory", {
+                                title: category.title,
+                                id: category?.id,
+                              });
+                            }}
+                          >
+                            {category.title}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    {formik.errors.bookCategory?.title &&
+                    formik.touched.bookCategory?.title ? (
+                      <span className="error">
+                        {formik.errors.bookCategory?.title}
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                    <label htmlFor="status" className="form-label">
+                      {t("content")}
+                    </label>
                     <div
-                      className={`dropdown-content ${
+                      className={`dropdown form-input w-100 ${
                         toggle.status ? "active" : ""
                       }`}
                     >
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values.status === "private" ? "active" : ""
-                        }`}
-                        value="private"
-                        name="status"
                         onClick={() => {
                           setToggle({
                             ...toggle,
-                            status: false,
+                            status: !toggle.status,
                           });
-                          formik.setFieldValue("status", "private");
                         }}
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
                       >
-                        {t("private")}
+                        {formik.values.status === "private"
+                          ? t("private")
+                          : formik.values.status === "public"
+                          ? t("public")
+                          : t("content")}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        />
                       </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "public" ? "active" : ""
+                      <div
+                        className={`dropdown-content ${
+                          toggle.status ? "active" : ""
                         }`}
-                        value="public"
-                        name="status"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: false,
-                          });
-                          formik.setFieldValue("status", "public");
-                        }}
                       >
-                        {t("public")}
-                      </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.status === "private" ? "active" : ""
+                          }`}
+                          value="private"
+                          name="status"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: false,
+                            });
+                            formik.setFieldValue("status", "private");
+                          }}
+                        >
+                          {t("private")}
+                        </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.status === "public" ? "active" : ""
+                          }`}
+                          value="public"
+                          name="status"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: false,
+                            });
+                            formik.setFieldValue("status", "public");
+                          }}
+                        >
+                          {t("public")}
+                        </button>
+                      </div>
                     </div>
+                    {formik.errors.status && formik.touched.status ? (
+                      <span className="error">{formik.errors.status}</span>
+                    ) : null}
                   </div>
-                  {formik.errors.status && formik.touched.status ? (
-                    <span className="error">{formik.errors.status}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="is_active" className="form-label">
-                    {t("activation")}
-                  </label>
-                  <div
-                    className={`dropdown form-input w-100 ${
-                      toggle.is_active ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          is_active: !toggle.is_active,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.is_active === 1
-                        ? t("active")
-                        : formik.values.is_active === 0
-                        ? t("inactive")
-                        : t("activation")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.is_active ? "active" : ""
-                        }`}
-                      />
-                    </button>
+                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                    <label htmlFor="is_active" className="form-label">
+                      {t("activation")}
+                    </label>
                     <div
-                      className={`dropdown-content ${
+                      className={`dropdown form-input w-100 ${
                         toggle.is_active ? "active" : ""
                       }`}
                     >
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values.is_active === 1 ? "active" : ""
-                        }`}
-                        value="active"
-                        name="is_active"
                         onClick={() => {
                           setToggle({
                             ...toggle,
-                            is_active: false,
+                            is_active: !toggle.is_active,
                           });
-                          formik.setFieldValue("is_active", 1);
                         }}
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
                       >
-                        {t("active")}
+                        {formik.values.is_active === 1
+                          ? t("active")
+                          : formik.values.is_active === 0
+                          ? t("inactive")
+                          : t("activation")}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.is_active ? "active" : ""
+                          }`}
+                        />
                       </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 0 ? "active" : ""
+                      <div
+                        className={`dropdown-content ${
+                          toggle.is_active ? "active" : ""
                         }`}
-                        value="inactive"
-                        name="is_active"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            is_active: false,
-                          });
-                          formik.setFieldValue("is_active", 0);
-                        }}
                       >
-                        {t("inactive")}
-                      </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.is_active === 1 ? "active" : ""
+                          }`}
+                          value="active"
+                          name="is_active"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: false,
+                            });
+                            formik.setFieldValue("is_active", 1);
+                          }}
+                        >
+                          {t("active")}
+                        </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.is_active === 0 ? "active" : ""
+                          }`}
+                          value="inactive"
+                          name="is_active"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: false,
+                            });
+                            formik.setFieldValue("is_active", 0);
+                          }}
+                        >
+                          {t("inactive")}
+                        </button>
+                      </div>
                     </div>
+                    {formik.errors.is_active && formik.touched.is_active ? (
+                      <span className="error">{formik.errors.is_active}</span>
+                    ) : null}
                   </div>
-                  {formik.errors.is_active && formik.touched.is_active ? (
-                    <span className="error">{formik.errors.is_active}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : toggle.edit && formik.values.id ? (
-                      t("edit")
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                        edit: false,
-                        is_active: false,
-                        status: false,
-                        pdf: null,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
+                </Col>
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                    <button
+                      type="submit"
+                      className={`add-btn${loading ? " loading-btn" : ""}`}
+                    >
+                      {/* loading */}
+                      {loading ? (
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : toggle.edit && formik.values.id ? (
+                        t("edit")
+                      ) : (
+                        t("add")
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className="cancel-btn"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                          edit: false,
+                          is_active: false,
+                          status: false,
+                          pdf: null,
+                        });
+                        formik.handleReset();
+                      }}
+                    >
+                      {t("cancel")}
+                    </button>
+                  </div>
+                </Col>
+              </Row>
+            </form>
+          </ModalBody>
+        </Modal>
+      )}
       {/* Pagination */}
       {searchResultsBookSCategoryAndTitle?.length > 0 &&
         error === null &&
