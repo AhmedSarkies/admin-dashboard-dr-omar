@@ -169,50 +169,7 @@ export const deleteArticleCategoryApi = createAsyncThunk(
 const articleSlice = createSlice({
   name: "article",
   initialState,
-  reducers: {
-    // Get Articles
-    getArticles: (state, action) => {
-      state.articles = action.payload.data;
-    },
-    // Add Article
-    addArticle: (state, action) => {
-      state.articles.push(action.payload);
-    },
-    // Update Article
-    updateArticle: (state, action) => {
-      state.articles = state.articles.map((picture) =>
-        picture.id === action.payload.id ? action.payload : picture
-      );
-    },
-    // Delete Article
-    deleteArticle: (state, action) => {
-      state.articles = state.articles.filter(
-        (picture) => picture.id !== action.payload
-      );
-    },
-    // Get Articles Category
-    getArticlesCategories: (state, action) => {
-      state.articleCategories = action.payload;
-    },
-    // Add Article Category
-    addArticleCategory: (state, action) => {
-      state.articleCategories.push(action.payload);
-    },
-    // Update Article Category
-    updateArticleCategory: (state, action) => {
-      state.articleCategories = state.articleCategories.map((category) =>
-        category.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : category
-      );
-    },
-    // Delete Article Category
-    deleteArticleCategory: (state, action) => {
-      state.articleCategories = state.articleCategories.filter(
-        (category) => category.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Articles======
     // Pending
@@ -223,6 +180,7 @@ const articleSlice = createSlice({
     builder.addCase(getArticlesApi.fulfilled, (state, action) => {
       state.articles = action.payload.data;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getArticlesApi.rejected, (state, action) => {
@@ -280,6 +238,7 @@ const articleSlice = createSlice({
     builder.addCase(getArticlesCategoriesApi.fulfilled, (state, action) => {
       state.articleCategories = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getArticlesCategoriesApi.rejected, (state, action) => {
@@ -331,14 +290,4 @@ const articleSlice = createSlice({
   },
 });
 
-export const {
-  getArticles,
-  addArticle,
-  updateArticle,
-  deleteArticle,
-  getArticlesCategories,
-  addArticleCategory,
-  updateArticleCategory,
-  deleteArticleCategory,
-} = articleSlice.actions;
 export default articleSlice.reducer;
