@@ -100,6 +100,15 @@ const SubAdmins = ({ dashboard }) => {
             return;
           }
         }
+        if (subAdmins.length > 0) {
+          const phoneExist = subAdmins.find(
+            (subAdmin) => subAdmin.phone === formik.values.phone
+          );
+          if (phoneExist && phoneExist.id !== formik.values.id) {
+            toast.error(t("phoneExisted"));
+            return;
+          }
+        }
         const formData = new FormData();
         formData.append("name", values.name);
         formData.append("email", values.email);
@@ -193,6 +202,12 @@ const SubAdmins = ({ dashboard }) => {
         if (result.isConfirmed) {
           dispatch(deleteSubAdmin(subAdmin.id)).then((res) => {
             if (!res.error) {
+              if (searchResults.length === 1) {
+                setToggle({
+                  ...toggle,
+                  currentPage: 1,
+                });
+              }
               dispatch(getSubAdmins());
               Swal.fire({
                 title: `تم حذف ${subAdmin?.name}`,
