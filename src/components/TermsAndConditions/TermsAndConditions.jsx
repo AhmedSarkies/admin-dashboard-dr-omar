@@ -195,6 +195,12 @@ const TermsAndConditions = () => {
           dispatch(deleteTermAndConditionApi(termsAndCondition?.id)).then(
             (res) => {
               if (!res.error) {
+                if (searchResults.length === 1) {
+                  setToggle({
+                    ...toggle,
+                    currentPage: 1,
+                  });
+                }
                 dispatch(getTermsAndConditionsApi());
                 Swal.fire({
                   title: `${t("titleDeletedSuccess")} ${
