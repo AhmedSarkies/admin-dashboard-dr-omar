@@ -20,6 +20,8 @@ import anonymous from "../../assets/images/anonymous.png";
 // import { useSchema } from "../../hooks";
 import { ImUpload } from "react-icons/im";
 import { toast } from "react-toastify";
+import Cookies from "js-cookie";
+
 const contactFields = [
   {
     name: "facebook",
@@ -80,6 +82,7 @@ const Settings = () => {
   // const { validationSchema } = useSchema();
   const { settings, loading } = useSelector((state) => state.settings);
   const fileRef = useRef();
+  const role = Cookies.get("_role");
   const fileBackgroundRef = useRef();
   const fileLogoRef = useRef();
   const [toggle, setToggle] = useState({
@@ -114,52 +117,54 @@ const Settings = () => {
     },
     // validationSchema: validationSchema.settings,
     onSubmit: (values) => {
-      const data = new FormData();
-      data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
-      data.append("code_phone", values.code_phone === true ? 1 : 0);
-      data.append("code_email", values.code_email === true ? 1 : 0);
-      data.append("facebook", values.facebook);
-      data.append("whatsapp", values.whatsapp);
-      data.append("messenger", values.messenger);
-      data.append("instagram", values.instagram);
-      data.append("play_store", values.playStore);
-      data.append("app_store", values.appStore);
-      data.append("id", 2);
-      if (values.image.file) {
-        data.append("image", values.image.file);
-      }
-      if (values.background.file) {
-        data.append("background", values.background.file);
-      }
-      if (values.logo.file) {
-        data.append("logo", values.logo.file);
-      }
-      if (settings) {
-        dispatch(updateSetting(data)).then((res) => {
-          if (!res.error) {
-            dispatch(getSettings());
-            toast.success(t("toast.settingsApp.success"));
-          } else {
-            dispatch(getSettings());
-            toast.error(t("toast.settingsApp.error"));
-          }
-        });
-      } else {
-        dispatch(
-          addSetting({
-            image: values.image.file,
-            prayer_timings: values.prayer_timings === true ? 1 : 0,
-            code_phone: values.code_phone === true ? 1 : 0,
-            code_email: values.code_email === true ? 1 : 0,
-            facebook: values.facebook,
-            whatsapp: values.whatsapp,
-            messenger: values.messenger,
-            instagram: values.instagram,
-            play_store: values.playStore,
-            app_store: values.appStore,
-            id: settings.id,
-          })
-        );
+      if (role === "admin") {
+        const data = new FormData();
+        data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
+        data.append("code_phone", values.code_phone === true ? 1 : 0);
+        data.append("code_email", values.code_email === true ? 1 : 0);
+        data.append("facebook", values.facebook);
+        data.append("whatsapp", values.whatsapp);
+        data.append("messenger", values.messenger);
+        data.append("instagram", values.instagram);
+        data.append("play_store", values.playStore);
+        data.append("app_store", values.appStore);
+        data.append("id", 2);
+        if (values.image.file) {
+          data.append("image", values.image.file);
+        }
+        if (values.background.file) {
+          data.append("background", values.background.file);
+        }
+        if (values.logo.file) {
+          data.append("logo", values.logo.file);
+        }
+        if (settings) {
+          dispatch(updateSetting(data)).then((res) => {
+            if (!res.error) {
+              dispatch(getSettings());
+              toast.success(t("toast.settingsApp.success"));
+            } else {
+              dispatch(getSettings());
+              toast.error(t("toast.settingsApp.error"));
+            }
+          });
+        } else {
+          dispatch(
+            addSetting({
+              image: values.image.file,
+              prayer_timings: values.prayer_timings === true ? 1 : 0,
+              code_phone: values.code_phone === true ? 1 : 0,
+              code_email: values.code_email === true ? 1 : 0,
+              facebook: values.facebook,
+              whatsapp: values.whatsapp,
+              messenger: values.messenger,
+              instagram: values.instagram,
+              play_store: values.playStore,
+              app_store: values.appStore,
+              id: settings.id,
+            })
+          );
+        }
       }
     },
   });
@@ -388,33 +393,37 @@ const Settings = () => {
                         className="image-preview"
                       />
                     </ModalBody>
-                    <ModalFooter className="p-md-4 p-2">
-                      <div className="form-group-container d-flex justify-content-center align-items-center">
-                        <button
-                          className="delete-btn cancel-btn"
-                          onClick={handleDeleteLogo}
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    </ModalFooter>
+                    {role === "admin" && (
+                      <ModalFooter className="p-md-4 p-2">
+                        <div className="form-group-container d-flex justify-content-center align-items-center">
+                          <button
+                            className="delete-btn cancel-btn"
+                            onClick={handleDeleteLogo}
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </ModalFooter>
+                    )}
                   </Modal>
                 </label>
               </div>
-              <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                <label htmlFor="logo" className="form-label">
-                  <ImUpload /> {t("chooseImageLogo")}
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-input form-img-input"
-                  id="logo"
-                  name="logo"
-                  ref={fileLogoRef}
-                  onChange={handleLogoChange}
-                />
-              </div>
+              {role === "admin" && (
+                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                  <label htmlFor="logo" className="form-label">
+                    <ImUpload /> {t("chooseImageLogo")}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input form-img-input"
+                    id="logo"
+                    name="logo"
+                    ref={fileLogoRef}
+                    onChange={handleLogoChange}
+                  />
+                </div>
+              )}
               {formik.errors.logo && formik.touched.logo ? (
                 <span className="error text-center">{formik.errors.logo}</span>
               ) : null}
@@ -507,32 +516,36 @@ const Settings = () => {
                         className="image-preview"
                       />
                     </ModalBody>
-                    <ModalFooter className="p-md-4 p-2">
-                      <div className="form-group-container d-flex justify-content-center align-items-center">
-                        <button
-                          className="delete-btn cancel-btn"
-                          onClick={handleDeleteImage}
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    </ModalFooter>
+                    {role === "admin" && (
+                      <ModalFooter className="p-md-4 p-2">
+                        <div className="form-group-container d-flex justify-content-center align-items-center">
+                          <button
+                            className="delete-btn cancel-btn"
+                            onClick={handleDeleteImage}
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </ModalFooter>
+                    )}
                   </Modal>
                 </label>
               </div>
-              <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                <label htmlFor="image" className="form-label">
-                  <ImUpload /> {t("chooseImageElder")}
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-input form-img-input"
-                  id="image"
-                  ref={fileRef}
-                  onChange={handleImageChange}
-                />
-              </div>
+              {role === "admin" && (
+                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                  <label htmlFor="image" className="form-label">
+                    <ImUpload /> {t("chooseImageElder")}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input form-img-input"
+                    id="image"
+                    ref={fileRef}
+                    onChange={handleImageChange}
+                  />
+                </div>
+              )}
               {formik.errors.image && formik.touched.image ? (
                 <span className="error text-center">{formik.errors.image}</span>
               ) : null}
@@ -644,32 +657,36 @@ const Settings = () => {
                         className="image-preview"
                       />
                     </ModalBody>
-                    <ModalFooter className="p-md-4 p-2">
-                      <div className="form-group-container d-flex justify-content-center align-items-center">
-                        <button
-                          className="delete-btn cancel-btn"
-                          onClick={handleDeleteBackground}
-                        >
-                          حذف
-                        </button>
-                      </div>
-                    </ModalFooter>
+                    {role === "admin" && (
+                      <ModalFooter className="p-md-4 p-2">
+                        <div className="form-group-container d-flex justify-content-center align-items-center">
+                          <button
+                            className="delete-btn cancel-btn"
+                            onClick={handleDeleteBackground}
+                          >
+                            حذف
+                          </button>
+                        </div>
+                      </ModalFooter>
+                    )}
                   </Modal>
                 </label>
               </div>
-              <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                <label htmlFor="background" className="form-label">
-                  <ImUpload /> {t("chooseBackground")}
-                </label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="form-input form-img-input"
-                  id="background"
-                  ref={fileBackgroundRef}
-                  onChange={handleBackgroundChange}
-                />
-              </div>
+              {role === "admin" && (
+                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                  <label htmlFor="background" className="form-label">
+                    <ImUpload /> {t("chooseBackground")}
+                  </label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="form-input form-img-input"
+                    id="background"
+                    ref={fileBackgroundRef}
+                    onChange={handleBackgroundChange}
+                  />
+                </div>
+              )}
               {formik.errors.background && formik.touched.background ? (
                 <span className="error text-center">
                   {formik.errors.background}
@@ -705,6 +722,7 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="prayer_timings"
                   name="prayer_timings"
+                  disabled={role === "admin" ? false : true}
                   value={formik.values.prayer_timings}
                   checked={formik.values.prayer_timings}
                   onChange={handleInputChange}
@@ -740,6 +758,7 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="code_phone"
                   name="code_phone"
+                  disabled={role === "admin" ? false : true}
                   value={formik.values.code_phone}
                   checked={formik.values.code_phone}
                   onChange={handleInputChange}
@@ -756,6 +775,7 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="code_email"
                   name="code_email"
+                  disabled={role === "admin" ? false : true}
                   value={formik.values.code_email}
                   checked={formik.values.code_email}
                   onChange={handleInputChange}
@@ -789,6 +809,7 @@ const Settings = () => {
                     id={field.name}
                     name={field.name}
                     value={formik.values[field.name]}
+                    disabled={role === "admin" ? false : true}
                     placeholder={t(
                       `settings.links.contact.columns.${field.name}`
                     )}
@@ -820,7 +841,11 @@ const Settings = () => {
               {t("settings.links.appLink.title")}
             </h3>
           </div>
-          <Row className="flex-row-reverse justify-content-between g-3">
+          <Row
+            className={`flex-row-reverse justify-content-between g-3 ${
+              role !== "admin" ? "mb-5" : ""
+            }`}
+          >
             {appFields.map((field, index) => (
               <Col md="6" key={index}>
                 <div className="form-group">
@@ -830,6 +855,7 @@ const Settings = () => {
                     id={field.name}
                     name={field.name}
                     value={formik.values[field.name]}
+                    disabled={role === "admin" ? false : true}
                     placeholder={t(
                       `settings.links.appLink.columns.${field.name}`
                     )}
@@ -845,24 +871,29 @@ const Settings = () => {
               </Col>
             ))}
           </Row>
-          <Row>
-            <Col md="12">
-              <div className="form-group-container d-flex justify-content-center mt-5 mb-3">
-                <button type="submit" className="add-btn">
-                  {/* loading */}
-                  {loading ? (
-                    <span
-                      className="spinner-border spinner-border-sm"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
-                  ) : (
-                    t("save")
-                  )}
-                </button>
-              </div>
-            </Col>
-          </Row>
+          {role === "admin" && (
+            <Row>
+              <Col md="12">
+                <div className="form-group-container d-flex justify-content-center mt-5 mb-3">
+                  <button
+                    type="submit"
+                    className={`add-btn${loading ? " loading-btn" : ""}`}
+                  >
+                    {/* loading */}
+                    {loading ? (
+                      <span
+                        className="spinner-border spinner-border-sm"
+                        role="status"
+                        aria-hidden="true"
+                      ></span>
+                    ) : (
+                      t("save")
+                    )}
+                  </button>
+                </div>
+              </Col>
+            </Row>
+          )}
         </form>
       </div>
     </>
