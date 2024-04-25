@@ -117,30 +117,7 @@ export const getApprovedScholarsApi = createAsyncThunk(
 const scholarSlice = createSlice({
   name: "scholar",
   initialState,
-  reducers: {
-    // Get Scholars
-    getScholars: (state, action) => {
-      state.scholars = action.payload.data;
-    },
-    // Update Scholar
-    updateScholar: (state, action) => {
-      state.scholars = state.scholars.map((scholar) =>
-        scholar.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : scholar
-      );
-    },
-    // Delete Scholar
-    deleteScholar: (state, action) => {
-      state.scholars = state.scholars.filter(
-        (scholar) => scholar.id !== action.payload
-      );
-    },
-    // Get Approved Scholars
-    getApprovedScholars: (state, action) => {
-      state.approvedScholars = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Scholars======
     // Pending
@@ -151,6 +128,7 @@ const scholarSlice = createSlice({
     builder.addCase(getScholarsApi.fulfilled, (state, action) => {
       state.scholars = action.payload.data;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getScholarsApi.rejected, (state, action) => {
@@ -166,6 +144,7 @@ const scholarSlice = createSlice({
     builder.addCase(getScholarByIdApi.fulfilled, (state, action) => {
       state.dataById = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getScholarByIdApi.rejected, (state, action) => {
@@ -227,6 +206,7 @@ const scholarSlice = createSlice({
     builder.addCase(getApprovedScholarsApi.fulfilled, (state, action) => {
       state.approvedScholars = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getApprovedScholarsApi.rejected, (state, action) => {
@@ -236,10 +216,4 @@ const scholarSlice = createSlice({
   },
 });
 
-export const {
-  getScholars,
-  getApprovedScholars,
-  updateScholar,
-  deleteScholar,
-} = scholarSlice.actions;
 export default scholarSlice.reducer;
