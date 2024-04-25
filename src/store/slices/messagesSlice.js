@@ -32,12 +32,7 @@ export const getMessagesApi = createAsyncThunk(
 const messagesSlice = createSlice({
   name: "messages",
   initialState,
-  reducers: {
-    // Get Messages
-    getMessages: (state, action) => {
-      state.messages = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Messages======
     // Pending
@@ -48,6 +43,7 @@ const messagesSlice = createSlice({
     builder.addCase(getMessagesApi.fulfilled, (state, action) => {
       state.messages = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getMessagesApi.rejected, (state, action) => {
@@ -57,5 +53,4 @@ const messagesSlice = createSlice({
   },
 });
 
-export const { getMessages } = messagesSlice.actions;
 export default messagesSlice.reducer;
