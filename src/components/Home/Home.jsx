@@ -69,7 +69,11 @@ const Home = () => {
     },
     {
       title: t("linkItems.subCategoriesBooks"),
-      path: "/dr-omar/sub-categories-book",
+      path: "/dr-omar/sub-main-categories-book",
+    },
+    {
+      title: t("linkItems.SubSubCategoriesBooks"),
+      path: "/dr-omar/sub-sub-categories-book",
     },
     {
       title: t("linkItems.categoriesAudio"),
