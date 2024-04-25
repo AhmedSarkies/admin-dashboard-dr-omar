@@ -1245,6 +1245,39 @@ div[tabindex] {
   padding: 0.25rem 0.5rem;
   border-radius: 5px;
 }
+.password {
+  position: relative;
+}
+.password .show-hide-password {
+  position: absolute;
+  left: 1%;
+  top: 65%;
+  transform: translateY(-50%);
+  cursor: pointer;
+}
+[lang="en"] .password .show-hide-password {
+  right: 1%;
+}
+[lang="en"] .dropdown-users .dropdown-content,
+.users_all {
+  direction: rtl;
+  margin-left: 1rem;
+}
+.password.change-password-profile svg {
+  position: absolute;
+  top: 50%;
+  transform: translate(100%, -50%);
+  left: 0;
+}
+[lang="en"] .password.change-password-profile svg {
+  transform: translate(-100%, -50%);
+  right: 0;
+}
+.loading-btn {
+  cursor: default;
+  pointer-events: none;
+}
+
 /* Media Screens */
 @media only screen and (max-width: 1200px) {
   .dashboard-container {
