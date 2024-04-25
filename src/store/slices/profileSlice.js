@@ -10,8 +10,8 @@ const initialState = {
 };
 
 // Get Profile Admin using Axios and Redux Thunk
-export const getProfileAdmin = createAsyncThunk(
-  "profile/getProfileAdmin",
+export const getProfile = createAsyncThunk(
+  "profile/getProfile",
   async (_, { rejectWithValue }) => {
     try {
       const response = await Http({
@@ -20,6 +20,24 @@ export const getProfileAdmin = createAsyncThunk(
         params: { id: Cookies.get("_id") },
       });
       return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Update Profile Admin using Axios and Redux Thunk
+export const updateProfile = createAsyncThunk(
+  "profile/updateProfile",
+  async (data, { rejectWithValue }) => {
+    try {
+      await Http({
+        method: "POST",
+        url: "/admin/updateAdmin",
+        data,
+      }).then((response) => {
+        return response.data;
+      });
     } catch (error) {
       return rejectWithValue(error.message);
     }
@@ -39,7 +57,6 @@ export const changePassword = createAsyncThunk(
           new_password: data.new_password,
           new_password_confirmation: data.new_password_confirmation,
         },
-        params: { id: data.id },
       }).then((response) => {
         return response.data;
       });
@@ -57,16 +74,31 @@ const profileSlice = createSlice({
   extraReducers: (builder) => {
     // ======Get Profile Admin======
     // Pending
-    builder.addCase(getProfileAdmin.pending, (state, action) => {
+    builder.addCase(getProfile.pending, (state, action) => {
       state.loading = true;
     });
     // Fulfilled
-    builder.addCase(getProfileAdmin.fulfilled, (state, action) => {
+    builder.addCase(getProfile.fulfilled, (state, action) => {
       state.profile = action.payload.data;
+      state.loading = false;
+      state.error = null;
+    });
+    // Rejected
+    builder.addCase(getProfile.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Update Profile Admin======
+    // Pending
+    builder.addCase(updateProfile.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(updateProfile.fulfilled, (state, action) => {
       state.loading = false;
     });
     // Rejected
-    builder.addCase(getProfileAdmin.rejected, (state, action) => {
+    builder.addCase(updateProfile.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
