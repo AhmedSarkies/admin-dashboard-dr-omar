@@ -164,44 +164,7 @@ export const deleteAudioCategoryApi = createAsyncThunk(
 const audioSlice = createSlice({
   name: "audio",
   initialState,
-  reducers: {
-    // Get Audios
-    getAudios: (state, action) => {
-      state.audios = action.payload.data;
-    },
-    // Update Audio
-    updateAudio: (state, action) => {
-      state.audios = state.audios.map((audio) =>
-        audio.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : audio
-      );
-    },
-    // Delete Audio
-    deleteAudio: (state, action) => {
-      state.audios = state.audios.filter(
-        (audio) => audio.id !== action.payload
-      );
-    },
-    // Get Audios Category
-    getAudiosCategories: (state, action) => {
-      state.audioCategories = action.payload;
-    },
-    // Update Audio Category
-    updateAudioCategory: (state, action) => {
-      state.audioCategories = state.audioCategories.map((category) =>
-        category.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : category
-      );
-    },
-    // Delete Audio Category
-    deleteAudioCategory: (state, action) => {
-      state.audioCategories = state.audioCategories.filter(
-        (category) => category.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Audios======
     // Pending
@@ -212,6 +175,7 @@ const audioSlice = createSlice({
     builder.addCase(getAudiosApi.fulfilled, (state, action) => {
       state.audios = action.payload.data;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getAudiosApi.rejected, (state, action) => {
@@ -273,6 +237,7 @@ const audioSlice = createSlice({
     builder.addCase(getAudiosCategoriesApi.fulfilled, (state, action) => {
       state.audioCategories = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getAudiosCategoriesApi.rejected, (state, action) => {
@@ -324,13 +289,4 @@ const audioSlice = createSlice({
   },
 });
 
-export const {
-  getAudios,
-  updateAudio,
-  deleteAudio,
-  getAudiosCategories,
-  addAudioCategory,
-  updateAudioCategory,
-  deleteAudioCategory,
-} = audioSlice.actions;
 export default audioSlice.reducer;
