@@ -1,7 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
 import {
   Col,
   Modal,
@@ -11,7 +9,6 @@ import {
   Row,
   Spinner,
 } from "reactstrap";
-
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
 import { FaEdit } from "react-icons/fa";
@@ -20,23 +17,17 @@ import { IoMdClose, IoMdEye } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
 import {
   deleteArticleApi,
-  getArticles,
   getArticlesApi,
   addArticleApi,
   updateArticleApi,
   getArticlesCategoriesApi,
-  getArticlesCategories,
-  deleteArticle,
 } from "../../store/slices/articleSlice";
-import {
-  getApprovedScholarsApi,
-  getApprovedScholars,
-} from "../../store/slices/scholarSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
 import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
+import Cookies from "js-cookie";
 
 const initialValues = {
   image: {
@@ -57,6 +48,7 @@ const initialValues = {
 
 const Articles = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
@@ -114,7 +106,7 @@ const Articles = () => {
     { id: 3, name: "title", label: t("articles.columns.title") },
     { id: 4, name: "content", label: t("articles.columns.article") },
     { id: 5, name: "category", label: t("articles.columns.category") },
-    { id: 6, name: "status", label: t("status") },
+    { id: 6, name: "status", label: t("content") },
     { id: 7, name: "visitCount", label: t("visits") },
     { id: 8, name: "favorites", label: t("favorites") },
     { id: 9, name: "shares", label: t("shares") },
@@ -139,75 +131,79 @@ const Articles = () => {
     initialValues,
     validationSchema: validationSchema.article,
     onSubmit: (values) => {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("content", values.content);
-      formData.append("writer", values.writer);
-      formData.append("is_active", values.is_active);
-      formData.append("showWriter", values.showWriter);
-      formData.append("articles_categories_id", values.articleCategories.id);
-      formData.append(
-        "status",
-        values.status === "Private"
-          ? "Private"
-          : values.status === "Public"
-          ? "Public"
-          : "Private"
-      );
-      if (values?.id) {
-        // if the article don't change anything even the image
-        const article = articles.find((article) => article?.id === values?.id);
-        if (
-          article.title === values.title &&
-          article.status === values.status &&
-          article.image === values.image &&
-          article.content === values.content &&
-          article.elder.id === values.elder.id &&
-          article.articleCategories.id === values.articleCategories.id
-        ) {
-          setToggle({ ...toggle, edit: !toggle.edit });
-          toast.error(t("noChange"));
+      if (role === "admin") {
+        const formData = new FormData();
+        formData.append("title", values.title);
+        formData.append("content", values.content);
+        formData.append("writer", values.writer);
+        formData.append("is_active", values.is_active);
+        formData.append("showWriter", values.showWriter);
+        formData.append("articles_categories_id", values.articleCategories.id);
+        formData.append(
+          "status",
+          values.status === "Private"
+            ? "Private"
+            : values.status === "Public"
+            ? "Public"
+            : "Private"
+        );
+        if (values?.id) {
+          // if the article don't change anything even the image
+          const article = articles.find(
+            (article) => article?.id === values?.id
+          );
+          if (
+            article.title === values.title &&
+            article.status === values.status &&
+            article.image === values.image &&
+            article.content === values.content &&
+            article.elder.id === values.elder.id &&
+            article.articleCategories.id === values.articleCategories.id
+          ) {
+            setToggle({ ...toggle, edit: !toggle.edit });
+            toast.error(t("noChange"));
+          } else {
+            formData.append("id", values.id);
+            if (values.image.file !== "") {
+              formData.append("image", values.image.file);
+            }
+            if (values.image.file === undefined) {
+              formData.append(
+                "image",
+                `${values?.image?.split("Articles_image")[0]}Articles_image`
+              );
+            }
+            dispatch(updateArticleApi(formData)).then((res) => {
+              dispatch(getArticlesApi());
+              if (!res.error) {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  edit: !toggle.edit,
+                  add: !toggle.add,
+                });
+                toast.success(t("toast.article.updatedSuccess"));
+              } else {
+                toast.error(t("toast.article.updatedError"));
+              }
+            });
+          }
         } else {
-          formData.append("id", values.id);
-          if (values.image.file !== "") {
-            formData.append("image", values.image.file);
-          }
-          if (values.image.file === undefined) {
-            formData.append(
-              "image",
-              `${values?.image?.split("Articles_image")[0]}Articles_image`
-            );
-          }
-          dispatch(updateArticleApi(formData)).then((res) => {
+          formData.append("image", values.image.file);
+          dispatch(addArticleApi(formData)).then((res) => {
             dispatch(getArticlesApi());
             if (!res.error) {
               formik.handleReset();
               setToggle({
                 ...toggle,
-                edit: !toggle.edit,
                 add: !toggle.add,
               });
-              toast.success(t("toast.article.updatedSuccess"));
+              toast.success(t("toast.article.addedSuccess"));
             } else {
-              toast.error(t("toast.article.updatedError"));
+              toast.error(t("toast.article.addedError"));
             }
           });
         }
-      } else {
-        formData.append("image", values.image.file);
-        dispatch(addArticleApi(formData)).then((res) => {
-          dispatch(getArticlesApi());
-          if (!res.error) {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            toast.success(t("toast.article.addedSuccess"));
-          } else {
-            toast.error(t("toast.article.addedError"));
-          }
-        });
       }
     },
   });
@@ -288,7 +284,7 @@ const Articles = () => {
       if (result.isConfirmed) {
         dispatch(deleteArticleApi(article?.id)).then((res) => {
           if (!res.error) {
-            dispatch(deleteArticle(article?.id));
+            dispatch(getArticlesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${article?.title}`,
               text: `${t("titleDeletedSuccess")} ${article?.title} ${t(
@@ -299,6 +295,7 @@ const Articles = () => {
               confirmButtonText: t("doneDeletedSuccess"),
             }).then(() => toast.success(t("toast.article.deletedSuccess")));
           } else {
+            dispatch(getArticlesApi());
             toast.error(t("toast.article.deletedError"));
           }
         });
@@ -309,42 +306,33 @@ const Articles = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getArticlesApi()).then((res) => {
-        if (!res.error) {
-          dispatch(getArticles(res.payload));
-        }
-      });
-      dispatch(getArticlesCategoriesApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getArticlesCategories(res.payload));
-        }
-      });
-      dispatch(getApprovedScholarsApi()).then((res) => {
-        if (!res.error && res.payload.length > 0) {
-          dispatch(getApprovedScholars(res.payload));
-        }
-      });
+      dispatch(getArticlesApi());
+      if (role === "admin") {
+        dispatch(getArticlesCategoriesApi());
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, role]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("articles.addTitle")}
-        </button>
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("articles.addTitle")}
+          </button>
+        </div>
+      )}
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
@@ -481,7 +469,7 @@ const Articles = () => {
               )}
               {toggle.toggleColumns.status && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("status")}
+                  {t("content")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -690,35 +678,39 @@ const Articles = () => {
                                   : result?.status === t("private")
                                   ? "red"
                                   : "red",
-                              cursor: "pointer",
+                              cursor: role === "admin" ? "pointer" : "default",
                             }}
                             onClick={() => {
-                              const data = {
-                                id: result.id,
-                                title: result.title,
-                                content: result.content,
-                                writer: result.writer,
-                                articles_categories_id: result.Category.id,
-                                status:
-                                  result?.status === t("public")
-                                    ? "Private"
-                                    : "Public",
-                                is_active:
-                                  result?.is_active === t("active") ? 1 : 0,
-                                showWriter:
-                                  result?.showWriter === t("show") ? 1 : 0,
-                              };
-                              dispatch(updateArticleApi(data)).then((res) => {
-                                if (!res.error) {
-                                  dispatch(getArticlesApi());
-                                  toast.success(
-                                    t("toast.article.updatedSuccess")
-                                  );
-                                } else {
-                                  dispatch(getArticlesApi());
-                                  toast.error(t("toast.article.updatedError"));
-                                }
-                              });
+                              if (role === "admin") {
+                                const data = {
+                                  id: result.id,
+                                  title: result.title,
+                                  content: result.content,
+                                  writer: result.writer,
+                                  articles_categories_id: result.Category.id,
+                                  status:
+                                    result?.status === t("public")
+                                      ? "Private"
+                                      : "Public",
+                                  is_active:
+                                    result?.is_active === t("active") ? 1 : 0,
+                                  showWriter:
+                                    result?.showWriter === t("show") ? 1 : 0,
+                                };
+                                dispatch(updateArticleApi(data)).then((res) => {
+                                  if (!res.error) {
+                                    dispatch(getArticlesApi());
+                                    toast.success(
+                                      t("toast.article.updatedSuccess")
+                                    );
+                                  } else {
+                                    dispatch(getArticlesApi());
+                                    toast.error(
+                                      t("toast.article.updatedError")
+                                    );
+                                  }
+                                });
+                              }
                             }}
                           >
                             {result?.status === t("public")
@@ -747,35 +739,39 @@ const Articles = () => {
                                 result?.is_active === t("active")
                                   ? "green"
                                   : "red",
-                              cursor: "pointer",
+                              cursor: role === "admin" ? "pointer" : "default",
                             }}
                             onClick={() => {
-                              const data = {
-                                id: result.id,
-                                title: result.title,
-                                content: result.content,
-                                writer: result.writer,
-                                articles_categories_id: result.Category.id,
-                                status:
-                                  result?.status === t("public")
-                                    ? "Public"
-                                    : "Private",
-                                is_active:
-                                  result?.is_active === t("active") ? 0 : 1,
-                                showWriter:
-                                  result?.showWriter === t("show") ? 1 : 0,
-                              };
-                              dispatch(updateArticleApi(data)).then((res) => {
-                                if (!res.error) {
-                                  dispatch(getArticlesApi());
-                                  toast.success(
-                                    t("toast.article.updatedSuccess")
-                                  );
-                                } else {
-                                  dispatch(getArticlesApi());
-                                  toast.error(t("toast.article.updatedError"));
-                                }
-                              });
+                              if (role === "admin") {
+                                const data = {
+                                  id: result.id,
+                                  title: result.title,
+                                  content: result.content,
+                                  writer: result.writer,
+                                  articles_categories_id: result.Category.id,
+                                  status:
+                                    result?.status === t("public")
+                                      ? "Public"
+                                      : "Private",
+                                  is_active:
+                                    result?.is_active === t("active") ? 0 : 1,
+                                  showWriter:
+                                    result?.showWriter === t("show") ? 1 : 0,
+                                };
+                                dispatch(updateArticleApi(data)).then((res) => {
+                                  if (!res.error) {
+                                    dispatch(getArticlesApi());
+                                    toast.success(
+                                      t("toast.article.updatedSuccess")
+                                    );
+                                  } else {
+                                    dispatch(getArticlesApi());
+                                    toast.error(
+                                      t("toast.article.updatedError")
+                                    );
+                                  }
+                                });
+                              }
                             }}
                           >
                             {result?.is_active === t("active")
@@ -793,35 +789,39 @@ const Articles = () => {
                                 result?.showWriter === t("show")
                                   ? "green"
                                   : "red",
-                              cursor: "pointer",
+                              cursor: role === "admin" ? "pointer" : "default",
                             }}
                             onClick={() => {
-                              const data = {
-                                id: result.id,
-                                title: result.title,
-                                content: result.content,
-                                writer: result.writer,
-                                articles_categories_id: result.Category.id,
-                                status:
-                                  result?.status === t("public")
-                                    ? "Public"
-                                    : "Private",
-                                is_active:
-                                  result?.is_active === t("active") ? 1 : 0,
-                                showWriter:
-                                  result?.showWriter === t("show") ? 0 : 1,
-                              };
-                              dispatch(updateArticleApi(data)).then((res) => {
-                                if (!res.error) {
-                                  dispatch(getArticlesApi());
-                                  toast.success(
-                                    t("toast.article.updatedSuccess")
-                                  );
-                                } else {
-                                  dispatch(getArticlesApi());
-                                  toast.error(t("toast.article.updatedError"));
-                                }
-                              });
+                              if (role === "admin") {
+                                const data = {
+                                  id: result.id,
+                                  title: result.title,
+                                  content: result.content,
+                                  writer: result.writer,
+                                  articles_categories_id: result.Category.id,
+                                  status:
+                                    result?.status === t("public")
+                                      ? "Public"
+                                      : "Private",
+                                  is_active:
+                                    result?.is_active === t("active") ? 1 : 0,
+                                  showWriter:
+                                    result?.showWriter === t("show") ? 0 : 1,
+                                };
+                                dispatch(updateArticleApi(data)).then((res) => {
+                                  if (!res.error) {
+                                    dispatch(getArticlesApi());
+                                    toast.success(
+                                      t("toast.article.updatedSuccess")
+                                    );
+                                  } else {
+                                    dispatch(getArticlesApi());
+                                    toast.error(
+                                      t("toast.article.updatedError")
+                                    );
+                                  }
+                                });
+                              }
                             }}
                           >
                             {result?.showWriter === t("show")
@@ -839,17 +839,21 @@ const Articles = () => {
                                   ...toggle,
                                   readMore: !toggle.readMore,
                                 });
-                                handleEdit(result);
+                                formik.setValues(result);
                               }}
                             />
-                            <FaEdit
-                              className="edit-btn"
-                              onClick={() => handleEdit(result)}
-                            />
-                            <MdDeleteOutline
-                              className="delete-btn"
-                              onClick={() => handleDelete(result)}
-                            />
+                            {role === "admin" && (
+                              <>
+                                <FaEdit
+                                  className="edit-btn"
+                                  onClick={() => handleEdit(result)}
+                                />
+                                <MdDeleteOutline
+                                  className="delete-btn"
+                                  onClick={() => handleDelete(result)}
+                                />
+                              </>
+                            )}
                           </span>
                         </td>
                       )}
@@ -860,105 +864,61 @@ const Articles = () => {
             )}
         </table>
       </div>
-      {/* Add Article */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          formik.handleReset();
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-            edit: !toggle.edit,
-          });
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              edit: false,
-            });
-          }}
-        >
-          {formik.values.id ? t("articles.editTitle") : t("articles.addTitle")}
-          <IoMdClose
-            onClick={() => {
+      {role === "admin" && (
+        <>
+          {/* Add/Edit Article */}
+          <Modal
+            isOpen={toggle.add}
+            toggle={() => {
               formik.handleReset();
               setToggle({
                 ...toggle,
                 add: !toggle.add,
-                edit: false,
+                edit: !toggle.edit,
               });
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3 pb-0">
-              {formik.values.id ? (
-                <Col
-                  lg={5}
-                  className="d-flex flex-column justify-content-center align-items-center"
-                >
-                  <div className="image-preview-container d-flex justify-content-center align-items-center">
-                    <label
-                      htmlFor={formik.values.image.preview ? "" : "image"}
-                      className="form-label d-flex justify-content-center align-items-center"
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                  edit: false,
+                });
+              }}
+            >
+              {formik.values.id
+                ? t("articles.editTitle")
+                : t("articles.addTitle")}
+              <IoMdClose
+                onClick={() => {
+                  formik.handleReset();
+                  setToggle({
+                    ...toggle,
+                    add: !toggle.add,
+                    edit: false,
+                  });
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3 pb-0">
+                  {formik.values.id ? (
+                    <Col
+                      lg={5}
+                      className="d-flex flex-column justify-content-center align-items-center"
                     >
-                      <img
-                        src={
-                          formik.values.image && formik.values.image.preview
-                            ? formik.values.image.preview
-                            : anonymous
-                        }
-                        alt="avatar"
-                        className="image-preview"
-                        onClick={() =>
-                          formik.values.image && formik.values.image.preview
-                            ? setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            : ""
-                        }
-                      />
-                      <Modal
-                        isOpen={toggle.imagePreview}
-                        toggle={() =>
-                          setToggle({
-                            ...toggle,
-                            imagePreview: !toggle.imagePreview,
-                          })
-                        }
-                        centered={true}
-                        keyboard={true}
-                        size={"md"}
-                        contentClassName="modal-preview-image modal-add-scholar"
-                      >
-                        <ModalHeader
-                          toggle={() =>
-                            setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          }
+                      <div className="image-preview-container d-flex justify-content-center align-items-center">
+                        <label
+                          htmlFor={formik.values.image.preview ? "" : "image"}
+                          className="form-label d-flex justify-content-center align-items-center"
                         >
-                          <IoMdClose
-                            onClick={() =>
-                              setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            }
-                          />
-                        </ModalHeader>
-                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
                           <img
                             src={
                               formik.values.image && formik.values.image.preview
@@ -967,111 +927,105 @@ const Articles = () => {
                             }
                             alt="avatar"
                             className="image-preview"
-                          />
-                        </ModalBody>
-                        <ModalFooter className="p-md-4 p-2">
-                          <div className="form-group-container d-flex justify-content-center align-items-center">
-                            <button
-                              className="delete-btn cancel-btn"
-                              onClick={handleDeleteImage}
-                            >
-                              {t("delete")}
-                            </button>
-                          </div>
-                        </ModalFooter>
-                      </Modal>
-                    </label>
-                  </div>
-                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                    <label htmlFor="image" className="form-label">
-                      <ImUpload /> {t("chooseImage")}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-input form-img-input"
-                      id="image"
-                      ref={fileRef}
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                  {formik.errors.image && formik.touched.image ? (
-                    <span className="error text-center">
-                      {formik.errors.image}
-                    </span>
-                  ) : null}
-                </Col>
-              ) : (
-                <Col
-                  lg={5}
-                  className="d-flex flex-column justify-content-center align-items-center"
-                >
-                  <div className="image-preview-container d-flex justify-content-center align-items-center">
-                    <label
-                      htmlFor={
-                        formik.values.image?.file
-                          ? ""
-                          : formik.values.image?.file === undefined
-                          ? ""
-                          : "image"
-                      }
-                      className="form-label d-flex justify-content-center align-items-center"
-                    >
-                      <img
-                        src={
-                          formik.values.image?.file
-                            ? formik.values.image?.preview
-                            : formik.values.image?.file === undefined
-                            ? formik.values.image
-                            : anonymous
-                        }
-                        alt="avatar"
-                        className="image-preview"
-                        onClick={() =>
-                          formik.values.image?.file
-                            ? setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            : formik.values.image?.file === undefined
-                            ? setToggle({
-                                ...toggle,
-                                imagePreview: !toggle.imagePreview,
-                              })
-                            : ""
-                        }
-                      />
-                      <Modal
-                        isOpen={toggle.imagePreview}
-                        toggle={() =>
-                          setToggle({
-                            ...toggle,
-                            imagePreview: !toggle.imagePreview,
-                          })
-                        }
-                        centered={true}
-                        keyboard={true}
-                        size={"md"}
-                        contentClassName="modal-preview-image modal-add-scholar"
-                      >
-                        <ModalHeader
-                          toggle={() =>
-                            setToggle({
-                              ...toggle,
-                              imagePreview: !toggle.imagePreview,
-                            })
-                          }
-                        >
-                          <IoMdClose
                             onClick={() =>
+                              formik.values.image && formik.values.image.preview
+                                ? setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  })
+                                : ""
+                            }
+                          />
+                          <Modal
+                            isOpen={toggle.imagePreview}
+                            toggle={() =>
                               setToggle({
                                 ...toggle,
                                 imagePreview: !toggle.imagePreview,
                               })
                             }
-                          />
-                        </ModalHeader>
-                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                            centered={true}
+                            keyboard={true}
+                            size={"md"}
+                            contentClassName="modal-preview-image modal-add-scholar"
+                          >
+                            <ModalHeader
+                              toggle={() =>
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                              }
+                            >
+                              <IoMdClose
+                                onClick={() =>
+                                  setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  })
+                                }
+                              />
+                            </ModalHeader>
+                            <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                              <img
+                                src={
+                                  formik.values.image &&
+                                  formik.values.image.preview
+                                    ? formik.values.image.preview
+                                    : anonymous
+                                }
+                                alt="avatar"
+                                className="image-preview"
+                              />
+                            </ModalBody>
+                            <ModalFooter className="p-md-4 p-2">
+                              <div className="form-group-container d-flex justify-content-center align-items-center">
+                                <button
+                                  className="delete-btn cancel-btn"
+                                  onClick={handleDeleteImage}
+                                >
+                                  {t("delete")}
+                                </button>
+                              </div>
+                            </ModalFooter>
+                          </Modal>
+                        </label>
+                      </div>
+                      <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                        <label htmlFor="image" className="form-label">
+                          <ImUpload /> {t("chooseImage")}
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="form-input form-img-input"
+                          id="image"
+                          ref={fileRef}
+                          onChange={handleImageChange}
+                        />
+                      </div>
+                      {formik.errors.image && formik.touched.image ? (
+                        <span className="error text-center">
+                          {formik.errors.image}
+                        </span>
+                      ) : null}
+                    </Col>
+                  ) : (
+                    <Col
+                      lg={5}
+                      className="d-flex flex-column justify-content-center align-items-center"
+                    >
+                      <div className="image-preview-container d-flex justify-content-center align-items-center">
+                        <label
+                          htmlFor={
+                            formik.values.image?.file
+                              ? ""
+                              : formik.values.image?.file === undefined
+                              ? ""
+                              : "image"
+                          }
+                          className="form-label d-flex justify-content-center align-items-center"
+                        >
                           <img
                             src={
                               formik.values.image?.file
@@ -1082,434 +1036,497 @@ const Articles = () => {
                             }
                             alt="avatar"
                             className="image-preview"
+                            onClick={() =>
+                              formik.values.image?.file
+                                ? setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  })
+                                : formik.values.image?.file === undefined
+                                ? setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  })
+                                : ""
+                            }
                           />
-                        </ModalBody>
-                        <ModalFooter className="p-md-4 p-2">
-                          <div className="form-group-container d-flex justify-content-center align-items-center">
-                            <button
-                              className="delete-btn cancel-btn"
-                              onClick={handleDeleteImage}
+                          <Modal
+                            isOpen={toggle.imagePreview}
+                            toggle={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                            centered={true}
+                            keyboard={true}
+                            size={"md"}
+                            contentClassName="modal-preview-image modal-add-scholar"
+                          >
+                            <ModalHeader
+                              toggle={() =>
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                })
+                              }
                             >
-                              {t("delete")}
-                            </button>
-                          </div>
-                        </ModalFooter>
-                      </Modal>
-                    </label>
-                  </div>
-                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                    <label htmlFor="image" className="form-label">
-                      <ImUpload /> {t("chooseImage")}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-input form-img-input"
-                      id="image"
-                      ref={fileRef}
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                  {formik.errors.image && formik.touched.image ? (
-                    <span className="error text-center">
-                      {formik.errors.image}
-                    </span>
-                  ) : null}
-                </Col>
-              )}
-              <Col lg={7}>
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="writer" className="form-label">
-                    {t("articles.columns.writer")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="writer"
-                    placeholder={t("articles.columns.writer")}
-                    name="writer"
-                    value={formik.values.writer}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.writer && formik.touched.writer ? (
-                    <span className="error">{formik.errors.writer}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
-                  <label htmlFor="showWriter" className="form-label">
-                    {t("showWriter")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          showWriter: !toggle.showWriter,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.showWriter === 1
-                        ? t("show")
-                        : formik.values.showWriter === 0
-                        ? t("hide")
-                        : t("showWriter")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.showWriter ? "active" : ""
-                        }`}
-                      />
-                    </button>
+                              <IoMdClose
+                                onClick={() =>
+                                  setToggle({
+                                    ...toggle,
+                                    imagePreview: !toggle.imagePreview,
+                                  })
+                                }
+                              />
+                            </ModalHeader>
+                            <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                              <img
+                                src={
+                                  formik.values.image?.file
+                                    ? formik.values.image?.preview
+                                    : formik.values.image?.file === undefined
+                                    ? formik.values.image
+                                    : anonymous
+                                }
+                                alt="avatar"
+                                className="image-preview"
+                              />
+                            </ModalBody>
+                            <ModalFooter className="p-md-4 p-2">
+                              <div className="form-group-container d-flex justify-content-center align-items-center">
+                                <button
+                                  className="delete-btn cancel-btn"
+                                  onClick={handleDeleteImage}
+                                >
+                                  {t("delete")}
+                                </button>
+                              </div>
+                            </ModalFooter>
+                          </Modal>
+                        </label>
+                      </div>
+                      <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                        <label htmlFor="image" className="form-label">
+                          <ImUpload /> {t("chooseImage")}
+                        </label>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="form-input form-img-input"
+                          id="image"
+                          ref={fileRef}
+                          onChange={handleImageChange}
+                        />
+                      </div>
+                      {formik.errors.image && formik.touched.image ? (
+                        <span className="error text-center">
+                          {formik.errors.image}
+                        </span>
+                      ) : null}
+                    </Col>
+                  )}
+                  <Col lg={7}>
                     <div
-                      className={`dropdown-content ${
-                        toggle.showWriter ? "active" : ""
-                      }`}
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
                     >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.showWriter === 0 ? "active" : ""
-                        }`}
-                        value="hide"
-                        name="showWriter"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            showWriter: !toggle.showWriter,
-                          });
-                          formik.setFieldValue("showWriter", 0);
-                        }}
-                      >
-                        {t("hide")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.showWriter === 1 ? "active" : ""
-                        }`}
-                        value="show"
-                        name="showWriter"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            showWriter: !toggle.showWriter,
-                          });
-                          formik.setFieldValue("showWriter", 1);
-                        }}
-                      >
-                        {t("show")}
-                      </button>
+                      <label htmlFor="writer" className="form-label">
+                        {t("articles.columns.writer")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="writer"
+                        placeholder={t("articles.columns.writer")}
+                        name="writer"
+                        value={formik.values.writer}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.writer && formik.touched.writer ? (
+                        <span className="error">{formik.errors.writer}</span>
+                      ) : null}
                     </div>
-                  </div>
-                  {formik.errors.showWriter && formik.touched.showWriter ? (
-                    <span className="error">{formik.errors.showWriter}</span>
-                  ) : null}
-                </div>
-              </Col>
-            </Row>
-            <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0">
-              <Col lg={6}>
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="title" className="form-label">
-                    {t("articles.columns.title")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="title"
-                    placeholder={t("articles.columns.title")}
-                    name="title"
-                    value={formik.values.title}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="articleCategories" className="form-label">
-                    {t("articles.columns.category")}
-                  </label>
-                  <div
-                    className={`dropdown form-input ${
-                      toggle.articleCategories ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          articleCategories: !toggle.articleCategories,
-                        });
-                      }}
-                      className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.articleCategories?.title
-                        ? formik.values.articleCategories?.title
-                        : t("chooseCategory")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.articleCategories ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.articleCategories ? "active" : ""
-                      }`}
-                    >
-                      {articleCategories?.map((category) => (
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
+                      <label htmlFor="showWriter" className="form-label">
+                        {t("showWriter")}
+                      </label>
+                      <div className="dropdown form-input">
                         <button
                           type="button"
-                          key={category?.id}
-                          className={`item ${
-                            formik.values.articleCategories?.id === category?.id
-                              ? "active"
-                              : ""
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              showWriter: !toggle.showWriter,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.showWriter === 1
+                            ? t("show")
+                            : formik.values.showWriter === 0
+                            ? t("hide")
+                            : t("showWriter")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.showWriter ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.showWriter ? "active" : ""
                           }`}
-                          value={category?.id}
-                          name="articleCategories"
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.showWriter === 0 ? "active" : ""
+                            }`}
+                            value="hide"
+                            name="showWriter"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                showWriter: !toggle.showWriter,
+                              });
+                              formik.setFieldValue("showWriter", 0);
+                            }}
+                          >
+                            {t("hide")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.showWriter === 1 ? "active" : ""
+                            }`}
+                            value="show"
+                            name="showWriter"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                showWriter: !toggle.showWriter,
+                              });
+                              formik.setFieldValue("showWriter", 1);
+                            }}
+                          >
+                            {t("show")}
+                          </button>
+                        </div>
+                      </div>
+                      {formik.errors.showWriter && formik.touched.showWriter ? (
+                        <span className="error">
+                          {formik.errors.showWriter}
+                        </span>
+                      ) : null}
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0">
+                  <Col lg={6}>
+                    <div
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
+                    >
+                      <label htmlFor="title" className="form-label">
+                        {t("articles.columns.title")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="title"
+                        placeholder={t("articles.columns.title")}
+                        name="title"
+                        value={formik.values.title}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.title && formik.touched.title ? (
+                        <span className="error">{formik.errors.title}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={6}>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="articleCategories" className="form-label">
+                        {t("articles.columns.category")}
+                      </label>
+                      <div
+                        className={`dropdown form-input ${
+                          toggle.articleCategories ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
                           onClick={() => {
                             setToggle({
                               ...toggle,
                               articleCategories: !toggle.articleCategories,
                             });
-                            formik.setFieldValue("articleCategories", {
-                              title: category?.title,
-                              id: category?.id,
-                            });
                           }}
+                          className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
                         >
-                          {category?.title}
+                          {formik.values.articleCategories?.title
+                            ? formik.values.articleCategories?.title
+                            : t("chooseCategory")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.articleCategories ? "active" : ""
+                            }`}
+                          />
                         </button>
-                      ))}
+                        <div
+                          className={`dropdown-content ${
+                            toggle.articleCategories ? "active" : ""
+                          }`}
+                        >
+                          {articleCategories?.map((category) => (
+                            <button
+                              type="button"
+                              key={category?.id}
+                              className={`item ${
+                                formik.values.articleCategories?.id ===
+                                category?.id
+                                  ? "active"
+                                  : ""
+                              }`}
+                              value={category?.id}
+                              name="articleCategories"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  articleCategories: !toggle.articleCategories,
+                                });
+                                formik.setFieldValue("articleCategories", {
+                                  title: category?.title,
+                                  id: category?.id,
+                                });
+                              }}
+                            >
+                              {category?.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {formik.errors.articleCategories?.title &&
+                      formik.touched.articleCategories?.title ? (
+                        <span className="error">
+                          {formik.errors.articleCategories?.title}
+                        </span>
+                      ) : null}
                     </div>
-                  </div>
-                  {formik.errors.articleCategories?.title &&
-                  formik.touched.articleCategories?.title ? (
-                    <span className="error">
-                      {formik.errors.articleCategories?.title}
-                    </span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="status" className="form-label">
-                    {t("status")}
-                  </label>
-                  <div
-                    className={`dropdown form-input ${
-                      toggle.status ? "active" : ""
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "Private"
-                        ? t("private")
-                        : formik.values.status === "Public"
-                        ? t("public")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
+                  </Col>
+                  <Col lg={6}>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                      <label htmlFor="status" className="form-label">
+                        {t("content")}
+                      </label>
+                      <div
+                        className={`dropdown form-input ${
                           toggle.status ? "active" : ""
                         }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.status === "Private"
+                            ? t("private")
+                            : formik.values.status === "Public"
+                            ? t("public")
+                            : t("content")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.status ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "Private" ? "active" : ""
+                            }`}
+                            value="Private"
+                            name="status"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Private");
+                            }}
+                          >
+                            {t("private")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "Public" ? "active" : ""
+                            }`}
+                            value="Public"
+                            name="status"
+                            onClick={() => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "Public");
+                            }}
+                          >
+                            {t("public")}
+                          </button>
+                        </div>
+                      </div>
+                      {formik.errors.status && formik.touched.status ? (
+                        <span className="error">{formik.errors.status}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={6}>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                      <label htmlFor="activation" className="form-label">
+                        {t("activation")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: !toggle.is_active,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values?.is_active === 1
+                            ? t("active")
+                            : formik.values.is_active === 0
+                            ? t("inactive")
+                            : t("activation")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.is_active ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.is_active ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 0 ? "active" : ""
+                            }`}
+                            value="inactive"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 0);
+                            }}
+                          >
+                            {t("inactive")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 1 ? "active" : ""
+                            }`}
+                            value="active"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 1);
+                            }}
+                          >
+                            {t("active")}
+                          </button>
+                        </div>
+                      </div>
+                      {formik.errors.is_active && formik.touched.is_active ? (
+                        <span className="error">{formik.errors.is_active}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="d-flex justify-content-center align-items-center p-3 pt-0 pb-0">
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-column align-items-end">
+                      <label htmlFor="content" className="form-label">
+                        {t("articles.columns.article")}
+                      </label>
+                      <textarea
+                        className="form-input"
+                        id="content"
+                        placeholder={t("articles.columns.article")}
+                        name="content"
+                        value={formik.values.content}
+                        onChange={handleInput}
+                      ></textarea>
+                      {formik.errors.content && formik.touched.content ? (
+                        <span className="error">{formik.errors.content}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : formik.values.id ? (
+                          t("edit")
+                        ) : (
+                          t("add")
+                        )}
+                      </button>
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values.status === "Private" ? "active" : ""
-                        }`}
-                        value="Private"
-                        name="status"
+                        className="cancel-btn"
                         onClick={() => {
                           setToggle({
                             ...toggle,
-                            status: !toggle.status,
+                            add: !toggle.add,
                           });
-                          formik.setFieldValue("status", "Private");
+                          formik.handleReset();
                         }}
                       >
-                        {t("private")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "Public" ? "active" : ""
-                        }`}
-                        value="Public"
-                        name="status"
-                        onClick={() => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "Public");
-                        }}
-                      >
-                        {t("public")}
+                        {t("cancel")}
                       </button>
                     </div>
-                  </div>
-                  {formik.errors.status && formik.touched.status ? (
-                    <span className="error">{formik.errors.status}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={6}>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="activation" className="form-label">
-                    {t("activation")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          is_active: !toggle.is_active,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values?.is_active === 1
-                        ? t("active")
-                        : formik.values.is_active === 0
-                        ? t("inactive")
-                        : t("activation")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.is_active ? "active" : ""
-                        }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.is_active ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 0 ? "active" : ""
-                        }`}
-                        value="inactive"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 0);
-                        }}
-                      >
-                        {t("inactive")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 1 ? "active" : ""
-                        }`}
-                        value="active"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 1);
-                        }}
-                      >
-                        {t("active")}
-                      </button>
-                    </div>
-                  </div>
-                  {formik.errors.is_active && formik.touched.is_active ? (
-                    <span className="error">{formik.errors.is_active}</span>
-                  ) : null}
-                </div>
-              </Col>
-            </Row>
-            <Row className="d-flex justify-content-center align-items-center p-3 pt-0 pb-0">
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-column align-items-end">
-                  <label htmlFor="content" className="form-label">
-                    {t("articles.columns.article")}
-                  </label>
-                  <textarea
-                    className="form-input"
-                    id="content"
-                    placeholder={t("articles.columns.article")}
-                    name="content"
-                    value={formik.values.content}
-                    onChange={handleInput}
-                  ></textarea>
-                  {formik.errors.content && formik.touched.content ? (
-                    <span className="error">{formik.errors.content}</span>
-                  ) : null}
-                </div>
-              </Col>
-            </Row>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : formik.values.id ? (
-                      t("edit")
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+        </>
+      )}
       {/* Read More */}
       <Modal
         isOpen={toggle.readMore}
