@@ -48,16 +48,19 @@
   "admin": "Admin",
   "supAdmin": "Sub Admin",
   "search": "Search",
-  "searchSubAdmin": "Search by Name, Email or Phone",
+  "searchSubAdmin": "Search by Name, Email, Phone, Power or Status",
   "searchMessage": "Search by Name, Email or Phone",
-  "searchUser": "Search by Name, Email or Phone",
-  "searchElder": "Search by Name, Email or Phone",
-  "searchAudio": "Search  by Title, Category or Elder Name",
-  "searchArticle": "Search by Title, Category or Writer",
-  "searchBook": "Search by Title, Category",
-  "searchImage": "Search by Category or Content",
-  "searchSubCategoryBook": "Search Sub Category Book",
-  "searchMainCategoryBook": "Search Main Category Book",
+  "searchUser": "Search by Name, Email, Phone, Register Method or Subscription",
+  "searchNewUser": "Search by Name, Email, Phone, Register Method, Subscription, Activation, Email Verified or Phone Verified",
+  "searchUserDropDown": "Search by Email",
+  "searchElder": "Search by Name, Email, Phone, Category or Activation",
+  "searchAudio": "Search  by Title, Category, Elder, Content or Activation",
+  "searchArticle": "Search by Title, Category, Writer, Content or Activation",
+  "searchBook": "Search by Title, Category, Content or Activation",
+  "searchImage": "Search by Category, Content or Activation",
+  "searchSubCategoryBook": "Search by Category",
+  "searchMainCategoryBook": "Search by Category",
+  "searchSubSubCategoryBook": "Search by Sub Category or Main Sub Category",
   "searchCategoryImage": "Search Category Image",
   "searchCategoryAudio": "Search Category Audio",
   "searchCategoryArticle": "Search Category Article",
@@ -78,7 +81,7 @@
   "someError": "Some Error",
   "index": "Index",
   "checkboxes": "Checkboxes",
-  "searchAudioElder": "Search Audio by Title or Category",
+  "searchAudioElder": "Search Audio by Title, Category, Content or Activation",
   "listening": "Listening",
   "auth": {
     "login": {
@@ -126,7 +129,8 @@
     "notifications": "Notifications",
     "categories": "Categories",
     "mainCategoriesBooks": "Main Book",
-    "subCategoriesBooks": "Sub Book",
+    "subCategoriesBooks": "Main Sub Book",
+    "SubSubCategoriesBooks": "Sub Sub Book",
     "categoriesAudio": "Audio",
     "categoriesImage": "Image",
     "categoriesArticle": "Article",
@@ -232,6 +236,7 @@
       "sendTitle": "Send Code Content",
       "addTitle": "Add Code Content",
       "editTitle": "Edit Code Content",
+      "showTitle": "Show Code Content",
       "sendSelectedUser": "Send To Selected Used",
       "columns": {
         "code": "Code",
@@ -339,11 +344,19 @@
     }
   },
   "subCategoriesBooks": {
-    "addTitle": "Add Sub Category Book",
-    "editTitle": "Edit Sub Category Book",
+    "addTitle": "Add Main For Sub Category Book",
+    "editTitle": "Edit Main For Sub Category Book",
     "columns": {
       "category": "Category",
       "mainCategory": "Main Category"
+    }
+  },
+  "subSubCategoriesBooks": {
+    "addTitle": "Add Sub For Sub Category Book",
+    "editTitle": "Edit Sub For Sub Category Book",
+    "columns": {
+      "category": "Sub Category",
+      "mainCategory": "Main Sub Category"
     }
   },
   "books": {
@@ -548,7 +561,7 @@
     "email": "Please enter a valid email",
     "password": "Password must be at least 6 characters",
     "confirmPassword": "Password and confirm password must be the same",
-    "phone": "Please enter a valid phone number 11 digits (Ex: 01234567890)",
+    "phone": "Please enter a valid phone number with country code (Ex: +966000000000)",
     "image": "Please choose an image",
     "imageElder": "Please choose an image elder",
     "activation": "Please Choose Activation Status",
@@ -558,6 +571,7 @@
     "imageArticle": "Please choose an image article",
     "audio": "Please choose an audio",
     "book": "Please choose a book",
+    "pages": "Please enter number of pages",
     "article": "Please choose an article",
     "writer": "Please enter a writer",
     "category": "Please choose a category",
