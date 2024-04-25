@@ -2,14 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose } from "react-icons/io";
-import {
-  Col,
-  Modal,
-  ModalBody,
-  ModalHeader,
-  Row,
-  Spinner,
-} from "reactstrap";
+import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -17,12 +10,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import { getProfile, updateProfile } from "../../store/slices/profileSlice";
 import useSchema from "../../hooks/useSchema";
+import { getSubAdmins } from "../../store/slices/subAdminSlice";
 
 const EditProfile = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { profile, loading } = useSelector((state) => state.profile);
+  const { subAdmins } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({});
   const navigate = useNavigate();
 
@@ -38,6 +33,20 @@ const EditProfile = () => {
     },
     validationSchema: validationSchema.editProfile,
     onSubmit: (values) => {
+      // Check if the email is already taken by another subAdmin or not
+      const emailExists = subAdmins.find(
+        (subAdmin) => subAdmin.email === values.email
+      );
+      if (emailExists && emailExists.id !== profile.id) {
+        return toast.error(t("emailExisted"));
+      }
+      // Check if the phone is already taken by another subAdmin or not
+      const phoneExists = subAdmins.find(
+        (subAdmin) => subAdmin.phone === values.phone
+      );
+      if (phoneExists && phoneExists.id !== profile.id) {
+        return toast.error(t("phoneExisted"));
+      }
       const formData = new FormData();
       formData.append("name", values.name);
       formData.append("email", values.email);
@@ -78,24 +87,28 @@ const EditProfile = () => {
 
   useEffect(() => {
     try {
-      dispatch(getProfile()).then((res) => {
-        if (!res.error) {
-          formik.setValues({
-            name: profile.name,
-            email: profile.email,
-            phone: profile.phone,
-            image: {
-              file: "",
-              preview: profile.image,
-            },
-          });
-        }
-      });
+      dispatch(getProfile());
+      dispatch(getSubAdmins());
     } catch (error) {
       console.log(error);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dispatch]);
+
+  // Set Profile Data
+  useEffect(() => {
+    if (profile) {
+      formik.setValues({
+        name: profile.name,
+        email: profile.email,
+        phone: profile.phone,
+        image: {
+          file: "",
+          preview: profile.image,
+        },
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile]);
 
   return (
     <div className="profile-container">
