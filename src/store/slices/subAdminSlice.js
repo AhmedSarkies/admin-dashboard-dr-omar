@@ -119,6 +119,7 @@ const subAdminSlice = createSlice({
     builder.addCase(getSubAdmins.fulfilled, (state, action) => {
       state.subAdmins = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getSubAdmins.rejected, (state, action) => {
