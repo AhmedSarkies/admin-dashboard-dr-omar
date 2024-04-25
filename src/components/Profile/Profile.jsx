@@ -5,7 +5,7 @@ import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getProfileAdmin } from "../../store/slices/profileSlice";
+import { getProfile } from "../../store/slices/profileSlice";
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -14,7 +14,7 @@ const Profile = () => {
   const { profile, loading } = useSelector((state) => state.profile);
 
   useEffect(() => {
-    dispatch(getProfileAdmin());
+    dispatch(getProfile());
   }, [dispatch]);
 
   return (
@@ -53,7 +53,7 @@ const Profile = () => {
                   <button
                     className="change-password-btn"
                     onClick={() =>
-                      navigate(`/dr-omar/profile/change-password/${profile.id}`)
+                      navigate(`/dr-omar/profile/change-password`)
                     }
                   >
                     {t("profile.changePassword")}
@@ -61,7 +61,7 @@ const Profile = () => {
                   <button
                     className="add-btn"
                     onClick={() =>
-                      navigate(`/dr-omar/profile/edit-profile/${profile.id}`)
+                      navigate(`/dr-omar/profile/edit-profile`)
                     }
                   >
                     {t("edit")}
