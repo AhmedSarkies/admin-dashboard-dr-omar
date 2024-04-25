@@ -82,24 +82,7 @@ export const deleteTermAndConditionApi = createAsyncThunk(
 const termsConditionsSlice = createSlice({
   name: "termAndCondition",
   initialState,
-  reducers: {
-    // Get Terms And Conditions
-    getTermsAndConditions: (state, action) => {
-      state.termsAndConditions = action.payload;
-    },
-    // Add Term And Condition
-    addTermAndCondition: (state, action) => {
-      state.termsAndConditions = action.payload;
-    },
-    // Update Term And Condition
-    updateTermAndCondition: (state, action) => {
-      state.termsAndConditions = action.payload;
-    },
-    // Delete Term And Condition
-    deleteTermAndCondition: (state, action) => {
-      state.termsAndConditions = action.payload;
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Terms And Conditions======
     // Pending
@@ -110,6 +93,7 @@ const termsConditionsSlice = createSlice({
     builder.addCase(getTermsAndConditionsApi.fulfilled, (state, action) => {
       state.termsAndConditions = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getTermsAndConditionsApi.rejected, (state, action) => {
@@ -164,10 +148,4 @@ const termsConditionsSlice = createSlice({
   },
 });
 
-export const {
-  getTermsAndConditions,
-  addTermAndCondition,
-  updateTermAndCondition,
-  deleteTermAndCondition,
-} = termsConditionsSlice.actions;
 export default termsConditionsSlice.reducer;
