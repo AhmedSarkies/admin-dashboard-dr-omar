@@ -12,22 +12,28 @@ import { useFormik } from "formik";
 import { Modal, ModalBody, ModalHeader, Row, Col } from "reactstrap";
 import { IoMdClose, IoMdEye } from "react-icons/io";
 import { Link, useNavigate } from "react-router-dom";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import Cookies from "js-cookie";
 
 const initialValues = {
   name: "",
   email: "",
   phone: "",
   password: "",
+  confirmPassword: "",
   is_active: "",
 };
 
 const Users = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
   const [toggle, setToggle] = useState({
+    showHidePassword: false,
+    showHideConfirmedPassword: false,
     add: false,
     readMessage: false,
     is_active: false,
@@ -58,38 +64,40 @@ const Users = () => {
     initialValues,
     validationSchema: validationSchema.user,
     onSubmit: (values) => {
-      // if email and phone is already exist with another user if just i change them to new values
-      if (users.length > 0) {
-        const emailExist = users.find(
-          (user) => user.email === formik.values.email
-        );
-        if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error(t("emailExisted"));
-          return;
+      if (role === "admin") {
+        // if email and phone is already exist with another user if just i change them to new values
+        if (users.length > 0) {
+          const emailExist = users.find(
+            (user) => user.email === formik.values.email
+          );
+          if (emailExist && emailExist.id !== formik.values.id) {
+            toast.error(t("emailExisted"));
+            return;
+          }
         }
-      }
-      const formData = new FormData();
-      formData.append("id", values.id);
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("phonenumber", values.phone);
-      formData.append("is_active", values.is_active);
-      if (values.password) {
-        formData.append("password", values.password);
-      }
-      dispatch(updateUser(formData)).then((res) => {
-        dispatch(getUsers());
-        if (!res.error) {
-          toast.success(t("toast.user.updatedSuccess"));
-          formik.handleReset();
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-        } else {
-          toast.error(t("toast.user.updatedError"));
+        const formData = new FormData();
+        formData.append("id", values.id);
+        formData.append("name", values.name);
+        formData.append("email", values.email);
+        formData.append("phonenumber", values.phone);
+        formData.append("is_active", values.is_active);
+        if (values.password) {
+          formData.append("password", values.password);
         }
-      });
+        dispatch(updateUser(formData)).then((res) => {
+          dispatch(getUsers());
+          if (!res.error) {
+            toast.success(t("toast.user.updatedSuccess"));
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+            });
+          } else {
+            toast.error(t("toast.user.updatedError"));
+          }
+        });
+      }
     },
   });
 
@@ -97,6 +105,15 @@ const Users = () => {
   const handleInput = (e) => {
     formik.handleChange(e);
   };
+
+  // Data
+  const data = users?.map((user) => ({
+    ...user,
+    created_at: new Date(user.created_at).toLocaleDateString(),
+    last_login: new Date(user.last_login).toLocaleDateString(),
+    is_active: user.is_active === 1 ? t("active") : t("inactive"),
+    privacy: user.privacy === "private" ? t("private") : t("public"),
+  }));
 
   // Filtration, Sorting, Pagination
   // Columns
@@ -122,41 +139,43 @@ const Users = () => {
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
+    searchResultsUser,
   } = useFiltration({
-    rowData: users,
+    rowData: data,
     toggle,
     setToggle,
   });
 
   // Delete User
   const handleDelete = (user) => {
-    Swal.fire({
-      title: `هل انت متأكد من حذف ${user?.name}؟`,
-      text: "لن تتمكن من التراجع عن هذا الاجراء!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: "نعم, احذفه!",
-      cancelButtonText: "الغاء",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteUser(user.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getUsers());
-            Swal.fire({
-              title: `تم حذف ${user?.name}`,
-              text: `تم حذف ${user?.name} بنجاح`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-            }).then(() => toast.success(t("toast.user.deletedSuccess")));
-          } else {
-            toast.error(t("toast.user.deletedError"));
-          }
-        });
-      }
-    });
+    if (role === "admin") {
+      Swal.fire({
+        title: `هل انت متأكد من حذف ${user?.name}؟`,
+        text: "لن تتمكن من التراجع عن هذا الاجراء!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: "نعم, احذفه!",
+        cancelButtonText: "الغاء",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteUser(user.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getUsers());
+              Swal.fire({
+                title: `تم حذف ${user?.name}`,
+                text: `تم حذف ${user?.name} بنجاح`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+              }).then(() => toast.success(t("toast.user.deletedSuccess")));
+            } else {
+              toast.error(t("toast.user.deletedError"));
+            }
+          });
+        }
+      });
+    }
   };
 
   // Edit User
@@ -166,7 +185,7 @@ const Users = () => {
       name: user?.name,
       email: user?.email,
       phone: user?.phonenumber,
-      is_active: user?.is_active,
+      is_active: user?.is_active === t("active") ? 1 : 0,
       password: user?.password,
     });
     setToggle({
@@ -193,7 +212,7 @@ const Users = () => {
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "45%",
             }}
           >
             <input
@@ -402,7 +421,7 @@ const Users = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
+          {searchResultsUser?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
                 <td className="table-td" colSpan="9">
@@ -424,323 +443,428 @@ const Users = () => {
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {searchResults?.map((result, idx) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns?.id && (
-                    <td className="table-td">{idx + 1}#</td>
-                  )}
-                  {toggle.toggleColumns?.name && (
-                    <td className="table-td name">
-                      <Link
-                        to={`/dr-omar/users/${result?.id}`}
-                        className="scholar-link"
-                      >
-                        {result?.name}
-                      </Link>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.email && (
-                    <td className="table-td email">
-                      <a href={`mailto: ${result?.email}`}>{result?.email}</a>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.phone && (
-                    <td className="table-td phone">
-                      <a href={`mailto:${result?.phonenumber}`}>
-                        {result?.phonenumber}
-                      </a>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.subscription && (
-                    <td className="table-td subscription">
-                      <span
-                        className={`status ${
-                          result?.privacy === "private" ? "inactive" : "active"
-                        }`}
-                      >
-                        {result?.privacy === "private"
-                          ? t("private")
-                          : t("public")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.created_at && (
-                    <td className="table-td created_at">
-                      {new Date(result?.created_at).toLocaleDateString()}
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.login_count && (
-                    <td className="table-td login_count">
-                      {result?.login_count}
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.register_method && (
-                    <td className="table-td register_method">
-                      {result?.register_method}
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.last_login && (
-                    <td className="table-td last_login">
-                      {new Date(result?.last_login).toLocaleDateString()}
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.activation && (
-                    <td className="table-td">
-                      <span
-                        className="table-status badge"
-                        style={{
-                          backgroundColor:
-                            result?.is_active === 1 ? "green" : "red",
-                        }}
-                      >
-                        {result?.is_active === 1 ? t("active") : t("inactive")}
-                      </span>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <IoMdEye
-                          className="view-btn"
-                          onClick={() =>
-                            navigate(`/dr-omar/users/${result?.id}`)
-                          }
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                        <MdEdit
-                          className="edit-btn"
-                          onClick={() => handleEdit(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+          {searchResultsUser?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsUser?.map((result, idx) => (
+                  <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
+                    {toggle.toggleColumns?.name && (
+                      <td className="table-td name">
+                        <Link
+                          to={`/dr-omar/users/${result?.id}`}
+                          className="scholar-link"
+                        >
+                          {result?.name}
+                        </Link>
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.email && (
+                      <td className="table-td email">
+                        <a href={`mailto: ${result?.email}`}>{result?.email}</a>
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.phone && (
+                      <td className="table-td phone">
+                        <a href={`mailto:${result?.phonenumber}`}>
+                          {result?.phonenumber}
+                        </a>
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.subscription && (
+                      <td className="table-td subscription">
+                        <span
+                          className={`status ${
+                            result?.privacy === t("private")
+                              ? "inactive"
+                              : "active"
+                          }`}
+                        >
+                          {result?.privacy}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.created_at && (
+                      <td className="table-td created_at">
+                        {result?.created_at}
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.login_count && (
+                      <td className="table-td login_count">
+                        {result?.login_count}
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.register_method && (
+                      <td className="table-td register_method">
+                        {result?.register_method}
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.last_login && (
+                      <td className="table-td last_login">
+                        {result?.last_login}
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.activation && (
+                      <td className="table-td">
+                        <span
+                          className="table-status badge"
+                          style={{
+                            backgroundColor:
+                              result?.is_active === t("active")
+                                ? "green"
+                                : "red",
+                            cursor: role === "admin" ? "pointer" : "default",
+                          }}
+                          onClick={() => {
+                            if (role === "admin") {
+                              const data = {
+                                id: result.id,
+                                name: result.name,
+                                email: result.email,
+                                phonenumber: result.phonenumber,
+                                is_active:
+                                  result.is_active === t("active") ? 0 : 1,
+                              };
+                              dispatch(updateUser(data)).then((res) => {
+                                if (!res.error) {
+                                  dispatch(getUsers());
+                                  toast.success(t("toast.user.updatedSuccess"));
+                                } else {
+                                  dispatch(getUsers());
+                                  toast.error(t("toast.user.updatedError"));
+                                }
+                              });
+                            }
+                          }}
+                        >
+                          {result?.is_active}
+                        </span>
+                      </td>
+                    )}
+                    {toggle.toggleColumns?.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          <IoMdEye
+                            className="view-btn"
+                            onClick={() =>
+                              navigate(`/dr-omar/users/${result?.id}`)
+                            }
+                          />
+                          {role === "admin" && (
+                            <>
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                              <MdEdit
+                                className="edit-btn"
+                                onClick={() => handleEdit(result)}
+                              />
+                            </>
+                          )}
+                        </span>
+                      </td>
+                    )}
+                  </tr>
+                ))}
+              </tbody>
+            )}
         </table>
       </div>
       {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
+      {searchResultsUser?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
-      {/* Add & Edit Sub Admin */}
-      <Modal
-        isOpen={toggle.add}
-        toggle={() => {
-          formik.handleReset();
-          setToggle({
-            ...toggle,
-            add: !toggle.add,
-          });
-        }}
-        centered={true}
-        keyboard={true}
-        size={"md"}
-        contentClassName="modal-add-scholar"
-      >
-        <ModalHeader
-          toggle={() => {
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          }}
-        >
-          {t("user.editTitle")}
-          <IoMdClose
-            onClick={() => {
+      {role === "admin" && (
+        <>
+          {/* Add & Edit Sub Admin */}
+          <Modal
+            isOpen={toggle.add}
+            toggle={() => {
               formik.handleReset();
               setToggle({
                 ...toggle,
                 add: !toggle.add,
               });
             }}
-          />
-        </ModalHeader>
-        <ModalBody>
-          <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
-              <Col lg={12} className="mb-5">
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="name" className="form-label">
-                    {t("user.columns.name")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="name"
-                    placeholder={t("user.columns.name")}
-                    name="name"
-                    value={formik.values.name}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.name && formik.touched.name ? (
-                    <span className="error">{formik.errors.name}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="email" className="form-label">
-                    {t("user.columns.email")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="email"
-                    placeholder={t("user.columns.email")}
-                    name="email"
-                    value={formik.values.email}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.email && formik.touched.email ? (
-                    <span className="error">{formik.errors.email}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="phone" className="form-label">
-                    {t("user.columns.phone")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input"
-                    id="phone"
-                    placeholder={t("user.columns.phone")}
-                    name="phone"
-                    value={formik.values.phone}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.phone && formik.touched.phone ? (
-                    <span className="error">{formik.errors.phone}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
-                  <label htmlFor="activation" className="form-label">
-                    {t("activation")}
-                  </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          is_active: !toggle.is_active,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.is_active === 1
-                        ? t("active")
-                        : formik.values.is_active === 0
-                        ? t("inactive")
-                        : t("activation")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
-                          toggle.is_active ? "active" : ""
-                        }`}
-                      />
-                    </button>
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                });
+              }}
+            >
+              {t("user.editTitle")}
+              <IoMdClose
+                onClick={() => {
+                  formik.handleReset();
+                  setToggle({
+                    ...toggle,
+                    add: !toggle.add,
+                  });
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12} className="mb-5">
                     <div
-                      className={`dropdown-content ${
-                        toggle.is_active ? "active" : ""
-                      }`}
+                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      style={{ marginTop: "-4px" }}
                     >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.is_active === 0 ? "active" : ""
+                      <label htmlFor="name" className="form-label">
+                        {t("user.columns.name")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="name"
+                        placeholder={t("user.columns.name")}
+                        name="name"
+                        value={formik.values.name}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.name && formik.touched.name ? (
+                        <span className="error">{formik.errors.name}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="email" className="form-label">
+                        {t("user.columns.email")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="email"
+                        placeholder={t("user.columns.email")}
+                        name="email"
+                        value={formik.values.email}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.email && formik.touched.email ? (
+                        <span className="error">{formik.errors.email}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="phone" className="form-label">
+                        {t("user.columns.phone")}
+                      </label>
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="phone"
+                        placeholder={t("user.columns.phone")}
+                        name="phone"
+                        value={formik.values.phone}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.phone && formik.touched.phone ? (
+                        <span className="error">{formik.errors.phone}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                      <label htmlFor="activation" className="form-label">
+                        {t("activation")}
+                      </label>
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              is_active: !toggle.is_active,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.is_active === 1
+                            ? t("active")
+                            : formik.values.is_active === 0
+                            ? t("inactive")
+                            : t("activation")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.is_active ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.is_active ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 0 ? "active" : ""
+                            }`}
+                            value="inactive"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 0);
+                            }}
+                          >
+                            {t("inactive")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.is_active === 1 ? "active" : ""
+                            }`}
+                            value="active"
+                            name="activation"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                is_active: !toggle.is_active,
+                              });
+                              formik.setFieldValue("is_active", 1);
+                            }}
+                          >
+                            {t("active")}
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="password" className="form-label">
+                        {t("auth.login.password")}
+                      </label>
+                      <input
+                        type={`${
+                          toggle.showHidePassword ? "text" : "password"
                         }`}
-                        value="inactive"
-                        name="activation"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            is_active: !toggle.is_active,
-                          });
-                          formik.setFieldValue("is_active", 0);
-                        }}
+                        className="form-input"
+                        id="password"
+                        placeholder="********"
+                        name="password"
+                        value={formik.values.password}
+                        onChange={handleInput}
+                      />
+                      <span className="show-hide-password">
+                        {toggle.showHidePassword ? (
+                          <FaRegEye
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHidePassword: !toggle.showHidePassword,
+                              })
+                            }
+                          />
+                        ) : (
+                          <FaRegEyeSlash
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHidePassword: !toggle.showHidePassword,
+                              })
+                            }
+                          />
+                        )}
+                      </span>
+                      {formik.errors.password && formik.touched.password ? (
+                        <span className="error">{formik.errors.password}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="confirmPassword" className="form-label">
+                        {t("auth.login.confirmPassword")}
+                      </label>
+                      <input
+                        type={`${
+                          toggle.showHideConfirmedPassword ? "text" : "password"
+                        }`}
+                        className="form-input"
+                        id="confirmPassword"
+                        placeholder="********"
+                        name="confirmPassword"
+                        value={formik.values.confirmPassword}
+                        onChange={handleInput}
+                      />
+                      <span className="show-hide-password">
+                        {toggle.showHideConfirmedPassword ? (
+                          <FaRegEye
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHideConfirmedPassword:
+                                  !toggle.showHideConfirmedPassword,
+                              })
+                            }
+                          />
+                        ) : (
+                          <FaRegEyeSlash
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHideConfirmedPassword:
+                                  !toggle.showHideConfirmedPassword,
+                              })
+                            }
+                          />
+                        )}
+                      </span>
+                      {formik.errors.confirmPassword &&
+                      formik.touched.confirmPassword ? (
+                        <span className="error">
+                          {formik.errors.confirmPassword}
+                        </span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
                       >
-                        {t("inactive")}
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : (
+                          t("edit")
+                        )}
                       </button>
                       <button
                         type="button"
-                        className={`item ${
-                          formik.values.is_active === 1 ? "active" : ""
-                        }`}
-                        value="active"
-                        name="activation"
-                        onClick={(e) => {
+                        className="cancel-btn"
+                        onClick={() => {
                           setToggle({
                             ...toggle,
-                            is_active: !toggle.is_active,
+                            add: !toggle.add,
                           });
-                          formik.setFieldValue("is_active", 1);
+                          formik.handleReset();
                         }}
                       >
-                        {t("active")}
+                        {t("cancel")}
                       </button>
                     </div>
-                  </div>
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="password" className="form-label">
-                    {t("auth.login.password")}
-                  </label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    id="password"
-                    placeholder="********"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.password && formik.touched.password ? (
-                    <span className="error">{formik.errors.password}</span>
-                  ) : null}
-                </div>
-              </Col>
-              <Col lg={12}>
-                <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : (
-                      t("edit")
-                    )}
-                  </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setToggle({
-                        ...toggle,
-                        add: !toggle.add,
-                      });
-                      formik.handleReset();
-                    }}
-                  >
-                    {t("cancel")}
-                  </button>
-                </div>
-              </Col>
-            </Row>
-          </form>
-        </ModalBody>
-      </Modal>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+        </>
+      )}
     </div>
   );
 };
