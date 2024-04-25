@@ -1,29 +1,41 @@
 import i18next from "i18next";
 import Cookies from "js-cookie";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { MdMenu, MdOutlineLogout } from "react-icons/md";
 import { useLocation } from "react-router-dom";
 
 const Header = ({ menu, toggleMenu, linkItems }) => {
   const location = useLocation();
-  const lng = Cookies.get("i18next") || "ar";
-
-  useEffect(() => {
-    document.documentElement.lang = lng;
-  }, [lng]);
+  const { t } = useTranslation();
+  const [loading, setLoading] = useState(false);
 
   // Logout Function
   const logout = () => {
-    Cookies.remove("_auth");
-    Cookies.remove("_user");
-    Cookies.remove("_role");
-    Cookies.remove("_email");
-    Cookies.remove("_phone");
-    Cookies.remove("_image");
-    Cookies.remove("_active");
-    Cookies.remove("_id");
-    window.location.href = "/dr-omar/login";
+    setLoading(true);
+    try {
+      // Remove Cookies on Logout Click Event but make it in 3 seconds
+      const timer = setTimeout(() => {
+        Cookies.remove("_auth");
+        Cookies.remove("_user");
+        Cookies.remove("_role");
+        Cookies.remove("_email");
+        Cookies.remove("_phone");
+        Cookies.remove("_image");
+        Cookies.remove("_active");
+        Cookies.remove("_id");
+        setLoading(false);
+        window.location.href = "/dr-omar/login";
+      }, 3000);
+      return () => clearTimeout(timer);
+    } catch (error) {
+      setLoading(false);
+    }
   };
+
+  useEffect(() => {
+    document.documentElement.lang = t("lng");
+  }, [t]);
 
   return (
     <>
@@ -31,13 +43,19 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
       <div className="dashboard-header">
         <div className="dashboard-header-btns">
           <button
-            className="btn logout-btn"
+            className={`btn logout-btn${loading ? " loading-btn" : ""}`}
             onClick={() => {
               logout();
             }}
           >
-            <MdOutlineLogout />
-            {lng === "en" ? "Logout" : "تسجيل الخروج"}
+            {loading ? (
+              t("loading")
+            ) : (
+              <>
+                <MdOutlineLogout />
+                {t("headerLogout")}
+              </>
+            )}
           </button>
           <button
             className="btn lang-btn"
@@ -47,7 +65,7 @@ const Header = ({ menu, toggleMenu, linkItems }) => {
                 : i18next.changeLanguage("en")
             }
           >
-            {lng === "ar" ? "EN" : "ع"}
+            {t("lng")}
           </button>
         </div>
         <div className="dashboard-header-title">
