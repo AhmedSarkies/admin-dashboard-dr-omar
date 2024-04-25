@@ -169,50 +169,7 @@ export const deletePictureCategoryApi = createAsyncThunk(
 const pictureSlice = createSlice({
   name: "picture",
   initialState,
-  reducers: {
-    // Get Pictures
-    getPictures: (state, action) => {
-      state.pictures = action.payload.data;
-    },
-    // Add Picture
-    addPicture: (state, action) => {
-      state.pictures.push(action.payload);
-    },
-    // Update Picture
-    updatePicture: (state, action) => {
-      state.pictures = state.pictures.map((picture) =>
-        picture.id === action.payload.id ? action.payload : picture
-      );
-    },
-    // Delete Picture
-    deletePicture: (state, action) => {
-      state.pictures = state.pictures.filter(
-        (picture) => picture.id !== action.payload
-      );
-    },
-    // Get Pictures Category
-    getPicturesCategories: (state, action) => {
-      state.pictureCategories = action.payload;
-    },
-    // Add Picture Category
-    addPictureCategory: (state, action) => {
-      state.pictureCategories.push(action.payload);
-    },
-    // Update Picture Category
-    updatePictureCategory: (state, action) => {
-      state.pictureCategories = state.pictureCategories.map((category) =>
-        category.id === action.payload.id
-          ? { ...action.payload, isEditing: true }
-          : category
-      );
-    },
-    // Delete Picture Category
-    deletePictureCategory: (state, action) => {
-      state.pictureCategories = state.pictureCategories.filter(
-        (category) => category.id !== action.payload
-      );
-    },
-  },
+  reducers: {},
   extraReducers: (builder) => {
     // ======Get Pictures======
     // Pending
@@ -223,6 +180,7 @@ const pictureSlice = createSlice({
     builder.addCase(getPicturesApi.fulfilled, (state, action) => {
       state.pictures = action.payload.data;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getPicturesApi.rejected, (state, action) => {
@@ -280,6 +238,7 @@ const pictureSlice = createSlice({
     builder.addCase(getPicturesCategoriesApi.fulfilled, (state, action) => {
       state.pictureCategories = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getPicturesCategoriesApi.rejected, (state, action) => {
@@ -331,14 +290,4 @@ const pictureSlice = createSlice({
   },
 });
 
-export const {
-  getPictures,
-  addPicture,
-  updatePicture,
-  deletePicture,
-  getPicturesCategories,
-  addPictureCategory,
-  updatePictureCategory,
-  deletePictureCategory,
-} = pictureSlice.actions;
 export default pictureSlice.reducer;
