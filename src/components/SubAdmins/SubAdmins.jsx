@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 import { MdAdd, MdDeleteOutline, MdEdit } from "react-icons/md";
 import { TiArrowSortedUp, TiArrowSortedDown } from "react-icons/ti";
-import { IoMdClose } from "react-icons/io";
+import { IoMdClose, IoMdEye } from "react-icons/io";
 import {
   getSubAdmins,
   addSubAdmin,
@@ -25,6 +25,8 @@ import { useTranslation } from "react-i18next";
 import { useFiltration, useSchema } from "../../hooks";
 import { ImUpload } from "react-icons/im";
 import anonymous from "../../assets/images/anonymous.png";
+import { FaRegEye, FaRegEyeSlash } from "react-icons/fa";
+import Cookies from "js-cookie";
 
 const initialValues = {
   image: {
@@ -42,13 +44,17 @@ const initialValues = {
 
 const SubAdmins = ({ dashboard }) => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
   const { subAdmins, loading, error } = useSelector((state) => state.subAdmin);
   const [toggle, setToggle] = useState({
+    showHidePassword: false,
+    showHideConfirmedPassword: false,
     add: false,
     imagePreview: false,
+    read: false,
     status: false,
     powers: false,
     searchTerm: "",
@@ -70,6 +76,12 @@ const SubAdmins = ({ dashboard }) => {
     },
   });
 
+  const data = subAdmins?.map((subAdmin) => ({
+    ...subAdmin,
+    powers: subAdmin.powers === "admin" ? t("admin") : t("supAdmin"),
+    active: subAdmin.active === 1 ? t("active") : t("inactive"),
+  }));
+
   // Formik
   const formik = useFormik({
     initialValues,
@@ -77,55 +89,57 @@ const SubAdmins = ({ dashboard }) => {
       ? validationSchema.subAdminsEdit
       : validationSchema.subAdmins,
     onSubmit: (values) => {
-      // if email and phone is already exist with another subAdmin if just i change them to new values
-      if (subAdmins.length > 0) {
-        const emailExist = subAdmins.find(
-          (subAdmin) => subAdmin.email === formik.values.email
-        );
-        if (emailExist && emailExist.id !== formik.values.id) {
-          toast.error(t("emailExisted"));
-          return;
+      if (role === "admin") {
+        // if email and phone is already exist with another subAdmin if just i change them to new values
+        if (subAdmins.length > 0) {
+          const emailExist = subAdmins.find(
+            (subAdmin) => subAdmin.email === formik.values.email
+          );
+          if (emailExist && emailExist.id !== formik.values.id) {
+            toast.error(t("emailExisted"));
+            return;
+          }
         }
-      }
-      const formData = new FormData();
-      formData.append("name", values.name);
-      formData.append("email", values.email);
-      formData.append("phone", values.phone);
-      formData.append("active", values.status === "active" ? 1 : 0);
-      formData.append("password", values.password);
-      formData.append("powers", values.powers);
-      if (values.image.file !== "") {
-        formData.append("image", values.image.file);
-      }
-      if (values.id) {
-        formData.append("id", values.id);
-        dispatch(updateSubAdmin(formData)).then((res) => {
-          dispatch(getSubAdmins());
-          if (!res.error) {
-            toast.success(t("toast.subAdmin.updatedSuccess"));
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          } else {
-            toast.error(t("toast.subAdmin.updatedError"));
-          }
-        });
-      } else {
-        dispatch(addSubAdmin(formData)).then((res) => {
-          dispatch(getSubAdmins());
-          if (!res.error) {
-            toast.success(t("toast.subAdmin.addedSuccess"));
-            formik.handleReset();
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-          } else {
-            toast.error(t("toast.subAdmin.addedError"));
-          }
-        });
+        const formData = new FormData();
+        formData.append("name", values.name);
+        formData.append("email", values.email);
+        formData.append("phone", values.phone);
+        formData.append("active", values.status === "active" ? 1 : 0);
+        formData.append("password", values.password);
+        formData.append("powers", values.powers);
+        if (values.image.file !== "") {
+          formData.append("image", values.image.file);
+        }
+        if (values.id) {
+          formData.append("id", values.id);
+          dispatch(updateSubAdmin(formData)).then((res) => {
+            dispatch(getSubAdmins());
+            if (!res.error) {
+              toast.success(t("toast.subAdmin.updatedSuccess"));
+              formik.handleReset();
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+            } else {
+              toast.error(t("toast.subAdmin.updatedError"));
+            }
+          });
+        } else {
+          dispatch(addSubAdmin(formData)).then((res) => {
+            dispatch(getSubAdmins());
+            if (!res.error) {
+              toast.success(t("toast.subAdmin.addedSuccess"));
+              formik.handleReset();
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+            } else {
+              toast.error(t("toast.subAdmin.addedError"));
+            }
+          });
+        }
       }
     },
   });
@@ -165,32 +179,34 @@ const SubAdmins = ({ dashboard }) => {
 
   // Delete Sub Admin
   const handleDelete = (subAdmin) => {
-    Swal.fire({
-      title: `هل انت متأكد من حذف ${subAdmin?.name}؟`,
-      text: "لن تتمكن من التراجع عن هذا الاجراء!",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: "نعم, احذفه!",
-      cancelButtonText: "الغاء",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteSubAdmin(subAdmin.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getSubAdmins());
-            Swal.fire({
-              title: `تم حذف ${subAdmin?.name}`,
-              text: `تم حذف ${subAdmin?.name} بنجاح`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-            }).then(() => toast.success(t("toast.subAdmin.deletedSuccess")));
-          } else {
-            toast.error(t("toast.subAdmin.deletedError"));
-          }
-        });
-      }
-    });
+    if (role === "admin") {
+      Swal.fire({
+        title: `هل انت متأكد من حذف ${subAdmin?.name}؟`,
+        text: "لن تتمكن من التراجع عن هذا الاجراء!",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: "نعم, احذفه!",
+        cancelButtonText: "الغاء",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteSubAdmin(subAdmin.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getSubAdmins());
+              Swal.fire({
+                title: `تم حذف ${subAdmin?.name}`,
+                text: `تم حذف ${subAdmin?.name} بنجاح`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+              }).then(() => toast.success(t("toast.subAdmin.deletedSuccess")));
+            } else {
+              toast.error(t("toast.subAdmin.deletedError"));
+            }
+          });
+        }
+      });
+    }
   };
 
   // Handle Edit
@@ -201,8 +217,8 @@ const SubAdmins = ({ dashboard }) => {
       email: subAdmin?.email,
       password: subAdmin?.password,
       phone: subAdmin?.phone,
-      powers: subAdmin?.powers,
-      status: subAdmin?.active ? "active" : "inactive",
+      powers: subAdmin?.powers === t("admin") ? "admin" : "supAdmin",
+      status: subAdmin?.active === t("active") ? "active" : "inactive",
       image: {
         file: "",
         preview: subAdmin?.image,
@@ -234,7 +250,7 @@ const SubAdmins = ({ dashboard }) => {
     handleToggleColumns,
     searchResults,
   } = useFiltration({
-    rowData: subAdmins,
+    rowData: data,
     toggle,
     setToggle,
   });
@@ -250,28 +266,30 @@ const SubAdmins = ({ dashboard }) => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            })
-          }
-        >
-          <MdAdd />
-          {t("subAdmin.addTitle")}
-        </button>
-        {dashboard && <h2>{t("subAdmin.title")}</h2>}
-      </div>
+      {role === "admin" && (
+        <div className="table-header">
+          <button
+            className="add-btn"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              })
+            }
+          >
+            <MdAdd />
+            {t("subAdmin.addTitle")}
+          </button>
+          {dashboard && <h2>{t("subAdmin.title")}</h2>}
+        </div>
+      )}
       <div className="scholar">
         <div className="table-header">
           {/* Search */}
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "40%",
             }}
           >
             <input
@@ -524,12 +542,39 @@ const SubAdmins = ({ dashboard }) => {
                     <td className="table-td">
                       <span
                         className={`status ${
-                          result?.powers === "admin" ? "active" : "inactive"
+                          result?.powers === t("admin") ? "active" : "inactive"
                         }`}
+                        style={{
+                          cursor: role === "admin" ? "pointer" : "default",
+                        }}
+                        onClick={() => {
+                          if (role === "admin") {
+                            const data = {
+                              id: result.id,
+                              name: result.name,
+                              email: result.email,
+                              phone: result.phone,
+                              active: result.active === t("active") ? 1 : 0,
+                              powers:
+                                result.powers === t("admin")
+                                  ? "supAdmin"
+                                  : "admin",
+                            };
+                            dispatch(updateSubAdmin(data)).then((res) => {
+                              dispatch(getSubAdmins());
+                              if (!res.error) {
+                                toast.success(
+                                  t("toast.subAdmin.updatedSuccess")
+                                );
+                              } else {
+                                dispatch(getSubAdmins());
+                                toast.error(t("toast.subAdmin.updatedError"));
+                              }
+                            });
+                          }
+                        }}
                       >
-                        {result?.powers === "admin"
-                          ? t("admin")
-                          : t("supAdmin")}
+                        {result?.powers}
                       </span>
                     </td>
                   )}
@@ -537,24 +582,80 @@ const SubAdmins = ({ dashboard }) => {
                     <td className="table-td">
                       <span
                         className={`status ${
-                          result?.active ? "active" : "inactive"
+                          result?.active === t("active") ? "active" : "inactive"
                         }`}
+                        style={{
+                          cursor: role === "admin" ? "pointer" : "default",
+                        }}
+                        onClick={() => {
+                          if (role === "admin") {
+                            const data = {
+                              id: result.id,
+                              name: result.name,
+                              email: result.email,
+                              phone: result.phone,
+                              active: result.active === t("active") ? 0 : 1,
+                              powers:
+                                result.powers === t("admin")
+                                  ? "admin"
+                                  : "supAdmin",
+                            };
+                            dispatch(updateSubAdmin(data)).then((res) => {
+                              dispatch(getSubAdmins());
+                              if (!res.error) {
+                                toast.success(
+                                  t("toast.subAdmin.updatedSuccess")
+                                );
+                              } else {
+                                dispatch(getSubAdmins());
+                                toast.error(t("toast.subAdmin.updatedError"));
+                              }
+                            });
+                          }
+                        }}
                       >
-                        {result?.active ? t("active") : t("inactive")}
+                        {result?.active}
                       </span>
                     </td>
                   )}
                   {toggle.toggleColumns.control && (
                     <td className="table-td">
                       <span className="table-btn-container">
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
+                        <IoMdEye
+                          className="view-btn"
+                          onClick={() => {
+                            formik.setValues({
+                              id: result?.id,
+                              name: result?.name,
+                              email: result?.email,
+                              password: result?.password,
+                              phone: result?.phone,
+                              powers: result?.powers,
+                              status: result?.active,
+                              image: {
+                                file: "",
+                                preview: result?.image,
+                              },
+                            });
+                            setToggle({
+                              ...toggle,
+                              add: !toggle.add,
+                              read: true,
+                            });
+                          }}
                         />
-                        <MdEdit
-                          className="edit-btn"
-                          onClick={() => handleEdit(result)}
-                        />
+                        {role === "admin" && (
+                          <>
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                            <MdEdit
+                              className="edit-btn"
+                              onClick={() => handleEdit(result)}
+                            />
+                          </>
+                        )}
                       </span>
                     </td>
                   )}
@@ -568,7 +669,7 @@ const SubAdmins = ({ dashboard }) => {
       {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
-      {/* Add & Edit Sub Admin */}
+      {/* Add & Edit & Read Sub Admin */}
       <Modal
         isOpen={toggle.add}
         toggle={() => {
@@ -579,6 +680,7 @@ const SubAdmins = ({ dashboard }) => {
             powers: false,
             status: false,
             edit: false,
+            read: false,
           });
         }}
         centered={true}
@@ -595,10 +697,15 @@ const SubAdmins = ({ dashboard }) => {
               powers: false,
               status: false,
               edit: false,
+              read: false,
             });
           }}
         >
-          {toggle.edit ? t("subAdmin.editTitle") : t("subAdmin.addTitle")}
+          {toggle.edit
+            ? t("subAdmin.editTitle")
+            : toggle.read
+            ? formik.values.name
+            : t("subAdmin.addTitle")}
           <IoMdClose
             onClick={() => {
               formik.handleReset();
@@ -608,6 +715,7 @@ const SubAdmins = ({ dashboard }) => {
                 powers: false,
                 status: false,
                 edit: false,
+                read: false,
               });
             }}
           />
@@ -682,32 +790,36 @@ const SubAdmins = ({ dashboard }) => {
                           className="image-preview"
                         />
                       </ModalBody>
-                      <ModalFooter className="p-md-4 p-2">
-                        <div className="form-group-container d-flex justify-content-center align-items-center">
-                          <button
-                            className="delete-btn cancel-btn"
-                            onClick={handleDeleteImage}
-                          >
-                            {t("delete")}
-                          </button>
-                        </div>
-                      </ModalFooter>
+                      {!toggle.read && (
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={handleDeleteImage}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      )}
                     </Modal>
                   </label>
                 </div>
-                <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                  <label htmlFor="image" className="form-label">
-                    <ImUpload /> {t("chooseImage")}
-                  </label>
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="form-input form-img-input"
-                    id="image"
-                    ref={fileRef}
-                    onChange={handleImageChange}
-                  />
-                </div>
+                {!toggle.read && (
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImage")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      ref={fileRef}
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                )}
                 {formik.errors.image && formik.touched.image ? (
                   <span className="error text-center">
                     {formik.errors.image}
@@ -728,6 +840,7 @@ const SubAdmins = ({ dashboard }) => {
                     id="name"
                     placeholder={t("subAdmin.columns.name")}
                     name="name"
+                    disabled={toggle.read}
                     value={formik.values.name}
                     onChange={handleInput}
                   />
@@ -745,6 +858,7 @@ const SubAdmins = ({ dashboard }) => {
                     id="email"
                     placeholder={t("subAdmin.columns.email")}
                     name="email"
+                    disabled={toggle.read}
                     value={formik.values.email}
                     onChange={handleInput}
                   />
@@ -762,6 +876,7 @@ const SubAdmins = ({ dashboard }) => {
                     id="phone"
                     placeholder={t("subAdmin.columns.phone")}
                     name="phone"
+                    disabled={toggle.read}
                     value={formik.values.phone}
                     onChange={handleInput}
                   />
@@ -773,195 +888,276 @@ const SubAdmins = ({ dashboard }) => {
                   <label htmlFor="status" className="form-label">
                     {t("status")}
                   </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          status: !toggle.status,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.status === "inactive"
-                        ? t("inactive")
-                        : formik.values.status === "active"
-                        ? t("active")
-                        : t("status")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
+                  {toggle.read ? (
+                    <input
+                      type="text"
+                      className="form-input"
+                      id="status"
+                      placeholder={t("subAdmin.columns.status")}
+                      name="status"
+                      disabled={toggle.read}
+                      value={formik.values.status}
+                    />
+                  ) : (
+                    <div className="dropdown form-input">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            status: !toggle.status,
+                          });
+                        }}
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
+                      >
+                        {formik.values.status === "inactive"
+                          ? t("inactive")
+                          : formik.values.status === "active"
+                          ? t("active")
+                          : t("status")}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        />
+                      </button>
+                      <div
+                        className={`dropdown-content ${
                           toggle.status ? "active" : ""
                         }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.status ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "inactive" ? "active" : ""
-                        }`}
-                        value="inactive"
-                        name="status"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "inactive");
-                        }}
                       >
-                        {t("inactive")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.status === "active" ? "active" : ""
-                        }`}
-                        value="active"
-                        name="status"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            status: !toggle.status,
-                          });
-                          formik.setFieldValue("status", "active");
-                        }}
-                      >
-                        {t("active")}
-                      </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.status === "inactive" ? "active" : ""
+                          }`}
+                          value="inactive"
+                          name="status"
+                          onClick={(e) => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                            formik.setFieldValue("status", "inactive");
+                          }}
+                        >
+                          {t("inactive")}
+                        </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.status === "active" ? "active" : ""
+                          }`}
+                          value="active"
+                          name="status"
+                          onClick={(e) => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                            formik.setFieldValue("status", "active");
+                          }}
+                        >
+                          {t("active")}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                 </div>
                 <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                   <label htmlFor="powers" className="form-label">
                     {t("powers")}
                   </label>
-                  <div className="dropdown form-input">
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setToggle({
-                          ...toggle,
-                          powers: !toggle.powers,
-                        });
-                      }}
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
-                    >
-                      {formik.values.powers === "admin"
-                        ? t("admin")
-                        : formik.values.powers === "supAdmin"
-                        ? t("supAdmin")
-                        : t("powers")}
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
+                  {toggle.read ? (
+                    <input
+                      type="text"
+                      className="form-input"
+                      id="powers"
+                      placeholder={t("subAdmin.columns.powers")}
+                      name="powers"
+                      disabled={toggle.read}
+                      value={formik.values.powers}
+                    />
+                  ) : (
+                    <div className="dropdown form-input">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            powers: !toggle.powers,
+                          });
+                        }}
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
+                      >
+                        {formik.values.powers === "admin"
+                          ? t("admin")
+                          : formik.values.powers === "supAdmin"
+                          ? t("supAdmin")
+                          : t("powers")}
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.powers ? "active" : ""
+                          }`}
+                        />
+                      </button>
+                      <div
+                        className={`dropdown-content ${
                           toggle.powers ? "active" : ""
                         }`}
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.powers ? "active" : ""
-                      }`}
-                    >
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.powers === "admin" ? "active" : ""
-                        }`}
-                        value="admin"
-                        name="powers"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            powers: !toggle.powers,
-                          });
-                          formik.setFieldValue("powers", "admin");
-                        }}
                       >
-                        {t("admin")}
-                      </button>
-                      <button
-                        type="button"
-                        className={`item ${
-                          formik.values.powers === "supAdmin" ? "active" : ""
-                        }`}
-                        value="supAdmin"
-                        name="powers"
-                        onClick={(e) => {
-                          setToggle({
-                            ...toggle,
-                            powers: !toggle.powers,
-                          });
-                          formik.setFieldValue("powers", "supAdmin");
-                        }}
-                      >
-                        {t("supAdmin")}
-                      </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.powers === "admin" ? "active" : ""
+                          }`}
+                          value="admin"
+                          name="powers"
+                          onClick={(e) => {
+                            setToggle({
+                              ...toggle,
+                              powers: !toggle.powers,
+                            });
+                            formik.setFieldValue("powers", "admin");
+                          }}
+                        >
+                          {t("admin")}
+                        </button>
+                        <button
+                          type="button"
+                          className={`item ${
+                            formik.values.powers === "supAdmin" ? "active" : ""
+                          }`}
+                          value="supAdmin"
+                          name="powers"
+                          onClick={(e) => {
+                            setToggle({
+                              ...toggle,
+                              powers: !toggle.powers,
+                            });
+                            formik.setFieldValue("powers", "supAdmin");
+                          }}
+                        >
+                          {t("supAdmin")}
+                        </button>
+                      </div>
                     </div>
-                  </div>
+                  )}
                   {formik.errors.powers && formik.touched.powers ? (
                     <span className="error">{formik.errors.powers}</span>
                   ) : null}
                 </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="password" className="form-label">
-                    {t("auth.login.password")}
-                  </label>
-                  <input
-                    type="password"
-                    className="form-input"
-                    id="password"
-                    placeholder="********"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.password && formik.touched.password ? (
-                    <span className="error">{formik.errors.password}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="confirmPassword" className="form-label">
-                    {t("auth.login.confirmPassword")}
-                  </label>
-                  <input
-                    type="confirmPassword"
-                    className="form-input"
-                    id="confirmPassword"
-                    placeholder="********"
-                    name="confirmPassword"
-                    value={formik.values.confirmPassword}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.confirmPassword &&
-                  formik.touched.confirmPassword ? (
-                    <span className="error">
-                      {formik.errors.confirmPassword}
-                    </span>
-                  ) : null}
-                </div>
+                {!toggle.read && (
+                  <>
+                    <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="password" className="form-label">
+                        {t("auth.login.password")}
+                      </label>
+                      <input
+                        type={`${
+                          toggle.showHidePassword ? "text" : "password"
+                        }`}
+                        className="form-input"
+                        id="password"
+                        placeholder="********"
+                        name="password"
+                        value={formik.values.password}
+                        onChange={handleInput}
+                      />
+                      <span className="show-hide-password">
+                        {toggle.showHidePassword ? (
+                          <FaRegEye
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHidePassword: !toggle.showHidePassword,
+                              })
+                            }
+                          />
+                        ) : (
+                          <FaRegEyeSlash
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHidePassword: !toggle.showHidePassword,
+                              })
+                            }
+                          />
+                        )}
+                      </span>
+                      {formik.errors.password && formik.touched.password ? (
+                        <span className="error">{formik.errors.password}</span>
+                      ) : null}
+                    </div>
+                    <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="confirmPassword" className="form-label">
+                        {t("auth.login.confirmPassword")}
+                      </label>
+                      <input
+                        type={`${
+                          toggle.showHideConfirmedPassword ? "text" : "password"
+                        }`}
+                        className="form-input"
+                        id="confirmPassword"
+                        placeholder="********"
+                        name="confirmPassword"
+                        value={formik.values.confirmPassword}
+                        onChange={handleInput}
+                      />
+                      {formik.errors.confirmPassword &&
+                      formik.touched.confirmPassword ? (
+                        <span className="error">
+                          {formik.errors.confirmPassword}
+                        </span>
+                      ) : null}
+                      <span className="show-hide-password">
+                        {toggle.showHideConfirmedPassword ? (
+                          <FaRegEye
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHideConfirmedPassword:
+                                  !toggle.showHideConfirmedPassword,
+                              })
+                            }
+                          />
+                        ) : (
+                          <FaRegEyeSlash
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                showHideConfirmedPassword:
+                                  !toggle.showHideConfirmedPassword,
+                              })
+                            }
+                          />
+                        )}
+                      </span>
+                    </div>
+                  </>
+                )}
               </Col>
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : toggle.edit ? (
-                      t("edit")
-                    ) : (
-                      t("add")
-                    )}
-                  </button>
+                  {!toggle.read && (
+                    <button
+                      type="submit"
+                      className={`add-btn${loading ? " loading-btn" : ""}`}
+                    >
+                      {/* loading */}
+                      {loading ? (
+                        <span
+                          className="spinner-border spinner-border-sm"
+                          role="status"
+                          aria-hidden="true"
+                        ></span>
+                      ) : toggle.edit ? (
+                        t("edit")
+                      ) : (
+                        t("add")
+                      )}
+                    </button>
+                  )}
                   <button
                     type="button"
                     className="cancel-btn"
