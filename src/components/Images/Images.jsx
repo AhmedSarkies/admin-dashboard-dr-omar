@@ -238,6 +238,12 @@ const Images = () => {
       if (result.isConfirmed) {
         dispatch(deletePictureApi(picture?.id)).then((res) => {
           if (!res.error) {
+            if (searchResultsImagesCategory.length === 1) {
+              setToggle({
+                ...toggle,
+                currentPage: 1,
+              });
+            }
             dispatch(getPicturesApi());
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${picture?.title}`,
