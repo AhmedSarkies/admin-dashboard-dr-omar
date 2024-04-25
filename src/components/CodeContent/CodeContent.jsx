@@ -17,15 +17,18 @@ import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { getUsers } from "../../store/slices/userSlice";
 import Swal from "sweetalert2";
+import Cookies from "js-cookie";
 
 const CodeContent = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
   const { codeContent } = useSelector((state) => state.codeContent);
   const [toggle, setToggle] = useState({
     add: false,
+    show: false,
     checked: false,
     checkedAll: false,
     id: [],
@@ -54,40 +57,42 @@ const CodeContent = () => {
     },
     validationSchema: validationSchema.codeContent,
     onSubmit: (values) => {
-      if (values?.id) {
-        dispatch(updateCodeContent(values)).then((res) => {
-          if (!res.error) {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            dispatch(getCodeContent());
-            dispatch(getUsers());
-            formik.handleReset();
-            toast.success(t("toast.codeContent.updatedSuccess"));
-          } else {
-            dispatch(getCodeContent());
-            dispatch(getUsers());
-            toast.error(t("toast.codeContent.updatedError"));
-          }
-        });
-      } else {
-        dispatch(sendCodeContentAll(values)).then((res) => {
-          if (!res.error) {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-            });
-            dispatch(getCodeContent());
-            dispatch(getUsers());
-            formik.handleReset();
-            toast.success(t("toast.codeContent.addedSuccess"));
-          } else {
-            dispatch(getCodeContent());
-            dispatch(getUsers());
-            toast.error(t("toast.codeContent.addedError"));
-          }
-        });
+      if (role === "admin") {
+        if (values?.id) {
+          dispatch(updateCodeContent(values)).then((res) => {
+            if (!res.error) {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+              dispatch(getCodeContent());
+              dispatch(getUsers());
+              formik.handleReset();
+              toast.success(t("toast.codeContent.updatedSuccess"));
+            } else {
+              dispatch(getCodeContent());
+              dispatch(getUsers());
+              toast.error(t("toast.codeContent.updatedError"));
+            }
+          });
+        } else {
+          dispatch(sendCodeContentAll(values)).then((res) => {
+            if (!res.error) {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+              dispatch(getCodeContent());
+              dispatch(getUsers());
+              formik.handleReset();
+              toast.success(t("toast.codeContent.addedSuccess"));
+            } else {
+              dispatch(getCodeContent());
+              dispatch(getUsers());
+              toast.error(t("toast.codeContent.addedError"));
+            }
+          });
+        }
       }
     },
   });
@@ -182,17 +187,27 @@ const CodeContent = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getUsers());
       dispatch(getCodeContent());
+      dispatch(getUsers());
       formik.setValues({
         id: codeContent[0]?.id,
         code: codeContent[0]?.code,
       });
+      if (role !== "admin") {
+        setToggle({
+          ...toggle,
+          toggleColumns: {
+            ...toggle.toggleColumns,
+            checkboxes: false,
+            send: false,
+          },
+        });
+      }
     } catch (error) {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch]);
+  }, [dispatch, role]);
 
   // Add just selected users to the list
   const [ids, setIds] = useState([]);
@@ -240,70 +255,97 @@ const CodeContent = () => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      <div className="table-header">
-        <button
-          className="add-btn send"
-          onClick={() => {
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              everyOne: true,
-              edit: true,
-            });
-            dispatch(getCodeContent());
-            formik.setValues({
-              id: codeContent[0]?.id,
-              code: codeContent[0]?.code,
-            });
-          }}
-          style={{
-            opacity: loading ? "0.5" : "1",
-            pointerEvents: loading ? "none" : "auto",
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-        >
-          {loading ? (
-            <span
-              className="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          ) : (
-            <>
-              <MdEdit />
-              {t("settings.codeContent.editTitle")}
-            </>
-          )}
-        </button>
-        <button
-          className="add-btn send"
-          onClick={() =>
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              everyOne: true,
-              edit: false,
-            })
-          }
-          style={{
-            opacity: loading ? "0.5" : "1",
-            pointerEvents: loading ? "none" : "auto",
-            cursor: loading ? "not-allowed" : "pointer",
-          }}
-        >
-          {loading ? (
-            <span
-              className="spinner-border spinner-border-sm"
-              role="status"
-              aria-hidden="true"
-            ></span>
-          ) : (
-            <>
-              <MdSend />
-              {t("settings.codeContent.addTitle")}
-            </>
-          )}
-        </button>
+      {role === "admin" && !loading && (
+        <div className="table-header">
+          <button
+            className="add-btn send"
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+                everyOne: true,
+                edit: true,
+              });
+              dispatch(getCodeContent());
+              formik.setValues({
+                id: codeContent[0]?.id,
+                code: codeContent[0]?.code,
+              });
+            }}
+            style={{
+              opacity: loading ? "0.5" : "1",
+              pointerEvents: loading ? "none" : "auto",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? (
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            ) : (
+              <>
+                <MdEdit />
+                {t("settings.codeContent.editTitle")}
+              </>
+            )}
+          </button>
+          <button
+            className="add-btn send"
+            onClick={() =>
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+                everyOne: true,
+                edit: false,
+              })
+            }
+            style={{
+              opacity: loading ? "0.5" : "1",
+              pointerEvents: loading ? "none" : "auto",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {loading ? (
+              <span
+                className="spinner-border spinner-border-sm"
+                role="status"
+                aria-hidden="true"
+              ></span>
+            ) : (
+              <>
+                <MdSend />
+                {t("settings.codeContent.addTitle")}
+              </>
+            )}
+          </button>
+        </div>
+      )}
+      <div className="table-header justify-content-end">
+        {!loading && (
+          <button
+            className="add-btn send"
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                show: !toggle.show,
+              });
+              dispatch(getCodeContent());
+              formik.setValues({
+                id: codeContent[0]?.id,
+                code: codeContent[0]?.code,
+              });
+            }}
+            style={{
+              opacity: loading ? "0.5" : "1",
+              pointerEvents: loading ? "none" : "auto",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {t("settings.codeContent.showTitle")}
+          </button>
+        )}
       </div>
       <div className="scholar">
         <div className={`table-header ${ids.length > 0 ? "mb-3" : "mb-4"}`}>
@@ -350,29 +392,34 @@ const CodeContent = () => {
                 maxHeight: "160px",
               }}
             >
-              {columns.map((column) => (
-                <button
-                  type="button"
-                  key={column.id}
-                  className={`item filter`}
-                  onClick={() => handleToggleColumns(column.name)}
-                >
-                  <span className="d-flex justify-content-start align-items-center gap-2">
-                    <input
-                      type="checkbox"
-                      className="checkbox-column"
-                      checked={toggle.toggleColumns[column.name]}
-                      readOnly
-                    />
-                    <span>{column.label}</span>
-                  </span>
-                </button>
-              ))}
+              {columns
+                .filter(
+                  (column) =>
+                    column.name !== "checkboxes" && column.name !== "send"
+                )
+                .map((column) => (
+                  <button
+                    type="button"
+                    key={column.id}
+                    className={`item filter`}
+                    onClick={() => handleToggleColumns(column.name)}
+                  >
+                    <span className="d-flex justify-content-start align-items-center gap-2">
+                      <input
+                        type="checkbox"
+                        className="checkbox-column"
+                        checked={toggle.toggleColumns[column.name]}
+                        readOnly
+                      />
+                      <span>{column.label}</span>
+                    </span>
+                  </button>
+                ))}
             </div>
           </div>
         </div>
         {/* Send Selected Users */}
-        {ids.length > 0 && (
+        {role === "admin" && ids.length > 0 && (
           <div className="table-header justify-content-start m-0">
             <button
               className="add-btn send"
@@ -403,7 +450,7 @@ const CodeContent = () => {
         <table className="table-body">
           <thead>
             <tr>
-              {toggle.toggleColumns?.checkboxes && (
+              {role === "admin" && toggle.toggleColumns?.checkboxes && (
                 <th className="table-th" onClick={handleAddAll}>
                   <input
                     type="checkbox"
@@ -461,7 +508,7 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.send && (
+              {role === "admin" && toggle.toggleColumns?.send && (
                 <th className="table-th">
                   {t("settings.codeContent.columns.send")}
                 </th>
@@ -472,7 +519,7 @@ const CodeContent = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -490,7 +537,7 @@ const CodeContent = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -510,7 +557,7 @@ const CodeContent = () => {
           {results?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -522,7 +569,7 @@ const CodeContent = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="6">
+                <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -533,7 +580,7 @@ const CodeContent = () => {
             <tbody>
               {results?.map((result, idx) => (
                 <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns?.checkboxes && (
+                  {role === "admin" && toggle.toggleColumns?.checkboxes && (
                     <td className="table-td">
                       <input
                         type="checkbox"
@@ -567,7 +614,7 @@ const CodeContent = () => {
                       </span>
                     </td>
                   )}
-                  {toggle.toggleColumns?.send && (
+                  {role === "admin" && toggle.toggleColumns?.send && (
                     <td className="table-td send">
                       <MdSend
                         className="btn-edit"
@@ -587,11 +634,11 @@ const CodeContent = () => {
       </div>
       {/* Add Book */}
       <Modal
-        isOpen={toggle.add}
+        isOpen={toggle.show}
         toggle={() => {
           setToggle({
             ...toggle,
-            add: !toggle.add,
+            show: !toggle.show,
           });
           formik.handleReset();
         }}
@@ -604,19 +651,17 @@ const CodeContent = () => {
           toggle={() => {
             setToggle({
               ...toggle,
-              add: !toggle.add,
+              show: !toggle.add,
             });
             formik.handleReset();
           }}
         >
-          {toggle.add === true && toggle.edit === false
-            ? t("settings.codeContent.addTitle")
-            : t("settings.codeContent.editTitle")}
+          {t("settings.codeContent.showTitle")}
           <IoMdClose
             onClick={() => {
               setToggle({
                 ...toggle,
-                add: !toggle.add,
+                show: !toggle.show,
               });
               formik.handleReset();
             }}
@@ -637,8 +682,8 @@ const CodeContent = () => {
                     name="code"
                     className="form-input w-100"
                     placeholder={t("settings.codeContent.columns.code")}
+                    disabled={true}
                     value={formik.values.code}
-                    onChange={formik.handleChange}
                   />
                   {formik.errors.code && formik.touched.code ? (
                     <span className="error">{formik.errors.code}</span>
@@ -649,27 +694,13 @@ const CodeContent = () => {
             <Row className="d-flex justify-content-center align-items-center p-3">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  <button type="submit" className="add-btn">
-                    {/* loading */}
-                    {loading ? (
-                      <span
-                        className="spinner-border spinner-border-sm"
-                        role="status"
-                        aria-hidden="true"
-                      ></span>
-                    ) : toggle.add === true && toggle.edit === false ? (
-                      t("settings.codeContent.addTitle")
-                    ) : (
-                      t("settings.codeContent.editTitle")
-                    )}
-                  </button>
                   <button
                     type="button"
                     className="cancel-btn"
                     onClick={() => {
                       setToggle({
                         ...toggle,
-                        add: !toggle.add,
+                        show: !toggle.show,
                       });
                       formik.handleReset();
                     }}
@@ -682,6 +713,113 @@ const CodeContent = () => {
           </form>
         </ModalBody>
       </Modal>
+      {role === "admin" && (
+        <>
+          {/* Add Book */}
+          <Modal
+            isOpen={toggle.add}
+            toggle={() => {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+              });
+              formik.handleReset();
+            }}
+            centered={true}
+            keyboard={true}
+            size={"md"}
+            contentClassName="modal-add-book modal-add-scholar"
+          >
+            <ModalHeader
+              toggle={() => {
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                });
+                formik.handleReset();
+              }}
+            >
+              {toggle.add === true && toggle.edit === false
+                ? t("settings.codeContent.addTitle")
+                : t("settings.codeContent.editTitle")}
+              <IoMdClose
+                onClick={() => {
+                  setToggle({
+                    ...toggle,
+                    add: !toggle.add,
+                  });
+                  formik.handleReset();
+                }}
+              />
+            </ModalHeader>
+            <ModalBody>
+              <form className="overlay-form" onSubmit={formik.handleSubmit}>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12}>
+                    {/* Code */}
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="code" className="form-label">
+                        {t("settings.codeContent.columns.code")}
+                      </label>
+                      <input
+                        type="text"
+                        id="code"
+                        name="code"
+                        className="form-input w-100"
+                        placeholder={t("settings.codeContent.columns.code")}
+                        disabled={role === "admin" ? false : true}
+                        value={formik.values.code}
+                        onChange={formik.handleChange}
+                      />
+                      {formik.errors.code && formik.touched.code ? (
+                        <span className="error">{formik.errors.code}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                </Row>
+                <Row className="d-flex justify-content-center align-items-center p-3">
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                      {role === "admin" && (
+                        <button
+                          type="submit"
+                          className={`add-btn${loading ? " loading-btn" : ""}`}
+                        >
+                          {/* loading */}
+                          {loading ? (
+                            <span
+                              className="spinner-border spinner-border-sm"
+                              role="status"
+                              aria-hidden="true"
+                            ></span>
+                          ) : toggle.add === true && toggle.edit === false ? (
+                            t("settings.codeContent.addTitle")
+                          ) : (
+                            t("settings.codeContent.editTitle")
+                          )}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="cancel-btn"
+                        onClick={() => {
+                          setToggle({
+                            ...toggle,
+                            add: !toggle.add,
+                          });
+                          formik.handleReset();
+                        }}
+                      >
+                        {t("cancel")}
+                      </button>
+                    </div>
+                  </Col>
+                </Row>
+              </form>
+            </ModalBody>
+          </Modal>
+        </>
+      )}
     </div>
   );
 };
