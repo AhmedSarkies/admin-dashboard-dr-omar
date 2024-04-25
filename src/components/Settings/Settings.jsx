@@ -14,6 +14,7 @@ import {
   ModalFooter,
   ModalHeader,
   Row,
+  Spinner,
 } from "reactstrap";
 import { IoMdClose } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
@@ -308,8 +309,16 @@ const Settings = () => {
   }, [settings]);
 
   return (
-    <>
-      <div className="scholar-container mt-4 mb-5 m-3">
+    <div
+      className={`scholar-container mt-4 mb-5 m-3${
+        loading
+          ? " pt-5 pb-5 d-flex justify-content-center align-items-center"
+          : ""
+      }`}
+    >
+      {loading ? (
+        <Spinner color="primary" style={{ width: "3rem", height: "3rem" }} />
+      ) : (
         <form className="w-100" onSubmit={formik.handleSubmit}>
           {/* Logo */}
           <div className="table-header justify-content-end">
@@ -726,6 +735,9 @@ const Settings = () => {
                   value={formik.values.prayer_timings}
                   checked={formik.values.prayer_timings}
                   onChange={handleInputChange}
+                  style={{
+                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                  }}
                 />
               </div>
             </Col>
@@ -762,6 +774,9 @@ const Settings = () => {
                   value={formik.values.code_phone}
                   checked={formik.values.code_phone}
                   onChange={handleInputChange}
+                  style={{
+                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                  }}
                 />
               </div>
             </Col>
@@ -779,6 +794,9 @@ const Settings = () => {
                   value={formik.values.code_email}
                   checked={formik.values.code_email}
                   onChange={handleInputChange}
+                  style={{
+                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                  }}
                 />
               </div>
             </Col>
@@ -793,7 +811,7 @@ const Settings = () => {
               className="title"
               style={{
                 color: "var(--main-color)",
-                marginBottom: "0 !important",
+                marginBottom: "0",
               }}
             >
               {t("settings.links.contact.title")}
@@ -895,8 +913,8 @@ const Settings = () => {
             </Row>
           )}
         </form>
-      </div>
-    </>
+      )}
+    </div>
   );
 };
 
