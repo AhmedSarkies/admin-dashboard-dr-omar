@@ -6,26 +6,23 @@ import {
   Col,
   Modal,
   ModalBody,
-  ModalFooter,
   ModalHeader,
   Row,
   Spinner,
 } from "reactstrap";
-import { object, string } from "yup";
-
 import anonymous from "../../assets/images/anonymous.png";
 import { useTranslation } from "react-i18next";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { getSubAdmins, updateSubAdmin } from "../../store/slices/subAdminSlice";
-import Cookies from "js-cookie";
 import { toast } from "react-toastify";
+import { getProfile, updateProfile } from "../../store/slices/profileSlice";
+import useSchema from "../../hooks/useSchema";
 
 const EditProfile = () => {
   const { t } = useTranslation();
-  const { id } = useParams();
   const dispatch = useDispatch();
-  const { subAdmins, loading } = useSelector((state) => state.subAdmin);
+  const { validationSchema } = useSchema();
+  const { profile, loading } = useSelector((state) => state.profile);
   const [toggle, setToggle] = useState({});
   const navigate = useNavigate();
 
@@ -39,56 +36,24 @@ const EditProfile = () => {
         preview: "",
       },
     },
-    validationSchema: object().shape({
-      name: string().required("يجب ادخال الاسم"),
-      email: string()
-        .email("يجب ادخال البريد الالكتروني بشكل صحيح")
-        .required("يجب ادخال البريد الالكتروني"),
-      phone: string()
-        .min(11, "يجب ادخال رقم الهاتف بشكل صحيح")
-        .required("يجب ادخال رقم الهاتف"),
-    }),
+    validationSchema: validationSchema.editProfile,
     onSubmit: (values) => {
-      if (values.image.file === "") {
-        dispatch(
-          updateSubAdmin({
-            id: parseInt(id),
-            name: values.name,
-            email: values.email,
-            phone: values.phone,
-            active: Cookies.get("_active"),
-            powers: Cookies.get("_role"),
-          })
-        ).then((res) => {
-          if (res.meta.requestStatus === "fulfilled") {
-            formik.resetForm();
-            toast.success(t("toast.profile.updatedSuccess"));
-            navigate("/dr-omar/profile");
-          } else {
-            toast.error(t("toast.profile.updatedError"));
-          }
-        });
-      } else {
-        dispatch(
-          updateSubAdmin({
-            id: parseInt(id),
-            active: Cookies.get("_active"),
-            powers: Cookies.get("_role"),
-            image: values.image.file,
-            name: values.name,
-            email: values.email,
-            phone: values.phone,
-          })
-        ).then((res) => {
-          if (res.meta.requestStatus === "fulfilled") {
-            formik.resetForm();
-            toast.success(t("toast.profile.updatedSuccess"));
-            navigate("/dr-omar/profile");
-          } else {
-            toast.error(t("toast.profile.updatedError"));
-          }
-        });
+      const formData = new FormData();
+      formData.append("name", values.name);
+      formData.append("email", values.email);
+      formData.append("phone", values.phone);
+      if (values.image.file !== "") {
+        formData.append("image", profile.image);
       }
+      dispatch(updateProfile(formData)).then((res) => {
+        if (!res.error) {
+          formik.resetForm();
+          toast.success(t("toast.profile.updatedSuccess"));
+          navigate("/dr-omar/profile");
+        } else {
+          toast.error(t("toast.profile.updatedError"));
+        }
+      });
     },
   });
 
@@ -113,30 +78,24 @@ const EditProfile = () => {
 
   useEffect(() => {
     try {
-      dispatch(getSubAdmins());
+      dispatch(getProfile()).then((res) => {
+        if (!res.error) {
+          formik.setValues({
+            name: profile.name,
+            email: profile.email,
+            phone: profile.phone,
+            image: {
+              file: "",
+              preview: profile.image,
+            },
+          });
+        }
+      });
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
-
-  useEffect(() => {
-    if (id === undefined) return;
-    if (subAdmins.length === 0) return;
-    // Get Data By ID Using Filter Method
-    if (id) {
-      const data = subAdmins.filter((subAdmin) => subAdmin.id === parseInt(id));
-      formik.setValues({
-        name: data[0]?.name,
-        email: data[0]?.email,
-        phone: data[0]?.phone,
-        image: {
-          file: "",
-          preview: data[0]?.image,
-        },
-      });
-    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [subAdmins]);
+  }, [dispatch]);
 
   return (
     <div className="profile-container">
@@ -227,7 +186,7 @@ const EditProfile = () => {
                             className="image-preview"
                           />
                         </ModalBody>
-                        <ModalFooter className="p-md-4 p-2">
+                        {/* <ModalFooter className="p-md-4 p-2">
                           <div className="form-group-container d-flex justify-content-center align-items-center">
                             <button
                               className="delete-btn cancel-btn"
@@ -245,7 +204,7 @@ const EditProfile = () => {
                               حذف
                             </button>
                           </div>
-                        </ModalFooter>
+                        </ModalFooter> */}
                       </Modal>
                     </label>
                   </div>
@@ -261,6 +220,9 @@ const EditProfile = () => {
                       onChange={handleImageChange}
                     />
                   </div>
+                  {formik.touched.image && formik.errors.image ? (
+                    <span className="error">{formik.errors.image}</span>
+                  ) : null}
                 </Col>
                 <div className="form-group">
                   <input
@@ -327,7 +289,10 @@ const EditProfile = () => {
                   >
                     {t("cancel")}
                   </button>
-                  <button type="submit" className="add-btn">
+                  <button
+                    type="submit"
+                    className={`add-btn${loading ? " loading-btn" : ""}`}
+                  >
                     {loading ? (
                       <Spinner
                         color="primary"
