@@ -93,6 +93,7 @@ const introductionPageSlice = createSlice({
     builder.addCase(getIntroductionPageApi.fulfilled, (state, action) => {
       state.introductionPage = action.payload;
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(getIntroductionPageApi.rejected, (state, action) => {
