@@ -223,7 +223,7 @@ const Elders = () => {
 
   // Delete Scholar
   const handleDelete = (elder) => {
-    if(role === "admin") {
+    if (role === "admin") {
       Swal.fire({
         title: t("titleDeleteAlert") + elder?.name + "?",
         text: t("textDeleteAlert"),
@@ -237,10 +237,10 @@ const Elders = () => {
         if (result.isConfirmed) {
           dispatch(deleteScholarApi(elder?.id)).then((res) => {
             if (!res.error) {
-              if (searchResultsElders.length === 1) {
+              if (toggle.currentPage > 1 && searchResultsElders.length === 1) {
                 setToggle({
                   ...toggle,
-                  currentPage: 1,
+                  currentPage: toggle.currentPage - 1,
                 });
               }
               dispatch(getScholarsApi());
