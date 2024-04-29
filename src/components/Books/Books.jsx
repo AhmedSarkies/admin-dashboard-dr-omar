@@ -85,6 +85,8 @@ const Books = () => {
       image: true,
       title: true,
       category: true,
+      subCategory: true,
+      subSubCategory: true,
       // book: true,
       pages: true,
       visits: true,
@@ -106,6 +108,16 @@ const Books = () => {
     return {
       ...book,
       categories: book?.Sup_Sup_categories[0],
+      sub_categories: {
+        id: 1,
+        title: "Sub Category",
+      },
+      main_categories: {
+        id: 1,
+        title: "Main Category",
+      },
+      // sub_categories: book?.Sup_Main_categories[0],
+      // main_categories: book?.Main_categories[0],
       status: book?.status === "public" ? t("public") : t("private"),
       is_active: book?.is_active === 1 ? t("active") : t("inactive"),
       number_pages: book?.number_pages === null ? 0 : book?.number_pages,
@@ -124,20 +136,27 @@ const Books = () => {
     toggle,
     setToggle,
   });
+
   // Columns
   const columns = [
     { id: 0, name: "id", label: t("index") },
     { id: 1, name: "image", label: t("books.columns.book.image") },
     { id: 2, name: "title", label: t("books.columns.book.title") },
     { id: 3, name: "category", label: t("books.columns.book.category") },
-    { id: 4, name: "pages", label: t("pages") },
-    { id: 5, name: "visits", label: t("visits") },
-    { id: 6, name: "favorites", label: t("favorites") },
-    { id: 7, name: "downloads", label: t("downloads") },
-    { id: 8, name: "shares", label: t("shares") },
-    { id: 9, name: "status", label: t("content") },
-    { id: 10, name: "activation", label: t("activation") },
-    { id: 11, name: "control", label: t("action") },
+    { id: 4, name: "subCategory", label: t("books.columns.book.subCategory") },
+    {
+      id: 5,
+      name: "subSubCategory",
+      label: t("books.columns.book.subSubCategory"),
+    },
+    { id: 6, name: "pages", label: t("pages") },
+    { id: 7, name: "visits", label: t("visits") },
+    { id: 8, name: "favorites", label: t("favorites") },
+    { id: 9, name: "downloads", label: t("downloads") },
+    { id: 10, name: "shares", label: t("shares") },
+    { id: 11, name: "status", label: t("content") },
+    { id: 12, name: "activation", label: t("activation") },
+    { id: 13, name: "control", label: t("action") },
   ];
 
   const onSubmit = (values) => {
@@ -334,6 +353,15 @@ const Books = () => {
           dispatch(deleteBookApi(book?.id)).then((res) => {
             if (!res.error) {
               dispatch(getBooksApi());
+              if (
+                toggle.currentPage > 1 &&
+                searchResultsBookSCategoryAndTitle.length === 1
+              ) {
+                setToggle({
+                  ...toggle,
+                  currentPage: toggle.currentPage - 1,
+                });
+              }
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${book?.name}`,
                 text: `${t("titleDeletedSuccess")} ${book?.name} ${t(
@@ -399,7 +427,7 @@ const Books = () => {
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "40%",
+              width: "50%",
             }}
           >
             <input
@@ -500,9 +528,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.pages && (
+              {toggle.toggleColumns.subCategory && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("pages")}
+                  {t("books.columns.book.subCategory")}
                   {toggle.sortColumn === columns[4].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -512,9 +540,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.subSubCategory && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("visits")}
+                  {t("books.columns.book.subSubCategory")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -524,9 +552,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.pages && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("favorites")}
+                  {t("pages")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -536,9 +564,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("downloads")}
+                  {t("visits")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -548,9 +576,9 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("shares")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -560,10 +588,40 @@ const Books = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("content")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.shares && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("shares")}
+                  {toggle.sortColumn === columns[10].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[11])}
+                >
+                  {t("content")}
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -575,10 +633,10 @@ const Books = () => {
               {toggle.toggleColumns.activation && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[12])}
                 >
                   {t("activation")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[12].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -588,19 +646,7 @@ const Books = () => {
                 </th>
               )}
               {toggle.toggleColumns.control && (
-                <th
-                  className="table-th"
-                  onClick={() => handleSort(columns[11])}
-                >
-                  {t("action")}
-                  {toggle.sortColumn === columns[11].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
+                <th className="table-th">{t("action")}</th>
               )}
             </tr>
           </thead>
@@ -695,6 +741,16 @@ const Books = () => {
                     )}
                     {toggle.toggleColumns.category && (
                       <td className="table-td">{result?.categories?.title}</td>
+                    )}
+                    {toggle.toggleColumns.subCategory && (
+                      <td className="table-td">
+                        {result?.sub_categories?.title}
+                      </td>
+                    )}
+                    {toggle.toggleColumns.subSubCategory && (
+                      <td className="table-td">
+                        {result?.main_categories?.title}
+                      </td>
                     )}
                     {toggle.toggleColumns.pages && (
                       <td className="table-td">{result?.number_pages}</td>
