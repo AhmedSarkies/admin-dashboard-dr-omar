@@ -72,7 +72,7 @@ const Home = () => {
       path: "/dr-omar/sub-main-categories-book",
     },
     {
-      title: t("linkItems.SubSubCategoriesBooks"),
+      title: t("linkItems.subSubCategoriesBooks"),
       path: "/dr-omar/sub-sub-categories-book",
     },
     {
