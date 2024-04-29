@@ -355,6 +355,15 @@ const Audios = () => {
           dispatch(deleteAudioApi(audio?.id)).then((res) => {
             if (!res.error) {
               dispatch(getAudiosApi());
+              if (
+                toggle.currentPage > 1 &&
+                searchResultsAudioSCategoryAndTitleAndAuthor.length === 1
+              ) {
+                setToggle({
+                  ...toggle,
+                  currentPage: toggle.currentPage - 1,
+                });
+              }
               Swal.fire({
                 title: `${t("titleDeletedSuccess")} ${audio?.title}`,
                 text: `${t("titleDeletedSuccess")} ${audio?.title} ${t(
