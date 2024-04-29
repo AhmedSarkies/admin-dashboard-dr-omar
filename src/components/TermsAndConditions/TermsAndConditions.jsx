@@ -40,7 +40,6 @@ const TermsAndConditions = () => {
     toggleColumns: {
       id: true,
       title: true,
-      country: true,
       text: true,
       control: true,
     },
@@ -55,8 +54,6 @@ const TermsAndConditions = () => {
     initialValues: {
       title: "",
       title_en: "",
-      country: "",
-      country_en: "",
       text: "",
       text_en: "",
       isEditing: false,
@@ -64,19 +61,15 @@ const TermsAndConditions = () => {
     validationSchema: validationSchema.termsAndConditions,
     onSubmit: (values) => {
       if (role === "admin") {
+        const formDate = new FormData();
+        formDate.append("title", values.title);
+        formDate.append("title_en", values.title_en);
+        formDate.append("text", values.text);
+        formDate.append("text_en", values.text_en);
         if (values.id) {
+          formDate.append("id", values.id);
           // Edit
-          dispatch(
-            updateTermAndConditionApi({
-              id: values.id,
-              title: values.title.toLowerCase(),
-              title_en: values.title_en.toLowerCase(),
-              country: values.country.toLowerCase(),
-              country_en: values.country_en.toLowerCase(),
-              text: values.text.toLowerCase(),
-              text_en: values.text_en.toLowerCase(),
-            })
-          ).then((res) => {
+          dispatch(updateTermAndConditionApi(formDate)).then((res) => {
             if (!res.error) {
               dispatch(getTermsAndConditionsApi());
               setToggle({
@@ -92,16 +85,7 @@ const TermsAndConditions = () => {
           });
         } else {
           // Add
-          dispatch(
-            addTermAndConditionApi({
-              title: values.title.toLowerCase(),
-              title_en: values.title_en.toLowerCase(),
-              country: values.country.toLowerCase(),
-              country_en: values.country_en.toLowerCase(),
-              text: values.text.toLowerCase(),
-              text_en: values.text_en.toLowerCase(),
-            })
-          ).then((res) => {
+          dispatch(addTermAndConditionApi(formDate)).then((res) => {
             if (!res.error) {
               dispatch(getTermsAndConditionsApi());
               toast.success(t("toast.termsAndConditions.addedSuccess"));
@@ -131,15 +115,10 @@ const TermsAndConditions = () => {
     },
     {
       id: 2,
-      name: "country",
-      label: t("settings.termsAndConditions.columns.country"),
-    },
-    {
-      id: 3,
       name: "text",
       label: t("settings.termsAndConditions.columns.text"),
     },
-    { id: 4, name: "control", label: t("action") },
+    { id: 3, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -162,8 +141,6 @@ const TermsAndConditions = () => {
     formik.setValues({
       title: termsAndCondition?.title,
       title_en: termsAndCondition?.title_en,
-      country: termsAndCondition?.country,
-      country_en: termsAndCondition?.country_en,
       text: termsAndCondition?.text,
       text_en: termsAndCondition?.text_en,
       isEditing: true,
@@ -195,10 +172,10 @@ const TermsAndConditions = () => {
           dispatch(deleteTermAndConditionApi(termsAndCondition?.id)).then(
             (res) => {
               if (!res.error) {
-                if (searchResults.length === 1) {
+                if (toggle.currentPage > 1 && searchResults.length === 1) {
                   setToggle({
                     ...toggle,
-                    currentPage: 1,
+                    currentPage: toggle.currentPage - 1,
                   });
                 }
                 dispatch(getTermsAndConditionsApi());
@@ -364,12 +341,12 @@ const TermsAndConditions = () => {
                     ) : null}
                   </th>
                 )}
-                {toggle.toggleColumns?.country && (
+                {toggle.toggleColumns.text && (
                   <th
                     className="table-th"
                     onClick={() => handleSort(columns[2])}
                   >
-                    {t("settings.termsAndConditions.columns.country")}
+                    {t("settings.termsAndConditions.columns.text")}
                     {toggle.sortColumn === columns[2].name ? (
                       toggle.sortOrder === "asc" ? (
                         <TiArrowSortedUp />
@@ -379,35 +356,8 @@ const TermsAndConditions = () => {
                     ) : null}
                   </th>
                 )}
-                {toggle.toggleColumns.text && (
-                  <th
-                    className="table-th"
-                    onClick={() => handleSort(columns[3])}
-                  >
-                    {t("settings.termsAndConditions.columns.text")}
-                    {toggle.sortColumn === columns[3].name ? (
-                      toggle.sortOrder === "asc" ? (
-                        <TiArrowSortedUp />
-                      ) : (
-                        <TiArrowSortedDown />
-                      )
-                    ) : null}
-                  </th>
-                )}
                 {role === "admin" && toggle.toggleColumns.control && (
-                  <th
-                    className="table-th"
-                    onClick={() => handleSort(columns[4])}
-                  >
-                    {t("action")}
-                    {toggle.sortColumn === columns[4].name ? (
-                      toggle.sortOrder === "asc" ? (
-                        <TiArrowSortedUp />
-                      ) : (
-                        <TiArrowSortedDown />
-                      )
-                    ) : null}
-                  </th>
+                  <th className="table-th">{t("action")}</th>
                 )}
               </tr>
             </thead>
@@ -415,7 +365,7 @@ const TermsAndConditions = () => {
             {error !== null && loading === false && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 5 : 4}>
+                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
                     <p className="no-data mb-0">
                       {error === "Network Error"
                         ? t("networkError")
@@ -433,7 +383,7 @@ const TermsAndConditions = () => {
             {loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 5 : 4}>
+                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
                     <div className="no-data mb-0">
                       <Spinner
                         color="primary"
@@ -453,7 +403,7 @@ const TermsAndConditions = () => {
             {searchResults?.length === 0 && error === null && !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 5 : 4}>
+                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -465,7 +415,7 @@ const TermsAndConditions = () => {
             ) && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 5 : 4}>
+                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
                     <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                   </td>
                 </tr>
@@ -484,11 +434,6 @@ const TermsAndConditions = () => {
                       {toggle.toggleColumns?.title && (
                         <td className="table-td title">
                           {lng === "ar" ? result?.title : result?.title_en}
-                        </td>
-                      )}
-                      {toggle.toggleColumns?.country && (
-                        <td className="table-td country">
-                          {lng === "ar" ? result?.country : result?.country_en}
                         </td>
                       )}
                       {toggle.toggleColumns?.text && (
@@ -559,9 +504,9 @@ const TermsAndConditions = () => {
               </ModalHeader>
               <ModalBody>
                 <form className="overlay-form" onSubmit={formik.handleSubmit}>
-                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3">
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center gap-lg-0 gap-3 p-3 pb-0">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <input
                           type="text"
                           className="form-control"
@@ -582,7 +527,7 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
-                    <Col lg={6} className="mb-3">
+                    {/* <Col lg={6} className="mb-3">
                       <div className="form-group mb-4">
                         <input
                           type="text"
@@ -604,33 +549,9 @@ const TermsAndConditions = () => {
                           <p className="error">{formik.errors.country}</p>
                         )}
                       </div>
-                    </Col>
-                    <Col lg={12} className="mb-3">
-                      <div className="form-group mb-4">
-                        <textarea
-                          className="form-control"
-                          id="text"
-                          name="text"
-                          placeholder={t(
-                            "settings.termsAndConditions.columns.ar.text"
-                          )}
-                          value={formik.values.text}
-                          onChange={handleInputChange}
-                        />
-                        <label htmlFor="text" className="label-form">
-                          {t("settings.termsAndConditions.columns.ar.text")}
-                        </label>
-                      </div>
-                      <div className="error-container">
-                        {formik.errors.text && formik.touched.text && (
-                          <p className="error">{formik.errors.text}</p>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
-                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3">
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
+                    </Col> */}
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <input
                           type="text"
                           className="form-control"
@@ -651,7 +572,9 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
-                    <Col lg={6} className="mb-3">
+                  </Row>
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center gap-lg-0 gap-3 p-3 pb-0">
+                    {/* <Col lg={6} className="mb-3">
                       <div className="form-group mb-4">
                         <input
                           type="text"
@@ -674,9 +597,31 @@ const TermsAndConditions = () => {
                             <p className="error">{formik.errors.country_en}</p>
                           )}
                       </div>
+                    </Col> */}
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
+                        <textarea
+                          className="form-control"
+                          id="text"
+                          name="text"
+                          placeholder={t(
+                            "settings.termsAndConditions.columns.ar.text"
+                          )}
+                          value={formik.values.text}
+                          onChange={handleInputChange}
+                        />
+                        <label htmlFor="text" className="label-form">
+                          {t("settings.termsAndConditions.columns.ar.text")}
+                        </label>
+                      </div>
+                      <div className="error-container">
+                        {formik.errors.text && formik.touched.text && (
+                          <p className="error">{formik.errors.text}</p>
+                        )}
+                      </div>
                     </Col>
-                    <Col lg={12} className="mb-5">
-                      <div className="form-group mb-4">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <textarea
                           className="form-control"
                           id="text_en"
@@ -697,6 +642,8 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
+                  </Row>
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3 pb-0">
                     <Col lg={12}>
                       <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                         <button
@@ -758,7 +705,7 @@ const TermsAndConditions = () => {
                   formik.handleReset();
                 }}
               >
-                {t("subCategoriesBooks.editTitle")}
+                {t("settings.termsAndConditions.editTitle")}
                 <IoMdClose
                   onClick={() => {
                     setToggle({
@@ -772,9 +719,9 @@ const TermsAndConditions = () => {
               </ModalHeader>
               <ModalBody>
                 <form className="overlay-form" onSubmit={formik.handleSubmit}>
-                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3">
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center gap-lg-0 gap-3 p-3 pb-0">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <input
                           type="text"
                           className="form-control"
@@ -796,55 +743,8 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
-                        <input
-                          type="text"
-                          className="form-control"
-                          id="country"
-                          name="country"
-                          placeholder={t(
-                            "settings.termsAndConditions.columns.ar.country"
-                          )}
-                          value={formik.values.country}
-                          onChange={handleInputChange}
-                        />
-                        <label htmlFor="country" className="label-form">
-                          {t("settings.termsAndConditions.columns.ar.country")}
-                        </label>
-                      </div>
-                      <div className="error-container">
-                        {formik.errors.country && formik.touched.country && (
-                          <p className="error">{formik.errors.country}</p>
-                        )}
-                      </div>
-                    </Col>
-                    <Col lg={12} className="mb-3">
-                      <div className="form-group mb-4">
-                        <textarea
-                          className="form-control"
-                          id="text"
-                          name="text"
-                          placeholder={t(
-                            "settings.termsAndConditions.columns.ar.text"
-                          )}
-                          value={formik.values.text}
-                          onChange={handleInputChange}
-                        />
-                        <label htmlFor="text" className="label-form">
-                          {t("settings.termsAndConditions.columns.ar.text")}
-                        </label>
-                      </div>
-                      <div className="error-container">
-                        {formik.errors.text && formik.touched.text && (
-                          <p className="error">{formik.errors.text}</p>
-                        )}
-                      </div>
-                    </Col>
-                  </Row>
-                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3">
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <input
                           type="text"
                           className="form-control"
@@ -866,32 +766,32 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
-                    <Col lg={6} className="mb-3">
-                      <div className="form-group mb-4">
-                        <input
-                          type="text"
+                  </Row>
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center gap-lg-0 gap-3 p-3 pb-0">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
+                        <textarea
                           className="form-control"
-                          id="country_en"
-                          name="country_en"
+                          id="text"
+                          name="text"
                           placeholder={t(
-                            "settings.termsAndConditions.columns.en.country"
+                            "settings.termsAndConditions.columns.ar.text"
                           )}
-                          value={formik.values.country_en}
+                          value={formik.values.text}
                           onChange={handleInputChange}
                         />
-                        <label htmlFor="country_en" className="label-form">
-                          {t("settings.termsAndConditions.columns.en.country")}
+                        <label htmlFor="text" className="label-form">
+                          {t("settings.termsAndConditions.columns.ar.text")}
                         </label>
                       </div>
                       <div className="error-container">
-                        {formik.errors.country_en &&
-                          formik.touched.country_en && (
-                            <p className="error">{formik.errors.country_en}</p>
-                          )}
+                        {formik.errors.text && formik.touched.text && (
+                          <p className="error">{formik.errors.text}</p>
+                        )}
                       </div>
                     </Col>
-                    <Col lg={12} className="mb-5">
-                      <div className="form-group mb-4">
+                    <Col lg={6}>
+                      <div className="form-group mb-3">
                         <textarea
                           className="form-control"
                           id="text_en"
@@ -912,6 +812,8 @@ const TermsAndConditions = () => {
                         )}
                       </div>
                     </Col>
+                  </Row>
+                  <Row className="d-flex flex-row-reverse justify-content-between align-items-center p-3 pt-0">
                     <Col lg={12}>
                       <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                         <button
