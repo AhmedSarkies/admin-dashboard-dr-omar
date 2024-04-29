@@ -12,6 +12,8 @@ body {
   font-family: "Tajawal", sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 .App {
   min-height: 100vh;
@@ -290,7 +292,7 @@ body {
 }
 /* Dashboard */
 .dashboard {
-  width: 80%;
+  width: 85%;
 }
 .dashboard .dashboard-header {
   display: flex;
@@ -378,10 +380,11 @@ body {
   direction: rtl;
   position: sticky;
   top: 0;
-  max-width: 290px;
-  min-width: 20%;
+  max-width: 250px;
+  min-width: 15%;
   max-height: 100vh;
-  background-color: var(--main-color);
+  /* background-color: var(--main-color); */
+  background-color: #fff;
   border-left: 1px solid #0c1c33;
   overflow-y: auto;
   transition: all 0.3s ease;
@@ -395,7 +398,8 @@ body {
   background: #fff;
 }
 .sidebar .sidebar-body {
-  background: #0c1c33;
+  /* background: #0c1c33; */
+  background: #fff;
   height: fit-content;
 }
 .sidebar .sidebar-body .sidebar-list {
@@ -411,9 +415,27 @@ body {
   list-style: none;
   width: 100%;
   padding: 0 1rem;
+  font-size: 0.8rem;
+}
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link
+  .accordion {
+  --bs-accordion-btn-icon-width: 0.8rem !important;
+  --bs-accordion-btn-icon-width: 0.8rem !important;
 }
 .accordion-button::after {
   margin: 0;
+}
+.sidebar-item svg,
+.accordion-button svg {
+  width: 1rem;
+}
+.accordion-button .title {
+  font-size: 0.8rem;
 }
 .accordion-button,
 .accordion-button.collapsed {
@@ -421,7 +443,6 @@ body {
   display: flex;
   justify-content: space-between;
   color: var(--main-color);
-  font-weight: 500;
 }
 .accordion-button.collapsed,
 .accordion-button:not(.collapsed) {
@@ -439,7 +460,6 @@ body {
   .accordion-body
   .sidebar-link {
   color: var(--main-color);
-  font-weight: 500;
   padding: 0.5rem 0;
   border-radius: 0;
   box-shadow: none;
@@ -480,21 +500,105 @@ body {
   display: flex;
   justify-content: flex-start;
   align-items: center;
-  gap: 0.75rem;
+  gap: 0.5rem;
+}
+.accordion {
+  --bs-accordion-btn-icon-width: 0.8rem !important;
+  --bs-accordion-btn-icon-width: 0.8rem !important;
+}
+.accordion-button::after {
+  margin: 0;
+}
+.sidebar-item svg,
+.accordion-button svg {
+  width: 1rem;
+}
+.accordion-button .title {
+  font-size: 0.8rem;
+}
+.accordion-button,
+.accordion-button.collapsed {
+  padding: 0.5rem 1rem;
+  display: flex;
+  justify-content: space-between;
+  color: var(--main-color);
+}
+.accordion-button.collapsed,
+.accordion-button:not(.collapsed) {
+  color: var(--main-color);
+  background: #fff;
+  box-shadow: none;
+}
+.accordion-body {
+  padding: 1rem;
+}
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link {
+  color: var(--main-color);
+  padding: 0.5rem 0;
+  border-radius: 0;
+  box-shadow: none;
+  background: none;
+  border-bottom: 1px solid transparent;
+}
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link:hover,
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link.active {
+  border-color: var(--main-color);
+}
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link.active,
+.sidebar
+  .sidebar-body
+  .sidebar-list
+  .sidebar-item
+  .accordion-body
+  .sidebar-link:hover {
+  background: transparent;
+  color: var(--main-color);
+}
+.sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link {
+  list-style: none;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 0.5rem;
   text-decoration: none;
-  color: #0c1c33;
+  /* color: #0c1c33; */
+  color: var(--main-color);
   background: #fff;
   padding: 0.5rem 1rem;
   border-radius: 0.5rem;
-  box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25);
+  /* box-shadow: 0 0 10px 0 rgba(0, 0, 0, 0.25); */
   transition: all 0.3s ease;
+}
+.accordion-item {
+  border: none;
 }
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link svg {
   font-size: 1.5rem;
 }
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link.active,
 .sidebar .sidebar-body .sidebar-list .sidebar-item .sidebar-link:hover {
-  background: #1e61bfe8;
+  /* background: #1e61bfe8; */
+  background: var(--main-color);
   color: #fff;
 }
 .btn-close {
@@ -882,8 +986,11 @@ div[tabindex] {
   max-height: 100px;
   overflow: hidden;
   overflow-y: auto;
-  scrollbar-width: none;
+  scrollbar-width: thin;
   transition: all 0.3s ease-in-out;
+}
+.dropdown-content.notifications {
+  max-height: 250px;
 }
 [lang="en"] .dropdown-content button {
   text-align: start;
@@ -902,6 +1009,12 @@ div[tabindex] {
   width: 100%;
   text-align: right;
   cursor: pointer;
+}
+.table-status {
+  padding: 0.4rem !important;
+  /* display: flex; */
+  /* justify-content: center; */
+  /* align-items: center; */
 }
 /* ============= */
 .form-group-container .form-label {
@@ -1277,6 +1390,12 @@ div[tabindex] {
   cursor: default;
   pointer-events: none;
 }
+label {
+  direction: rtl;
+}
+[lang="en"] label {
+  direction: ltr;
+}
 
 /* Media Screens */
 @media only screen and (max-width: 1200px) {
@@ -1461,7 +1580,7 @@ div[tabindex] {
 }
 @media only screen and (max-width: 480px) {
   .add-btn {
-    font-size: 0.5rem !important;
+    font-size: 0.4rem !important;
     gap: 0.1rem;
   }
   .dashboard-header {
