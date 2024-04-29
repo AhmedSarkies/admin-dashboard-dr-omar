@@ -11,7 +11,7 @@ import {
 } from "reactstrap";
 import { MdAdd, MdDeleteOutline } from "react-icons/md";
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaRegCalendar, FaUser } from "react-icons/fa";
 import { ImUpload } from "react-icons/im";
 import { IoMdClose, IoMdEye } from "react-icons/io";
 import anonymous from "../../assets/images/anonymous.png";
@@ -139,14 +139,7 @@ const Articles = () => {
         formData.append("is_active", values.is_active);
         formData.append("showWriter", values.showWriter);
         formData.append("articles_categories_id", values.articleCategories.id);
-        formData.append(
-          "status",
-          values.status === "Private"
-            ? "Private"
-            : values.status === "Public"
-            ? "Public"
-            : "Private"
-        );
+        formData.append("status", values.status);
         if (values?.id) {
           // if the article don't change anything even the image
           const article = articles.find(
@@ -260,7 +253,11 @@ const Articles = () => {
         title: article?.Category?.title,
         id: article?.Category?.id,
       },
-      status: article?.status,
+      writer: article.writer,
+      articles_categories_id: article.Category.id,
+      status: article?.status === t("public") ? "Public" : "Private",
+      is_active: article?.is_active === t("active") ? 1 : 0,
+      showWriter: article?.showWriter === t("show") ? 1 : 0,
     });
     setToggle({
       ...toggle,
@@ -285,6 +282,15 @@ const Articles = () => {
         dispatch(deleteArticleApi(article?.id)).then((res) => {
           if (!res.error) {
             dispatch(getArticlesApi());
+            if (
+              toggle.currentPage > 1 &&
+              searchResultsArticleSCategoryAndTitleAndAuthor.length === 1
+            ) {
+              setToggle({
+                ...toggle,
+                currentPage: toggle.currentPage - 1,
+              });
+            }
             Swal.fire({
               title: `${t("titleDeletedSuccess")} ${article?.title}`,
               text: `${t("titleDeletedSuccess")} ${article?.title} ${t(
@@ -1560,8 +1566,8 @@ const Articles = () => {
           />
         </ModalHeader>
         <ModalBody>
-          <div className="read-more-container text-center">
-            <h3 className="text-center mb-3">{formik.values?.title}</h3>
+          <div className="read-more-container p-3 text-center">
+            <h3 className="text-end mb-3">{formik.values?.title}</h3>
             <img
               src={formik.values?.image}
               alt={formik.values?.title || "avatar"}
@@ -1572,7 +1578,60 @@ const Articles = () => {
                 objectFit: "cover",
               }}
             />
+            <div className="d-flex justify-content-between align-items-center mb-3">
+              <span
+                className="d-flex justify-content-start align-items-center gap-2"
+                style={{
+                  backgroundColor:
+                    formik.values?.status === t("public")
+                      ? "green"
+                      : formik.values?.status === t("private")
+                      ? "red"
+                      : "red",
+                  color: "#fff",
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: "5px",
+                }}
+              >
+                {formik.values?.status}
+              </span>
+              <span
+                className="d-flex justify-content-start align-items-center gap-2"
+                style={{
+                  backgroundColor: "green",
+                  color: "#fff",
+                  padding: "0.2rem 0.5rem",
+                  borderRadius: "5px",
+                }}
+              >
+                <span className="d-flex justify-content-center align-items-center">
+                  <FaUser />
+                </span>
+                <span>{formik.values?.writer}</span>
+              </span>
+            </div>
+            <div className="d-flex justify-content-end align-items-center mb-3">
+              <span className="d-flex justify-content-start align-items-center gap-2">
+                <span className="d-flex justify-content-center align-items-center">
+                  <FaRegCalendar />
+                </span>
+                <span>{formik.values?.created_at}</span>
+              </span>
+            </div>
             <div className="content text-end">{formik.values?.content}</div>
+            <div className="form-group-container d-flex justify-content-center align-items-center mt-3">
+              <button
+                className="cancel-btn"
+                onClick={() =>
+                  setToggle({
+                    ...toggle,
+                    readMore: !toggle.readMore,
+                  })
+                }
+              >
+                {t("cancel")}
+              </button>
+            </div>
           </div>
         </ModalBody>
       </Modal>
