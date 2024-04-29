@@ -67,6 +67,11 @@ const Notifications = () => {
     rowsPerPage: 20,
     currentPage: 1,
   });
+  const lng = Cookies.get("i18next") || "ar";
+  // Change Language
+  useEffect(() => {
+    document.documentElement.lang = lng;
+  }, [lng]);
 
   const filteredNotifications = notifications.filter((notification) => {
     return notification?.type?.toLowerCase() === "notification";
@@ -75,13 +80,10 @@ const Notifications = () => {
   // Filtration, Sorting, Pagination
   const columns = [
     { id: 0, name: "id", label: t("index") },
-    { id: 1, name: "name", label: t("user.columns.name") },
-    { id: 2, name: "email", label: t("user.columns.email") },
-    { id: 3, name: "phone", label: t("user.columns.phone") },
-    { id: 4, name: "image", label: t("notifications.columns.image") },
-    { id: 6, name: "title", label: t("notifications.columns.title") },
-    { id: 7, name: "body", label: t("notifications.columns.body") },
-    { id: 8, name: "control", label: t("action") },
+    { id: 1, name: "image", label: t("notifications.columns.image") },
+    { id: 2, name: "title", label: t("notifications.columns.title") },
+    { id: 3, name: "body", label: t("notifications.columns.body") },
+    { id: 4, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
@@ -106,7 +108,9 @@ const Notifications = () => {
         preview: "",
       },
       title: "",
+      title_en: "",
       description: "",
+      description_en: "",
     },
     validationSchema: validationSchema.notifications,
     onSubmit: (values) => {
@@ -115,7 +119,9 @@ const Notifications = () => {
         const data = {
           user_ids: ids.length === 0 ? users.map((user) => user.id) : ids,
           title: values.title,
+          title_en: values.title_en,
           body: values.description,
+          body_en: values.description_en,
         };
         if (values.image.file) {
           data.image = values.image.file;
@@ -153,7 +159,9 @@ const Notifications = () => {
     });
     formik.setValues({
       title: notification?.notification?.title,
+      title_en: notification?.notification?.title_en,
       description: notification?.notification?.body,
+      description_en: notification?.notification?.body_en,
       image: {
         file: "",
         preview: notification?.notification?.image,
@@ -205,10 +213,13 @@ const Notifications = () => {
         dispatch(deleteNotification(notification?.notification?.id)).then(
           (res) => {
             if (!res.error) {
-              if (searchResultsNotifications.length === 1) {
+              if (
+                toggle.currentPage > 1 &&
+                searchResultsNotifications.length === 1
+              ) {
                 setToggle({
                   ...toggle,
-                  currentPage: 1,
+                  currentPage: toggle.currentPage - 1,
                 });
               }
               dispatch(getNotification());
@@ -402,7 +413,7 @@ const Notifications = () => {
               {toggle.toggleColumns?.id && (
                 <th className="table-th">{t("index")}</th>
               )}
-              {toggle.toggleColumns?.name && (
+              {/* {toggle.toggleColumns?.name && (
                 <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("user.columns.name")}
                   {toggle.sortColumn === columns[1].name ? (
@@ -437,11 +448,11 @@ const Notifications = () => {
                     )
                   ) : null}
                 </th>
-              )}
+              )} */}
               {toggle.toggleColumns?.image && (
-                <th className="table-th" onClick={() => handleSort(columns[4])}>
+                <th className="table-th" onClick={() => handleSort(columns[0])}>
                   {t("notifications.columns.image")}
-                  {toggle.sortColumn === columns[4].name ? (
+                  {toggle.sortColumn === columns[0].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -451,9 +462,9 @@ const Notifications = () => {
                 </th>
               )}
               {toggle.toggleColumns?.title && (
-                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                <th className="table-th" onClick={() => handleSort(columns[1])}>
                   {t("notifications.columns.title")}
-                  {toggle.sortColumn === columns[5].name ? (
+                  {toggle.sortColumn === columns[1].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -463,9 +474,9 @@ const Notifications = () => {
                 </th>
               )}
               {toggle.toggleColumns?.body && (
-                <th className="table-th" onClick={() => handleSort(columns[6])}>
+                <th className="table-th" onClick={() => handleSort(columns[2])}>
                   {t("notifications.columns.body")}
-                  {toggle.sortColumn === columns[6].name ? (
+                  {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -483,7 +494,7 @@ const Notifications = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="5">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -501,7 +512,7 @@ const Notifications = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="5">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -523,7 +534,7 @@ const Notifications = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="8">
+                  <td className="table-td" colSpan="5">
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -535,7 +546,7 @@ const Notifications = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="5">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -551,7 +562,7 @@ const Notifications = () => {
                     {toggle.toggleColumns?.id && (
                       <td className="table-td">{idx + 1}#</td>
                     )}
-                    {toggle.toggleColumns.name && (
+                    {/* {toggle.toggleColumns.name && (
                       <td className="table-td name">{result?.user?.name}</td>
                     )}
                     {toggle.toggleColumns.email && (
@@ -567,7 +578,7 @@ const Notifications = () => {
                           {result?.user?.phonenumber}
                         </a>
                       </td>
-                    )}
+                    )} */}
                     {toggle.toggleColumns.image && (
                       <td className="table-td">
                         <img
@@ -584,12 +595,28 @@ const Notifications = () => {
                     )}
                     {toggle.toggleColumns.title && (
                       <td className="table-td title">
-                        {result?.notification?.title}
+                        {lng === "ar"
+                          ? result?.notification?.title?.length > 50
+                            ? result?.notification?.title?.substring(0, 50) +
+                              "..."
+                            : result?.notification?.title
+                          : result?.notification?.title_en?.length > 50
+                          ? result?.notification?.title_en?.substring(0, 50) +
+                            "..."
+                          : result?.notification?.title_en}
                       </td>
                     )}
                     {toggle.toggleColumns.body && (
                       <td className="table-td body">
-                        {result?.notification?.body}
+                        {lng === "ar"
+                          ? result?.notification?.body?.length > 50
+                            ? result?.notification?.body?.substring(0, 50) +
+                              "..."
+                            : result?.notification?.body
+                          : result?.notification?.body_en?.length > 50
+                          ? result?.notification?.body_en?.substring(0, 50) +
+                            "..."
+                          : result?.notification?.body_en}
                       </td>
                     )}
                     {toggle.toggleColumns.control && (
@@ -628,6 +655,7 @@ const Notifications = () => {
             showNotification: false,
             is_user: false,
           });
+          setIds([]);
           formik.handleReset();
         }}
         centered={true}
@@ -640,7 +668,10 @@ const Notifications = () => {
             setToggle({
               ...toggle,
               add: !toggle.add,
+              showNotification: false,
+              is_user: false,
             });
+            setIds([]);
             formik.handleReset();
           }}
         >
@@ -653,14 +684,16 @@ const Notifications = () => {
                 ...toggle,
                 add: !toggle.add,
                 showNotification: false,
+                is_user: false,
               });
+              setIds([]);
               formik.handleReset();
             }}
           />
         </ModalHeader>
         <ModalBody>
           <form className="overlay-form" onSubmit={formik.handleSubmit}>
-            <Row className="d-flex justify-content-center align-items-center p-3">
+            <Row className="d-flex justify-content-center align-items-center p-3 pb-0">
               <Col
                 lg={5}
                 className="d-flex flex-column justify-content-center align-items-center"
@@ -774,141 +807,103 @@ const Notifications = () => {
                   </>
                 )}
               </Col>
-              <Col
-                lg={12}
-                className={`${!toggle.showNotification ? "mb-5" : "mb-3"}`}
-              >
-                <div
-                  className="form-group-container d-flex flex-column align-items-end mb-3"
-                  style={{ marginTop: "-4px" }}
-                >
-                  <label htmlFor="title" className="form-label">
-                    {t("notifications.columns.title")}
-                  </label>
-                  <input
-                    type="text"
-                    className="form-input w-100"
-                    id="title"
-                    placeholder={t("notifications.columns.title")}
-                    name="title"
-                    value={formik.values.title}
-                    disabled={toggle.showNotification}
-                    onChange={formik.handleChange}
-                  />
-                  {formik.errors.title && formik.touched.title ? (
-                    <span className="error">{formik.errors.title}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mt-3">
-                  <label htmlFor="body" className="form-label">
-                    {t("notifications.columns.body")}
-                  </label>
-                  <textarea
-                    className="form-input"
-                    id="body"
-                    placeholder={t("notifications.columns.body")}
-                    name="description"
-                    disabled={toggle.showNotification}
-                    value={formik.values.description}
-                    onChange={formik.handleChange}
-                  ></textarea>
-                  {formik.errors.description && formik.touched.description ? (
-                    <span className="error">{formik.errors.description}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container d-flex flex-column align-items-end mt-3">
-                  <label htmlFor="user" className="form-label">
-                    {t("user.title")}
-                  </label>
-                  <div
-                    className="dropdown dropdown-users form-input p-0"
-                    ref={ref}
-                  >
-                    <button
-                      type="button"
-                      className="dropdown-btn d-flex justify-content-between align-items-center"
+            </Row>
+            <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0 pt-0">
+              {!toggle.showNotification && (
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="user" className="form-label">
+                      {t("user.title")}
+                    </label>
+                    <div
+                      className="dropdown dropdown-users form-input p-0"
+                      ref={ref}
                     >
-                      <input
-                        type="text"
-                        className="form-input border-0 search-dropdown"
-                        placeholder={t("searchUserDropDown")}
-                        dir="ltr"
-                        focused={toggle.is_user === true ? "true" : "false"}
-                        onClick={() => setToggle({ ...toggle, is_user: true })}
-                        onChange={handleSearchUser}
-                      />
-                      <TiArrowSortedUp
-                        className={`dropdown-icon ${
+                      <button
+                        type="button"
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
+                      >
+                        <input
+                          type="text"
+                          className="form-input border-0 search-dropdown"
+                          placeholder={t("searchUserDropDown")}
+                          dir="ltr"
+                          focused={toggle.is_user === true ? "true" : "false"}
+                          onClick={() =>
+                            setToggle({ ...toggle, is_user: true })
+                          }
+                          onChange={handleSearchUser}
+                        />
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
+                            toggle.is_user ? "active" : ""
+                          }`}
+                          onClick={() =>
+                            setToggle({ ...toggle, is_user: !toggle.is_user })
+                          }
+                        />
+                      </button>
+                      <div
+                        className={`dropdown-content notifications ${
                           toggle.is_user ? "active" : ""
                         }`}
-                        onClick={() =>
-                          setToggle({ ...toggle, is_user: !toggle.is_user })
-                        }
-                      />
-                    </button>
-                    <div
-                      className={`dropdown-content ${
-                        toggle.is_user ? "active" : ""
-                      }`}
-                      style={{
-                        top: "102%",
-                      }}
-                    >
-                      {searchResultsUsers.length === 0 ? (
-                        <label className="item form-label d-flex justify-content-end align-items-center gap-2 m-0">
-                          {t("noData")}
-                        </label>
-                      ) : (
-                        <>
-                          <label
-                            htmlFor="users_all"
-                            className={`item ${
-                              ids.length === users.length ? "active" : ""
-                            } item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
-                          >
-                            {t("user.columns.selectAll")}
-                            <input
-                              type="checkbox"
-                              className="checkbox"
-                              id="users_all"
-                              checked={ids.length === users.length}
-                              onClick={handleAddAll}
-                              readOnly
-                            />
+                        style={{
+                          top: "102%",
+                        }}
+                      >
+                        {searchResultsUsers.length === 0 ? (
+                          <label className="item form-label d-flex justify-content-end align-items-center gap-2 m-0">
+                            {t("noData")}
                           </label>
-                          {searchResultsUsers.map((user, idx) => {
-                            const match = ids.includes(+user.id);
-                            const active = match ? "active" : "";
-                            return (
-                              <label
-                                key={idx}
-                                htmlFor={`user_${user?.id}`}
-                                className={`${active} item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
-                              >
-                                {user.email}
-                                <input
-                                  type="checkbox"
-                                  id={`user_${user?.id}`}
-                                  className={`checked-${user?.id} checked`}
-                                  value={user?.id}
-                                  onChange={handleAddSelected}
-                                  readOnly
-                                />
-                              </label>
-                            );
-                          })}
-                        </>
-                      )}
+                        ) : (
+                          <>
+                            <label
+                              htmlFor="users_all"
+                              className={`item ${
+                                ids.length === users.length ? "active" : ""
+                              } item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                            >
+                              {t("user.columns.selectAll")}
+                              <input
+                                type="checkbox"
+                                className="checkbox"
+                                id="users_all"
+                                checked={ids.length === users.length}
+                                onClick={handleAddAll}
+                                readOnly
+                              />
+                            </label>
+                            {searchResultsUsers.map((user, idx) => {
+                              const match = ids.includes(+user.id);
+                              const active = match ? "active" : "";
+                              return (
+                                <label
+                                  key={idx}
+                                  htmlFor={`user_${user?.id}`}
+                                  className={`${active} item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                                >
+                                  {user.email}
+                                  <input
+                                    type="checkbox"
+                                    id={`user_${user?.id}`}
+                                    className={`checked-${user?.id} checked`}
+                                    value={user?.id}
+                                    onChange={handleAddSelected}
+                                    readOnly
+                                  />
+                                </label>
+                              );
+                            })}
+                          </>
+                        )}
+                      </div>
                     </div>
                   </div>
-                </div>
-              </Col>
+                </Col>
+              )}
               {toggle.showNotification && (
-                <Col lg={12} className="mb-5">
-                  <div
-                    className="form-group-container d-flex flex-column align-items-end mb-3"
-                    style={{ marginTop: "-4px" }}
-                  >
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
                     <label htmlFor="name" className="form-label">
                       {t("user.columns.name")}
                     </label>
@@ -922,10 +917,7 @@ const Notifications = () => {
                       disabled={toggle.showNotification}
                     />
                   </div>
-                  <div
-                    className="form-group-container d-flex flex-column align-items-end mb-3"
-                    style={{ marginTop: "-4px" }}
-                  >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
                     <label htmlFor="email" className="form-label">
                       {t("user.columns.email")}
                     </label>
@@ -939,10 +931,7 @@ const Notifications = () => {
                       disabled={toggle.showNotification}
                     />
                   </div>
-                  <div
-                    className="form-group-container d-flex flex-column align-items-end mb-3"
-                    style={{ marginTop: "-4px" }}
-                  >
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
                     <label htmlFor="phone" className="form-label">
                       {t("user.columns.phone")}
                     </label>
@@ -958,6 +947,89 @@ const Notifications = () => {
                   </div>
                 </Col>
               )}
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title" className="form-label">
+                    {t("notifications.columns.ar.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="title"
+                    placeholder={t("notifications.columns.ar.title")}
+                    name="title"
+                    value={formik.values.title}
+                    disabled={toggle.showNotification}
+                    onChange={formik.handleChange}
+                  />
+                  {formik.errors.title && formik.touched.title ? (
+                    <span className="error">{formik.errors.title}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                  <label htmlFor="title_en" className="form-label">
+                    {t("notifications.columns.en.title")}
+                  </label>
+                  <input
+                    type="text"
+                    className="form-input w-100"
+                    id="title_en"
+                    placeholder={t("notifications.columns.en.title")}
+                    name="title_en"
+                    value={formik.values.title_en}
+                    disabled={toggle.showNotification}
+                    onChange={formik.handleChange}
+                  />
+                  {formik.errors.title_en && formik.touched.title_en ? (
+                    <span className="error">{formik.errors.title_en}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end">
+                  <label htmlFor="body" className="form-label">
+                    {t("notifications.columns.ar.body")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="body"
+                    placeholder={t("notifications.columns.ar.body")}
+                    name="description"
+                    disabled={toggle.showNotification}
+                    value={formik.values.description}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.description && formik.touched.description ? (
+                    <span className="error">{formik.errors.description}</span>
+                  ) : null}
+                </div>
+              </Col>
+              <Col lg={6}>
+                <div className="form-group-container d-flex flex-column align-items-end mt-lg-0 mt-3">
+                  <label htmlFor="body_en" className="form-label">
+                    {t("notifications.columns.en.body")}
+                  </label>
+                  <textarea
+                    className="form-input"
+                    id="body_en"
+                    placeholder={t("notifications.columns.en.body")}
+                    name="description_en"
+                    disabled={toggle.showNotification}
+                    value={formik.values.description_en}
+                    onChange={formik.handleChange}
+                  ></textarea>
+                  {formik.errors.description_en &&
+                  formik.touched.description_en ? (
+                    <span className="error">
+                      {formik.errors.description_en}
+                    </span>
+                  ) : null}
+                </div>
+              </Col>
+            </Row>
+            <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pt-0">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
                   {!toggle.showNotification && (
@@ -991,6 +1063,7 @@ const Notifications = () => {
                         showNotification: false,
                         is_user: false,
                       });
+                      setIds([]);
                       formik.handleReset();
                     }}
                   >
