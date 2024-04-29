@@ -32,7 +32,7 @@ const Dashboard = () => {
       id: 2,
       title: t("dashboard.elders"),
       icon: <SiGooglescholar />,
-      path: "elder",
+      path: "elders",
       disabled: false,
       count: counts?.Elder_Count,
       color: "linear-gradient(45deg, rgb(51, 153, 255), rgb(41, 130, 204))",
