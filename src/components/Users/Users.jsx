@@ -172,10 +172,10 @@ const Users = () => {
         if (result.isConfirmed) {
           dispatch(deleteUser(user.id)).then((res) => {
             if (!res.error) {
-              if (searchResultsUser.length === 1) {
+              if (toggle.currentPage > 1 && searchResultsUser.length === 1) {
                 setToggle({
                   ...toggle,
-                  currentPage: 1,
+                  currentPage: toggle.currentPage - 1,
                 });
               }
               dispatch(getUsers());
@@ -542,6 +542,7 @@ const Users = () => {
                                 name: result.name,
                                 email: result.email,
                                 phonenumber: result.phonenumber,
+                                type: result.type,
                                 is_active:
                                   result.is_active === t("active") ? 0 : 1,
                               };
