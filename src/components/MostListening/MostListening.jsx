@@ -33,10 +33,10 @@ const MostListening = () => {
       title: true,
       audio: true,
       status: true,
-      shares: true,
+      shares: false,
       visits: true,
-      favorites: true,
-      downloads: true,
+      favorites: false,
+      downloads: false,
       activation: true,
       control: false,
     },
@@ -45,7 +45,6 @@ const MostListening = () => {
   const data = mostListening?.map((item) => {
     return {
       ...item,
-      categories: item?.categories[0],
       is_active: item?.is_active === 1 ? t("active") : t("inactive"),
       status: item?.status === "public" ? t("public") : t("private"),
     };
@@ -64,12 +63,12 @@ const MostListening = () => {
     { id: 3, name: "image", label: t("mostListening.columns.audio.image") },
     { id: 4, name: "title", label: t("mostListening.columns.audio.title") },
     { id: 5, name: "audio", label: t("mostListening.columns.audio.audio") },
-    { id: 6, name: "shares", label: t("shares") },
-    { id: 7, name: "visits", label: t("visits") },
-    { id: 8, name: "favorites", label: t("favorites") },
-    { id: 9, name: "downloads", label: t("downloads") },
-    { id: 10, name: "activation", label: t("activation") },
-    { id: 11, name: "status", label: t("content") },
+    // { id: 6, name: "shares", label: t("shares") },
+    { id: 6, name: "visits", label: t("listening") },
+    // { id: 8, name: "favorites", label: t("favorites") },
+    // { id: 9, name: "downloads", label: t("downloads") },
+    { id: 7, name: "activation", label: t("activation") },
+    { id: 8, name: "status", label: t("content") },
   ];
   const {
     PaginationUI,
@@ -103,13 +102,13 @@ const MostListening = () => {
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "30%",
+              width: "40%",
             }}
           >
             <input
               type="text"
               className="form-input"
-              placeholder={t("searchAudio")}
+              placeholder={t("searchAudioMostListening")}
               onChange={handleSearch}
             />
           </div>
@@ -231,7 +230,7 @@ const MostListening = () => {
               )}
               {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("visits")}
+                  {t("listening")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -241,7 +240,7 @@ const MostListening = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {/* {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
                   {t("favorites")}
                   {toggle.sortColumn === columns[6].name ? (
@@ -276,11 +275,11 @@ const MostListening = () => {
                     )
                   ) : null}
                 </th>
-              )}
+              )} */}
               {toggle.toggleColumns.activation && (
-                <th className="table-th" onClick={() => handleSort(columns[9])}>
+                <th className="table-th" onClick={() => handleSort(columns[6])}>
                   {t("activation")}
-                  {toggle.sortColumn === columns[9].name ? (
+                  {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -292,10 +291,10 @@ const MostListening = () => {
               {toggle.toggleColumns.status && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[7])}
                 >
                   {t("content")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -310,7 +309,7 @@ const MostListening = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -328,7 +327,7 @@ const MostListening = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="9">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -348,7 +347,7 @@ const MostListening = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="9">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -360,7 +359,7 @@ const MostListening = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td className="table-td" colSpan="9">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -420,7 +419,7 @@ const MostListening = () => {
                   {toggle.toggleColumns.visits && (
                     <td className="table-td">{result?.visits_count}</td>
                   )}
-                  {toggle.toggleColumns.favorites && (
+                  {/* {toggle.toggleColumns.favorites && (
                     <td className="table-td">{result?.favorites_count}</td>
                   )}
                   {toggle.toggleColumns.downloads && (
@@ -428,7 +427,7 @@ const MostListening = () => {
                   )}
                   {toggle.toggleColumns.shares && (
                     <td className="table-td">{result?.shares_count}</td>
-                  )}
+                  )} */}
                   {toggle.toggleColumns.activation && (
                     <td className="table-td">
                       <span
