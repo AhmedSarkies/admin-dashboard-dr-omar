@@ -70,7 +70,11 @@ const useSchema = () => {
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
+      title_en: string()
+        .max(40, t("validation.maxCharacters"))
+        .required(t("validation.title")),
       description: string().required(t("validation.description")),
+      description_en: string().required(t("validation.description")),
     }),
     elder: object().shape({
       name: string()
