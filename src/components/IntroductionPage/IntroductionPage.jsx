@@ -208,10 +208,10 @@ const IntroductionPage = () => {
         if (result.isConfirmed) {
           dispatch(deleteIntroductionPageApi(picture?.id)).then((res) => {
             if (!res.error) {
-              if (searchResults.length === 1) {
+              if (toggle.currentPage > 1 && searchResults.length === 1) {
                 setToggle({
                   ...toggle,
-                  currentPage: 1,
+                  currentPage: toggle.currentPage - 1,
                 });
               }
               dispatch(getIntroductionPageApi());
