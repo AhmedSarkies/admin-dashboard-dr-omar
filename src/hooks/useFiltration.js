@@ -184,6 +184,12 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
             dataRow?.categories?.title
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.sub_categories?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.main_categories?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.name
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
