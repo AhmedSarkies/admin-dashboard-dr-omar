@@ -158,10 +158,13 @@ const SubSubCategoriesBook = () => {
           dispatch(deleteBookSubSubCategoryApi(bookSubCategory?.id)).then(
             (res) => {
               if (!res.error) {
-                if (searchResultsSubSubBookCategories.length === 1) {
+                if (
+                  toggle.currentPage > 1 &&
+                  searchResultsSubSubBookCategories.length === 1
+                ) {
                   setToggle({
                     ...toggle,
-                    currentPage: 1,
+                    currentPage: toggle.currentPage - 1,
                   });
                 }
                 dispatch(getBooksSubSubCategoriesApi());
