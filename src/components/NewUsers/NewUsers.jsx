@@ -410,6 +410,7 @@ const NewUsers = () => {
                       <td className="table-td email_verified_at">
                         {result?.email_verified_at === t("inactive") ? (
                           <span
+                          className="table-status badge"
                             style={{
                               color: "#fff",
                               backgroundColor: "#dc3545",
@@ -439,6 +440,7 @@ const NewUsers = () => {
                       <td className="table-td phone_verified_at">
                         {result?.phone_verified_at === t("inactive") ? (
                           <span
+                          className="table-status badge"
                             style={{
                               color: "#fff",
                               backgroundColor: "#dc3545",
