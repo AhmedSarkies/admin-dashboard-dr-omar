@@ -255,8 +255,13 @@ const CodeContent = () => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && !loading && (
-        <div className="table-header">
+      <div
+        className="table-header"
+        style={{
+          margin: "1.5rem 0",
+        }}
+      >
+        {role === "admin" && !loading && (
           <button
             className="add-btn send"
             onClick={() => {
@@ -291,6 +296,31 @@ const CodeContent = () => {
               </>
             )}
           </button>
+        )}
+        {!loading && (
+          <button
+            className="add-btn send"
+            onClick={() => {
+              setToggle({
+                ...toggle,
+                show: !toggle.show,
+              });
+              dispatch(getCodeContent());
+              formik.setValues({
+                id: codeContent[0]?.id,
+                code: codeContent[0]?.code,
+              });
+            }}
+            style={{
+              opacity: loading ? "0.5" : "1",
+              pointerEvents: loading ? "none" : "auto",
+              cursor: loading ? "not-allowed" : "pointer",
+            }}
+          >
+            {t("settings.codeContent.showTitle")}
+          </button>
+        )}
+        {role === "admin" && !loading && (
           <button
             className="add-btn send"
             onClick={() =>
@@ -319,31 +349,6 @@ const CodeContent = () => {
                 {t("settings.codeContent.addTitle")}
               </>
             )}
-          </button>
-        </div>
-      )}
-      <div className="table-header justify-content-end">
-        {!loading && (
-          <button
-            className="add-btn send"
-            onClick={() => {
-              setToggle({
-                ...toggle,
-                show: !toggle.show,
-              });
-              dispatch(getCodeContent());
-              formik.setValues({
-                id: codeContent[0]?.id,
-                code: codeContent[0]?.code,
-              });
-            }}
-            style={{
-              opacity: loading ? "0.5" : "1",
-              pointerEvents: loading ? "none" : "auto",
-              cursor: loading ? "not-allowed" : "pointer",
-            }}
-          >
-            {t("settings.codeContent.showTitle")}
           </button>
         )}
       </div>
