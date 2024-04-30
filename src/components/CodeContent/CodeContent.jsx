@@ -44,10 +44,20 @@ const CodeContent = () => {
       id: true,
       name: true,
       email: true,
+      phone: true,
       subscription: true,
       send: true,
     },
   });
+
+  // Data
+  const data = users?.map((user) => ({
+    ...user,
+    created_at: new Date(user.created_at).toLocaleDateString(),
+    last_login: new Date(user.last_login).toLocaleDateString(),
+    is_active: user.is_active === 1 ? t("active") : t("inactive"),
+    privacy: user.privacy === "private" ? t("private") : t("public"),
+  }));
 
   // Formik
   const formik = useFormik({
@@ -104,29 +114,20 @@ const CodeContent = () => {
     { id: 1, name: "id", label: t("index") },
     { id: 2, name: "name", label: t("user.columns.name") },
     { id: 3, name: "email", label: t("user.columns.email") },
-    { id: 4, name: "subscription", label: t("user.columns.subscription") },
-    { id: 5, name: "send", label: t("settings.codeContent.columns.send") },
+    { id: 4, name: "phone", label: t("user.columns.phone") },
+    { id: 5, name: "subscription", label: t("user.columns.subscription") },
+    { id: 6, name: "send", label: t("settings.codeContent.columns.send") },
   ];
-  const { handleSort, handleSearch, handleToggleColumns } = useFiltration({
-    rowData: users,
+  const {
+    handleSort,
+    handleSearch,
+    handleToggleColumns,
+    searchResultsUsersSNameAndEmailForCodeContent,
+  } = useFiltration({
+    rowData: data,
     toggle,
     setToggle,
   });
-
-  // Filter Results
-  const results =
-    toggle.searchTerm && toggle.searchTerm !== ""
-      ? users?.filter((dataRow) => {
-          return (
-            dataRow?.name
-              ?.toLowerCase()
-              .includes(toggle.searchTerm?.toLowerCase()) ||
-            dataRow?.email
-              ?.toLowerCase()
-              .includes(toggle.searchTerm?.toLowerCase())
-          );
-        })
-      : users;
 
   // Handle Add
   const handleAddOne = (user) => {
@@ -358,13 +359,13 @@ const CodeContent = () => {
           <div
             className="search-container form-group-container form-input"
             style={{
-              width: "40%",
+              width: "30%",
             }}
           >
             <input
               type="text"
               className="form-input"
-              placeholder={t("searchUser")}
+              placeholder={t("searchUserCodeContent")}
               value={toggle.searchTerm}
               onChange={handleSearch}
             />
@@ -501,10 +502,22 @@ const CodeContent = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns?.subscription && (
+              {toggle.toggleColumns?.phone && (
                 <th className="table-th" onClick={() => handleSort(columns[4])}>
-                  {t("user.columns.subscription")}
+                  {t("user.columns.phone")}
                   {toggle.sortColumn === columns[4].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns?.subscription && (
+                <th className="table-th" onClick={() => handleSort(columns[5])}>
+                  {t("user.columns.subscription")}
+                  {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -559,15 +572,17 @@ const CodeContent = () => {
             </tbody>
           )}
           {/* No Data */}
-          {results?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
+          {searchResultsUsersSNameAndEmailForCodeContent?.length === 0 &&
+            error === null &&
+            !loading && (
+              <tbody>
+                <tr className="no-data-container">
+                  <td className="table-td" colSpan={role === "admin" ? 6 : 5}>
+                    <p className="no-data mb-0">{t("noData")}</p>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           {/* There is no any columns */}
           {Object.values(toggle.toggleColumns).every(
             (column) => column === false
@@ -581,60 +596,73 @@ const CodeContent = () => {
             </tbody>
           )}
           {/* Data */}
-          {results?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {results?.map((result, idx) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {role === "admin" && toggle.toggleColumns?.checkboxes && (
-                    <td className="table-td">
-                      <input
-                        type="checkbox"
-                        className={`checked-${result?.id} checked`}
-                        value={result?.id}
-                        onChange={handleAddSelected}
-                      />
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.id && (
-                    <td className="table-td">{idx + 1}#</td>
-                  )}
-                  {toggle.toggleColumns?.name && (
-                    <td className="table-td name">{result?.name}</td>
-                  )}
-                  {toggle.toggleColumns?.email && (
-                    <td className="table-td email">
-                      <a href={`mailto:${result?.email}`}>{result?.email}</a>
-                    </td>
-                  )}
-                  {toggle.toggleColumns?.subscription && (
-                    <td className="table-td subscription">
-                      <span
-                        className={`status ${
-                          result?.privacy === "private" ? "inactive" : "active"
-                        }`}
-                      >
-                        {result?.privacy === "private"
-                          ? t("private")
-                          : t("public")}
-                      </span>
-                    </td>
-                  )}
-                  {role === "admin" && toggle.toggleColumns?.send && (
-                    <td className="table-td send">
-                      <MdSend
-                        className="btn-edit"
-                        style={{
-                          color: "green",
-                          cursor: "pointer",
-                        }}
-                        onClick={() => handleAddOne(result)}
-                      />
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+          {searchResultsUsersSNameAndEmailForCodeContent?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsUsersSNameAndEmailForCodeContent?.map(
+                  (result, idx) => (
+                    <tr key={result?.id + new Date().getDate()}>
+                      {role === "admin" && toggle.toggleColumns?.checkboxes && (
+                        <td className="table-td">
+                          <input
+                            type="checkbox"
+                            className={`checked-${result?.id} checked`}
+                            value={result?.id}
+                            onChange={handleAddSelected}
+                          />
+                        </td>
+                      )}
+                      {toggle.toggleColumns?.id && (
+                        <td className="table-td">{idx + 1}#</td>
+                      )}
+                      {toggle.toggleColumns?.name && (
+                        <td className="table-td name">{result?.name}</td>
+                      )}
+                      {toggle.toggleColumns?.email && (
+                        <td className="table-td email">
+                          <a href={`mailto:${result?.email}`}>
+                            {result?.email}
+                          </a>
+                        </td>
+                      )}
+                      {toggle.toggleColumns?.phone && (
+                        <td className="table-td phone">
+                          <a href={`mailto:${result?.phonenumber}`}>
+                            {result?.phonenumber}
+                          </a>
+                        </td>
+                      )}
+                      {toggle.toggleColumns?.subscription && (
+                        <td className="table-td subscription">
+                          <span
+                            className={`status ${
+                              result?.privacy === t("private")
+                                ? "inactive"
+                                : "active"
+                            }`}
+                          >
+                            {result?.privacy}
+                          </span>
+                        </td>
+                      )}
+                      {role === "admin" && toggle.toggleColumns?.send && (
+                        <td className="table-td send">
+                          <MdSend
+                            className="btn-edit"
+                            style={{
+                              color: "green",
+                              cursor: "pointer",
+                            }}
+                            onClick={() => handleAddOne(result)}
+                          />
+                        </td>
+                      )}
+                    </tr>
+                  )
+                )}
+              </tbody>
+            )}
         </table>
       </div>
       {/* Add Book */}
