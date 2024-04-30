@@ -241,6 +241,26 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
           );
         })
       : results;
+  // Search Users using just name and email
+  const searchResultsUsersSNameAndEmailForCodeContent =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.name
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.email
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.phone
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.privacy
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : rowData;
 
   // Search Users using just name and email
   const searchResultsUsers =
@@ -433,6 +453,7 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
     searchResults,
     searchResultsElders,
     searchResultsUsersSNameAndEmail,
+    searchResultsUsersSNameAndEmailForCodeContent,
     searchResultsUsers,
     searchResultsUser,
     searchResultsNewUsers,
