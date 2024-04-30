@@ -20,6 +20,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
           src={logo}
           alt="logo"
           width={150}
+          height={150}
           style={{
             borderRadius: "50%",
           }}
