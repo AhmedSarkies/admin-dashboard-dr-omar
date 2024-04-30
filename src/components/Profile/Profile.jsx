@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getProfile } from "../../store/slices/profileSlice";
+import Cookies from "js-cookie";
 
 const Profile = () => {
   const { t } = useTranslation();
@@ -15,7 +16,32 @@ const Profile = () => {
 
   useEffect(() => {
     dispatch(getProfile());
-  }, [dispatch]);
+    Cookies.set("_user", profile.name, {
+      expires: 30,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+    });
+    Cookies.set("_email", profile.email, {
+      expires: 30,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+    });
+    Cookies.set("_phone", profile.phone, {
+      expires: 30,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+    });
+    Cookies.set("_image", profile.image, {
+      expires: 30,
+      secure: true,
+      sameSite: "strict",
+      path: "/",
+    });
+    // eslint-disable-next-line
+  }, [dispatch, profile.name, profile.email, profile.phone, profile.image]);
 
   return (
     <div className="profile-container">
