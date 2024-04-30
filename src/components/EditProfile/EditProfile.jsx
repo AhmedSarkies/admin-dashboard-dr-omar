@@ -51,8 +51,8 @@ const EditProfile = () => {
       formData.append("name", values.name);
       formData.append("email", values.email);
       formData.append("phone", values.phone);
-      if (values.image.file !== "") {
-        formData.append("image", profile.image);
+      if (typeof values.image.file === "object" && values.image.file !== "") {
+        formData.append("image", values.image.file);
       }
       dispatch(updateProfile(formData)).then((res) => {
         if (!res.error) {
