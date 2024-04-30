@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useFormik } from "formik";
-import { Col, Row } from "reactstrap";
+import { Col, Row, Spinner } from "reactstrap";
 
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
@@ -182,7 +182,20 @@ const ChangePassword = () => {
                   type="submit"
                   className={`add-btn${vars.loading ? " loading-btn" : ""}`}
                 >
-                  {t("update")}
+                  {vars.loading ? (
+                    <Spinner
+                      color="white"
+                      style={{
+                        height: "1.5rem",
+                        width: "1.5rem",
+                        borderWidth: "0.2em",
+                      }}
+                    >
+                      Loading...
+                    </Spinner>
+                  ) : (
+                    t("update")
+                  )}
                 </button>
               </div>
             </form>
