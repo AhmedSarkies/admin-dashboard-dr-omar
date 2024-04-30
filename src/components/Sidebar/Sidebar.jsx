@@ -16,7 +16,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
       <div className="sidebar-header d-flex justify-content-center align-items-center pt-4 pb-4">
-        <img src={logo} alt="logo" width={150} />
+        <img
+          src={logo}
+          alt="logo"
+          width={150}
+          style={{
+            borderRadius: "50%",
+          }}
+        />
       </div>
       <div className="sidebar-body">
         <ul className="sidebar-list">
