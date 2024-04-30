@@ -54,6 +54,7 @@
   "searchMessage": "Name, Email or Phone",
   "searchUser": "Name, Email, Phone, Register Method or Subscription",
   "searchNewUser": "Name, Email, Phone, Register Method, Subscription, Activation, Email Verified or Phone Verified",
+  "searchUserCodeContent": "Name, Email, Phone or Subscription",
   "searchUserDropDown": "Email",
   "searchElder": "Name, Email, Phone, Category or Activation",
   "searchAudio": " by Title, Category, Elder, Content or Activation",
