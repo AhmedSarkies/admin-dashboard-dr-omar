@@ -1274,7 +1274,7 @@ const Elder = () => {
                           ></span>
                         ) : load ? (
                           <Spinner
-                            color="white"
+                            color="light"
                             style={{
                               height: "1rem",
                               width: "1rem",
@@ -1766,7 +1766,7 @@ const Elder = () => {
                           ></span>
                         ) : load ? (
                           <Spinner
-                            color="white"
+                            color="light"
                             style={{
                               height: "1rem",
                               width: "1rem",
