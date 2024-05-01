@@ -101,12 +101,9 @@ const Audios = () => {
   const allDataWithCategoriesObj = audios?.map((audio) => {
     return {
       ...audio,
-      categories: {
-        title: audio.categories[0]?.title,
-        id: audio.categories[0]?.id,
-      },
-      status: audio.status === "public" ? t("public") : t("private"),
-      is_active: audio.is_active === 1 ? t("active") : t("inactive"),
+      categories: audio?.categories[0],
+      status: audio?.status === "public" ? t("public") : t("private"),
+      is_active: audio?.is_active === 1 ? t("active") : t("inactive"),
     };
   });
 
@@ -778,7 +775,9 @@ const Audios = () => {
                         <td className="table-td">{result?.title}</td>
                       )}
                       {toggle.toggleColumns.category && (
-                        <td className="table-td">{result?.categories.title}</td>
+                        <td className="table-td">
+                          {result?.categories?.title}
+                        </td>
                       )}
                       {toggle.toggleColumns.audio && (
                         <td className="table-td">
