@@ -202,8 +202,7 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
           );
         })
       : results;
-
-  // Search Audio using just category and title and author
+  // Search books using just category and title
   const searchResultsAudioSCategoryAndTitleAndAuthor =
     toggle.searchTerm && toggle.searchTerm !== ""
       ? rowData?.filter((dataRow) => {
