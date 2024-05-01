@@ -218,10 +218,8 @@ const audioSlice = createSlice({
     });
     // Fulfilled
     builder.addCase(deleteAudioApi.fulfilled, (state, action) => {
-      state.audios = state.audios.filter(
-        (audio) => audio.id !== action.payload
-      );
       state.loading = false;
+      state.error = null;
     });
     // Rejected
     builder.addCase(deleteAudioApi.rejected, (state, action) => {
