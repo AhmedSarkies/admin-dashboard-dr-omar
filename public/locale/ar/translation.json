@@ -290,8 +290,8 @@
       }
     },
     "introductionPage": {
-      "addTitle": "إضافة صفخة تعريفية",
-      "editTitle": "تعديل صفخة تعريفية",
+      "addTitle": "إضافة صفحة تعريفية",
+      "editTitle": "تعديل صفحة تعريفية",
       "columns": {
         "image": "الصورة",
         "title": {
