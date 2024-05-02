@@ -266,8 +266,8 @@ const Elders = () => {
   const data = scholars?.map((item) => {
     return {
       ...item,
-      status: item.status === "Approve" ? t("approve") : t("pending"),
-      is_active: item.is_active === 1 ? t("active") : t("inactive"),
+      status: item?.status === "Approve" ? t("approve") : t("pending"),
+      is_active: item?.is_active === 1 ? t("active") : t("inactive"),
     };
   });
 
@@ -641,7 +641,11 @@ const Elders = () => {
                     )}
                     {toggle.toggleColumns.phone && (
                       <td className="table-td">
-                        <a className="text-white" href={`tel:${result?.phone}`}>
+                        <a
+                          className="text-white"
+                          href={`tel:${result?.phone}`}
+                          dir="ltr"
+                        >
                           {result?.phone}
                         </a>
                       </td>
@@ -674,13 +678,13 @@ const Elders = () => {
                                   name: result?.name,
                                   email: result?.email,
                                   phone: result?.phone,
-                                  id: result.id,
+                                  id: result?.id,
                                   status:
-                                    result.status === t("approve")
+                                    result?.status === t("approve")
                                       ? "Pending"
                                       : "Approve",
                                   is_active:
-                                    result.is_active === t("active") ? 1 : 0,
+                                    result?.is_active === t("active") ? 1 : 0,
                                 })
                               ).then((res) => {
                                 if (!res.error) {
