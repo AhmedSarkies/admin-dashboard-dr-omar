@@ -176,74 +176,74 @@ const Books = () => {
 
   const onSubmit = (values) => {
     console.log(values);
-    // if (role === "admin") {
-    //   if (!values.id) {
-    //     // Add Book
-    //     dispatch(
-    //       addBookApi({
-    //         name: values.title,
-    //         number_pages: values.number_pages,
-    //         file: values.book.file,
-    //         image: values.image.file,
-    //         sub_categories_id: values.bookCategory.id,
-    //         status: values.status === "private" ? "Private" : "Public",
-    //         is_active: values.is_active,
-    //       })
-    //     ).then((res) => {
-    //       if (!res.error) {
-    //         dispatch(getBooksApi());
-    //         setToggle({
-    //           ...toggle,
-    //           add: !toggle.add,
-    //           edit: false,
-    //           is_active: false,
-    //           status: false,
-    //         });
-    //         formik.handleReset();
-    //         toast.success(t("toast.book.addedSuccess"));
-    //       } else {
-    //         toast.error(t("toast.book.addedError"));
-    //         dispatch(getBooksApi());
-    //       }
-    //     });
-    //   }
-    //   // Edit Book
-    //   else {
-    //     const formDate = new FormData();
-    //     formDate.append("id", values.id);
-    //     formDate.append("name", values.title);
-    //     formDate.append("number_pages", values.number_pages);
-    //     formDate.append("sub_categories_id", values.bookCategory.id);
-    //     formDate.append(
-    //       "status",
-    //       values.status === "private" ? "Private" : "Public"
-    //     );
-    //     formDate.append("is_active", values.is_active);
-    //     if (values.image.file) {
-    //       formDate.append("image", values.image.file);
-    //     }
-    //     if (values.book.file) {
-    //       formDate.append("file", values.book.file);
-    //     }
-    //     dispatch(updateBookApi(formDate)).then((res) => {
-    //       if (!res.error) {
-    //         dispatch(getBooksApi());
-    //         setToggle({
-    //           ...toggle,
-    //           edit: !toggle.edit,
-    //           add: !toggle.add,
-    //           is_active: false,
-    //           status: false,
-    //         });
-    //         formik.handleReset();
-    //         toast.success(t("toast.book.updatedSuccess"));
-    //       } else {
-    //         toast.error(t("toast.book.updatedError"));
-    //         dispatch(getBooksApi());
-    //       }
-    //     });
-    //   }
-    // }
+    if (role === "admin") {
+      if (!values.id) {
+        // Add Book
+        dispatch(
+          addBookApi({
+            name: values.title,
+            number_pages: values.number_pages,
+            file: values.book.file,
+            image: values.image.file,
+            sub_categories_id: values.bookCategory.id,
+            status: values.status === "private" ? "Private" : "Public",
+            is_active: values.is_active,
+          })
+        ).then((res) => {
+          if (!res.error) {
+            dispatch(getBooksApi());
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              edit: false,
+              is_active: false,
+              status: false,
+            });
+            formik.handleReset();
+            toast.success(t("toast.book.addedSuccess"));
+          } else {
+            toast.error(t("toast.book.addedError"));
+            dispatch(getBooksApi());
+          }
+        });
+      }
+      // Edit Book
+      else {
+        const formDate = new FormData();
+        formDate.append("id", values.id);
+        formDate.append("name", values.title);
+        formDate.append("number_pages", values.number_pages);
+        formDate.append("sub_categories_id", values.bookCategory.id);
+        formDate.append(
+          "status",
+          values.status === "private" ? "Private" : "Public"
+        );
+        formDate.append("is_active", values.is_active);
+        if (values.image.file) {
+          formDate.append("image", values.image.file);
+        }
+        if (values.book.file) {
+          formDate.append("file", values.book.file);
+        }
+        dispatch(updateBookApi(formDate)).then((res) => {
+          if (!res.error) {
+            dispatch(getBooksApi());
+            setToggle({
+              ...toggle,
+              edit: !toggle.edit,
+              add: !toggle.add,
+              is_active: false,
+              status: false,
+            });
+            formik.handleReset();
+            toast.success(t("toast.book.updatedSuccess"));
+          } else {
+            toast.error(t("toast.book.updatedError"));
+            dispatch(getBooksApi());
+          }
+        });
+      }
+    }
   };
 
   // Handle PDF Change
