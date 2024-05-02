@@ -21,6 +21,8 @@ import {
   updateBookApi,
   deleteBookApi,
   getBooksSubSubCategoriesApi,
+  getBooksCategoriesApi,
+  getBooksSubCategoriesApi,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -48,6 +50,14 @@ const initialValues = {
     title: "",
     id: "",
   },
+  bookMainCategory: {
+    title: "",
+    id: "",
+  },
+  bookSubCategory: {
+    title: "",
+    id: "",
+  },
 };
 
 const Books = () => {
@@ -60,9 +70,14 @@ const Books = () => {
   const { validationSchema } = useSchema();
   const fileRef = useRef();
   const role = Cookies.get("_role");
-  const { books, bookSubSubCategories, loading, error } = useSelector(
-    (state) => state.book
-  );
+  const {
+    books,
+    bookCategories,
+    bookSubCategories,
+    bookSubSubCategories,
+    loading,
+    error,
+  } = useSelector((state) => state.book);
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
@@ -160,74 +175,75 @@ const Books = () => {
   ];
 
   const onSubmit = (values) => {
-    if (role === "admin") {
-      if (!values.id) {
-        // Add Book
-        dispatch(
-          addBookApi({
-            name: values.title,
-            number_pages: values.number_pages,
-            file: values.book.file,
-            image: values.image.file,
-            sub_categories_id: values.bookCategory.id,
-            status: values.status === "private" ? "Private" : "Public",
-            is_active: values.is_active,
-          })
-        ).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            setToggle({
-              ...toggle,
-              add: !toggle.add,
-              edit: false,
-              is_active: false,
-              status: false,
-            });
-            formik.handleReset();
-            toast.success(t("toast.book.addedSuccess"));
-          } else {
-            toast.error(t("toast.book.addedError"));
-            dispatch(getBooksApi());
-          }
-        });
-      }
-      // Edit Book
-      else {
-        const formDate = new FormData();
-        formDate.append("id", values.id);
-        formDate.append("name", values.title);
-        formDate.append("number_pages", values.number_pages);
-        formDate.append("sub_categories_id", values.bookCategory.id);
-        formDate.append(
-          "status",
-          values.status === "private" ? "Private" : "Public"
-        );
-        formDate.append("is_active", values.is_active);
-        if (values.image.file) {
-          formDate.append("image", values.image.file);
-        }
-        if (values.book.file) {
-          formDate.append("file", values.book.file);
-        }
-        dispatch(updateBookApi(formDate)).then((res) => {
-          if (!res.error) {
-            dispatch(getBooksApi());
-            setToggle({
-              ...toggle,
-              edit: !toggle.edit,
-              add: !toggle.add,
-              is_active: false,
-              status: false,
-            });
-            formik.handleReset();
-            toast.success(t("toast.book.updatedSuccess"));
-          } else {
-            toast.error(t("toast.book.updatedError"));
-            dispatch(getBooksApi());
-          }
-        });
-      }
-    }
+    console.log(values);
+    // if (role === "admin") {
+    //   if (!values.id) {
+    //     // Add Book
+    //     dispatch(
+    //       addBookApi({
+    //         name: values.title,
+    //         number_pages: values.number_pages,
+    //         file: values.book.file,
+    //         image: values.image.file,
+    //         sub_categories_id: values.bookCategory.id,
+    //         status: values.status === "private" ? "Private" : "Public",
+    //         is_active: values.is_active,
+    //       })
+    //     ).then((res) => {
+    //       if (!res.error) {
+    //         dispatch(getBooksApi());
+    //         setToggle({
+    //           ...toggle,
+    //           add: !toggle.add,
+    //           edit: false,
+    //           is_active: false,
+    //           status: false,
+    //         });
+    //         formik.handleReset();
+    //         toast.success(t("toast.book.addedSuccess"));
+    //       } else {
+    //         toast.error(t("toast.book.addedError"));
+    //         dispatch(getBooksApi());
+    //       }
+    //     });
+    //   }
+    //   // Edit Book
+    //   else {
+    //     const formDate = new FormData();
+    //     formDate.append("id", values.id);
+    //     formDate.append("name", values.title);
+    //     formDate.append("number_pages", values.number_pages);
+    //     formDate.append("sub_categories_id", values.bookCategory.id);
+    //     formDate.append(
+    //       "status",
+    //       values.status === "private" ? "Private" : "Public"
+    //     );
+    //     formDate.append("is_active", values.is_active);
+    //     if (values.image.file) {
+    //       formDate.append("image", values.image.file);
+    //     }
+    //     if (values.book.file) {
+    //       formDate.append("file", values.book.file);
+    //     }
+    //     dispatch(updateBookApi(formDate)).then((res) => {
+    //       if (!res.error) {
+    //         dispatch(getBooksApi());
+    //         setToggle({
+    //           ...toggle,
+    //           edit: !toggle.edit,
+    //           add: !toggle.add,
+    //           is_active: false,
+    //           status: false,
+    //         });
+    //         formik.handleReset();
+    //         toast.success(t("toast.book.updatedSuccess"));
+    //       } else {
+    //         toast.error(t("toast.book.updatedError"));
+    //         dispatch(getBooksApi());
+    //       }
+    //     });
+    //   }
+    // }
   };
 
   // Handle PDF Change
@@ -386,6 +402,8 @@ const Books = () => {
     try {
       dispatch(getBooksApi());
       if (role === "admin") {
+        dispatch(getBooksCategoriesApi());
+        dispatch(getBooksSubCategoriesApi());
         dispatch(getBooksSubSubCategoriesApi());
       }
     } catch (error) {
@@ -396,7 +414,7 @@ const Books = () => {
   // Formik
   const formik = useFormik({
     initialValues,
-    validationSchema: validationSchema.book,
+    // validationSchema: validationSchema.book,
     onSubmit,
   });
 
@@ -1140,12 +1158,12 @@ const Books = () => {
                     ) : null}
                   </div>
                   <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                    <label htmlFor="bookCategory" className="form-label">
-                      {t("chooseCategory")}
+                    <label htmlFor="bookMainCategory" className="form-label">
+                      {t("chooseBookMainCategory")}
                     </label>
                     <div
                       className={`dropdown form-input w-100 ${
-                        toggle.bookCategory ? "active" : ""
+                        toggle.bookMainCategory ? "active" : ""
                       }`}
                     >
                       <button
@@ -1153,42 +1171,43 @@ const Books = () => {
                         onClick={() => {
                           setToggle({
                             ...toggle,
-                            bookCategory: !toggle.bookCategory,
+                            bookMainCategory: !toggle.bookMainCategory,
                           });
                         }}
                         className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
                       >
-                        {formik.values.bookCategory?.title
-                          ? formik.values.bookCategory?.title
+                        {formik.values.bookMainCategory?.title
+                          ? formik.values.bookMainCategory?.title
                           : t("chooseCategory")}
                         <TiArrowSortedUp
                           className={`dropdown-icon ${
-                            toggle.bookCategory ? "active" : ""
+                            toggle.bookMainCategory ? "active" : ""
                           }`}
                         />
                       </button>
                       <div
                         className={`dropdown-content ${
-                          toggle.bookCategory ? "active" : ""
+                          toggle.bookMainCategory ? "active" : ""
                         }`}
                       >
-                        {bookSubSubCategories?.map((category) => (
+                        {bookCategories?.map((category) => (
                           <button
                             type="button"
                             key={category?.id}
                             className={`item ${
-                              formik.values.bookCategory?.id === category?.id
+                              formik.values.bookMainCategory?.id ===
+                              category?.id
                                 ? "active"
                                 : ""
                             }`}
                             value={category?.id}
-                            name="bookCategory"
+                            name="bookMainCategory"
                             onClick={() => {
                               setToggle({
                                 ...toggle,
-                                bookCategory: !toggle.bookCategory,
+                                bookMainCategory: !toggle.bookMainCategory,
                               });
-                              formik.setFieldValue("bookCategory", {
+                              formik.setFieldValue("bookMainCategory", {
                                 title: category.title,
                                 id: category?.id,
                               });
@@ -1199,13 +1218,152 @@ const Books = () => {
                         ))}
                       </div>
                     </div>
-                    {formik.errors.bookCategory?.title &&
-                    formik.touched.bookCategory?.title ? (
+                    {formik.errors.bookMainCategory?.title &&
+                    formik.touched.bookMainCategory?.title ? (
                       <span className="error">
-                        {formik.errors.bookCategory?.title}
+                        {formik.errors.bookMainCategory?.title}
                       </span>
                     ) : null}
                   </div>
+                  {formik.values.bookMainCategory.id ? (
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="bookSubCategory" className="form-label">
+                        {t("chooseBookSubCategory")}
+                      </label>
+                      <div
+                        className={`dropdown form-input w-100 ${
+                          toggle.bookSubCategory ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              bookSubCategory: !toggle.bookSubCategory,
+                            });
+                          }}
+                          className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.bookSubCategory?.title
+                            ? formik.values.bookSubCategory?.title
+                            : t("chooseCategory")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.bookSubCategory ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.bookSubCategory ? "active" : ""
+                          }`}
+                        >
+                          {bookSubCategories?.map((category) => (
+                            <button
+                              type="button"
+                              key={category?.id}
+                              className={`item ${
+                                formik.values.bookSubCategory?.id ===
+                                category?.id
+                                  ? "active"
+                                  : ""
+                              }`}
+                              value={category?.id}
+                              name="bookSubCategory"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  bookSubCategory: !toggle.bookSubCategory,
+                                });
+                                formik.setFieldValue("bookSubCategory", {
+                                  title: category.title,
+                                  id: category?.id,
+                                });
+                              }}
+                            >
+                              {category.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {formik.errors.bookSubCategory?.title &&
+                      formik.touched.bookSubCategory?.title ? (
+                        <span className="error">
+                          {formik.errors.bookSubCategory?.title}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
+                  {formik.values.bookSubCategory.id ? (
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="bookCategory" className="form-label">
+                        {t("chooseBookSubSubCategory")}
+                      </label>
+                      <div
+                        className={`dropdown form-input w-100 ${
+                          toggle.bookCategory ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              bookCategory: !toggle.bookCategory,
+                            });
+                          }}
+                          className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.bookCategory?.title
+                            ? formik.values.bookCategory?.title
+                            : t("chooseCategory")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.bookCategory ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.bookCategory ? "active" : ""
+                          }`}
+                        >
+                          {bookSubSubCategories?.map((category) => (
+                            <button
+                              type="button"
+                              key={category?.id}
+                              className={`item ${
+                                formik.values.bookCategory?.id === category?.id
+                                  ? "active"
+                                  : ""
+                              }`}
+                              value={category?.id}
+                              name="bookCategory"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  bookCategory: !toggle.bookCategory,
+                                });
+                                formik.setFieldValue("bookCategory", {
+                                  title: category.title,
+                                  id: category?.id,
+                                });
+                              }}
+                            >
+                              {category.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {formik.errors.bookCategory?.title &&
+                      formik.touched.bookCategory?.title ? (
+                        <span className="error">
+                          {formik.errors.bookCategory?.title}
+                        </span>
+                      ) : null}
+                    </div>
+                  ) : null}
                   <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
                     <label htmlFor="status" className="form-label">
                       {t("content")}
