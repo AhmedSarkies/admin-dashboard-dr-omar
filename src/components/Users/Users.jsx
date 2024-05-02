@@ -485,7 +485,7 @@ const Users = () => {
                       </td>
                     )}
                     {toggle.toggleColumns?.phone && (
-                      <td className="table-td phone">
+                      <td className="table-td phone" dir="ltr">
                         <a href={`mailto:${result?.phonenumber}`}>
                           {result?.phonenumber}
                         </a>
