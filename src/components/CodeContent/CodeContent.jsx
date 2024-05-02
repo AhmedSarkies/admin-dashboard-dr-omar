@@ -628,7 +628,7 @@ const CodeContent = () => {
                       )}
                       {toggle.toggleColumns?.phone && (
                         <td className="table-td phone">
-                          <a href={`mailto:${result?.phonenumber}`}>
+                          <a href={`mailto:${result?.phonenumber}`} dir="ltr">
                             {result?.phonenumber}
                           </a>
                         </td>
