@@ -5,6 +5,7 @@ import Http from "../../Http";
 const initialState = {
   books: [],
   bookCategories: [],
+  bookSubCategories: [],
   bookSubSubCategories: [],
   loading: false,
   error: null,
