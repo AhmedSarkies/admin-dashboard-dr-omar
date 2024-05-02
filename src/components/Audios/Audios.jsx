@@ -923,6 +923,7 @@ const Audios = () => {
                 elders: false,
                 audioCategory: false,
                 status: false,
+                is_active: false,
               });
               formik.handleReset();
             }}
@@ -936,6 +937,10 @@ const Audios = () => {
                 setToggle({
                   ...toggle,
                   add: !toggle.add,
+                  elders: false,
+                  audioCategory: false,
+                  status: false,
+                  is_active: false,
                 });
                 formik.handleReset();
               }}
@@ -946,6 +951,10 @@ const Audios = () => {
                   setToggle({
                     ...toggle,
                     add: !toggle.add,
+                    elders: false,
+                    audioCategory: false,
+                    status: false,
+                    is_active: false,
                   });
                 }}
               />
@@ -1192,7 +1201,8 @@ const Audios = () => {
                           toggle.status ? "active" : ""
                         }`}
                       >
-                        <div
+                        <button
+                          type="button"
                           onClick={() => {
                             setToggle({
                               ...toggle,
@@ -1201,9 +1211,11 @@ const Audios = () => {
                           }}
                           className="dropdown-btn d-flex justify-content-between align-items-center"
                         >
-                          {formik.values.status === "Private"
+                          {formik.values.status === "Private" ||
+                          formik.values.status === "private"
                             ? t("private")
-                            : formik.values.status === "Public"
+                            : formik.values.status === "Public" ||
+                              formik.values.status === "public"
                             ? t("public")
                             : t("content")}
                           <TiArrowSortedUp
@@ -1211,15 +1223,19 @@ const Audios = () => {
                               toggle.status ? "active" : ""
                             }`}
                           />
-                        </div>
+                        </button>
                         <div
                           className={`dropdown-content ${
                             toggle.status ? "active" : ""
                           }`}
                         >
-                          <div
+                          <button
+                            type="button"
                             className={`item ${
-                              formik.values.status === "Private" ? "active" : ""
+                              formik.values.status === "Private" ||
+                              formik.values.status === "private"
+                                ? "active"
+                                : ""
                             }`}
                             value="Private"
                             name="status"
@@ -1232,10 +1248,14 @@ const Audios = () => {
                             }}
                           >
                             {t("private")}
-                          </div>
-                          <div
+                          </button>
+                          <button
+                            type="button"
                             className={`item ${
-                              formik.values.status === "Public" ? "active" : ""
+                              formik.values.status === "Public" ||
+                              formik.values.status === "public"
+                                ? "active"
+                                : ""
                             }`}
                             value="Public"
                             name="status"
@@ -1248,7 +1268,7 @@ const Audios = () => {
                             }}
                           >
                             {t("public")}
-                          </div>
+                          </button>
                         </div>
                       </div>
                       {formik.errors.status && formik.touched.status ? (
@@ -1389,6 +1409,9 @@ const Audios = () => {
                           </button>
                         </div>
                       </div>
+                      {formik.errors.is_active && formik.touched.is_active ? (
+                        <span className="error">{formik.errors.is_active}</span>
+                      ) : null}
                     </div>
                   </Col>
                   <Col lg={12}>
@@ -1415,6 +1438,10 @@ const Audios = () => {
                           setToggle({
                             ...toggle,
                             add: !toggle.add,
+                            elders: false,
+                            audioCategory: false,
+                            status: false,
+                            is_active: false,
                           });
                           formik.handleReset();
                         }}
@@ -1437,6 +1464,7 @@ const Audios = () => {
                 audioCategory: false,
                 status: false,
                 elders: false,
+                is_active: false,
               });
               formik.handleReset();
             }}
@@ -1450,6 +1478,10 @@ const Audios = () => {
                 setToggle({
                   ...toggle,
                   edit: !toggle.edit,
+                  audioCategory: false,
+                  status: false,
+                  elders: false,
+                  is_active: false,
                 });
                 formik.handleReset();
               }}
@@ -1460,6 +1492,10 @@ const Audios = () => {
                   setToggle({
                     ...toggle,
                     edit: !toggle.edit,
+                    audioCategory: false,
+                    status: false,
+                    elders: false,
+                    is_active: false,
                   });
                   formik.handleReset();
                 }}
@@ -1931,6 +1967,9 @@ const Audios = () => {
                           </button>
                         </div>
                       </div>
+                      {formik.errors.is_active && formik.touched.is_active ? (
+                        <span className="error">{formik.errors.is_active}</span>
+                      ) : null}
                     </div>
                   </Col>
                   <Col lg={12}>
@@ -1957,6 +1996,10 @@ const Audios = () => {
                           setToggle({
                             ...toggle,
                             edit: !toggle.edit,
+                            audioCategory: false,
+                            status: false,
+                            elders: false,
+                            is_active: false,
                           });
                           formik.handleReset();
                         }}
