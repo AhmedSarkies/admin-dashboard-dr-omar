@@ -282,7 +282,8 @@ const useSchema = () => {
       title: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      status: string(),
+      status: string().required(t("validation.content")),
+      is_active: string().required(t("validation.activation")),
       image: mixed().test("fileSize", t("validation.imageAudio"), (value) => {
         if (value.file) {
           return value.file.size > 0;
