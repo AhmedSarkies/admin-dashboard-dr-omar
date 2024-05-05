@@ -56,6 +56,10 @@ const initialValues = {
 const Audios = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getAudiosCookies = Cookies.get("GetAudio");
+  const addAudiosCookies = Cookies.get("addAudio");
+  const editAudiosCookies = Cookies.get("editAudio");
+  const deleteAudiosCookies = Cookies.get("deleteAudio");
   const { validationSchema } = useSchema();
   const dispatch = useDispatch();
   const fileRef = useRef();
@@ -176,7 +180,11 @@ const Audios = () => {
     initialValues,
     validationSchema: validationSchema.audio,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addAudiosCookies === "1" && getAudiosCookies === "1") ||
+        (editAudiosCookies === "1" && getAudiosCookies === "1")
+      ) {
         // Add Audio
         if (!values.id) {
           dispatch(
@@ -337,7 +345,7 @@ const Audios = () => {
 
   // Delete Audio
   const handleDelete = (audio) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteAudiosCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + audio?.title + "?",
         text: t("textDeleteAlert"),
@@ -383,12 +391,23 @@ const Audios = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getAudiosApi());
-      if (role === "admin") {
+      if (role === "admin" || getAudiosCookies === "1") {
+        dispatch(getAudiosApi());
+      }
+      if (
+        role === "admin" ||
+        addAudiosCookies === "1" ||
+        editAudiosCookies === "1"
+      ) {
         dispatch(getAudiosCategoriesApi());
         dispatch(getApprovedScholarsApi());
       }
-      if (role !== "admin") {
+      if (
+        role !== "admin" &&
+        addAudiosCookies === "0" &&
+        editAudiosCookies === "0" &&
+        deleteAudiosCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -397,15 +416,36 @@ const Audios = () => {
           },
         });
       }
+      if (getAudiosCookies === "0") {
+        Cookies.set("addAudio", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editAudio", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteAudio", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch]);
+  }, [dispatch, role, getAudiosCookies, addAudiosCookies, editAudiosCookies]);
 
   return (
     <div className="audio-container scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addAudiosCookies === "1" && getAudiosCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -467,7 +507,12 @@ const Audios = () => {
             >
               {columns
                 .filter((column) =>
-                  role === "admin" ? column : column.name !== "control"
+                  role === "admin" ||
+                  (addAudiosCookies === "1" && getAudiosCookies === "1") ||
+                  role === "admin" ||
+                  (editAudiosCookies === "1" && getAudiosCookies === "1")
+                    ? column
+                    : column.name !== "control"
                 )
                 .map((column) => (
                   <button
@@ -650,28 +695,41 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th
-                  className="table-th"
-                  onClick={() => handleSort(columns[13])}
-                >
-                  {t("action")}
-                  {toggle.sortColumn === columns[13].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addAudiosCookies === "1" && getAudiosCookies === "1") ||
+                role === "admin" ||
+                (editAudiosCookies === "1" && getAudiosCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[13])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[13].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 14 : 13}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addAudiosCookies === "0" &&
+                    editAudiosCookies === "0" &&
+                    deleteAudiosCookies === "0"
+                      ? 13
+                      : 14
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -689,7 +747,16 @@ const Audios = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 14 : 13}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addAudiosCookies === "0" &&
+                    editAudiosCookies === "0" &&
+                    deleteAudiosCookies === "0"
+                      ? 13
+                      : 14
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -711,7 +778,16 @@ const Audios = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 14 : 13}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addAudiosCookies === "0" &&
+                      editAudiosCookies === "0" &&
+                      deleteAudiosCookies === "0"
+                        ? 13
+                        : 14
+                    }
+                  >
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -723,7 +799,16 @@ const Audios = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 14 : 13}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addAudiosCookies === "0" &&
+                    editAudiosCookies === "0" &&
+                    deleteAudiosCookies === "0"
+                      ? 13
+                      : 14
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -808,13 +893,20 @@ const Audios = () => {
                               backgroundColor:
                                 result?.status === t("public")
                                   ? "green"
-                                  : result?.status === t("private")
-                                  ? "red"
                                   : "red",
-                              cursor: role === "admin" ? "pointer" : "default",
+                              cursor:
+                                role === "admin" ||
+                                (editAudiosCookies === "1" &&
+                                  getAudiosCookies === "1")
+                                  ? "pointer"
+                                  : "default",
                             }}
                             onClick={() => {
-                              if (role === "admin") {
+                              if (
+                                role === "admin" ||
+                                (editAudiosCookies === "1" &&
+                                  getAudiosCookies === "1")
+                              ) {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
@@ -854,10 +946,19 @@ const Audios = () => {
                                 result?.is_active === t("active")
                                   ? "green"
                                   : "red",
-                              cursor: role === "admin" ? "pointer" : "default",
+                              cursor:
+                                role === "admin" ||
+                                (editAudiosCookies === "1" &&
+                                  getAudiosCookies === "1")
+                                  ? "pointer"
+                                  : "default",
                             }}
                             onClick={() => {
-                              if (role === "admin") {
+                              if (
+                                role === "admin" ||
+                                (editAudiosCookies === "1" &&
+                                  getAudiosCookies === "1")
+                              ) {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
@@ -888,22 +989,34 @@ const Audios = () => {
                           </span>
                         </td>
                       )}
-                      {role === "admin" && toggle.toggleColumns.control && (
-                        <td className="table-td">
-                          <span className="table-btn-container">
-                            <FaEdit
-                              className="edit-btn"
-                              onClick={() => {
-                                handleEdit(result);
-                              }}
-                            />
-                            <MdDeleteOutline
-                              className="delete-btn"
-                              onClick={() => handleDelete(result)}
-                            />
-                          </span>
-                        </td>
-                      )}
+                      {(role === "admin" ||
+                        (addAudiosCookies === "1" &&
+                          getAudiosCookies === "1") ||
+                        role === "admin" ||
+                        (editAudiosCookies === "1" &&
+                          getAudiosCookies === "1")) &&
+                        toggle.toggleColumns.control && (
+                          <td className="table-td">
+                            <span className="table-btn-container">
+                              {(role === "admin" ||
+                                editAudiosCookies === "1") && (
+                                <FaEdit
+                                  className="edit-btn"
+                                  onClick={() => {
+                                    handleEdit(result);
+                                  }}
+                                />
+                              )}
+                              {(role === "admin" ||
+                                deleteAudiosCookies === "1") && (
+                                <MdDeleteOutline
+                                  className="delete-btn"
+                                  onClick={() => handleDelete(result)}
+                                />
+                              )}
+                            </span>
+                          </td>
+                        )}
                     </tr>
                   )
                 )}
@@ -911,7 +1024,8 @@ const Audios = () => {
             )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addAudiosCookies === "1" && getAudiosCookies === "1")) && (
         <>
           {/* Add Audio */}
           <Modal
@@ -1454,6 +1568,11 @@ const Audios = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (getAudiosCookies === "1" && editAudiosCookies === "1")) && (
+        <>
           {/* Edit audio */}
           <Modal
             isOpen={toggle.edit}
