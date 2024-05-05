@@ -22,6 +22,12 @@ import Cookies from "js-cookie";
 const SubCategoriesBook = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getSubCategoriesBooksCookies = Cookies.get("GetSubBooksCategories");
+  const addSubCategoriesBooksCookies = Cookies.get("addSubBooksCategories");
+  const editSubCategoriesBooksCookies = Cookies.get("editSubBooksCategories");
+  const deleteSubCategoriesBooksCookies = Cookies.get(
+    "deleteSubBooksCategories"
+  );
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { bookSubCategories, bookCategories, loading, error } = useSelector(
@@ -41,6 +47,7 @@ const SubCategoriesBook = () => {
     toggleColumns: {
       id: true,
       title: true,
+      mainCategory: true,
       control: true,
     },
   });
@@ -50,14 +57,19 @@ const SubCategoriesBook = () => {
   const columns = [
     { id: 0, name: "id", label: t("index") },
     { id: 1, name: "title", label: t("subCategoriesBooks.columns.category") },
-    { id: 2, name: "control", label: t("action") },
+    {
+      id: 2,
+      name: "mainCategory",
+      label: t("subCategoriesBooks.columns.mainCategory"),
+    },
+    { id: 3, name: "control", label: t("action") },
   ];
   const {
     PaginationUI,
     handleSort,
     handleSearch,
     handleToggleColumns,
-    searchResults,
+    searchResultsSubBookCategories,
   } = useFiltration({
     rowData: bookSubCategories,
     toggle,
@@ -77,12 +89,19 @@ const SubCategoriesBook = () => {
       ? validationSchema.editBookSubCategory
       : validationSchema.bookSubCategory,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addSubCategoriesBooksCookies === "1" &&
+          getSubCategoriesBooksCookies === "1") ||
+        (editSubCategoriesBooksCookies === "1" &&
+          getSubCategoriesBooksCookies === "1")
+      ) {
         if (values.isEditing) {
           dispatch(
             updateBookSubCategoryApi({
               category_id: values.id,
               title: values.title,
+              ID_Main_Category: values.MainCategory.id,
             })
           ).then((res) => {
             if (!res.error) {
@@ -134,7 +153,7 @@ const SubCategoriesBook = () => {
 
   // Delete Book Category
   const handleDelete = (bookSubCategory) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteSubCategoriesBooksCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + bookSubCategory?.title + "?",
         text: t("textDeleteAlert"),
@@ -149,7 +168,10 @@ const SubCategoriesBook = () => {
           dispatch(deleteBookSubCategoryApi(bookSubCategory?.id)).then(
             (res) => {
               if (!res.error) {
-                if (toggle.currentPage > 1 && searchResults.length === 1) {
+                if (
+                  toggle.currentPage > 1 &&
+                  searchResultsSubBookCategories.length === 1
+                ) {
                   setToggle({
                     ...toggle,
                     currentPage: toggle.currentPage - 1,
@@ -182,11 +204,42 @@ const SubCategoriesBook = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksSubCategoriesApi());
-      if (role === "admin") {
+      if (role === "admin" || getSubCategoriesBooksCookies === "1") {
+        dispatch(getBooksSubCategoriesApi());
+      }
+      if (
+        role === "admin" ||
+        addSubCategoriesBooksCookies === "1" ||
+        editSubCategoriesBooksCookies === "1"
+      ) {
         dispatch(getBooksCategoriesApi());
       }
-      if (role !== "admin") {
+      if (getSubCategoriesBooksCookies === "0") {
+        Cookies.set("addSubBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editSubBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteSubBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addSubCategoriesBooksCookies === "0" &&
+        editSubCategoriesBooksCookies === "0" &&
+        deleteSubCategoriesBooksCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -199,11 +252,20 @@ const SubCategoriesBook = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    addSubCategoriesBooksCookies,
+    getSubCategoriesBooksCookies,
+    editSubCategoriesBooksCookies,
+    deleteSubCategoriesBooksCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addSubCategoriesBooksCookies === "1" &&
+          getSubCategoriesBooksCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -307,9 +369,9 @@ const SubCategoriesBook = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
+              {toggle.toggleColumns?.mainCategory && (
                 <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("action")}
+                  {t("subCategoriesBooks.columns.mainCategory")}
                   {toggle.sortColumn === columns[2].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -319,13 +381,31 @@ const SubCategoriesBook = () => {
                   ) : null}
                 </th>
               )}
+              {(role === "admin" ||
+                (addSubCategoriesBooksCookies === "1" &&
+                  getSubCategoriesBooksCookies === "1") ||
+                role === "admin" ||
+                (editSubCategoriesBooksCookies === "1" &&
+                  getSubCategoriesBooksCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th className="table-th">{t("action")}</th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubCategoriesBooksCookies === "0" &&
+                    editSubCategoriesBooksCookies === "0" &&
+                    deleteSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -343,7 +423,16 @@ const SubCategoriesBook = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubCategoriesBooksCookies === "0" &&
+                    editSubCategoriesBooksCookies === "0" &&
+                    deleteSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -360,65 +449,106 @@ const SubCategoriesBook = () => {
             </tbody>
           )}
           {/* No Data */}
-          {searchResults?.length === 0 && error === null && !loading && (
-            <tbody>
-              <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
-                  <p className="no-data mb-0">{t("noData")}</p>
-                </td>
-              </tr>
-            </tbody>
-          )}
+          {searchResultsSubBookCategories?.length === 0 &&
+            error === null &&
+            !loading && (
+              <tbody>
+                <tr className="no-data-container">
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addSubCategoriesBooksCookies === "0" &&
+                      editSubCategoriesBooksCookies === "0" &&
+                      deleteSubCategoriesBooksCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
+                    <p className="no-data mb-0">{t("noData")}</p>
+                  </td>
+                </tr>
+              </tbody>
+            )}
           {/* There is no any columns */}
           {Object.values(toggle.toggleColumns).every(
             (column) => column === false
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubCategoriesBooksCookies === "0" &&
+                    editSubCategoriesBooksCookies === "0" &&
+                    deleteSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
             </tbody>
           )}
           {/* Data */}
-          {searchResults?.length > 0 && error === null && loading === false && (
-            <tbody>
-              {searchResults?.map((result, idx) => (
-                <tr key={result?.id + new Date().getDate()}>
-                  {toggle.toggleColumns?.id && (
-                    <td className="table-td">{idx + 1}#</td>
-                  )}
-                  {toggle.toggleColumns?.title && (
-                    <td className="table-td name">{result?.title}</td>
-                  )}
-                  {role === "admin" && toggle.toggleColumns?.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
-                </tr>
-              ))}
-            </tbody>
-          )}
+          {searchResultsSubBookCategories?.length > 0 &&
+            error === null &&
+            loading === false && (
+              <tbody>
+                {searchResultsSubBookCategories?.map((result, idx) => (
+                  <tr key={result?.id + new Date().getDate()}>
+                    {toggle.toggleColumns?.id && (
+                      <td className="table-td">{idx + 1}#</td>
+                    )}
+                    {toggle.toggleColumns?.title && (
+                      <td className="table-td name">{result?.title}</td>
+                    )}
+                    {toggle.toggleColumns?.mainCategory && (
+                      <td className="table-td name">
+                        {result?.MainCategory?.title}
+                      </td>
+                    )}
+                    {(role === "admin" ||
+                      (addSubCategoriesBooksCookies === "1" &&
+                        getSubCategoriesBooksCookies === "1") ||
+                      role === "admin" ||
+                      (editSubCategoriesBooksCookies === "1" &&
+                        getSubCategoriesBooksCookies === "1")) &&
+                      toggle.toggleColumns?.control && (
+                        <td className="table-td">
+                          <span className="table-btn-container">
+                            {(role === "admin" ||
+                              editSubCategoriesBooksCookies === "1") && (
+                              <FaEdit
+                                className="edit-btn"
+                                onClick={() => {
+                                  handleEdit(result);
+                                }}
+                              />
+                            )}
+                            {(role === "admin" ||
+                              deleteSubCategoriesBooksCookies === "1") && (
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                            )}
+                          </span>
+                        </td>
+                      )}
+                  </tr>
+                ))}
+              </tbody>
+            )}
         </table>
       </div>
       {/* Pagination */}
-      {searchResults?.length > 0 && error === null && loading === false && (
-        <PaginationUI />
-      )}
-      {role === "admin" && (
+      {searchResultsSubBookCategories?.length > 0 &&
+        error === null &&
+        loading === false && <PaginationUI />}
+      {(role === "admin" ||
+        (addSubCategoriesBooksCookies === "1" &&
+          getSubCategoriesBooksCookies === "1")) && (
         <>
           {/* Add Book Sub Category */}
           <Modal
@@ -485,7 +615,7 @@ const SubCategoriesBook = () => {
                   <Col lg={12}>
                     <div className="form-group-container d-flex flex-column align-items-end mb-3">
                       <label htmlFor="bookCategories" className="form-label">
-                        {t("subSubCategoriesBooks.columns.mainCategory")}
+                        {t("subCategoriesBooks.columns.mainCategory")}
                       </label>
                       <div
                         className={`dropdown form-input ${
@@ -586,6 +716,12 @@ const SubCategoriesBook = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (editSubCategoriesBooksCookies === "1" &&
+          getSubCategoriesBooksCookies === "1")) && (
+        <>
           {/* Edit Book Sub Category */}
           <Modal
             isOpen={toggle.edit}
@@ -645,6 +781,75 @@ const SubCategoriesBook = () => {
                       />
                       {formik.errors.title && formik.touched.title ? (
                         <span className="error">{formik.errors.title}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="bookCategories" className="form-label">
+                        {t("subCategoriesBooks.columns.mainCategory")}
+                      </label>
+                      <div
+                        className={`dropdown form-input ${
+                          toggle.isBookCategories ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              isBookCategories: !toggle.isBookCategories,
+                            });
+                          }}
+                          className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.bookCategory?.title
+                            ? formik.values.bookCategory?.title
+                            : t("chooseCategory")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.isBookCategories ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.isBookCategories ? "active" : ""
+                          }`}
+                        >
+                          {bookCategories?.map((category) => (
+                            <button
+                              type="button"
+                              key={category?.id}
+                              className={`item ${
+                                formik.values.bookCategory?.id === category?.id
+                                  ? "active"
+                                  : ""
+                              }`}
+                              value={category?.id}
+                              name="bookCategory"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  isBookCategories: !toggle.isBookCategories,
+                                });
+                                formik.setFieldValue("bookCategory", {
+                                  title: category.title,
+                                  id: category?.id,
+                                });
+                              }}
+                            >
+                              {category.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {formik.errors.bookCategory?.title &&
+                      formik.touched.bookCategory?.title ? (
+                        <span className="error">
+                          {formik.errors.bookCategory?.title}
+                        </span>
                       ) : null}
                     </div>
                   </Col>
