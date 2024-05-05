@@ -27,10 +27,14 @@ const initialValues = {
 const Users = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getUserCookies = Cookies.get("GetUser");
+  const editUserCookies = Cookies.get("editUser");
+  const deleteUserCookies = Cookies.get("deleteUser");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { validationSchema } = useSchema();
   const { users, loading, error } = useSelector((state) => state.user);
+
   const [toggle, setToggle] = useState({
     showHidePassword: false,
     showHideConfirmedPassword: false,
@@ -64,7 +68,10 @@ const Users = () => {
     initialValues,
     validationSchema: validationSchema.user,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (editUserCookies === "1" && getUserCookies === "1")
+      ) {
         // if email and phone is already exist with another user if just i change them to new values
         if (users.length > 0) {
           const emailExist = users.find(
@@ -158,7 +165,7 @@ const Users = () => {
 
   // Delete User
   const handleDelete = (user) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteUserCookies === "1") {
       Swal.fire({
         title: `هل انت متأكد من حذف ${user?.name}؟`,
         text: "لن تتمكن من التراجع عن هذا الاجراء!",
@@ -215,11 +222,27 @@ const Users = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getUsers());
+      if (role === "admin" || getUserCookies === "1") {
+        dispatch(getUsers());
+      }
+      if (getUserCookies === "0") {
+        Cookies.set("editUser", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteUser", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, role, getUserCookies]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
@@ -403,7 +426,7 @@ const Users = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="11">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -421,7 +444,7 @@ const Users = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="11">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -441,7 +464,7 @@ const Users = () => {
           {searchResultsUser?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="11">
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -453,7 +476,7 @@ const Users = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="9">
+                <td className="table-td" colSpan="11">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -533,10 +556,19 @@ const Users = () => {
                               result?.is_active === t("active")
                                 ? "green"
                                 : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                            cursor:
+                              role === "admin" ||
+                              (editUserCookies === "1" &&
+                                getUserCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editUserCookies === "1" &&
+                                getUserCookies === "1")
+                            ) {
                               const data = {
                                 id: result.id,
                                 name: result.name,
@@ -571,17 +603,17 @@ const Users = () => {
                               navigate(`/dr-omar/users/${result?.id}`)
                             }
                           />
-                          {role === "admin" && (
-                            <>
-                              <MdDeleteOutline
-                                className="delete-btn"
-                                onClick={() => handleDelete(result)}
-                              />
-                              <MdEdit
-                                className="edit-btn"
-                                onClick={() => handleEdit(result)}
-                              />
-                            </>
+                          {(role === "admin" || deleteUserCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          )}
+                          {(role === "admin" || editUserCookies === "1") && (
+                            <MdEdit
+                              className="edit-btn"
+                              onClick={() => handleEdit(result)}
+                            />
                           )}
                         </span>
                       </td>
@@ -596,7 +628,8 @@ const Users = () => {
       {searchResultsUser?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
-      {role === "admin" && (
+      {(role === "admin" ||
+        (getUserCookies === "1" && editUserCookies === "1")) && (
         <>
           {/* Add & Edit Sub Admin */}
           <Modal
