@@ -158,6 +158,20 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
         })
       : results;
 
+  const searchResultsSubBookCategories =
+    toggle.searchTerm && toggle.searchTerm !== ""
+      ? rowData?.filter((dataRow) => {
+          return (
+            dataRow?.MainCategory?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase()) ||
+            dataRow?.title
+              ?.toLowerCase()
+              .includes(toggle.searchTerm?.toLowerCase())
+          );
+        })
+      : results;
+
   // Search images using just category
   const searchResultsImagesCategory =
     toggle.searchTerm && toggle.searchTerm !== ""
@@ -184,10 +198,10 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
             dataRow?.categories?.title
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
-            dataRow?.sub_categories?.title
+            dataRow?.subCategories?.title
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
-            dataRow?.main_categories?.title
+            dataRow?.subSubCategories?.title
               ?.toLowerCase()
               .includes(toggle.searchTerm?.toLowerCase()) ||
             dataRow?.name
@@ -458,6 +472,7 @@ const useFiltration = ({ rowData, rowDataUser, toggle, setToggle }) => {
     searchResultsNewUsers,
     searchResultsImagesCategory,
     searchResultsBookSCategoryAndTitle,
+    searchResultsSubBookCategories,
     searchResultsSubSubBookCategories,
     searchResultsAudioSCategoryAndTitleAndAuthor,
     searchResultsAudioSCategoryAndTitleElder,
