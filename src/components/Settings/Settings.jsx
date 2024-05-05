@@ -84,6 +84,8 @@ const Settings = () => {
   const { settings, loading } = useSelector((state) => state.settings);
   const fileRef = useRef();
   const role = Cookies.get("_role");
+  const getSettingsCookies = Cookies.get("GetSettings");
+  const editSettingsCookies = Cookies.get("editSettings");
   const fileBackgroundRef = useRef();
   const fileLogoRef = useRef();
   const [toggle, setToggle] = useState({
@@ -118,7 +120,10 @@ const Settings = () => {
     },
     // validationSchema: validationSchema.settings,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (editSettingsCookies === "1" && getSettingsCookies === "1")
+      ) {
         const data = new FormData();
         data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
         data.append("code_phone", values.code_phone === true ? 1 : 0);
@@ -275,8 +280,18 @@ const Settings = () => {
 
   // Get Settings
   useEffect(() => {
-    dispatch(getSettings());
-  }, [dispatch]);
+    if (getSettingsCookies === "1" || role === "admin") {
+      dispatch(getSettings());
+    }
+    if (getSettingsCookies === "0") {
+      Cookies.set("editSettings", 0, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+    }
+  }, [dispatch, getSettingsCookies, role]);
 
   // Set Settings
   useEffect(() => {
@@ -295,8 +310,8 @@ const Settings = () => {
           preview: settings?.logo,
         },
         prayer_timings: settings?.prayer_timings === "true" ? true : false,
-        code_phone: settings?.code_phone === 1 ? true : false,
-        code_email: settings?.code_email === 1 ? true : false,
+        code_phone: settings?.code_phone ? true : false,
+        code_email: settings?.code_email ? true : false,
         facebook: settings?.facebook,
         whatsapp: settings?.whatsapp,
         messenger: settings?.messenger,
@@ -409,7 +424,7 @@ const Settings = () => {
                             className="delete-btn cancel-btn"
                             onClick={handleDeleteLogo}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -417,7 +432,9 @@ const Settings = () => {
                   </Modal>
                 </label>
               </div>
-              {role === "admin" && (
+              {(role === "admin" ||
+                (editSettingsCookies === "1" &&
+                  getSettingsCookies === "1")) && (
                 <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
                   <label htmlFor="logo" className="form-label">
                     <ImUpload /> {t("chooseImageLogo")}
@@ -525,14 +542,16 @@ const Settings = () => {
                         className="image-preview"
                       />
                     </ModalBody>
-                    {role === "admin" && (
+                    {(role === "admin" ||
+                      (editSettingsCookies === "1" &&
+                        getSettingsCookies === "1")) && (
                       <ModalFooter className="p-md-4 p-2">
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
                             onClick={handleDeleteImage}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -540,7 +559,9 @@ const Settings = () => {
                   </Modal>
                 </label>
               </div>
-              {role === "admin" && (
+              {(role === "admin" ||
+                (editSettingsCookies === "1" &&
+                  getSettingsCookies === "1")) && (
                 <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
                   <label htmlFor="image" className="form-label">
                     <ImUpload /> {t("chooseImageElder")}
@@ -666,14 +687,16 @@ const Settings = () => {
                         className="image-preview"
                       />
                     </ModalBody>
-                    {role === "admin" && (
+                    {(role === "admin" ||
+                      (editSettingsCookies === "1" &&
+                        getSettingsCookies === "1")) && (
                       <ModalFooter className="p-md-4 p-2">
                         <div className="form-group-container d-flex justify-content-center align-items-center">
                           <button
                             className="delete-btn cancel-btn"
                             onClick={handleDeleteBackground}
                           >
-                            حذف
+                            {t("delete")}
                           </button>
                         </div>
                       </ModalFooter>
@@ -681,7 +704,9 @@ const Settings = () => {
                   </Modal>
                 </label>
               </div>
-              {role === "admin" && (
+              {(role === "admin" ||
+                (editSettingsCookies === "1" &&
+                  getSettingsCookies === "1")) && (
                 <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
                   <label htmlFor="background" className="form-label">
                     <ImUpload /> {t("chooseBackground")}
@@ -731,12 +756,22 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="prayer_timings"
                   name="prayer_timings"
-                  disabled={role === "admin" ? false : true}
+                  disabled={
+                    role === "admin" ||
+                    (editSettingsCookies === "1" && getSettingsCookies === "1")
+                      ? false
+                      : true
+                  }
                   value={formik.values.prayer_timings}
                   checked={formik.values.prayer_timings}
                   onChange={handleInputChange}
                   style={{
-                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                    cursor:
+                      role !== "admin" ||
+                      (editSettingsCookies === "0" &&
+                        getSettingsCookies === "0")
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 />
               </div>
@@ -770,12 +805,22 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="code_phone"
                   name="code_phone"
-                  disabled={role === "admin" ? false : true}
+                  disabled={
+                    role === "admin" ||
+                    (editSettingsCookies === "1" && getSettingsCookies === "1")
+                      ? false
+                      : true
+                  }
                   value={formik.values.code_phone}
                   checked={formik.values.code_phone}
                   onChange={handleInputChange}
                   style={{
-                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                    cursor:
+                      role !== "admin" ||
+                      (editSettingsCookies === "0" &&
+                        getSettingsCookies === "0")
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 />
               </div>
@@ -790,12 +835,22 @@ const Settings = () => {
                   className="prayer-time-input me-3 ms-3"
                   id="code_email"
                   name="code_email"
-                  disabled={role === "admin" ? false : true}
+                  disabled={
+                    role === "admin" ||
+                    (editSettingsCookies === "1" && getSettingsCookies === "1")
+                      ? false
+                      : true
+                  }
                   value={formik.values.code_email}
                   checked={formik.values.code_email}
                   onChange={handleInputChange}
                   style={{
-                    cursor: role !== "admin" ? "not-allowed" : "pointer",
+                    cursor:
+                      role !== "admin" ||
+                      (editSettingsCookies === "0" &&
+                        getSettingsCookies === "0")
+                        ? "not-allowed"
+                        : "pointer",
                   }}
                 />
               </div>
@@ -827,7 +882,13 @@ const Settings = () => {
                     id={field.name}
                     name={field.name}
                     value={formik.values[field.name]}
-                    disabled={role === "admin" ? false : true}
+                    disabled={
+                      role === "admin" ||
+                      (editSettingsCookies === "1" &&
+                        getSettingsCookies === "1")
+                        ? false
+                        : true
+                    }
                     placeholder={t(
                       `settings.links.contact.columns.${field.name}`
                     )}
@@ -861,7 +922,10 @@ const Settings = () => {
           </div>
           <Row
             className={`flex-row-reverse justify-content-between g-3 ${
-              role !== "admin" ? "mb-5" : ""
+              role !== "admin" ||
+              (editSettingsCookies === "0" && getSettingsCookies === "0")
+                ? "mb-5"
+                : ""
             }`}
           >
             {appFields.map((field, index) => (
@@ -873,7 +937,13 @@ const Settings = () => {
                     id={field.name}
                     name={field.name}
                     value={formik.values[field.name]}
-                    disabled={role === "admin" ? false : true}
+                    disabled={
+                      role === "admin" ||
+                      (editSettingsCookies === "1" &&
+                        getSettingsCookies === "1")
+                        ? false
+                        : true
+                    }
                     placeholder={t(
                       `settings.links.appLink.columns.${field.name}`
                     )}
@@ -889,7 +959,8 @@ const Settings = () => {
               </Col>
             ))}
           </Row>
-          {role === "admin" && (
+          {(role === "admin" ||
+            (editSettingsCookies === "1" && getSettingsCookies === "1")) && (
             <Row>
               <Col md="12">
                 <div className="form-group-container d-flex justify-content-center mt-5 mb-3">
