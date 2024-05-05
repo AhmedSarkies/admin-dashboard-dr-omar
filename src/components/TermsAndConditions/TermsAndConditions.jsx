@@ -21,6 +21,10 @@ import {
 const TermsAndConditions = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getTermsAndConditionsCookies = Cookies.get("GetTermsConditions");
+  const addTermsAndConditionsCookies = Cookies.get("addTermsConditions");
+  const editTermsAndConditionsCookies = Cookies.get("editTermsConditions");
+  const deleteTermsAndConditionsCookies = Cookies.get("deleteTermsConditions");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { termsAndConditions, loading, error } = useSelector(
@@ -60,7 +64,13 @@ const TermsAndConditions = () => {
     },
     validationSchema: validationSchema.termsAndConditions,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addTermsAndConditionsCookies === "1" &&
+          getTermsAndConditionsCookies === "1") ||
+        (editTermsAndConditionsCookies === "1" &&
+          getTermsAndConditionsCookies === "1")
+      ) {
         const formDate = new FormData();
         formDate.append("title", values.title);
         formDate.append("title_en", values.title_en);
@@ -154,12 +164,12 @@ const TermsAndConditions = () => {
 
   // Delete term And Condition
   const handleDelete = (termsAndCondition) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteTermsAndConditionsCookies === "1") {
       Swal.fire({
         title:
           t("titleDeleteAlert") + lng === "ar"
-            ? termsAndCondition?.country
-            : termsAndCondition.country_en + "?",
+            ? termsAndCondition?.title
+            : termsAndCondition.title_en + "?",
         text: t("textDeleteAlert"),
         icon: "warning",
         showCancelButton: true,
@@ -182,13 +192,13 @@ const TermsAndConditions = () => {
                 Swal.fire({
                   title: `${t("titleDeletedSuccess")} ${
                     lng === "ar"
-                      ? termsAndCondition?.country
-                      : termsAndCondition.country_en
+                      ? termsAndCondition?.title
+                      : termsAndCondition.title_en
                   }`,
                   text: `${t("titleDeletedSuccess")} ${
                     lng === "ar"
-                      ? termsAndCondition?.country
-                      : termsAndCondition.country_en
+                      ? termsAndCondition?.title
+                      : termsAndCondition.title_en
                   } ${t("textDeletedSuccess")}`,
                   icon: "success",
                   confirmButtonColor: "#0d1d34",
@@ -210,8 +220,35 @@ const TermsAndConditions = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getTermsAndConditionsApi());
-      if (role !== "admin") {
+      if (role === "admin" || getTermsAndConditionsCookies === "1") {
+        dispatch(getTermsAndConditionsApi());
+      }
+      if (getTermsAndConditionsCookies === "0") {
+        Cookies.set("addTermsConditions", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editTermsConditions", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteTermsConditions", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addTermsAndConditionsCookies === "0" &&
+        editTermsAndConditionsCookies === "0" &&
+        deleteTermsAndConditionsCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -224,12 +261,21 @@ const TermsAndConditions = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getTermsAndConditionsCookies,
+    addTermsAndConditionsCookies,
+    editTermsAndConditionsCookies,
+    deleteTermsAndConditionsCookies,
+  ]);
 
   return (
     <>
       <div className="scholar-container mt-4 m-sm-3 m-0">
-        {role === "admin" && (
+        {(role === "admin" ||
+          (addTermsAndConditionsCookies === "1" &&
+            getTermsAndConditionsCookies === "1")) && (
           <div className="table-header">
             <button
               className="add-btn"
@@ -356,16 +402,31 @@ const TermsAndConditions = () => {
                     ) : null}
                   </th>
                 )}
-                {role === "admin" && toggle.toggleColumns.control && (
-                  <th className="table-th">{t("action")}</th>
-                )}
+                {(role === "admin" ||
+                  (addTermsAndConditionsCookies === "1" &&
+                    getTermsAndConditionsCookies === "1") ||
+                  role === "admin" ||
+                  (editTermsAndConditionsCookies === "1" &&
+                    getTermsAndConditionsCookies === "1")) &&
+                  toggle.toggleColumns.control && (
+                    <th className="table-th">{t("action")}</th>
+                  )}
               </tr>
             </thead>
             {/* Error */}
             {error !== null && loading === false && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addTermsAndConditionsCookies === "0" &&
+                      editTermsAndConditionsCookies === "0" &&
+                      deleteTermsAndConditionsCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
                     <p className="no-data mb-0">
                       {error === "Network Error"
                         ? t("networkError")
@@ -383,7 +444,16 @@ const TermsAndConditions = () => {
             {loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addTermsAndConditionsCookies === "0" &&
+                      editTermsAndConditionsCookies === "0" &&
+                      deleteTermsAndConditionsCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
                     <div className="no-data mb-0">
                       <Spinner
                         color="primary"
@@ -403,7 +473,16 @@ const TermsAndConditions = () => {
             {searchResults?.length === 0 && error === null && !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addTermsAndConditionsCookies === "0" &&
+                      editTermsAndConditionsCookies === "0" &&
+                      deleteTermsAndConditionsCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -415,7 +494,16 @@ const TermsAndConditions = () => {
             ) && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 4 : 3}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addTermsAndConditionsCookies === "0" &&
+                      editTermsAndConditionsCookies === "0" &&
+                      deleteTermsAndConditionsCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
                     <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                   </td>
                 </tr>
@@ -441,29 +529,43 @@ const TermsAndConditions = () => {
                           {lng === "ar" ? result?.text : result?.text_en}
                         </td>
                       )}
-                      {role === "admin" && toggle.toggleColumns?.control && (
-                        <td className="table-td">
-                          <span className="table-btn-container">
-                            <FaEdit
-                              className="edit-btn"
-                              onClick={() => {
-                                handleEdit(result);
-                              }}
-                            />
-                            <MdDeleteOutline
-                              className="delete-btn"
-                              onClick={() => handleDelete(result)}
-                            />
-                          </span>
-                        </td>
-                      )}
+                      {(role === "admin" ||
+                        (addTermsAndConditionsCookies === "1" &&
+                          getTermsAndConditionsCookies === "1") ||
+                        role === "admin" ||
+                        (editTermsAndConditionsCookies === "1" &&
+                          getTermsAndConditionsCookies === "1")) &&
+                        toggle.toggleColumns?.control && (
+                          <td className="table-td">
+                            <span className="table-btn-container">
+                              {(role === "admin" ||
+                                editTermsAndConditionsCookies === "1") && (
+                                <FaEdit
+                                  className="edit-btn"
+                                  onClick={() => {
+                                    handleEdit(result);
+                                  }}
+                                />
+                              )}
+                              {(role === "admin" ||
+                                deleteTermsAndConditionsCookies === "1") && (
+                                <MdDeleteOutline
+                                  className="delete-btn"
+                                  onClick={() => handleDelete(result)}
+                                />
+                              )}
+                            </span>
+                          </td>
+                        )}
                     </tr>
                   ))}
                 </tbody>
               )}
           </table>
         </div>
-        {role === "admin" && (
+        {(role === "admin" ||
+          (addTermsAndConditionsCookies === "1" &&
+            getTermsAndConditionsCookies === "1")) && (
           <>
             {/* Add Terms And Conditions */}
             <Modal
@@ -679,6 +781,12 @@ const TermsAndConditions = () => {
                 </form>
               </ModalBody>
             </Modal>
+          </>
+        )}
+        {(role === "admin" ||
+          (editTermsAndConditionsCookies === "1" &&
+            getTermsAndConditionsCookies === "1")) && (
+          <>
             {/* Edit Terms And Conditions */}
             <Modal
               isOpen={toggle.edit}
@@ -828,7 +936,7 @@ const TermsAndConditions = () => {
                               aria-hidden="true"
                             ></span>
                           ) : (
-                            t("add")
+                            t("edit")
                           )}
                         </button>
                         <button
@@ -837,7 +945,8 @@ const TermsAndConditions = () => {
                           onClick={() => {
                             setToggle({
                               ...toggle,
-                              add: !toggle.add,
+                              add: false,
+                              edit: false,
                             });
                           }}
                         >
