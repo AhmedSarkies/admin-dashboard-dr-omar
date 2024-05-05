@@ -21,6 +21,12 @@ import Cookies from "js-cookie";
 const CategoriesBook = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getMainCategoriesBooksCookies = Cookies.get("GetMainCategoriesBook");
+  const addMainCategoriesBooksCookies = Cookies.get("addMainCategoriesBook");
+  const editMainCategoriesBooksCookies = Cookies.get("editMainCategoriesBook");
+  const deleteMainCategoriesBooksCookies = Cookies.get(
+    "deleteMainCategoriesBook"
+  );
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { bookCategories, loading, error } = useSelector((state) => state.book);
@@ -67,7 +73,13 @@ const CategoriesBook = () => {
     },
     validationSchema: validationSchema.category,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addMainCategoriesBooksCookies === "1" &&
+          getMainCategoriesBooksCookies === "1") ||
+        (editMainCategoriesBooksCookies === "1" &&
+          getMainCategoriesBooksCookies === "1")
+      ) {
         if (values.isEditing) {
           dispatch(
             updateBookCategoryApi({ id: values.id, title: values.title })
@@ -116,7 +128,7 @@ const CategoriesBook = () => {
 
   // Delete Book Category
   const handleDelete = (bookCategory) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteMainCategoriesBooksCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + bookCategory?.title + "?",
         text: t("textDeleteAlert"),
@@ -159,8 +171,35 @@ const CategoriesBook = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksCategoriesApi());
-      if (role !== "admin") {
+      if (role === "admin" || getMainCategoriesBooksCookies === "1") {
+        dispatch(getBooksCategoriesApi());
+      }
+      if (getMainCategoriesBooksCookies === "0") {
+        Cookies.set("addMainCategoriesBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editMainCategoriesBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteMainCategoriesBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addMainCategoriesBooksCookies === "0" &&
+        editMainCategoriesBooksCookies === "0" &&
+        deleteMainCategoriesBooksCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -177,7 +216,9 @@ const CategoriesBook = () => {
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addMainCategoriesBooksCookies === "1" &&
+          getMainCategoriesBooksCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -280,25 +321,43 @@ const CategoriesBook = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[2].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addMainCategoriesBooksCookies === "1" &&
+                  getMainCategoriesBooksCookies === "1") ||
+                role === "admin" ||
+                (editMainCategoriesBooksCookies === "1" &&
+                  getMainCategoriesBooksCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[2])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[2].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addMainCategoriesBooksCookies === "0" &&
+                    editMainCategoriesBooksCookies === "0" &&
+                    deleteMainCategoriesBooksCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -316,7 +375,16 @@ const CategoriesBook = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addMainCategoriesBooksCookies === "0" &&
+                    editMainCategoriesBooksCookies === "0" &&
+                    deleteMainCategoriesBooksCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -336,7 +404,16 @@ const CategoriesBook = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addMainCategoriesBooksCookies === "0" &&
+                    editMainCategoriesBooksCookies === "0" &&
+                    deleteMainCategoriesBooksCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -348,7 +425,16 @@ const CategoriesBook = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addMainCategoriesBooksCookies === "0" &&
+                    editMainCategoriesBooksCookies === "0" &&
+                    deleteMainCategoriesBooksCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -365,29 +451,43 @@ const CategoriesBook = () => {
                   {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
                   )}
-                  {role === "admin" && toggle.toggleColumns?.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
+                  {(role === "admin" ||
+                    (addMainCategoriesBooksCookies === "1" &&
+                      getMainCategoriesBooksCookies === "1") ||
+                    role === "admin" ||
+                    (editMainCategoriesBooksCookies === "1" &&
+                      getMainCategoriesBooksCookies === "1")) &&
+                    toggle.toggleColumns?.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          {(role === "admin" ||
+                            editMainCategoriesBooksCookies === "1") && (
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                              }}
+                            />
+                          )}
+                          {(role === "admin" ||
+                            deleteMainCategoriesBooksCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          )}
+                        </span>
+                      </td>
+                    )}
                 </tr>
               ))}
             </tbody>
           )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addMainCategoriesBooksCookies === "1" &&
+          getMainCategoriesBooksCookies === "1")) && (
         <>
           {/* Add Book Category */}
           <Modal
@@ -482,6 +582,12 @@ const CategoriesBook = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (editMainCategoriesBooksCookies === "1" &&
+          getMainCategoriesBooksCookies === "1")) && (
+        <>
           {/* Edit Book Category */}
           <Modal
             isOpen={toggle.edit}
