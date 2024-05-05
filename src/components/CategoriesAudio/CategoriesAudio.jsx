@@ -21,6 +21,10 @@ import Cookies from "js-cookie";
 const CategoriesAudio = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getCategoriesAudioCookies = Cookies.get("GetAudiosCategories");
+  const addCategoriesAudioCookies = Cookies.get("addAudiosCategories");
+  const editCategoriesAudioCookies = Cookies.get("editAudiosCategories");
+  const deleteCategoriesAudioCookies = Cookies.get("deleteAudiosCategories");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { audioCategories, loading, error } = useSelector(
@@ -69,7 +73,13 @@ const CategoriesAudio = () => {
     },
     validationSchema: validationSchema.category,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addCategoriesAudioCookies === "1" &&
+          getCategoriesAudioCookies === "1") ||
+        (editCategoriesAudioCookies === "1" &&
+          getCategoriesAudioCookies === "1")
+      ) {
         if (values.isEditing) {
           dispatch(
             updateAudioCategoryApi({ id: values.id, title: values.title })
@@ -118,7 +128,7 @@ const CategoriesAudio = () => {
 
   // Delete Audio Category
   const handleDelete = (audioCategory) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteCategoriesAudioCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + audioCategory?.title + "?",
         text: t("textDeleteAlert"),
@@ -161,8 +171,35 @@ const CategoriesAudio = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getAudiosCategoriesApi());
-      if (role !== "admin") {
+      if (role === "admin" || getCategoriesAudioCookies === "1") {
+        dispatch(getAudiosCategoriesApi());
+      }
+      if (getCategoriesAudioCookies === "0") {
+        Cookies.set("addAudiosCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editAudiosCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteAudiosCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addCategoriesAudioCookies === "0" &&
+        editCategoriesAudioCookies === "0" &&
+        deleteCategoriesAudioCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -175,11 +212,20 @@ const CategoriesAudio = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getCategoriesAudioCookies,
+    addCategoriesAudioCookies,
+    editCategoriesAudioCookies,
+    deleteCategoriesAudioCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addCategoriesAudioCookies === "1" &&
+          getCategoriesAudioCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -282,25 +328,43 @@ const CategoriesAudio = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[2].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addCategoriesAudioCookies === "1" &&
+                  getCategoriesAudioCookies === "1") ||
+                role === "admin" ||
+                (editCategoriesAudioCookies === "1" &&
+                  getCategoriesAudioCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[2])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[2].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesAudioCookies === "0" &&
+                    editCategoriesAudioCookies === "0" &&
+                    deleteCategoriesAudioCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -318,7 +382,16 @@ const CategoriesAudio = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesAudioCookies === "0" &&
+                    editCategoriesAudioCookies === "0" &&
+                    deleteCategoriesAudioCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -338,7 +411,16 @@ const CategoriesAudio = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesAudioCookies === "0" &&
+                    editCategoriesAudioCookies === "0" &&
+                    deleteCategoriesAudioCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -350,7 +432,16 @@ const CategoriesAudio = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesAudioCookies === "0" &&
+                    editCategoriesAudioCookies === "0" &&
+                    deleteCategoriesAudioCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -367,33 +458,47 @@ const CategoriesAudio = () => {
                   {toggle.toggleColumns.category && (
                     <td className="table-td name">{result?.title}</td>
                   )}
-                  {role === "admin" && toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              edit: !toggle.edit,
-                            });
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
+                  {(role === "admin" ||
+                    (addCategoriesAudioCookies === "1" &&
+                      getCategoriesAudioCookies === "1") ||
+                    role === "admin" ||
+                    (editCategoriesAudioCookies === "1" &&
+                      getCategoriesAudioCookies === "1")) &&
+                    toggle.toggleColumns.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          {(role === "admin" ||
+                            editCategoriesAudioCookies === "1") && (
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                                setToggle({
+                                  ...toggle,
+                                  edit: !toggle.edit,
+                                });
+                              }}
+                            />
+                          )}
+                          {(role === "admin" ||
+                            deleteCategoriesAudioCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          )}
+                        </span>
+                      </td>
+                    )}
                 </tr>
               ))}
             </tbody>
           )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addCategoriesAudioCookies === "1" &&
+          getCategoriesAudioCookies === "1")) && (
         <>
           {/* Add Audio Category */}
           <Modal
@@ -488,6 +593,12 @@ const CategoriesAudio = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (editCategoriesAudioCookies === "1" &&
+          getCategoriesAudioCookies === "1")) && (
+        <>
           {/* Edit Audio Category */}
           <Modal
             isOpen={toggle.edit}
