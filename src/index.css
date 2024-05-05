@@ -285,10 +285,10 @@ body {
   left: 0px !important;
 }
 [lang="en"] .form-group .prayer-time-input:checked:after {
-  left: 0px !important;
+  right: 0px !important;
 }
 [lang="en"] .form-group .prayer-time-input:after {
-  left: 0px !important;
+  right: 0px !important;
 }
 /* Dashboard */
 .dashboard {
