@@ -53,6 +53,11 @@ const initialValues = {
 const Elders = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getEldersCookies = Cookies.get("GetElder");
+  const addEldersCookies = Cookies.get("addElder");
+  const editEldersCookies = Cookies.get("editElder");
+  const deleteEldersCookies = Cookies.get("deleteElder");
+  const getAudiosCookies = Cookies.get("GetAudio");
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { validationSchema } = useSchema();
@@ -93,7 +98,11 @@ const Elders = () => {
     initialValues,
     validationSchema: validationSchema.elder,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addEldersCookies === "1" && getEldersCookies === "1") ||
+        (editEldersCookies === "1" && getEldersCookies === "1")
+      ) {
         // if email and phone is already exist with another scholar if just i change them to new values
         if (scholars.length > 0) {
           const emailExist = scholars.find(
@@ -223,7 +232,7 @@ const Elders = () => {
 
   // Delete Scholar
   const handleDelete = (elder) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteEldersCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + elder?.name + "?",
         text: t("textDeleteAlert"),
@@ -302,15 +311,38 @@ const Elders = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getScholarsApi());
+      if (role === "admin" || getEldersCookies === "1") {
+        dispatch(getScholarsApi());
+      }
+      if (getEldersCookies === "0") {
+        Cookies.set("addElder", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editElder", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteElder", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, role, getEldersCookies]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addEldersCookies === "1" && getEldersCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -521,28 +553,34 @@ const Elders = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.control && (
-                <th
-                  className="table-th"
-                  onClick={() => handleSort(columns[11])}
-                >
-                  {t("action")}
-                  {toggle.sortColumn === columns[11].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" || getAudiosCookies === "1") &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[11])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[11].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td
+                  className="table-td"
+                  colSpan={
+                    role === "admin" || getAudiosCookies === "1" ? 12 : 11
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -560,7 +598,12 @@ const Elders = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td
+                  className="table-td"
+                  colSpan={
+                    role === "admin" || getAudiosCookies === "1" ? 12 : 11
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       style={{
@@ -580,7 +623,12 @@ const Elders = () => {
           {searchResultsElders?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td
+                  className="table-td"
+                  colSpan={
+                    role === "admin" || getAudiosCookies === "1" ? 12 : 11
+                  }
+                >
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -592,7 +640,12 @@ const Elders = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="12">
+                <td
+                  className="table-td"
+                  colSpan={
+                    role === "admin" || getAudiosCookies === "1" ? 12 : 11
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -669,10 +722,19 @@ const Elders = () => {
                           style={{
                             backgroundColor:
                               result?.status === t("approve") ? "green" : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                            cursor:
+                              role === "admin" ||
+                              (editEldersCookies === "1" &&
+                                getEldersCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editEldersCookies === "1" &&
+                                getEldersCookies === "1")
+                            ) {
                               dispatch(
                                 updateScholarApi({
                                   name: result?.name,
@@ -713,10 +775,19 @@ const Elders = () => {
                               result?.is_active === t("active")
                                 ? "green"
                                 : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                            cursor:
+                              role === "admin" ||
+                              (editEldersCookies === "1" &&
+                                getEldersCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editEldersCookies === "1" &&
+                                getEldersCookies === "1")
+                            ) {
                               dispatch(
                                 updateScholarApi({
                                   name: result?.name,
@@ -751,29 +822,32 @@ const Elders = () => {
                     {toggle.toggleColumns.control && (
                       <td className="table-td">
                         <span className="table-btn-container">
-                          <IoMdEye
-                            className="edit-btn"
-                            onClick={() => {
-                              navigate(`/dr-omar/elders/${result?.id}`);
-                            }}
-                          />
-                          {role === "admin" && (
-                            <>
-                              <FaPen
-                                className="edit-btn"
-                                onClick={() => {
-                                  handleEdit(result);
-                                  setToggle({
-                                    ...toggle,
-                                    edit: !toggle.edit,
-                                  });
-                                }}
-                              />
-                              <MdDeleteOutline
-                                className="delete-btn"
-                                onClick={() => handleDelete(result)}
-                              />
-                            </>
+                          {(role === "admin" || getAudiosCookies === "1") && (
+                            <IoMdEye
+                              className="edit-btn"
+                              onClick={() => {
+                                navigate(`/dr-omar/elders/${result?.id}`);
+                              }}
+                            />
+                          )}
+                          {(role === "admin" || editEldersCookies === "1") && (
+                            <FaPen
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                                setToggle({
+                                  ...toggle,
+                                  edit: !toggle.edit,
+                                });
+                              }}
+                            />
+                          )}
+                          {(role === "admin" ||
+                            deleteEldersCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
                           )}
                         </span>
                       </td>
@@ -788,7 +862,8 @@ const Elders = () => {
       {searchResultsElders?.length > 0 &&
         error === null &&
         loading === false && <PaginationUI />}
-      {role === "admin" && (
+      {(role === "admin" ||
+        (getEldersCookies === "1" && addEldersCookies === "1")) && (
         <>
           {/* Add Elder */}
           <Modal
@@ -1156,6 +1231,11 @@ const Elders = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (getEldersCookies === "1" && editEldersCookies === "1")) && (
+        <>
           {/* Edit Elder */}
           <Modal
             isOpen={toggle.edit}
