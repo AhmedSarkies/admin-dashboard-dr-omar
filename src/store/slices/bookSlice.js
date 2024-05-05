@@ -7,6 +7,7 @@ const initialState = {
   bookCategories: [],
   bookSubCategories: [],
   bookSubSubCategories: [],
+  allCategories: [],
   loading: false,
   error: null,
 };
@@ -331,6 +332,22 @@ export const deleteBookSubSubCategoryApi = createAsyncThunk(
   }
 );
 
+// Get All Categories using Axios and Redux Thunk
+export const getAllCategoriesApi = createAsyncThunk(
+  "book/getAllCategoriesApi",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "GET",
+        url: "/Main-Categories-Books/main-categories",
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // Books Slice
 const bookSlice = createSlice({
   name: "book",
@@ -566,6 +583,22 @@ const bookSlice = createSlice({
     });
     // Rejected
     builder.addCase(deleteBookSubSubCategoryApi.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Get All Categories======
+    // Pending
+    builder.addCase(getAllCategoriesApi.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getAllCategoriesApi.fulfilled, (state, action) => {
+      state.allCategories = action.payload.data;
+      state.loading = false;
+      state.error = null;
+    });
+    // Rejected
+    builder.addCase(getAllCategoriesApi.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
