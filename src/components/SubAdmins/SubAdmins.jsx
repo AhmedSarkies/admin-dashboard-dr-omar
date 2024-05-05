@@ -17,6 +17,7 @@ import {
   addSubAdmin,
   deleteSubAdmin,
   updateSubAdmin,
+  getPermissions,
 } from "../../store/slices/subAdminSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -40,80 +41,84 @@ const initialValues = {
   password: "",
   confirmPassword: "",
   powers: "",
-  // subAdmins: "",
-  // addSubAdmins: "",
-  // editSubAdmins: "",
-  // deleteSubAdmins: "",
-  // users: "",
-  // editUser: "",
-  // deleteUser: "",
-  // elders: "",
-  // addElders: "",
-  // editElders: "",
-  // deleteElders: "",
-  // audios: "",
-  // addAudios: "",
-  // editAudios: "",
-  // deleteAudios: "",
-  // articles: "",
-  // addArticles: "",
-  // editArticles: "",
-  // deleteArticles: "",
-  // books: "",
-  // addBooks: "",
-  // editBooks: "",
-  // deleteBooks: "",
-  // images: "",
-  // addImages: "",
-  // editImages: "",
-  // deleteImages: "",
-  // notifications: "",
-  // addNotifications: "",
-  // deleteNotifications: "",
-  // messages: "",
-  // settings: "",
-  // editSettings: "",
-  // codeContent: "",
-  // addCodeContent: "",
-  // editCodeContent: "",
-  // sendCodeContent: "",
-  // introductionPages: "",
-  // addIntroductionPages: "",
-  // editIntroductionPages: "",
-  // deleteIntroductionPages: "",
-  // termsAndConditions: "",
-  // addTermsAndConditions: "",
-  // editTermsAndConditions: "",
-  // deleteTermsAndConditions: "",
-  // mainCategoriesBooks: "",
-  // addMainCategoriesBooks: "",
-  // editMainCategoriesBooks: "",
-  // deleteMainCategoriesBooks: "",
-  // subCategoriesBooks: "",
-  // addSubCategoriesBooks: "",
-  // editSubCategoriesBooks: "",
-  // deleteSubCategoriesBooks: "",
-  // subSubCategoriesBooks: "",
-  // addSubSubCategoriesBooks: "",
-  // editSubSubCategoriesBooks: "",
-  // deleteSubSubCategoriesBooks: "",
-  // categoriesAudio: "",
-  // addCategoriesAudio: "",
-  // editCategoriesAudio: "",
-  // deleteCategoriesAudio: "",
-  // categoriesImage: "",
-  // addCategoriesImage: "",
-  // editCategoriesImage: "",
-  // deleteCategoriesImage: "",
-  // categoriesArticle: "",
-  // addCategoriesArticle: "",
-  // editCategoriesArticle: "",
-  // deleteCategoriesArticle: "",
+  subAdmins: "",
+  addSubAdmins: "",
+  editSubAdmins: "",
+  deleteSubAdmins: "",
+  users: "",
+  editUser: "",
+  deleteUser: "",
+  elders: "",
+  addElders: "",
+  editElders: "",
+  deleteElders: "",
+  audios: "",
+  addAudios: "",
+  editAudios: "",
+  deleteAudios: "",
+  articles: "",
+  addArticles: "",
+  editArticles: "",
+  deleteArticles: "",
+  books: "",
+  addBooks: "",
+  editBooks: "",
+  deleteBooks: "",
+  images: "",
+  addImages: "",
+  editImages: "",
+  deleteImages: "",
+  notifications: "",
+  addNotifications: "",
+  deleteNotifications: "",
+  messages: "",
+  settings: "",
+  editSettings: "",
+  codeContent: "",
+  addCodeContent: "",
+  editCodeContent: "",
+  sendCodeContent: "",
+  introductionPages: "",
+  addIntroductionPages: "",
+  editIntroductionPages: "",
+  deleteIntroductionPages: "",
+  termsAndConditions: "",
+  addTermsAndConditions: "",
+  editTermsAndConditions: "",
+  deleteTermsAndConditions: "",
+  mainCategoriesBooks: "",
+  addMainCategoriesBooks: "",
+  editMainCategoriesBooks: "",
+  deleteMainCategoriesBooks: "",
+  subCategoriesBooks: "",
+  addSubCategoriesBooks: "",
+  editSubCategoriesBooks: "",
+  deleteSubCategoriesBooks: "",
+  subSubCategoriesBooks: "",
+  addSubSubCategoriesBooks: "",
+  editSubSubCategoriesBooks: "",
+  deleteSubSubCategoriesBooks: "",
+  categoriesAudio: "",
+  addCategoriesAudio: "",
+  editCategoriesAudio: "",
+  deleteCategoriesAudio: "",
+  categoriesImage: "",
+  addCategoriesImage: "",
+  editCategoriesImage: "",
+  deleteCategoriesImage: "",
+  categoriesArticle: "",
+  addCategoriesArticle: "",
+  editCategoriesArticle: "",
+  deleteCategoriesArticle: "",
 };
 
 const SubAdmins = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getSubAdminsCookies = Cookies.get("GetAdmin");
+  const addSubAdminsCookies = Cookies.get("addAdmin");
+  const editSubAdminsCookies = Cookies.get("editAdmin");
+  const deleteSubAdminsCookies = Cookies.get("deleteAdmin");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
@@ -145,6 +150,7 @@ const SubAdmins = () => {
     },
   });
 
+  // Data
   const data = subAdmins?.map((subAdmin) => ({
     ...subAdmin,
     powers: subAdmin.powers === "admin" ? t("admin") : t("supAdmin"),
@@ -158,38 +164,106 @@ const SubAdmins = () => {
       ? validationSchema.subAdminsEdit
       : validationSchema.subAdmins,
     onSubmit: (values) => {
-      if (role === "admin") {
-        // if email and phone is already exist with another subAdmin if just i change them to new values
-        if (subAdmins.length > 0) {
-          const emailExist = subAdmins.find(
-            (subAdmin) => subAdmin.email === formik.values.email
-          );
-          if (emailExist && emailExist.id !== formik.values.id) {
-            toast.error(t("emailExisted"));
-            return;
-          }
+      if (
+        role === "admin" ||
+        (addSubAdminsCookies === "1" && getSubAdminsCookies === "1") ||
+        (editSubAdminsCookies === "1" && getSubAdminsCookies === "1")
+      ) {
+        const formData = {
+          name: values.name,
+          email: values.email,
+          phone: values.phone,
+          active: values.status === "active" ? 1 : 0,
+          password: values.password,
+          powers: values.powers,
+        };
+        if (values.powers === "supAdmin") {
+          formData.permissions = [
+            values.addSubAdmins === true && 15,
+            values.editSubAdmins === true && 16,
+            values.deleteSubAdmins === true && 17,
+            values.subAdmins === true && 18,
+            values.editUser === true && 1,
+            values.deleteUser === true && 2,
+            values.users === true && 2,
+            values.addElders === true && 11,
+            values.editElders === true && 12,
+            values.deleteElders === true && 13,
+            values.elders === true && 14,
+            values.addAudios === true && 4,
+            values.editAudios === true && 5,
+            values.deleteAudios === true && 6,
+            values.audios === true && 7,
+            values.addArticles === true && 32,
+            values.editArticles === true && 33,
+            values.deleteArticles === true && 34,
+            values.articles === true && 34,
+            values.books === true && 51,
+            values.addBooks === true && 52,
+            values.editBooks === true && 53,
+            values.deleteBooks === true && 54,
+            values.images === true && 23,
+            values.addImages === true && 24,
+            values.editImages === true && 25,
+            values.deleteImages === true && 26,
+            values.notifications === true && 67,
+            values.addNotifications === true && 68,
+            // values.editNotifications === true && 69,
+            values.deleteNotifications === true && 70,
+            values.messages === true && 35,
+            // values.addMessages === true && 36,
+            // values.editMessages === true && 37,
+            // values.deleteMessages === true && 38,
+            values.settings === true && 59,
+            // values.addSettings === true && 60,
+            values.editSettings === true && 61,
+            values.deleteSettings === true && 62,
+            values.codeContent === true && 10,
+            values.addCodeContent === true && 8,
+            values.editCodeContent === true && 9,
+            // values.sendCodeContent === true && 0,
+            values.introductionPages === true && 63,
+            values.addIntroductionPages === true && 64,
+            values.editIntroductionPages === true && 65,
+            values.deleteIntroductionPages === true && 66,
+            values.termsAndConditions === true && 55,
+            values.addTermsAndConditions === true && 56,
+            values.editTermsAndConditions === true && 57,
+            values.deleteTermsAndConditions === true && 58,
+            values.mainCategoriesBooks === true && 39,
+            values.addMainCategoriesBooks === true && 40,
+            values.editMainCategoriesBooks === true && 41,
+            values.deleteMainCategoriesBooks === true && 42,
+            values.subCategoriesBooks === true && 47,
+            values.addSubCategoriesBooks === true && 48,
+            values.editSubCategoriesBooks === true && 49,
+            values.deleteSubCategoriesBooks === true && 50,
+            values.subSubCategoriesBooks === true && 43,
+            values.addSubSubCategoriesBooks === true && 44,
+            values.editSubSubCategoriesBooks === true && 45,
+            values.deleteSubSubCategoriesBooks === true && 46,
+            values.categoriesAudio === true && 71,
+            values.addCategoriesAudio === true && 72,
+            values.editCategoriesAudio === true && 73,
+            values.deleteCategoriesAudio === true && 74,
+            values.categoriesImage === true && 19,
+            values.addCategoriesImage === true && 20,
+            values.editCategoriesImage === true && 21,
+            values.deleteCategoriesImage === true && 22,
+            values.categoriesArticle === true && 27,
+            values.addCategoriesArticle === true && 28,
+            values.editCategoriesArticle === true && 29,
+            values.deleteCategoriesArticle === true && 30,
+          ];
+          formData.permissions = formData.permissions.filter((permission) => {
+            return permission !== false;
+          });
         }
-        if (subAdmins.length > 0) {
-          const phoneExist = subAdmins.find(
-            (subAdmin) => subAdmin.phone === formik.values.phone
-          );
-          if (phoneExist && phoneExist.id !== formik.values.id) {
-            toast.error(t("phoneExisted"));
-            return;
-          }
-        }
-        const formData = new FormData();
-        formData.append("name", values.name);
-        formData.append("email", values.email);
-        formData.append("phone", values.phone);
-        formData.append("active", values.status === "active" ? 1 : 0);
-        formData.append("password", values.password);
-        formData.append("powers", values.powers);
         if (values.image.file !== "") {
-          formData.append("image", values.image.file);
+          formData.image = values.image.file;
         }
         if (values.id) {
-          formData.append("id", values.id);
+          formData.id = values.id;
           dispatch(updateSubAdmin(formData)).then((res) => {
             dispatch(getSubAdmins());
             if (!res.error) {
@@ -257,7 +331,7 @@ const SubAdmins = () => {
 
   // Delete Sub Admin
   const handleDelete = (subAdmin) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteSubAdminsCookies === "1") {
       Swal.fire({
         title: `هل انت متأكد من حذف ${subAdmin?.name}؟`,
         text: "لن تتمكن من التراجع عن هذا الاجراء!",
@@ -303,84 +377,94 @@ const SubAdmins = () => {
       phone: subAdmin?.phone,
       powers: subAdmin?.powers === t("admin") ? "admin" : "supAdmin",
       status: subAdmin?.active === t("active") ? "active" : "inactive",
-      // subAdmins: subAdmin?.subAdmins === true ? 1 : 0,
-      // addSubAdmins: subAdmin?.addSubAdmins === true ? 1 : 0,
-      // editSubAdmins: subAdmin?.editSubAdmins === true ? 1 : 0,
-      // deleteSubAdmins: subAdmin?.deleteSubAdmins === true ? 1 : 0,
-      // users: subAdmin?.users === true ? 1 : 0,
-      // editUser: subAdmin?.editUser === true ? 1 : 0,
-      // deleteUser: subAdmin?.deleteUser === true ? 1 : 0,
-      // elders: subAdmin?.elders === true ? 1 : 0,
-      // addElders: subAdmin?.addElders === true ? 1 : 0,
-      // editElders: subAdmin?.editElders === true ? 1 : 0,
-      // deleteElders: subAdmin?.deleteElders === true ? 1 : 0,
-      // audios: subAdmin?.audios === true ? 1 : 0,
-      // addAudios: subAdmin?.addAudios === true ? 1 : 0,
-      // editAudios: subAdmin?.editAudios === true ? 1 : 0,
-      // deleteAudios: subAdmin?.deleteAudios === true ? 1 : 0,
-      // articles: subAdmin?.articles === true ? 1 : 0,
-      // addArticles: subAdmin?.addArticles === true ? 1 : 0,
-      // editArticles: subAdmin?.editArticles === true ? 1 : 0,
-      // deleteArticles: subAdmin?.deleteArticles === true ? 1 : 0,
-      // books: subAdmin?.books === true ? 1 : 0,
-      // addBooks: subAdmin?.addBooks === true ? 1 : 0,
-      // editBooks: subAdmin?.editBooks === true ? 1 : 0,
-      // deleteBooks: subAdmin?.deleteBooks === true ? 1 : 0,
-      // images: subAdmin?.images === true ? 1 : 0,
-      // addImages: subAdmin?.addImages === true ? 1 : 0,
-      // editImages: subAdmin?.editImages === true ? 1 : 0,
-      // deleteImages: subAdmin?.deleteImages === true ? 1 : 0,
-      // notifications: subAdmin?.notifications === true ? 1 : 0,
-      // addNotifications: subAdmin?.addNotifications === true ? 1 : 0,
-      // deleteNotifications: subAdmin?.deleteNotifications === true ? 1 : 0,
-      // messages: subAdmin?.messages === true ? 1 : 0,
-      // settings: subAdmin?.settings === true ? 1 : 0,
-      // editSettings: subAdmin?.editSettings === true ? 1 : 0,
-      // codeContent: subAdmin?.codeContent === true ? 1 : 0,
-      // addCodeContent: subAdmin?.addCodeContent === true ? 1 : 0,
-      // editCodeContent: subAdmin?.editCodeContent === true ? 1 : 0,
-      // sendCodeContent: subAdmin?.sendCodeContent === true ? 1 : 0,
-      // introductionPages: subAdmin?.introductionPages === true ? 1 : 0,
-      // addIntroductionPages: subAdmin?.addIntroductionPages === true ? 1 : 0,
-      // editIntroductionPages: subAdmin?.editIntroductionPages === true ? 1 : 0,
-      // deleteIntroductionPages:
-      //   subAdmin?.deleteIntroductionPages === true ? 1 : 0,
-      // termsAndConditions: subAdmin?.termsAndConditions === true ? 1 : 0,
-      // addTermsAndConditions: subAdmin?.addTermsAndConditions === true ? 1 : 0,
-      // editTermsAndConditions: subAdmin?.editTermsAndConditions === true ? 1 : 0,
-      // deleteTermsAndConditions:
-      //   subAdmin?.deleteTermsAndConditions === true ? 1 : 0,
-      // mainCategoriesBooks: subAdmin?.mainCategoriesBooks === true ? 1 : 0,
-      // addMainCategoriesBooks: subAdmin?.addMainCategoriesBooks === true ? 1 : 0,
-      // editMainCategoriesBooks:
-      //   subAdmin?.editMainCategoriesBooks === true ? 1 : 0,
-      // deleteMainCategoriesBooks:
-      //   subAdmin?.deleteMainCategoriesBooks === true ? 1 : 0,
-      // subCategoriesBooks: subAdmin?.subCategoriesBooks === true ? 1 : 0,
-      // addSubCategoriesBooks: subAdmin?.addSubCategoriesBooks === true ? 1 : 0,
-      // editSubCategoriesBooks: subAdmin?.editSubCategoriesBooks === true ? 1 : 0,
-      // deleteSubCategoriesBooks:
-      //   subAdmin?.deleteSubCategoriesBooks === true ? 1 : 0,
-      // subSubCategoriesBooks: subAdmin?.subSubCategoriesBooks === true ? 1 : 0,
-      // addSubSubCategoriesBooks:
-      //   subAdmin?.addSubSubCategoriesBooks === true ? 1 : 0,
-      // editSubSubCategoriesBooks:
-      //   subAdmin?.editSubSubCategoriesBooks === true ? 1 : 0,
-      // deleteSubSubCategoriesBooks:
-      //   subAdmin?.deleteSubSubCategoriesBooks === true ? 1 : 0,
-      // categoriesAudio: subAdmin?.categoriesAudio === true ? 1 : 0,
-      // addCategoriesAudio: subAdmin?.addCategoriesAudio === true ? 1 : 0,
-      // editCategoriesAudio: subAdmin?.editCategoriesAudio === true ? 1 : 0,
-      // deleteCategoriesAudio: subAdmin?.deleteCategoriesAudio === true ? 1 : 0,
-      // categoriesImage: subAdmin?.categoriesImage === true ? 1 : 0,
-      // addCategoriesImage: subAdmin?.addCategoriesImage === true ? 1 : 0,
-      // editCategoriesImage: subAdmin?.editCategoriesImage === true ? 1 : 0,
-      // deleteCategoriesImage: subAdmin?.deleteCategoriesImage === true ? 1 : 0,
-      // categoriesArticle: subAdmin?.categoriesArticle === true ? 1 : 0,
-      // addCategoriesArticle: subAdmin?.addCategoriesArticle === true ? 1 : 0,
-      // editCategoriesArticle: subAdmin?.editCategoriesArticle === true ? 1 : 0,
-      // deleteCategoriesArticle:
-      //   subAdmin?.deleteCategoriesArticle === true ? 1 : 0,
+      subAdmins: subAdmin?.subAdmins === 1 ? true : false,
+      addSubAdmins: subAdmin?.addSubAdmins === 1 ? true : false,
+      editSubAdmins: subAdmin?.editSubAdmins === 1 ? true : false,
+      deleteSubAdmins: subAdmin?.deleteSubAdmins === 1 ? true : false,
+      users: subAdmin?.users === 1 ? true : false,
+      editUser: subAdmin?.editUser === 1 ? true : false,
+      deleteUser: subAdmin?.deleteUser === 1 ? true : false,
+      elders: subAdmin?.elders === 1 ? true : false,
+      addElders: subAdmin?.addElders === 1 ? true : false,
+      editElders: subAdmin?.editElders === 1 ? true : false,
+      deleteElders: subAdmin?.deleteElders === 1 ? true : false,
+      audios: subAdmin?.audios === 1 ? true : false,
+      addAudios: subAdmin?.addAudios === 1 ? true : false,
+      editAudios: subAdmin?.editAudios === 1 ? true : false,
+      deleteAudios: subAdmin?.deleteAudios === 1 ? true : false,
+      articles: subAdmin?.articles === 1 ? true : false,
+      addArticles: subAdmin?.addArticles === 1 ? true : false,
+      editArticles: subAdmin?.editArticles === 1 ? true : false,
+      deleteArticles: subAdmin?.deleteArticles === 1 ? true : false,
+      books: subAdmin?.books === 1 ? true : false,
+      addBooks: subAdmin?.addBooks === 1 ? true : false,
+      editBooks: subAdmin?.editBooks === 1 ? true : false,
+      deleteBooks: subAdmin?.deleteBooks === 1 ? true : false,
+      images: subAdmin?.images === 1 ? true : false,
+      addImages: subAdmin?.addImages === 1 ? true : false,
+      editImages: subAdmin?.editImages === 1 ? true : false,
+      deleteImages: subAdmin?.deleteImages === 1 ? true : false,
+      notifications: subAdmin?.notifications === 1 ? true : false,
+      addNotifications: subAdmin?.addNotifications === 1 ? true : false,
+      deleteNotifications: subAdmin?.deleteNotifications === 1 ? true : false,
+      messages: subAdmin?.messages === 1 ? true : false,
+      settings: subAdmin?.settings === 1 ? true : false,
+      editSettings: subAdmin?.editSettings === 1 ? true : false,
+      codeContent: subAdmin?.codeContent === 1 ? true : false,
+      addCodeContent: subAdmin?.addCodeContent === 1 ? true : false,
+      editCodeContent: subAdmin?.editCodeContent === 1 ? true : false,
+      sendCodeContent: subAdmin?.sendCodeContent === 1 ? true : false,
+      introductionPages: subAdmin?.introductionPages === 1 ? true : false,
+      addIntroductionPages: subAdmin?.addIntroductionPages === 1 ? true : false,
+      editIntroductionPages:
+        subAdmin?.editIntroductionPages === 1 ? true : false,
+      deleteIntroductionPages:
+        subAdmin?.deleteIntroductionPages === 1 ? true : false,
+      termsAndConditions: subAdmin?.termsAndConditions === 1 ? true : false,
+      addTermsAndConditions:
+        subAdmin?.addTermsAndConditions === 1 ? true : false,
+      editTermsAndConditions:
+        subAdmin?.editTermsAndConditions === 1 ? true : false,
+      deleteTermsAndConditions:
+        subAdmin?.deleteTermsAndConditions === 1 ? true : false,
+      mainCategoriesBooks: subAdmin?.mainCategoriesBooks === 1 ? true : false,
+      addMainCategoriesBooks:
+        subAdmin?.addMainCategoriesBooks === 1 ? true : false,
+      editMainCategoriesBooks:
+        subAdmin?.editMainCategoriesBooks === 1 ? true : false,
+      deleteMainCategoriesBooks:
+        subAdmin?.deleteMainCategoriesBooks === 1 ? true : false,
+      subCategoriesBooks: subAdmin?.subCategoriesBooks === 1 ? true : false,
+      addSubCategoriesBooks:
+        subAdmin?.addSubCategoriesBooks === 1 ? true : false,
+      editSubCategoriesBooks:
+        subAdmin?.editSubCategoriesBooks === 1 ? true : false,
+      deleteSubCategoriesBooks:
+        subAdmin?.deleteSubCategoriesBooks === 1 ? true : false,
+      subSubCategoriesBooks:
+        subAdmin?.subSubCategoriesBooks === 1 ? true : false,
+      addSubSubCategoriesBooks:
+        subAdmin?.addSubSubCategoriesBooks === 1 ? true : false,
+      editSubSubCategoriesBooks:
+        subAdmin?.editSubSubCategoriesBooks === 1 ? true : false,
+      deleteSubSubCategoriesBooks:
+        subAdmin?.deleteSubSubCategoriesBooks === 1 ? true : false,
+      categoriesAudio: subAdmin?.categoriesAudio === 1 ? true : false,
+      addCategoriesAudio: subAdmin?.addCategoriesAudio === 1 ? true : false,
+      editCategoriesAudio: subAdmin?.editCategoriesAudio === 1 ? true : false,
+      deleteCategoriesAudio:
+        subAdmin?.deleteCategoriesAudio === 1 ? true : false,
+      categoriesImage: subAdmin?.categoriesImage === 1 ? true : false,
+      addCategoriesImage: subAdmin?.addCategoriesImage === 1 ? true : false,
+      editCategoriesImage: subAdmin?.editCategoriesImage === 1 ? true : false,
+      deleteCategoriesImage:
+        subAdmin?.deleteCategoriesImage === 1 ? true : false,
+      categoriesArticle: subAdmin?.categoriesArticle === 1 ? true : false,
+      addCategoriesArticle: subAdmin?.addCategoriesArticle === 1 ? true : false,
+      editCategoriesArticle:
+        subAdmin?.editCategoriesArticle === 1 ? true : false,
+      deleteCategoriesArticle:
+        subAdmin?.deleteCategoriesArticle === 1 ? true : false,
       image: {
         file: "",
         preview: subAdmin?.image,
@@ -420,15 +504,240 @@ const SubAdmins = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getSubAdmins());
+      if (role === "admin" || getSubAdminsCookies === "1") {
+        dispatch(getSubAdmins());
+        dispatch(getPermissions());
+      }
+      if (getSubAdminsCookies === "0") {
+        Cookies.set("addAdmin", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editAdmin", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteAdmin", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, role, getSubAdminsCookies]);
+
+  useEffect(() => {
+    if (formik.values.powers === "admin") {
+      formik.setValues({
+        ...formik.values,
+        subAdmins: false,
+        notifications: false,
+        messages: false,
+        settings: false,
+        codeContent: false,
+        introductionPages: false,
+        termsAndConditions: false,
+        mainCategoriesBooks: false,
+        subCategoriesBooks: false,
+        subSubCategoriesBooks: false,
+        categoriesAudio: false,
+        categoriesImage: false,
+        categoriesArticle: false,
+        users: false,
+        elders: false,
+        audios: false,
+        articles: false,
+        books: false,
+        images: false,
+      });
+    }
+    if (formik.values.settings === false) {
+      formik.setValues({
+        ...formik.values,
+        editSettings: false,
+      });
+    }
+    if (formik.values.notifications === false) {
+      formik.setValues({
+        ...formik.values,
+        addNotifications: false,
+        deleteNotifications: false,
+      });
+    }
+    if (formik.values.introductionPages === false) {
+      formik.setValues({
+        ...formik.values,
+        addIntroductionPages: false,
+        editIntroductionPages: false,
+        deleteIntroductionPages: false,
+      });
+    }
+    if (formik.values.termsAndConditions === false) {
+      formik.setValues({
+        ...formik.values,
+        addTermsAndConditions: false,
+        editTermsAndConditions: false,
+        deleteTermsAndConditions: false,
+      });
+    }
+    if (formik.values.mainCategoriesBooks === false) {
+      formik.setValues({
+        ...formik.values,
+        addMainCategoriesBooks: false,
+        editMainCategoriesBooks: false,
+        deleteMainCategoriesBooks: false,
+        subCategoriesBooks: false,
+        subSubCategoriesBooks: false,
+        books: false,
+      });
+    }
+    if (formik.values.subCategoriesBooks === false) {
+      formik.setValues({
+        ...formik.values,
+        addSubCategoriesBooks: false,
+        editSubCategoriesBooks: false,
+        deleteSubCategoriesBooks: false,
+        subSubCategoriesBooks: false,
+        books: false,
+      });
+    }
+    if (formik.values.subSubCategoriesBooks === false) {
+      formik.setValues({
+        ...formik.values,
+        addSubSubCategoriesBooks: false,
+        editSubSubCategoriesBooks: false,
+        deleteSubSubCategoriesBooks: false,
+        books: false,
+      });
+    }
+    if (formik.values.categoriesAudio === false) {
+      formik.setValues({
+        ...formik.values,
+        addCategoriesAudio: false,
+        editCategoriesAudio: false,
+        deleteCategoriesAudio: false,
+        audios: false,
+      });
+    }
+    if (formik.values.categoriesImage === false) {
+      formik.setValues({
+        ...formik.values,
+        addCategoriesImage: false,
+        editCategoriesImage: false,
+        deleteCategoriesImage: false,
+        images: false,
+      });
+    }
+    if (formik.values.categoriesArticle === false) {
+      formik.setValues({
+        ...formik.values,
+        addCategoriesArticle: false,
+        editCategoriesArticle: false,
+        deleteCategoriesArticle: false,
+        articles: false,
+      });
+    }
+    if (formik.values.users === false) {
+      formik.setValues({
+        ...formik.values,
+        editUser: false,
+        deleteUser: false,
+        codeContent: false,
+        notifications: false,
+      });
+    }
+    if (formik.values.codeContent === false) {
+      formik.setValues({
+        ...formik.values,
+        addCodeContent: false,
+        editCodeContent: false,
+        sendCodeContent: false,
+      });
+    }
+    if (formik.values.elders === false) {
+      formik.setValues({
+        ...formik.values,
+        addElders: false,
+        editElders: false,
+        deleteElders: false,
+        categoriesAudio: false,
+        audios: false,
+      });
+    }
+    if (formik.values.audios === false) {
+      formik.setValues({
+        ...formik.values,
+        addAudios: false,
+        editAudios: false,
+        deleteAudios: false,
+      });
+    }
+    if (formik.values.articles === false) {
+      formik.setValues({
+        ...formik.values,
+        addArticles: false,
+        editArticles: false,
+        deleteArticles: false,
+      });
+    }
+    if (formik.values.books === false) {
+      formik.setValues({
+        ...formik.values,
+        addBooks: false,
+        editBooks: false,
+        deleteBooks: false,
+      });
+    }
+    if (formik.values.images === false) {
+      formik.setValues({
+        ...formik.values,
+        addImages: false,
+        editImages: false,
+        deleteImages: false,
+      });
+    }
+    if (formik.values.subAdmins === false) {
+      formik.setValues({
+        ...formik.values,
+        addSubAdmins: false,
+        editSubAdmins: false,
+        deleteSubAdmins: false,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    formik.values.powers,
+    formik.values.settings,
+    formik.values.notifications,
+    formik.values.codeContent,
+    formik.values.introductionPages,
+    formik.values.termsAndConditions,
+    formik.values.mainCategoriesBooks,
+    formik.values.subCategoriesBooks,
+    formik.values.subSubCategoriesBooks,
+    formik.values.categoriesAudio,
+    formik.values.categoriesImage,
+    formik.values.categoriesArticle,
+    formik.values.users,
+    formik.values.elders,
+    formik.values.audios,
+    formik.values.articles,
+    formik.values.books,
+    formik.values.images,
+    formik.values.subAdmins,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addSubAdminsCookies === "1" && getSubAdminsCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -691,6 +1000,7 @@ const SubAdmins = () => {
                         <a
                           className="text-white"
                           href={`mailto:${result?.phone}`}
+                          dir="ltr"
                         >
                           {result?.phone}
                         </a>
@@ -706,10 +1016,19 @@ const SubAdmins = () => {
                           result?.powers === t("admin") ? "active" : "inactive"
                         }`}
                         style={{
-                          cursor: role === "admin" ? "pointer" : "default",
+                          cursor:
+                            role === "admin" ||
+                            (editSubAdminsCookies === "1" &&
+                              getSubAdminsCookies === "1")
+                              ? "pointer"
+                              : "default",
                         }}
                         onClick={() => {
-                          if (role === "admin") {
+                          if (
+                            role === "admin" ||
+                            (editSubAdminsCookies === "1" &&
+                              getSubAdminsCookies === "1")
+                          ) {
                             const data = {
                               id: result.id,
                               name: result.name,
@@ -746,10 +1065,19 @@ const SubAdmins = () => {
                           result?.active === t("active") ? "active" : "inactive"
                         }`}
                         style={{
-                          cursor: role === "admin" ? "pointer" : "default",
+                          cursor:
+                            role === "admin" ||
+                            (editSubAdminsCookies === "1" &&
+                              getSubAdminsCookies === "1")
+                              ? "pointer"
+                              : "default",
                         }}
                         onClick={() => {
-                          if (role === "admin") {
+                          if (
+                            role === "admin" ||
+                            (editSubAdminsCookies === "1" &&
+                              getSubAdminsCookies === "1")
+                          ) {
                             const data = {
                               id: result.id,
                               name: result.name,
@@ -800,22 +1128,22 @@ const SubAdmins = () => {
                             });
                             setToggle({
                               ...toggle,
-                              add: !toggle.add,
                               read: true,
                             });
                           }}
                         />
-                        {role === "admin" && (
-                          <>
-                            <MdDeleteOutline
-                              className="delete-btn"
-                              onClick={() => handleDelete(result)}
-                            />
-                            <MdEdit
-                              className="edit-btn"
-                              onClick={() => handleEdit(result)}
-                            />
-                          </>
+                        {(role === "admin" ||
+                          deleteSubAdminsCookies === "1") && (
+                          <MdDeleteOutline
+                            className="delete-btn"
+                            onClick={() => handleDelete(result)}
+                          />
+                        )}
+                        {(role === "admin" || editSubAdminsCookies === "1") && (
+                          <MdEdit
+                            className="edit-btn"
+                            onClick={() => handleEdit(result)}
+                          />
                         )}
                       </span>
                     </td>
@@ -830,14 +1158,2299 @@ const SubAdmins = () => {
       {searchResults?.length > 0 && error === null && loading === false && (
         <PaginationUI />
       )}
-      {/* Add & Edit & Read Sub Admin */}
+      {/* Add & Edit Sub Admin */}
+      {(role === "admin" ||
+        (getSubAdminsCookies === "1" && editSubAdminsCookies === "1") ||
+        (addSubAdminsCookies === "1" && getSubAdminsCookies === "1")) && (
+        <Modal
+          isOpen={toggle.add}
+          toggle={() => {
+            formik.handleReset();
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              powers: false,
+              status: false,
+              edit: false,
+              read: false,
+            });
+          }}
+          centered={true}
+          keyboard={true}
+          size={"md"}
+          contentClassName="modal-add-scholar"
+        >
+          <ModalHeader
+            toggle={() => {
+              formik.handleReset();
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+                powers: false,
+                status: false,
+                edit: false,
+                read: false,
+              });
+            }}
+          >
+            {toggle.edit
+              ? t("subAdmin.editTitle")
+              : toggle.read
+              ? formik.values.name
+              : t("subAdmin.addTitle")}
+            <IoMdClose
+              onClick={() => {
+                formik.handleReset();
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                  powers: false,
+                  status: false,
+                  edit: false,
+                  read: false,
+                });
+              }}
+            />
+          </ModalHeader>
+          <ModalBody>
+            <form className="overlay-form" onSubmit={formik.handleSubmit}>
+              <Row className="d-flex justify-content-center align-items-center p-3 pb-0">
+                <Col
+                  lg={5}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values.image && formik.values.image.preview
+                            ? formik.values.image.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        onClick={() =>
+                          formik.values.image && formik.values.image.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values.image && formik.values.image.preview
+                                ? formik.values.image.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        {!toggle.read && (
+                          <ModalFooter className="p-md-4 p-2">
+                            <div className="form-group-container d-flex justify-content-center align-items-center">
+                              <button
+                                className="delete-btn cancel-btn"
+                                onClick={handleDeleteImage}
+                              >
+                                {t("delete")}
+                              </button>
+                            </div>
+                          </ModalFooter>
+                        )}
+                      </Modal>
+                    </label>
+                  </div>
+                  {!toggle.read && (
+                    <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                      <label htmlFor="image" className="form-label">
+                        <ImUpload /> {t("chooseImage")}
+                      </label>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        className="form-input form-img-input"
+                        id="image"
+                        ref={fileRef}
+                        onChange={handleImageChange}
+                      />
+                    </div>
+                  )}
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center align-items-center p-3 pb-0 pt-0">
+                <Col lg={12}>
+                  <div
+                    className="form-group-container d-flex flex-column align-items-end mb-3"
+                    style={{ marginTop: "-4px" }}
+                  >
+                    <label htmlFor="name" className="form-label">
+                      {t("subAdmin.columns.name")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      id="name"
+                      placeholder={t("subAdmin.columns.name")}
+                      name="name"
+                      disabled={toggle.read}
+                      value={formik.values.name}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.name && formik.touched.name ? (
+                      <span className="error">{formik.errors.name}</span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="email" className="form-label">
+                      {t("subAdmin.columns.email")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      id="email"
+                      placeholder={t("subAdmin.columns.email")}
+                      name="email"
+                      disabled={toggle.read}
+                      value={formik.values.email}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.email && formik.touched.email ? (
+                      <span className="error">{formik.errors.email}</span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="phone" className="form-label">
+                      {t("subAdmin.columns.phone")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input"
+                      id="phone"
+                      placeholder={t("subAdmin.columns.phone")}
+                      name="phone"
+                      disabled={toggle.read}
+                      value={formik.values.phone}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.phone && formik.touched.phone ? (
+                      <span className="error">{formik.errors.phone}</span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                    <label htmlFor="status" className="form-label">
+                      {t("status")}
+                    </label>
+                    {toggle.read ? (
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="status"
+                        placeholder={t("subAdmin.columns.status")}
+                        name="status"
+                        disabled={toggle.read}
+                        value={formik.values.status}
+                      />
+                    ) : (
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              status: !toggle.status,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.status === "inactive"
+                            ? t("inactive")
+                            : formik.values.status === "active"
+                            ? t("active")
+                            : t("status")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.status ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.status ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "inactive"
+                                ? "active"
+                                : ""
+                            }`}
+                            value="inactive"
+                            name="status"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "inactive");
+                            }}
+                          >
+                            {t("inactive")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.status === "active" ? "active" : ""
+                            }`}
+                            value="active"
+                            name="status"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                status: !toggle.status,
+                              });
+                              formik.setFieldValue("status", "active");
+                            }}
+                          >
+                            {t("active")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </Col>
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                    <label htmlFor="powers" className="form-label">
+                      {t("powers")}
+                    </label>
+                    {toggle.read ? (
+                      <input
+                        type="text"
+                        className="form-input"
+                        id="powers"
+                        placeholder={t("subAdmin.columns.powers")}
+                        name="powers"
+                        disabled={toggle.read}
+                        value={formik.values.powers}
+                      />
+                    ) : (
+                      <div className="dropdown form-input">
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              powers: !toggle.powers,
+                            });
+                          }}
+                          className="dropdown-btn d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.powers === "admin"
+                            ? t("admin")
+                            : formik.values.powers === "supAdmin"
+                            ? t("supAdmin")
+                            : t("powers")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.powers ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.powers ? "active" : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.powers === "admin" ? "active" : ""
+                            }`}
+                            value="admin"
+                            name="powers"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                powers: !toggle.powers,
+                              });
+                              formik.setFieldValue("powers", "admin");
+                            }}
+                          >
+                            {t("admin")}
+                          </button>
+                          <button
+                            type="button"
+                            className={`item ${
+                              formik.values.powers === "supAdmin"
+                                ? "active"
+                                : ""
+                            }`}
+                            value="supAdmin"
+                            name="powers"
+                            onClick={(e) => {
+                              setToggle({
+                                ...toggle,
+                                powers: !toggle.powers,
+                              });
+                              formik.setFieldValue("powers", "supAdmin");
+                            }}
+                          >
+                            {t("supAdmin")}
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                    {formik.errors.powers && formik.touched.powers ? (
+                      <span className="error">{formik.errors.powers}</span>
+                    ) : null}
+                  </div>
+                </Col>
+              </Row>
+              {formik.values.powers === "supAdmin" && (
+                <Row className="d-flex flex-row-reverse justify-content-start align-items-start p-3 pt-2">
+                  <Col
+                    xs={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label htmlFor="settingsTitle" className="form-label">
+                      {t("subAdmin.powers.settings")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col xs={12}>
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label htmlFor="settings" className="form-label">
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="settings"
+                            name="settings"
+                            value={formik.values.settings}
+                            checked={formik.values.settings}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.settings && (
+                        <Col xs={12}>
+                          <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                            <label
+                              htmlFor="editSettings"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.edit")}
+                            </label>
+                            <input
+                              type="checkbox"
+                              className="prayer-time-input"
+                              id="editSettings"
+                              name="editSettings"
+                              value={formik.values.editSettings}
+                              checked={formik.values.editSettings}
+                              onChange={handleInput}
+                            />
+                          </div>
+                        </Col>
+                      )}
+                    </Row>
+                  </Col>
+                  <Col
+                    xs={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label htmlFor="messagesTitle" className="form-label">
+                      {t("subAdmin.powers.messages")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col xs={12} className="p-0 m-0">
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label htmlFor="messages" className="form-label">
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="messages"
+                            name="messages"
+                            value={formik.values.messages}
+                            checked={formik.values.messages}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                    </Row>
+                  </Col>
+                  <hr className="d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label htmlFor="subAdminsTitle" className="form-label">
+                      {t("subAdmin.powers.subAdmins")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.subAdmins ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label htmlFor="subAdmins" className="form-label">
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="subAdmins"
+                            name="subAdmins"
+                            value={formik.values.subAdmins}
+                            checked={formik.values.subAdmins}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.subAdmins && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addSubAdmins"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addSubAdmins"
+                                name="addSubAdmins"
+                                value={formik.values.addSubAdmins}
+                                checked={formik.values.addSubAdmins}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editSubAdmins"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editSubAdmins"
+                                name="editSubAdmins"
+                                value={formik.values.editSubAdmins}
+                                checked={formik.values.editSubAdmins}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteSubAdmins"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteSubAdmins"
+                                name="deleteSubAdmins"
+                                value={formik.values.deleteSubAdmins}
+                                checked={formik.values.deleteSubAdmins}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-sm-none d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label htmlFor="usersTitle" className="form-label">
+                      {t("subAdmin.powers.users")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.users ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label htmlFor="users" className="form-label">
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="users"
+                            name="users"
+                            value={formik.values.users}
+                            checked={formik.values.users}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.users && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label htmlFor="editUser" className="form-label">
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editUser"
+                                name="editUser"
+                                value={formik.values.editUser}
+                                checked={formik.values.editUser}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteUser"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteUser"
+                                name="deleteUser"
+                                value={formik.values.deleteUser}
+                                checked={formik.values.deleteUser}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label
+                              htmlFor="codeContentTitle"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.codeContent")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.codeContent ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="codeContent"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="codeContent"
+                                    name="codeContent"
+                                    value={formik.values.codeContent}
+                                    checked={formik.values.codeContent}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.codeContent && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addCodeContent"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.add")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addCodeContent"
+                                        name="addCodeContent"
+                                        value={formik.values.addCodeContent}
+                                        checked={formik.values.addCodeContent}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="editCodeContent"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.edit")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="editCodeContent"
+                                        name="editCodeContent"
+                                        value={formik.values.editCodeContent}
+                                        checked={formik.values.editCodeContent}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="sendCodeContent"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.send")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="sendCodeContent"
+                                        name="sendCodeContent"
+                                        value={formik.values.sendCodeContent}
+                                        checked={formik.values.sendCodeContent}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label
+                              htmlFor="notificationsTitle"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.notifications")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.notifications ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="notifications"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="notifications"
+                                    name="notifications"
+                                    value={formik.values.notifications}
+                                    checked={formik.values.notifications}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.notifications && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addNotifications"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.send")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addNotifications"
+                                        name="addNotifications"
+                                        value={formik.values.addNotifications}
+                                        checked={formik.values.addNotifications}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="deleteNotifications"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.delete")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="deleteNotifications"
+                                        name="deleteNotifications"
+                                        value={
+                                          formik.values.deleteNotifications
+                                        }
+                                        checked={
+                                          formik.values.deleteNotifications
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-sm-none d-block" />
+                  <hr className="d-none d-sm-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label htmlFor="eldersTitle" className="form-label">
+                      {t("subAdmin.powers.elders")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.elders ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label htmlFor="elders" className="form-label">
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="elders"
+                            name="elders"
+                            value={formik.values.elders}
+                            checked={formik.values.elders}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.elders && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label htmlFor="addElders" className="form-label">
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addElders"
+                                name="addElders"
+                                value={formik.values.addElders}
+                                checked={formik.values.addElders}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editElders"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editElders"
+                                name="editElders"
+                                value={formik.values.editElders}
+                                checked={formik.values.editElders}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteElders"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteElders"
+                                name="deleteElders"
+                                value={formik.values.deleteElders}
+                                checked={formik.values.deleteElders}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label
+                              htmlFor="categoriesAudioTitle"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.categoriesAudio")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.categoriesAudio ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="categoriesAudio"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="categoriesAudio"
+                                    name="categoriesAudio"
+                                    value={formik.values.categoriesAudio}
+                                    checked={formik.values.categoriesAudio}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.categoriesAudio && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addCategoriesAudio"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.add")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addCategoriesAudio"
+                                        name="addCategoriesAudio"
+                                        value={formik.values.addCategoriesAudio}
+                                        checked={
+                                          formik.values.addCategoriesAudio
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="editCategoriesAudio"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.edit")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="editCategoriesAudio"
+                                        name="editCategoriesAudio"
+                                        value={
+                                          formik.values.editCategoriesAudio
+                                        }
+                                        checked={
+                                          formik.values.editCategoriesAudio
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="deleteCategoriesAudio"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.delete")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="deleteCategoriesAudio"
+                                        name="deleteCategoriesAudio"
+                                        value={
+                                          formik.values.deleteCategoriesAudio
+                                        }
+                                        checked={
+                                          formik.values.deleteCategoriesAudio
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col
+                                    sm={12}
+                                    className="d-flex justify-content-center align-items-end flex-column"
+                                  >
+                                    <label
+                                      htmlFor="AudiosTitle"
+                                      className="form-label"
+                                    >
+                                      {t("subAdmin.powers.audios")}
+                                    </label>
+                                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                                      <Col
+                                        xs={formik.values.audios ? 6 : 12}
+                                        className="p-0 m-0"
+                                      >
+                                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                          <label
+                                            htmlFor="audios"
+                                            className="form-label"
+                                          >
+                                            {t("subAdmin.powers.show")}
+                                          </label>
+                                          <input
+                                            type="checkbox"
+                                            className="prayer-time-input"
+                                            id="audios"
+                                            name="audios"
+                                            value={formik.values.audios}
+                                            checked={formik.values.audios}
+                                            onChange={handleInput}
+                                          />
+                                        </div>
+                                      </Col>
+                                      {formik.values.audios && (
+                                        <>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="addAudios"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.add")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="addAudios"
+                                                name="addAudios"
+                                                value={formik.values.addAudios}
+                                                checked={
+                                                  formik.values.addAudios
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="editAudios"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.edit")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="editAudios"
+                                                name="editAudios"
+                                                value={formik.values.editAudios}
+                                                checked={
+                                                  formik.values.editAudios
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="deleteAudios"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.delete")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="deleteAudios"
+                                                name="deleteAudios"
+                                                value={
+                                                  formik.values.deleteAudios
+                                                }
+                                                checked={
+                                                  formik.values.deleteAudios
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                        </>
+                                      )}
+                                    </Row>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-sm-none d-block" />
+                  <hr className="d-sm-none d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label
+                      htmlFor="categoriesImageTitle"
+                      className="form-label"
+                    >
+                      {t("subAdmin.powers.categoriesImage")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.categoriesImage ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label
+                            htmlFor="categoriesImage"
+                            className="form-label"
+                          >
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="categoriesImage"
+                            name="categoriesImage"
+                            value={formik.values.categoriesImage}
+                            checked={formik.values.categoriesImage}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.categoriesImage && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addCategoriesImage"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addCategoriesImage"
+                                name="addCategoriesImage"
+                                value={formik.values.addCategoriesImage}
+                                checked={formik.values.addCategoriesImage}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editCategoriesImage"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editCategoriesImage"
+                                name="editCategoriesImage"
+                                value={formik.values.editCategoriesImage}
+                                checked={formik.values.editCategoriesImage}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteCategoriesImage"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteCategoriesImage"
+                                name="deleteCategoriesImage"
+                                value={formik.values.deleteCategoriesImage}
+                                checked={formik.values.deleteCategoriesImage}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label htmlFor="imagesTitle" className="form-label">
+                              {t("subAdmin.powers.images")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.images ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="images"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="images"
+                                    name="images"
+                                    value={formik.values.images}
+                                    checked={formik.values.images}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.images && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addImages"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.add")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addImages"
+                                        name="addImages"
+                                        value={formik.values.addImages}
+                                        checked={formik.values.addImages}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="editImages"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.edit")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="editImages"
+                                        name="editImages"
+                                        value={formik.values.editImages}
+                                        checked={formik.values.editImages}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="deleteImages"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.delete")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="deleteImages"
+                                        name="deleteImages"
+                                        value={formik.values.deleteImages}
+                                        checked={formik.values.deleteImages}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-none d-sm-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label
+                      htmlFor="categoriesArticleTitle"
+                      className="form-label"
+                    >
+                      {t("subAdmin.powers.categoriesArticle")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.categoriesArticle ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label
+                            htmlFor="categoriesArticle"
+                            className="form-label"
+                          >
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="categoriesArticle"
+                            name="categoriesArticle"
+                            value={formik.values.categoriesArticle}
+                            checked={formik.values.categoriesArticle}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.categoriesArticle && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addCategoriesArticle"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addCategoriesArticle"
+                                name="addCategoriesArticle"
+                                value={formik.values.addCategoriesArticle}
+                                checked={formik.values.addCategoriesArticle}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editCategoriesArticle"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editCategoriesArticle"
+                                name="editCategoriesArticle"
+                                value={formik.values.editCategoriesArticle}
+                                checked={formik.values.editCategoriesArticle}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteCategoriesArticle"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteCategoriesArticle"
+                                name="deleteCategoriesArticle"
+                                value={formik.values.deleteCategoriesArticle}
+                                checked={formik.values.deleteCategoriesArticle}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label
+                              htmlFor="articlesTitle"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.articles")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.articles ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="articles"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="articles"
+                                    name="articles"
+                                    value={formik.values.articles}
+                                    checked={formik.values.articles}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.articles && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addArticles"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.add")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addArticles"
+                                        name="addArticles"
+                                        value={formik.values.addArticles}
+                                        checked={formik.values.addArticles}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="editArticles"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.edit")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="editArticles"
+                                        name="editArticles"
+                                        value={formik.values.editArticles}
+                                        checked={formik.values.editArticles}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="deleteArticles"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.delete")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="deleteArticles"
+                                        name="deleteArticles"
+                                        value={formik.values.deleteArticles}
+                                        checked={formik.values.deleteArticles}
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-sm-none d-block" />
+                  <hr className="d-sm-none d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label
+                      htmlFor="mainCategoriesBooksTitle"
+                      className="form-label"
+                    >
+                      {t("subAdmin.powers.mainCategoriesBooks")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.mainCategoriesBooks ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label
+                            htmlFor="mainCategoriesBooks"
+                            className="form-label"
+                          >
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="mainCategoriesBooks"
+                            name="mainCategoriesBooks"
+                            value={formik.values.mainCategoriesBooks}
+                            checked={formik.values.mainCategoriesBooks}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.mainCategoriesBooks && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addMainCategoriesBooks"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addMainCategoriesBooks"
+                                name="addMainCategoriesBooks"
+                                value={formik.values.addMainCategoriesBooks}
+                                checked={formik.values.addMainCategoriesBooks}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editMainCategoriesBooks"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editMainCategoriesBooks"
+                                name="editMainCategoriesBooks"
+                                value={formik.values.editMainCategoriesBooks}
+                                checked={formik.values.editMainCategoriesBooks}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteMainCategoriesBooks"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteMainCategoriesBooks"
+                                name="deleteMainCategoriesBooks"
+                                value={formik.values.deleteMainCategoriesBooks}
+                                checked={
+                                  formik.values.deleteMainCategoriesBooks
+                                }
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col
+                            sm={12}
+                            className="d-flex justify-content-center align-items-end flex-column"
+                          >
+                            <label
+                              htmlFor="subCategoriesBooksTitle"
+                              className="form-label"
+                            >
+                              {t("subAdmin.powers.subCategoriesBooks")}
+                            </label>
+                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                              <Col
+                                xs={formik.values.subCategoriesBooks ? 6 : 12}
+                                className="p-0 m-0"
+                              >
+                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                  <label
+                                    htmlFor="subCategoriesBooks"
+                                    className="form-label"
+                                  >
+                                    {t("subAdmin.powers.show")}
+                                  </label>
+                                  <input
+                                    type="checkbox"
+                                    className="prayer-time-input"
+                                    id="subCategoriesBooks"
+                                    name="subCategoriesBooks"
+                                    value={formik.values.subCategoriesBooks}
+                                    checked={formik.values.subCategoriesBooks}
+                                    onChange={handleInput}
+                                  />
+                                </div>
+                              </Col>
+                              {formik.values.subCategoriesBooks && (
+                                <>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="addSubCategoriesBooks"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.add")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="addSubCategoriesBooks"
+                                        name="addSubCategoriesBooks"
+                                        value={
+                                          formik.values.addSubCategoriesBooks
+                                        }
+                                        checked={
+                                          formik.values.addSubCategoriesBooks
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="editSubCategoriesBooks"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.edit")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="editSubCategoriesBooks"
+                                        name="editSubCategoriesBooks"
+                                        value={
+                                          formik.values.editSubCategoriesBooks
+                                        }
+                                        checked={
+                                          formik.values.editSubCategoriesBooks
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col xs={6} className="p-0 m-0">
+                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                      <label
+                                        htmlFor="deleteSubCategoriesBooks"
+                                        className="form-label"
+                                      >
+                                        {t("subAdmin.powers.delete")}
+                                      </label>
+                                      <input
+                                        type="checkbox"
+                                        className="prayer-time-input"
+                                        id="deleteSubCategoriesBooks"
+                                        name="deleteSubCategoriesBooks"
+                                        value={
+                                          formik.values.deleteSubCategoriesBooks
+                                        }
+                                        checked={
+                                          formik.values.deleteSubCategoriesBooks
+                                        }
+                                        onChange={handleInput}
+                                      />
+                                    </div>
+                                  </Col>
+                                  <Col
+                                    sm={12}
+                                    className="d-flex justify-content-center align-items-end flex-column"
+                                  >
+                                    <label
+                                      htmlFor="subSubCategoriesBooksTitle"
+                                      className="form-label"
+                                    >
+                                      {t(
+                                        "subAdmin.powers.subSubCategoriesBooks"
+                                      )}
+                                    </label>
+                                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                                      <Col
+                                        xs={
+                                          formik.values.subSubCategoriesBooks
+                                            ? 6
+                                            : 12
+                                        }
+                                        className="p-0 m-0"
+                                      >
+                                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                          <label
+                                            htmlFor="subSubCategoriesBooks"
+                                            className="form-label"
+                                          >
+                                            {t("subAdmin.powers.show")}
+                                          </label>
+                                          <input
+                                            type="checkbox"
+                                            className="prayer-time-input"
+                                            id="subSubCategoriesBooks"
+                                            name="subSubCategoriesBooks"
+                                            value={
+                                              formik.values
+                                                .subSubCategoriesBooks
+                                            }
+                                            checked={
+                                              formik.values
+                                                .subSubCategoriesBooks
+                                            }
+                                            onChange={handleInput}
+                                          />
+                                        </div>
+                                      </Col>
+                                      {formik.values.subSubCategoriesBooks && (
+                                        <>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="addSubSubCategoriesBooks"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.add")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="addSubSubCategoriesBooks"
+                                                name="addSubSubCategoriesBooks"
+                                                value={
+                                                  formik.values
+                                                    .addSubSubCategoriesBooks
+                                                }
+                                                checked={
+                                                  formik.values
+                                                    .addSubSubCategoriesBooks
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="editSubSubCategoriesBooks"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.edit")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="editSubSubCategoriesBooks"
+                                                name="editSubSubCategoriesBooks"
+                                                value={
+                                                  formik.values
+                                                    .editSubSubCategoriesBooks
+                                                }
+                                                checked={
+                                                  formik.values
+                                                    .editSubSubCategoriesBooks
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                          <Col xs={6} className="p-0 m-0">
+                                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                              <label
+                                                htmlFor="deleteSubSubCategoriesBooks"
+                                                className="form-label"
+                                              >
+                                                {t("subAdmin.powers.delete")}
+                                              </label>
+                                              <input
+                                                type="checkbox"
+                                                className="prayer-time-input"
+                                                id="deleteSubSubCategoriesBooks"
+                                                name="deleteSubSubCategoriesBooks"
+                                                value={
+                                                  formik.values
+                                                    .deleteSubSubCategoriesBooks
+                                                }
+                                                checked={
+                                                  formik.values
+                                                    .deleteSubSubCategoriesBooks
+                                                }
+                                                onChange={handleInput}
+                                              />
+                                            </div>
+                                          </Col>
+                                          <Col
+                                            sm={12}
+                                            className="d-flex justify-content-center align-items-end flex-column"
+                                          >
+                                            <label
+                                              htmlFor="booksTitle"
+                                              className="form-label"
+                                            >
+                                              {t("subAdmin.powers.books")}
+                                            </label>
+                                            <Row className="d-flex flex-row-reverse justify-content-start align-items-center pt-2">
+                                              <Col
+                                                xs={
+                                                  formik.values.books ? 6 : 12
+                                                }
+                                                className="p-0 m-0"
+                                              >
+                                                <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                                  <label
+                                                    htmlFor="books"
+                                                    className="form-label"
+                                                  >
+                                                    {t("subAdmin.powers.show")}
+                                                  </label>
+                                                  <input
+                                                    type="checkbox"
+                                                    className="prayer-time-input"
+                                                    id="books"
+                                                    name="books"
+                                                    value={formik.values.books}
+                                                    checked={
+                                                      formik.values.books
+                                                    }
+                                                    onChange={handleInput}
+                                                  />
+                                                </div>
+                                              </Col>
+                                              {formik.values.books && (
+                                                <>
+                                                  <Col
+                                                    xs={6}
+                                                    className="p-0 m-0"
+                                                  >
+                                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                                      <label
+                                                        htmlFor="addBooks"
+                                                        className="form-label"
+                                                      >
+                                                        {t(
+                                                          "subAdmin.powers.add"
+                                                        )}
+                                                      </label>
+                                                      <input
+                                                        type="checkbox"
+                                                        className="prayer-time-input"
+                                                        id="addBooks"
+                                                        name="addBooks"
+                                                        value={
+                                                          formik.values.addBooks
+                                                        }
+                                                        checked={
+                                                          formik.values.addBooks
+                                                        }
+                                                        onChange={handleInput}
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                  <Col
+                                                    xs={6}
+                                                    className="p-0 m-0"
+                                                  >
+                                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                                      <label
+                                                        htmlFor="editBooks"
+                                                        className="form-label"
+                                                      >
+                                                        {t(
+                                                          "subAdmin.powers.edit"
+                                                        )}
+                                                      </label>
+                                                      <input
+                                                        type="checkbox"
+                                                        className="prayer-time-input"
+                                                        id="editBooks"
+                                                        name="editBooks"
+                                                        value={
+                                                          formik.values
+                                                            .editBooks
+                                                        }
+                                                        checked={
+                                                          formik.values
+                                                            .editBooks
+                                                        }
+                                                        onChange={handleInput}
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                  <Col
+                                                    xs={6}
+                                                    className="p-0 m-0"
+                                                  >
+                                                    <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                                                      <label
+                                                        htmlFor="deleteBooks"
+                                                        className="form-label"
+                                                      >
+                                                        {t(
+                                                          "subAdmin.powers.delete"
+                                                        )}
+                                                      </label>
+                                                      <input
+                                                        type="checkbox"
+                                                        className="prayer-time-input"
+                                                        id="deleteBooks"
+                                                        name="deleteBooks"
+                                                        value={
+                                                          formik.values
+                                                            .deleteBooks
+                                                        }
+                                                        checked={
+                                                          formik.values
+                                                            .deleteBooks
+                                                        }
+                                                        onChange={handleInput}
+                                                      />
+                                                    </div>
+                                                  </Col>
+                                                </>
+                                              )}
+                                            </Row>
+                                          </Col>
+                                        </>
+                                      )}
+                                    </Row>
+                                  </Col>
+                                </>
+                              )}
+                            </Row>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-none d-sm-block" />
+                  <hr className="d-sm-none d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label
+                      htmlFor="introductionPagesTitle"
+                      className="form-label"
+                    >
+                      {t("subAdmin.powers.introductionPages")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.introductionPages ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label
+                            htmlFor="introductionPages"
+                            className="form-label"
+                          >
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="introductionPages"
+                            name="introductionPages"
+                            value={formik.values.introductionPages}
+                            checked={formik.values.introductionPages}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.introductionPages && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addIntroductionPages"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addIntroductionPages"
+                                name="addIntroductionPages"
+                                value={formik.values.addIntroductionPages}
+                                checked={formik.values.addIntroductionPages}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editIntroductionPages"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editIntroductionPages"
+                                name="editIntroductionPages"
+                                value={formik.values.editIntroductionPages}
+                                checked={formik.values.editIntroductionPages}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteIntroductionPages"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteIntroductionPages"
+                                name="deleteIntroductionPages"
+                                value={formik.values.deleteIntroductionPages}
+                                checked={formik.values.deleteIntroductionPages}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                  <hr className="d-sm-none d-block" />
+                  <Col
+                    sm={6}
+                    className="d-flex justify-content-center align-items-end flex-column"
+                  >
+                    <label
+                      htmlFor="termsAndConditionsTitle"
+                      className="form-label"
+                    >
+                      {t("subAdmin.powers.termsAndConditions")}
+                    </label>
+                    <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
+                      <Col
+                        xs={formik.values.termsAndConditions ? 6 : 12}
+                        className="p-0 m-0"
+                      >
+                        <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                          <label
+                            htmlFor="termsAndConditions"
+                            className="form-label"
+                          >
+                            {t("subAdmin.powers.show")}
+                          </label>
+                          <input
+                            type="checkbox"
+                            className="prayer-time-input"
+                            id="termsAndConditions"
+                            name="termsAndConditions"
+                            value={formik.values.termsAndConditions}
+                            checked={formik.values.termsAndConditions}
+                            onChange={handleInput}
+                          />
+                        </div>
+                      </Col>
+                      {formik.values.termsAndConditions && (
+                        <>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="addTermsAndConditions"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.add")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="addTermsAndConditions"
+                                name="addTermsAndConditions"
+                                value={formik.values.addTermsAndConditions}
+                                checked={formik.values.addTermsAndConditions}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="editTermsAndConditions"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.edit")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="editTermsAndConditions"
+                                name="editTermsAndConditions"
+                                value={formik.values.editTermsAndConditions}
+                                checked={formik.values.editTermsAndConditions}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                          <Col xs={6} className="p-0 m-0">
+                            <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
+                              <label
+                                htmlFor="deleteTermsAndConditions"
+                                className="form-label"
+                              >
+                                {t("subAdmin.powers.delete")}
+                              </label>
+                              <input
+                                type="checkbox"
+                                className="prayer-time-input"
+                                id="deleteTermsAndConditions"
+                                name="deleteTermsAndConditions"
+                                value={formik.values.deleteTermsAndConditions}
+                                checked={formik.values.deleteTermsAndConditions}
+                                onChange={handleInput}
+                              />
+                            </div>
+                          </Col>
+                        </>
+                      )}
+                    </Row>
+                  </Col>
+                </Row>
+              )}
+              {!toggle.read && (
+                <Row className="d-flex justify-content-center align-items-center p-3 pt-0">
+                  <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="password" className="form-label">
+                      {t("auth.login.password")}
+                    </label>
+                    <input
+                      type={`${toggle.showHidePassword ? "text" : "password"}`}
+                      className="form-input"
+                      id="password"
+                      placeholder="********"
+                      name="password"
+                      value={formik.values.password}
+                      onChange={handleInput}
+                    />
+                    <span className="show-hide-password">
+                      {toggle.showHidePassword ? (
+                        <FaRegEye
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              showHidePassword: !toggle.showHidePassword,
+                            })
+                          }
+                        />
+                      ) : (
+                        <FaRegEyeSlash
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              showHidePassword: !toggle.showHidePassword,
+                            })
+                          }
+                        />
+                      )}
+                    </span>
+                    {formik.errors.password && formik.touched.password ? (
+                      <span className="error">{formik.errors.password}</span>
+                    ) : null}
+                  </div>
+                  <div className="form-group-container password d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="confirmPassword" className="form-label">
+                      {t("auth.login.confirmPassword")}
+                    </label>
+                    <input
+                      type={`${
+                        toggle.showHideConfirmedPassword ? "text" : "password"
+                      }`}
+                      className="form-input"
+                      id="confirmPassword"
+                      placeholder="********"
+                      name="confirmPassword"
+                      value={formik.values.confirmPassword}
+                      onChange={handleInput}
+                    />
+                    {formik.errors.confirmPassword &&
+                    formik.touched.confirmPassword ? (
+                      <span className="error">
+                        {formik.errors.confirmPassword}
+                      </span>
+                    ) : null}
+                    <span className="show-hide-password">
+                      {toggle.showHideConfirmedPassword ? (
+                        <FaRegEye
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              showHideConfirmedPassword:
+                                !toggle.showHideConfirmedPassword,
+                            })
+                          }
+                        />
+                      ) : (
+                        <FaRegEyeSlash
+                          onClick={() =>
+                            setToggle({
+                              ...toggle,
+                              showHideConfirmedPassword:
+                                !toggle.showHideConfirmedPassword,
+                            })
+                          }
+                        />
+                      )}
+                    </span>
+                  </div>
+                </Row>
+              )}
+              <Row className="d-flex justify-content-center align-items-center p-3 pt-0">
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                    {!toggle.read && (
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : toggle.edit ? (
+                          t("edit")
+                        ) : (
+                          t("add")
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="cancel-btn"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                          powers: false,
+                          status: false,
+                          edit: false,
+                        });
+                        formik.handleReset();
+                      }}
+                    >
+                      {t("cancel")}
+                    </button>
+                  </div>
+                </Col>
+              </Row>
+            </form>
+          </ModalBody>
+        </Modal>
+      )}
+      {/* Read Sub Admin */}
       <Modal
-        isOpen={toggle.add}
+        isOpen={toggle.read}
         toggle={() => {
           formik.handleReset();
           setToggle({
             ...toggle,
-            add: !toggle.add,
             powers: false,
             status: false,
             edit: false,
@@ -854,7 +3467,6 @@ const SubAdmins = () => {
             formik.handleReset();
             setToggle({
               ...toggle,
-              add: !toggle.add,
               powers: false,
               status: false,
               edit: false,
@@ -862,17 +3474,12 @@ const SubAdmins = () => {
             });
           }}
         >
-          {toggle.edit
-            ? t("subAdmin.editTitle")
-            : toggle.read
-            ? formik.values.name
-            : t("subAdmin.addTitle")}
+          {formik.values.name}
           <IoMdClose
             onClick={() => {
               formik.handleReset();
               setToggle({
                 ...toggle,
-                add: !toggle.add,
                 powers: false,
                 status: false,
                 edit: false,
@@ -966,26 +3573,6 @@ const SubAdmins = () => {
                     </Modal>
                   </label>
                 </div>
-                {!toggle.read && (
-                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                    <label htmlFor="image" className="form-label">
-                      <ImUpload /> {t("chooseImage")}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-input form-img-input"
-                      id="image"
-                      ref={fileRef}
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                )}
-                {formik.errors.image && formik.touched.image ? (
-                  <span className="error text-center">
-                    {formik.errors.image}
-                  </span>
-                ) : null}
               </Col>
             </Row>
             <Row className="d-flex justify-content-center align-items-center p-3 pb-0 pt-0">
@@ -1220,7 +3807,7 @@ const SubAdmins = () => {
                 </div>
               </Col>
             </Row>
-            {/* {formik.values.powers === "supAdmin" && (
+            {formik.values.powers === t("supAdmin") && (
               <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
                 <Col
                   xs={6}
@@ -1241,7 +3828,13 @@ const SubAdmins = () => {
                           id="settings"
                           name="settings"
                           value={formik.values.settings}
+                          checked={formik.values.settings}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1257,7 +3850,13 @@ const SubAdmins = () => {
                             id="editSettings"
                             name="editSettings"
                             value={formik.values.editSettings}
+                            checked={formik.values.editSettings}
                             onChange={handleInput}
+                            disabled
+                            style={{
+                              cursor: "not-allowed",
+                              pointerEvents: "none",
+                            }}
                           />
                         </div>
                       </Col>
@@ -1283,7 +3882,13 @@ const SubAdmins = () => {
                           id="messages"
                           name="messages"
                           value={formik.values.messages}
+                          checked={formik.values.messages}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1312,7 +3917,13 @@ const SubAdmins = () => {
                           id="subAdmins"
                           name="subAdmins"
                           value={formik.values.subAdmins}
+                          checked={formik.values.subAdmins}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1332,7 +3943,13 @@ const SubAdmins = () => {
                               id="addSubAdmins"
                               name="addSubAdmins"
                               value={formik.values.addSubAdmins}
+                              checked={formik.values.addSubAdmins}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1350,7 +3967,13 @@ const SubAdmins = () => {
                               id="editSubAdmins"
                               name="editSubAdmins"
                               value={formik.values.editSubAdmins}
+                              checked={formik.values.editSubAdmins}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1368,7 +3991,13 @@ const SubAdmins = () => {
                               id="deleteSubAdmins"
                               name="deleteSubAdmins"
                               value={formik.values.deleteSubAdmins}
+                              checked={formik.values.deleteSubAdmins}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1396,7 +4025,13 @@ const SubAdmins = () => {
                           id="users"
                           name="users"
                           value={formik.values.users}
+                          checked={formik.values.users}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1404,31 +4039,43 @@ const SubAdmins = () => {
                       <>
                         <Col xs={6} className="p-0 m-0">
                           <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
-                            <label htmlFor="editUsers" className="form-label">
+                            <label htmlFor="editUser" className="form-label">
                               {t("subAdmin.powers.edit")}
                             </label>
                             <input
                               type="checkbox"
                               className="prayer-time-input"
-                              id="editUsers"
-                              name="editUsers"
-                              value={formik.values.editUsers}
+                              id="editUser"
+                              name="editUser"
+                              value={formik.values.editUser}
+                              checked={formik.values.editUser}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
                         <Col xs={6} className="p-0 m-0">
                           <div className="form-group d-flex justify-content-end gap-sm-3 gap-2">
-                            <label htmlFor="deleteUsers" className="form-label">
+                            <label htmlFor="deleteUser" className="form-label">
                               {t("subAdmin.powers.delete")}
                             </label>
                             <input
                               type="checkbox"
                               className="prayer-time-input"
-                              id="deleteUsers"
-                              name="deleteUsers"
-                              value={formik.values.deleteUsers}
+                              id="deleteUser"
+                              name="deleteUser"
+                              value={formik.values.deleteUser}
+                              checked={formik.values.deleteUser}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1457,7 +4104,13 @@ const SubAdmins = () => {
                           id="elders"
                           name="elders"
                           value={formik.values.elders}
+                          checked={formik.values.elders}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1474,7 +4127,13 @@ const SubAdmins = () => {
                               id="addElders"
                               name="addElders"
                               value={formik.values.addElders}
+                              checked={formik.values.addElders}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1489,7 +4148,13 @@ const SubAdmins = () => {
                               id="editElders"
                               name="editElders"
                               value={formik.values.editElders}
+                              checked={formik.values.editElders}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1507,7 +4172,13 @@ const SubAdmins = () => {
                               id="deleteElders"
                               name="deleteElders"
                               value={formik.values.deleteElders}
+                              checked={formik.values.deleteElders}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1532,10 +4203,16 @@ const SubAdmins = () => {
                         <input
                           type="checkbox"
                           className="prayer-time-input"
-                          id="Audios"
-                          name="Audios"
-                          value={formik.values.Audios}
+                          id="audios"
+                          name="audios"
+                          value={formik.values.audios}
+                          checked={formik.values.audios}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1552,7 +4229,13 @@ const SubAdmins = () => {
                               id="addAudios"
                               name="addAudios"
                               value={formik.values.addAudios}
+                              checked={formik.values.addAudios}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1567,7 +4250,13 @@ const SubAdmins = () => {
                               id="editAudios"
                               name="editAudios"
                               value={formik.values.editAudios}
+                              checked={formik.values.editAudios}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1585,7 +4274,13 @@ const SubAdmins = () => {
                               id="deleteAudios"
                               name="deleteAudios"
                               value={formik.values.deleteAudios}
+                              checked={formik.values.deleteAudios}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1614,7 +4309,13 @@ const SubAdmins = () => {
                           id="books"
                           name="books"
                           value={formik.values.books}
+                          checked={formik.values.books}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1631,7 +4332,13 @@ const SubAdmins = () => {
                               id="addBooks"
                               name="addBooks"
                               value={formik.values.addBooks}
+                              checked={formik.values.addBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1646,7 +4353,13 @@ const SubAdmins = () => {
                               id="editBooks"
                               name="editBooks"
                               value={formik.values.editBooks}
+                              checked={formik.values.editBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1661,7 +4374,13 @@ const SubAdmins = () => {
                               id="deleteBooks"
                               name="deleteBooks"
                               value={formik.values.deleteBooks}
+                              checked={formik.values.deleteBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1689,7 +4408,13 @@ const SubAdmins = () => {
                           id="images"
                           name="images"
                           value={formik.values.images}
+                          checked={formik.values.images}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1706,7 +4431,13 @@ const SubAdmins = () => {
                               id="addImages"
                               name="addImages"
                               value={formik.values.addImages}
+                              checked={formik.values.addImages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1721,7 +4452,13 @@ const SubAdmins = () => {
                               id="editImages"
                               name="editImages"
                               value={formik.values.editImages}
+                              checked={formik.values.editImages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1739,7 +4476,13 @@ const SubAdmins = () => {
                               id="deleteImages"
                               name="deleteImages"
                               value={formik.values.deleteImages}
+                              checked={formik.values.deleteImages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1771,7 +4514,13 @@ const SubAdmins = () => {
                           id="articles"
                           name="articles"
                           value={formik.values.articles}
+                          checked={formik.values.articles}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1788,7 +4537,13 @@ const SubAdmins = () => {
                               id="addArticles"
                               name="addArticles"
                               value={formik.values.addArticles}
+                              checked={formik.values.addArticles}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1806,7 +4561,13 @@ const SubAdmins = () => {
                               id="editArticles"
                               name="editArticles"
                               value={formik.values.editArticles}
+                              checked={formik.values.editArticles}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1824,7 +4585,13 @@ const SubAdmins = () => {
                               id="deleteArticles"
                               name="deleteArticles"
                               value={formik.values.deleteArticles}
+                              checked={formik.values.deleteArticles}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1855,7 +4622,13 @@ const SubAdmins = () => {
                           id="notifications"
                           name="notifications"
                           value={formik.values.notifications}
+                          checked={formik.values.notifications}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1875,7 +4648,13 @@ const SubAdmins = () => {
                               id="addNotifications"
                               name="addNotifications"
                               value={formik.values.addNotifications}
+                              checked={formik.values.addNotifications}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1893,7 +4672,13 @@ const SubAdmins = () => {
                               id="deleteNotifications"
                               name="deleteNotifications"
                               value={formik.values.deleteNotifications}
+                              checked={formik.values.deleteNotifications}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1925,7 +4710,13 @@ const SubAdmins = () => {
                           id="codeContent"
                           name="codeContent"
                           value={formik.values.codeContent}
+                          checked={formik.values.codeContent}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -1945,7 +4736,13 @@ const SubAdmins = () => {
                               id="addCodeContent"
                               name="addCodeContent"
                               value={formik.values.addCodeContent}
+                              checked={formik.values.addCodeContent}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1963,7 +4760,13 @@ const SubAdmins = () => {
                               id="editCodeContent"
                               name="editCodeContent"
                               value={formik.values.editCodeContent}
+                              checked={formik.values.editCodeContent}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -1981,7 +4784,13 @@ const SubAdmins = () => {
                               id="sendCodeContent"
                               name="sendCodeContent"
                               value={formik.values.sendCodeContent}
+                              checked={formik.values.sendCodeContent}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2018,7 +4827,13 @@ const SubAdmins = () => {
                           id="introductionPages"
                           name="introductionPages"
                           value={formik.values.introductionPages}
+                          checked={formik.values.introductionPages}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2038,7 +4853,13 @@ const SubAdmins = () => {
                               id="addIntroductionPages"
                               name="addIntroductionPages"
                               value={formik.values.addIntroductionPages}
+                              checked={formik.values.addIntroductionPages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2056,7 +4877,13 @@ const SubAdmins = () => {
                               id="editIntroductionPages"
                               name="editIntroductionPages"
                               value={formik.values.editIntroductionPages}
+                              checked={formik.values.editIntroductionPages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2074,7 +4901,13 @@ const SubAdmins = () => {
                               id="deleteIntroductionPages"
                               name="deleteIntroductionPages"
                               value={formik.values.deleteIntroductionPages}
+                              checked={formik.values.deleteIntroductionPages}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2112,7 +4945,13 @@ const SubAdmins = () => {
                           id="termsAndConditions"
                           name="termsAndConditions"
                           value={formik.values.termsAndConditions}
+                          checked={formik.values.termsAndConditions}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2132,7 +4971,13 @@ const SubAdmins = () => {
                               id="addTermsAndConditions"
                               name="addTermsAndConditions"
                               value={formik.values.addTermsAndConditions}
+                              checked={formik.values.addTermsAndConditions}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2150,7 +4995,13 @@ const SubAdmins = () => {
                               id="editTermsAndConditions"
                               name="editTermsAndConditions"
                               value={formik.values.editTermsAndConditions}
+                              checked={formik.values.editTermsAndConditions}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2168,7 +5019,13 @@ const SubAdmins = () => {
                               id="deleteTermsAndConditions"
                               name="deleteTermsAndConditions"
                               value={formik.values.deleteTermsAndConditions}
+                              checked={formik.values.deleteTermsAndConditions}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2205,7 +5062,13 @@ const SubAdmins = () => {
                           id="mainCategoriesBooks"
                           name="mainCategoriesBooks"
                           value={formik.values.mainCategoriesBooks}
+                          checked={formik.values.mainCategoriesBooks}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2225,7 +5088,13 @@ const SubAdmins = () => {
                               id="addMainCategoriesBooks"
                               name="addMainCategoriesBooks"
                               value={formik.values.addMainCategoriesBooks}
+                              checked={formik.values.addMainCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2243,7 +5112,13 @@ const SubAdmins = () => {
                               id="editMainCategoriesBooks"
                               name="editMainCategoriesBooks"
                               value={formik.values.editMainCategoriesBooks}
+                              checked={formik.values.editMainCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2261,7 +5136,13 @@ const SubAdmins = () => {
                               id="deleteMainCategoriesBooks"
                               name="deleteMainCategoriesBooks"
                               value={formik.values.deleteMainCategoriesBooks}
+                              checked={formik.values.deleteMainCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2299,7 +5180,13 @@ const SubAdmins = () => {
                           id="subCategoriesBooks"
                           name="subCategoriesBooks"
                           value={formik.values.subCategoriesBooks}
+                          checked={formik.values.subCategoriesBooks}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2319,7 +5206,13 @@ const SubAdmins = () => {
                               id="addSubCategoriesBooks"
                               name="addSubCategoriesBooks"
                               value={formik.values.addSubCategoriesBooks}
+                              checked={formik.values.addSubCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2337,7 +5230,13 @@ const SubAdmins = () => {
                               id="editSubCategoriesBooks"
                               name="editSubCategoriesBooks"
                               value={formik.values.editSubCategoriesBooks}
+                              checked={formik.values.editSubCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2355,7 +5254,13 @@ const SubAdmins = () => {
                               id="deleteSubCategoriesBooks"
                               name="deleteSubCategoriesBooks"
                               value={formik.values.deleteSubCategoriesBooks}
+                              checked={formik.values.deleteSubCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2392,7 +5297,13 @@ const SubAdmins = () => {
                           id="subSubCategoriesBooks"
                           name="subSubCategoriesBooks"
                           value={formik.values.subSubCategoriesBooks}
+                          checked={formik.values.subSubCategoriesBooks}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2412,7 +5323,13 @@ const SubAdmins = () => {
                               id="addSubSubCategoriesBooks"
                               name="addSubSubCategoriesBooks"
                               value={formik.values.addSubSubCategoriesBooks}
+                              checked={formik.values.addSubSubCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2430,7 +5347,13 @@ const SubAdmins = () => {
                               id="editSubSubCategoriesBooks"
                               name="editSubSubCategoriesBooks"
                               value={formik.values.editSubSubCategoriesBooks}
+                              checked={formik.values.editSubSubCategoriesBooks}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2448,7 +5371,15 @@ const SubAdmins = () => {
                               id="deleteSubSubCategoriesBooks"
                               name="deleteSubSubCategoriesBooks"
                               value={formik.values.deleteSubSubCategoriesBooks}
+                              checked={
+                                formik.values.deleteSubSubCategoriesBooks
+                              }
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2480,7 +5411,13 @@ const SubAdmins = () => {
                           id="categoriesAudio"
                           name="categoriesAudio"
                           value={formik.values.categoriesAudio}
+                          checked={formik.values.categoriesAudio}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2500,7 +5437,13 @@ const SubAdmins = () => {
                               id="addCategoriesAudio"
                               name="addCategoriesAudio"
                               value={formik.values.addCategoriesAudio}
+                              checked={formik.values.addCategoriesAudio}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2518,7 +5461,13 @@ const SubAdmins = () => {
                               id="editCategoriesAudio"
                               name="editCategoriesAudio"
                               value={formik.values.editCategoriesAudio}
+                              checked={formik.values.editCategoriesAudio}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2536,7 +5485,13 @@ const SubAdmins = () => {
                               id="deleteCategoriesAudio"
                               name="deleteCategoriesAudio"
                               value={formik.values.deleteCategoriesAudio}
+                              checked={formik.values.deleteCategoriesAudio}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2567,7 +5522,13 @@ const SubAdmins = () => {
                           id="categoriesImage"
                           name="categoriesImage"
                           value={formik.values.categoriesImage}
+                          checked={formik.values.categoriesImage}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2587,7 +5548,13 @@ const SubAdmins = () => {
                               id="addCategoriesImage"
                               name="addCategoriesImage"
                               value={formik.values.addCategoriesImage}
+                              checked={formik.values.addCategoriesImage}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2605,7 +5572,13 @@ const SubAdmins = () => {
                               id="editCategoriesImage"
                               name="editCategoriesImage"
                               value={formik.values.editCategoriesImage}
+                              checked={formik.values.editCategoriesImage}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2623,7 +5596,13 @@ const SubAdmins = () => {
                               id="deleteCategoriesImage"
                               name="deleteCategoriesImage"
                               value={formik.values.deleteCategoriesImage}
+                              checked={formik.values.deleteCategoriesImage}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2661,7 +5640,13 @@ const SubAdmins = () => {
                           id="categoriesArticle"
                           name="categoriesArticle"
                           value={formik.values.categoriesArticle}
+                          checked={formik.values.categoriesArticle}
                           onChange={handleInput}
+                          disabled
+                          style={{
+                            cursor: "not-allowed",
+                            pointerEvents: "none",
+                          }}
                         />
                       </div>
                     </Col>
@@ -2681,7 +5666,13 @@ const SubAdmins = () => {
                               id="addCategoriesArticle"
                               name="addCategoriesArticle"
                               value={formik.values.addCategoriesArticle}
+                              checked={formik.values.addCategoriesArticle}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2699,7 +5690,13 @@ const SubAdmins = () => {
                               id="editCategoriesArticle"
                               name="editCategoriesArticle"
                               value={formik.values.editCategoriesArticle}
+                              checked={formik.values.editCategoriesArticle}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2717,7 +5714,13 @@ const SubAdmins = () => {
                               id="deleteCategoriesArticle"
                               name="deleteCategoriesArticle"
                               value={formik.values.deleteCategoriesArticle}
+                              checked={formik.values.deleteCategoriesArticle}
                               onChange={handleInput}
+                              disabled
+                              style={{
+                                cursor: "not-allowed",
+                                pointerEvents: "none",
+                              }}
                             />
                           </div>
                         </Col>
@@ -2726,126 +5729,20 @@ const SubAdmins = () => {
                   </Row>
                 </Col>
               </Row>
-            )} */}
-            {!toggle.read && (
-              <Row className="d-flex justify-content-center align-items-center p-3 pt-0">
-                <div className="form-group-container password d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="password" className="form-label">
-                    {t("auth.login.password")}
-                  </label>
-                  <input
-                    type={`${toggle.showHidePassword ? "text" : "password"}`}
-                    className="form-input"
-                    id="password"
-                    placeholder="********"
-                    name="password"
-                    value={formik.values.password}
-                    onChange={handleInput}
-                  />
-                  <span className="show-hide-password">
-                    {toggle.showHidePassword ? (
-                      <FaRegEye
-                        onClick={() =>
-                          setToggle({
-                            ...toggle,
-                            showHidePassword: !toggle.showHidePassword,
-                          })
-                        }
-                      />
-                    ) : (
-                      <FaRegEyeSlash
-                        onClick={() =>
-                          setToggle({
-                            ...toggle,
-                            showHidePassword: !toggle.showHidePassword,
-                          })
-                        }
-                      />
-                    )}
-                  </span>
-                  {formik.errors.password && formik.touched.password ? (
-                    <span className="error">{formik.errors.password}</span>
-                  ) : null}
-                </div>
-                <div className="form-group-container password d-flex flex-column align-items-end mb-3">
-                  <label htmlFor="confirmPassword" className="form-label">
-                    {t("auth.login.confirmPassword")}
-                  </label>
-                  <input
-                    type={`${
-                      toggle.showHideConfirmedPassword ? "text" : "password"
-                    }`}
-                    className="form-input"
-                    id="confirmPassword"
-                    placeholder="********"
-                    name="confirmPassword"
-                    value={formik.values.confirmPassword}
-                    onChange={handleInput}
-                  />
-                  {formik.errors.confirmPassword &&
-                  formik.touched.confirmPassword ? (
-                    <span className="error">
-                      {formik.errors.confirmPassword}
-                    </span>
-                  ) : null}
-                  <span className="show-hide-password">
-                    {toggle.showHideConfirmedPassword ? (
-                      <FaRegEye
-                        onClick={() =>
-                          setToggle({
-                            ...toggle,
-                            showHideConfirmedPassword:
-                              !toggle.showHideConfirmedPassword,
-                          })
-                        }
-                      />
-                    ) : (
-                      <FaRegEyeSlash
-                        onClick={() =>
-                          setToggle({
-                            ...toggle,
-                            showHideConfirmedPassword:
-                              !toggle.showHideConfirmedPassword,
-                          })
-                        }
-                      />
-                    )}
-                  </span>
-                </div>
-              </Row>
             )}
             <Row className="d-flex justify-content-center align-items-center p-3 pt-0">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  {!toggle.read && (
-                    <button
-                      type="submit"
-                      className={`add-btn${loading ? " loading-btn" : ""}`}
-                    >
-                      {/* loading */}
-                      {loading ? (
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                      ) : toggle.edit ? (
-                        t("edit")
-                      ) : (
-                        t("add")
-                      )}
-                    </button>
-                  )}
                   <button
                     type="button"
                     className="cancel-btn"
                     onClick={() => {
                       setToggle({
                         ...toggle,
-                        add: !toggle.add,
                         powers: false,
                         status: false,
                         edit: false,
+                        read: false,
                       });
                       formik.handleReset();
                     }}
