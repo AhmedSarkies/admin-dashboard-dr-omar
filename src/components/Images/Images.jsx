@@ -32,6 +32,10 @@ import Cookies from "js-cookie";
 const Images = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getImagesCookies = Cookies.get("GetImage");
+  const addImagesCookies = Cookies.get("addImage");
+  const editImagesCookies = Cookies.get("editImage");
+  const deleteImagesCookies = Cookies.get("deleteImage");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
@@ -121,7 +125,11 @@ const Images = () => {
     },
     validationSchema: validationSchema.image,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addImagesCookies === "1" && getImagesCookies === "1") ||
+        (editImagesCookies === "1" && getImagesCookies === "1")
+      ) {
         const formData = new FormData();
         formData.append("status", values.status);
         if (values.image.file !== "") {
@@ -225,57 +233,88 @@ const Images = () => {
 
   // Delete Picture
   const handleDelete = (picture) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + picture?.title + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deletePictureApi(picture?.id)).then((res) => {
-          if (!res.error) {
-            if (
-              toggle.currentPage > 1 &&
-              searchResultsImagesCategory.length === 1
-            ) {
-              setToggle({
-                ...toggle,
-                currentPage: toggle.currentPage - 1,
+    if (role === "admin" || deleteImagesCookies === "1") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deletePictureApi(picture?.id)).then((res) => {
+            if (!res.error) {
+              if (
+                toggle.currentPage > 1 &&
+                searchResultsImagesCategory.length === 1
+              ) {
+                setToggle({
+                  ...toggle,
+                  currentPage: toggle.currentPage - 1,
+                });
+              }
+              dispatch(getPicturesApi());
+              Swal.fire({
+                title: `${t("titleDeletedSuccess")}`,
+                text: `${t("titleDeletedSuccess")} ${t("textDeletedSuccess")}`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+                confirmButtonText: t("doneDeletedSuccess"),
+              }).then(() => {
+                toast.success(t("toast.image.deletedSuccess"));
               });
+            } else {
+              toast.error(t("toast.image.deletedError"));
+              dispatch(getPicturesApi());
             }
-            dispatch(getPicturesApi());
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${picture?.title}`,
-              text: `${t("titleDeletedSuccess")} ${picture?.title} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => {
-              toast.success(t("toast.image.deletedSuccess"));
-            });
-          } else {
-            toast.error(t("toast.image.deletedError"));
-            dispatch(getPicturesApi());
-          }
-        });
-      }
-    });
+          });
+        }
+      });
+    }
   };
 
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getPicturesApi());
-      if (role === "admin") {
+      if (role === "admin" || getImagesCookies === "1") {
+        dispatch(getPicturesApi());
+      }
+      if (
+        role === "admin" ||
+        addImagesCookies === "1" ||
+        editImagesCookies === "1"
+      ) {
         dispatch(getPicturesCategoriesApi());
       }
-      if (role !== "admin") {
+      if (getImagesCookies === "0") {
+        Cookies.set("addImage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editImage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteImage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addImagesCookies === "0" &&
+        editImagesCookies === "0" &&
+        deleteImagesCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -288,11 +327,19 @@ const Images = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getImagesCookies,
+    addImagesCookies,
+    editImagesCookies,
+    deleteImagesCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addImagesCookies === "1" && getImagesCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -480,25 +527,41 @@ const Images = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[9].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addImagesCookies === "1" && getImagesCookies === "1") ||
+                role === "admin" ||
+                (editImagesCookies === "1" && getImagesCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[9])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[9].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 10 : 11}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addImagesCookies === "0" &&
+                    editImagesCookies === "0" &&
+                    deleteImagesCookies === "0"
+                      ? 9
+                      : 10
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -516,7 +579,16 @@ const Images = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 10 : 11}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addImagesCookies === "0" &&
+                    editImagesCookies === "0" &&
+                    deleteImagesCookies === "0"
+                      ? 9
+                      : 10
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -538,7 +610,16 @@ const Images = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan={role === "admin" ? 10 : 11}>
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addImagesCookies === "0" &&
+                      editImagesCookies === "0" &&
+                      deleteImagesCookies === "0"
+                        ? 9
+                        : 10
+                    }
+                  >
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -550,7 +631,16 @@ const Images = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 10 : 11}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addImagesCookies === "0" &&
+                    editImagesCookies === "0" &&
+                    deleteImagesCookies === "0"
+                      ? 9
+                      : 10
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -603,15 +693,20 @@ const Images = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.status === t("public")
-                                ? "green"
-                                : result?.status === t("private")
-                                ? "red"
-                                : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                              result?.status === t("public") ? "green" : "red",
+                            cursor:
+                              role === "admin" ||
+                              (editImagesCookies === "1" &&
+                                getImagesCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editImagesCookies === "1" &&
+                                getImagesCookies === "1")
+                            ) {
                               dispatch(
                                 updatePictureApi({
                                   id: result.id,
@@ -637,11 +732,7 @@ const Images = () => {
                             }
                           }}
                         >
-                          {result?.status === t("public")
-                            ? t("public")
-                            : result?.status === t("private")
-                            ? t("private")
-                            : t("private")}
+                          {result?.status}
                         </span>
                       </td>
                     )}
@@ -653,13 +744,20 @@ const Images = () => {
                             backgroundColor:
                               result?.is_active === t("active")
                                 ? "green"
-                                : result?.is_active === t("inactive")
-                                ? "red"
                                 : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                            cursor:
+                              role === "admin" ||
+                              (editImagesCookies === "1" &&
+                                getImagesCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editImagesCookies === "1" &&
+                                getImagesCookies === "1")
+                            ) {
                               dispatch(
                                 updatePictureApi({
                                   id: result.id,
@@ -685,34 +783,41 @@ const Images = () => {
                             }
                           }}
                         >
-                          {result?.is_active === t("active")
-                            ? t("active")
-                            : result?.is_active === t("inactive")
-                            ? t("inactive")
-                            : t("inactive")}
+                          {result?.is_active}
                         </span>
                       </td>
                     )}
-                    {role === "admin" && toggle.toggleColumns.control && (
-                      <td className="table-td">
-                        <span className="table-btn-container">
-                          <FaEdit
-                            className="edit-btn"
-                            onClick={() => {
-                              handleEdit(result);
-                              setToggle({
-                                ...toggle,
-                                edit: !toggle.edit,
-                              });
-                            }}
-                          />
-                          <MdDeleteOutline
-                            className="delete-btn"
-                            onClick={() => handleDelete(result)}
-                          />
-                        </span>
-                      </td>
-                    )}
+                    {(role === "admin" ||
+                      (addImagesCookies === "1" && getImagesCookies === "1") ||
+                      role === "admin" ||
+                      (editImagesCookies === "1" &&
+                        getImagesCookies === "1")) &&
+                      toggle.toggleColumns.control && (
+                        <td className="table-td">
+                          <span className="table-btn-container">
+                            {(role === "admin" ||
+                              editImagesCookies === "1") && (
+                              <FaEdit
+                                className="edit-btn"
+                                onClick={() => {
+                                  handleEdit(result);
+                                  setToggle({
+                                    ...toggle,
+                                    edit: !toggle.edit,
+                                  });
+                                }}
+                              />
+                            )}
+                            {(role === "admin" ||
+                              deleteImagesCookies === "1") && (
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                            )}
+                          </span>
+                        </td>
+                      )}
                   </tr>
                 ))}
               </tbody>
@@ -723,7 +828,8 @@ const Images = () => {
           error === null &&
           loading === false && <PaginationUI />}
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addImagesCookies === "1" && getImagesCookies === "1")) && (
         <>
           {/* Add Image */}
           <Modal
@@ -1112,6 +1218,11 @@ const Images = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (getImagesCookies === "1" && editImagesCookies === "1")) && (
+        <>
           {/* Edit Image  */}
           <Modal
             isOpen={toggle.edit}
