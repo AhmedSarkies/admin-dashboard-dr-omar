@@ -67,7 +67,6 @@ const Elder = () => {
     edit: false,
     imagePreview: false,
     readMore: false,
-    article: {},
     status: false,
     elders: false,
     audioCategories: false,
@@ -75,8 +74,6 @@ const Elder = () => {
     activeColumn: false,
     toggleColumns: {
       id: true,
-      imageElder: false,
-      nameElder: false,
       image: true,
       title: true,
       audio: true,
@@ -159,6 +156,7 @@ const Elder = () => {
             if (!res.error) {
               formik.handleReset();
               setToggle({
+                ...toggle,
                 edit: !toggle.edit,
                 audioCategory: false,
                 status: false,
@@ -675,7 +673,7 @@ const Elder = () => {
                 {searchResultsAudioSCategoryAndTitleElder?.map(
                   (result, idx) => (
                     <tr key={result?.id + new Date().getDate()}>
-                      {toggle.toggleColumns?.id && (
+                      {toggle.toggleColumns.id && (
                         <td className="table-td">{idx + 1}#</td>
                       )}
                       {toggle.toggleColumns.image && (
