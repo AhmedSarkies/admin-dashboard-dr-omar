@@ -21,6 +21,10 @@ import Cookies from "js-cookie";
 const CategoriesImages = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getCategoriesImageCookies = Cookies.get("GetImageCategories");
+  const addCategoriesImageCookies = Cookies.get("addImageCategories");
+  const editCategoriesImageCookies = Cookies.get("editImageCategories");
+  const deleteCategoriesImageCookies = Cookies.get("deleteImageCategories");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { pictureCategories, loading, error } = useSelector(
@@ -68,7 +72,13 @@ const CategoriesImages = () => {
     },
     validationSchema: validationSchema.category,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addCategoriesImageCookies === "1" &&
+          getCategoriesImageCookies === "1") ||
+        (editCategoriesImageCookies === "1" &&
+          getCategoriesImageCookies === "1")
+      ) {
         if (values.isEditing) {
           dispatch(
             updatePictureCategoryApi({ id: values.id, title: values.title })
@@ -117,7 +127,7 @@ const CategoriesImages = () => {
 
   // Delete Picture Category
   const handleDelete = (pictureCategory) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteCategoriesImageCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + pictureCategory?.title + "?",
         text: t("textDeleteAlert"),
@@ -166,8 +176,35 @@ const CategoriesImages = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getPicturesCategoriesApi());
-      if (role !== "admin") {
+      if (role === "admin" || getCategoriesImageCookies === "1") {
+        dispatch(getPicturesCategoriesApi());
+      }
+      if (getCategoriesImageCookies === "0") {
+        Cookies.set("addImageCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editImageCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteImageCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addCategoriesImageCookies === "0" &&
+        editCategoriesImageCookies === "0" &&
+        deleteCategoriesImageCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -180,11 +217,20 @@ const CategoriesImages = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getCategoriesImageCookies,
+    addCategoriesImageCookies,
+    editCategoriesImageCookies,
+    deleteCategoriesImageCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addCategoriesImageCookies === "1" &&
+          getCategoriesImageCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -287,25 +333,43 @@ const CategoriesImages = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[2])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[2].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addCategoriesImageCookies === "1" &&
+                  getCategoriesImageCookies === "1") ||
+                role === "admin" ||
+                (editCategoriesImageCookies === "1" &&
+                  getCategoriesImageCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[2])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[2].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesImageCookies === "0" &&
+                    editCategoriesImageCookies === "0" &&
+                    deleteCategoriesImageCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -323,7 +387,16 @@ const CategoriesImages = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesImageCookies === "0" &&
+                    editCategoriesImageCookies === "0" &&
+                    deleteCategoriesImageCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -343,7 +416,16 @@ const CategoriesImages = () => {
           {searchResults?.length === 0 && error === null && !loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesImageCookies === "0" &&
+                    editCategoriesImageCookies === "0" &&
+                    deleteCategoriesImageCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data mb-0">{t("noData")}</p>
                 </td>
               </tr>
@@ -355,7 +437,16 @@ const CategoriesImages = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan={role === "admin" ? 3 : 2}>
+                <td
+                  className="table-td"
+                  colSpan={
+                    addCategoriesImageCookies === "0" &&
+                    editCategoriesImageCookies === "0" &&
+                    deleteCategoriesImageCookies === "0"
+                      ? 2
+                      : 3
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -372,33 +463,47 @@ const CategoriesImages = () => {
                   {toggle.toggleColumns?.title && (
                     <td className="table-td name">{result?.title}</td>
                   )}
-                  {role === "admin" && toggle.toggleColumns.control && (
-                    <td className="table-td">
-                      <span className="table-btn-container">
-                        <FaEdit
-                          className="edit-btn"
-                          onClick={() => {
-                            handleEdit(result);
-                            setToggle({
-                              ...toggle,
-                              edit: !toggle.edit,
-                            });
-                          }}
-                        />
-                        <MdDeleteOutline
-                          className="delete-btn"
-                          onClick={() => handleDelete(result)}
-                        />
-                      </span>
-                    </td>
-                  )}
+                  {(role === "admin" ||
+                    (addCategoriesImageCookies === "1" &&
+                      getCategoriesImageCookies === "1") ||
+                    role === "admin" ||
+                    (editCategoriesImageCookies === "1" &&
+                      getCategoriesImageCookies === "1")) &&
+                    toggle.toggleColumns.control && (
+                      <td className="table-td">
+                        <span className="table-btn-container">
+                          {(role === "admin" ||
+                            editCategoriesImageCookies === "1") && (
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => {
+                                handleEdit(result);
+                                setToggle({
+                                  ...toggle,
+                                  edit: !toggle.edit,
+                                });
+                              }}
+                            />
+                          )}
+                          {(role === "admin" ||
+                            deleteCategoriesImageCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
+                          )}
+                        </span>
+                      </td>
+                    )}
                 </tr>
               ))}
             </tbody>
           )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addCategoriesImageCookies === "1" &&
+          getCategoriesImageCookies === "1")) && (
         <>
           {/* Add Picture Category */}
           <Modal
@@ -496,6 +601,12 @@ const CategoriesImages = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (editCategoriesImageCookies === "1" &&
+          getCategoriesImageCookies === "1")) && (
+        <>
           {/* Edit Picture Category */}
           <Modal
             isOpen={toggle.edit}
