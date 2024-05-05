@@ -17,6 +17,8 @@ import Cookies from "js-cookie";
 const Messages = () => {
   const { t } = useTranslation();
   const lang = Cookies.get("i18next");
+  const role = Cookies.get("_role");
+  const getMessagesCookies = Cookies.get("GetMessage");
   const dispatch = useDispatch();
   const { messages, loading, error } = useSelector((state) => state.messages);
   const [toggle, setToggle] = useState({
@@ -70,11 +72,13 @@ const Messages = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getMessagesApi());
+      if (getMessagesCookies === "1" || role === "admin") {
+        dispatch(getMessagesApi());
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [dispatch, getMessagesCookies, role]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
