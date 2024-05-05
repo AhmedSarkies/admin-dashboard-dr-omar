@@ -49,6 +49,10 @@ const initialValues = {
 const Articles = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getArticlesCookies = Cookies.get("GetArticles");
+  const addArticlesCookies = Cookies.get("addArticles");
+  const editArticlesCookies = Cookies.get("editArticles");
+  const deleteArticlesCookies = Cookies.get("deleteArticles");
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const fileRef = useRef();
@@ -131,7 +135,11 @@ const Articles = () => {
     initialValues,
     validationSchema: validationSchema.article,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addArticlesCookies === "1" && getArticlesCookies === "1") ||
+        (editArticlesCookies === "1" && getArticlesCookies === "1")
+      ) {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("content", values.content);
@@ -268,62 +276,97 @@ const Articles = () => {
 
   // Delete article
   const handleDelete = (article) => {
-    Swal.fire({
-      title: t("titleDeleteAlert") + article?.title + "?",
-      text: t("textDeleteAlert"),
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonColor: "#d33",
-      cancelButtonColor: "#0d1d34",
-      confirmButtonText: t("confirmButtonText"),
-      cancelButtonText: t("cancel"),
-    }).then((result) => {
-      if (result.isConfirmed) {
-        dispatch(deleteArticleApi(article?.id)).then((res) => {
-          if (!res.error) {
-            dispatch(getArticlesApi());
-            if (
-              toggle.currentPage > 1 &&
-              searchResultsArticleSCategoryAndTitleAndAuthor.length === 1
-            ) {
-              setToggle({
-                ...toggle,
-                currentPage: toggle.currentPage - 1,
-              });
+    if (role === "admin" || deleteArticlesCookies === "1") {
+      Swal.fire({
+        title: t("titleDeleteAlert") + article?.title + "?",
+        text: t("textDeleteAlert"),
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#d33",
+        cancelButtonColor: "#0d1d34",
+        confirmButtonText: t("confirmButtonText"),
+        cancelButtonText: t("cancel"),
+      }).then((result) => {
+        if (result.isConfirmed) {
+          dispatch(deleteArticleApi(article?.id)).then((res) => {
+            if (!res.error) {
+              dispatch(getArticlesApi());
+              if (
+                toggle.currentPage > 1 &&
+                searchResultsArticleSCategoryAndTitleAndAuthor.length === 1
+              ) {
+                setToggle({
+                  ...toggle,
+                  currentPage: toggle.currentPage - 1,
+                });
+              }
+              Swal.fire({
+                title: `${t("titleDeletedSuccess")} ${article?.title}`,
+                text: `${t("titleDeletedSuccess")} ${article?.title} ${t(
+                  "textDeletedSuccess"
+                )}`,
+                icon: "success",
+                confirmButtonColor: "#0d1d34",
+                confirmButtonText: t("doneDeletedSuccess"),
+              }).then(() => toast.success(t("toast.article.deletedSuccess")));
+            } else {
+              dispatch(getArticlesApi());
+              toast.error(t("toast.article.deletedError"));
             }
-            Swal.fire({
-              title: `${t("titleDeletedSuccess")} ${article?.title}`,
-              text: `${t("titleDeletedSuccess")} ${article?.title} ${t(
-                "textDeletedSuccess"
-              )}`,
-              icon: "success",
-              confirmButtonColor: "#0d1d34",
-              confirmButtonText: t("doneDeletedSuccess"),
-            }).then(() => toast.success(t("toast.article.deletedSuccess")));
-          } else {
-            dispatch(getArticlesApi());
-            toast.error(t("toast.article.deletedError"));
-          }
-        });
-      }
-    });
+          });
+        }
+      });
+    }
   };
 
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getArticlesApi());
-      if (role === "admin") {
+      if (role === "admin" || getArticlesCookies === "1") {
+        dispatch(getArticlesApi());
+      }
+      if (
+        role === "admin" ||
+        addArticlesCookies === "1" ||
+        editArticlesCookies === "1"
+      ) {
         dispatch(getArticlesCategoriesApi());
+      }
+      if (getArticlesCookies === "0") {
+        Cookies.set("addArticle", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editArticle", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteArticle", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
       }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getArticlesCookies,
+    addArticlesCookies,
+    editArticlesCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addArticlesCookies === "1" && getArticlesCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -681,13 +724,20 @@ const Articles = () => {
                               backgroundColor:
                                 result?.status === t("public")
                                   ? "green"
-                                  : result?.status === t("private")
-                                  ? "red"
                                   : "red",
-                              cursor: role === "admin" ? "pointer" : "default",
+                              cursor:
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                                  ? "pointer"
+                                  : "default",
                             }}
                             onClick={() => {
-                              if (role === "admin") {
+                              if (
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                              ) {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
@@ -719,11 +769,7 @@ const Articles = () => {
                               }
                             }}
                           >
-                            {result?.status === t("public")
-                              ? t("public")
-                              : result?.status === t("private")
-                              ? t("private")
-                              : t("private")}
+                            {result?.status}
                           </span>
                         </td>
                       )}
@@ -745,10 +791,19 @@ const Articles = () => {
                                 result?.is_active === t("active")
                                   ? "green"
                                   : "red",
-                              cursor: role === "admin" ? "pointer" : "default",
+                              cursor:
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                                  ? "pointer"
+                                  : "default",
                             }}
                             onClick={() => {
-                              if (role === "admin") {
+                              if (
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                              ) {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
@@ -780,9 +835,7 @@ const Articles = () => {
                               }
                             }}
                           >
-                            {result?.is_active === t("active")
-                              ? t("active")
-                              : t("inactive")}
+                            {result?.is_active}
                           </span>
                         </td>
                       )}
@@ -795,10 +848,19 @@ const Articles = () => {
                                 result?.showWriter === t("show")
                                   ? "green"
                                   : "red",
-                              cursor: role === "admin" ? "pointer" : "default",
+                              cursor:
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                                  ? "pointer"
+                                  : "default",
                             }}
                             onClick={() => {
-                              if (role === "admin") {
+                              if (
+                                role === "admin" ||
+                                (editArticlesCookies === "1" &&
+                                  getArticlesCookies === "1")
+                              ) {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
@@ -830,9 +892,7 @@ const Articles = () => {
                               }
                             }}
                           >
-                            {result?.showWriter === t("show")
-                              ? t("show")
-                              : t("hide")}
+                            {result?.showWriter}
                           </span>
                         </td>
                       )}
@@ -848,17 +908,19 @@ const Articles = () => {
                                 formik.setValues(result);
                               }}
                             />
-                            {role === "admin" && (
-                              <>
-                                <FaEdit
-                                  className="edit-btn"
-                                  onClick={() => handleEdit(result)}
-                                />
-                                <MdDeleteOutline
-                                  className="delete-btn"
-                                  onClick={() => handleDelete(result)}
-                                />
-                              </>
+                            {(role === "admin" ||
+                              editArticlesCookies === "1") && (
+                              <FaEdit
+                                className="edit-btn"
+                                onClick={() => handleEdit(result)}
+                              />
+                            )}
+                            {(role === "admin" ||
+                              deleteArticlesCookies === "1") && (
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
                             )}
                           </span>
                         </td>
@@ -870,7 +932,9 @@ const Articles = () => {
             )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (getArticlesCookies === "1" && editArticlesCookies === "1") ||
+        (addArticlesCookies === "1" && getArticlesCookies === "1")) && (
         <>
           {/* Add/Edit Article */}
           <Modal
