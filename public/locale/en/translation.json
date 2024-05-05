@@ -63,9 +63,9 @@
   "searchAudio": " by Title, Category, Elder, Content or Activation",
   "searchAudioMostListening": "Title, Elder, Content, Activation or Listening Count",
   "searchArticle": "Title, Category, Writer, Content or Activation",
-  "searchBook": "Title, Main Category, Sub Main Category, Sub Sub Category, Content or Activation",
+  "searchBook": "Title, Main Category, Sub Category, Sub Sub Category, Content or Activation",
   "searchImage": "Category, Content or Activation",
-  "searchSubCategoryBook": "Category",
+  "searchSubCategoryBook": "Sub Category or Main Category",
   "searchMainCategoryBook": "Category",
   "searchSubSubCategoryBook": "Sub Category or Main Sub Category",
   "searchCategoryImage": "Category Image",
@@ -391,7 +391,7 @@
     "addTitle": "Add Main For Sub Category Book",
     "editTitle": "Edit Main For Sub Category Book",
     "columns": {
-      "category": "Category",
+      "category": "Sub Category",
       "mainCategory": "Main Category"
     }
   },
