@@ -60,6 +60,10 @@ const IntroductionPage = () => {
     currentPage: 1,
   });
   const role = Cookies.get("_role");
+  const getIntroductionPagesCookies = Cookies.get("GetIntroductionPage");
+  const addIntroductionPagesCookies = Cookies.get("addIntroductionPage");
+  const editIntroductionPagesCookies = Cookies.get("editIntroductionPage");
+  const deleteIntroductionPagesCookies = Cookies.get("deleteIntroductionPage");
   const lng = Cookies.get("i18next") || "ar";
   // Change Language
   useEffect(() => {
@@ -117,7 +121,13 @@ const IntroductionPage = () => {
     },
     validationSchema: validationSchema.introductionPage,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addIntroductionPagesCookies === "1" &&
+          getIntroductionPagesCookies === "1") ||
+        (editIntroductionPagesCookies === "1" &&
+          getIntroductionPagesCookies === "1")
+      ) {
         const formData = new FormData();
         formData.append("title", values.title);
         formData.append("body", values.description);
@@ -132,6 +142,7 @@ const IntroductionPage = () => {
             if (!res.error) {
               setToggle({
                 ...toggle,
+                add: !toggle.add,
                 edit: !toggle.edit,
               });
               formik.handleReset();
@@ -139,6 +150,7 @@ const IntroductionPage = () => {
               dispatch(getIntroductionPageApi());
             } else {
               toast.error(t("toast.introductionPage.updatedError"));
+              dispatch(getIntroductionPageApi());
             }
           });
         } else {
@@ -153,6 +165,7 @@ const IntroductionPage = () => {
               dispatch(getIntroductionPageApi());
             } else {
               toast.error(t("toast.introductionPage.addedError"));
+              dispatch(getIntroductionPageApi());
             }
           });
         }
@@ -173,7 +186,6 @@ const IntroductionPage = () => {
 
   // Handle Edit Introduction Page
   const handleEdit = (introductionPage) => {
-    console.log(introductionPage);
     formik.setValues({
       ...formik.values,
       id: introductionPage?.id,
@@ -194,7 +206,7 @@ const IntroductionPage = () => {
 
   // Delete Picture
   const handleDelete = (picture) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteIntroductionPagesCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + picture?.title + "?",
         text: t("textDeleteAlert"),
@@ -238,15 +250,45 @@ const IntroductionPage = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getIntroductionPageApi());
+      if (role === "admin" || getIntroductionPagesCookies === "1") {
+        dispatch(getIntroductionPageApi());
+      }
+      if (getIntroductionPagesCookies === "0") {
+        Cookies.set("addIntroductionPage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editIntroductionPage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteIntroductionPage", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch]);
+  }, [
+    dispatch,
+    role,
+    getIntroductionPagesCookies,
+    addIntroductionPagesCookies,
+    editIntroductionPagesCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addIntroductionPagesCookies === "1" &&
+          getIntroductionPagesCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -472,28 +514,30 @@ const IntroductionPage = () => {
                             handleEdit(result);
                             setToggle({
                               ...toggle,
-                              add: !toggle.add,
                               view: !toggle.view,
                             });
                           }}
                         />
-                        {role === "admin" && (
-                          <>
-                            <FaEdit
-                              className="edit-btn"
-                              onClick={() => {
-                                handleEdit(result);
-                                setToggle({
-                                  ...toggle,
-                                  add: !toggle.add,
-                                });
-                              }}
-                            />
-                            <MdDeleteOutline
-                              className="delete-btn"
-                              onClick={() => handleDelete(result)}
-                            />
-                          </>
+                        {(role === "admin" ||
+                          editIntroductionPagesCookies === "1") && (
+                          <FaEdit
+                            className="edit-btn"
+                            onClick={() => {
+                              handleEdit(result);
+                              setToggle({
+                                ...toggle,
+                                add: !toggle.add,
+                              });
+                            }}
+                          />
+                        )}
+
+                        {(role === "admin" ||
+                          deleteIntroductionPagesCookies === "1") && (
+                          <MdDeleteOutline
+                            className="delete-btn"
+                            onClick={() => handleDelete(result)}
+                          />
                         )}
                       </span>
                     </td>
@@ -504,13 +548,314 @@ const IntroductionPage = () => {
           )}
         </table>
       </div>
-      {/* Add introductionPage */}
+      {/* Add / Edit introductionPage */}
+      {(role === "admin" ||
+        (getIntroductionPagesCookies === "1" &&
+          editIntroductionPagesCookies === "1") ||
+        (addIntroductionPagesCookies === "1" &&
+          getIntroductionPagesCookies === "1")) && (
+        <Modal
+          isOpen={toggle.add}
+          toggle={() => {
+            setToggle({
+              ...toggle,
+              add: !toggle.add,
+              view: false,
+            });
+            formik.handleReset();
+          }}
+          centered={true}
+          keyboard={true}
+          size={"md"}
+          contentClassName="modal-add-scholar"
+        >
+          <ModalHeader
+            toggle={() => {
+              setToggle({
+                ...toggle,
+                add: !toggle.add,
+                view: false,
+              });
+              formik.handleReset();
+            }}
+          >
+            {formik.values.id && !toggle.view
+              ? t("settings.introductionPage.editTitle")
+              : !toggle.view
+              ? t("settings.introductionPage.addTitle")
+              : lng === "ar" && toggle.view && formik.values.id
+              ? formik.values.title
+              : formik.values.titleEn}
+            <IoMdClose
+              onClick={() => {
+                setToggle({
+                  ...toggle,
+                  add: !toggle.add,
+                  view: false,
+                });
+                formik.handleReset();
+              }}
+            />
+          </ModalHeader>
+          <ModalBody>
+            <form className="overlay-form" onSubmit={formik.handleSubmit}>
+              <Row className="d-flex justify-content-center align-items-center mb-3">
+                <Col
+                  lg={5}
+                  className="d-flex flex-column justify-content-center align-items-center"
+                >
+                  <div className="image-preview-container d-flex justify-content-center align-items-center">
+                    <label
+                      htmlFor={formik.values.image.preview ? "" : "image"}
+                      className="form-label d-flex justify-content-center align-items-center"
+                    >
+                      <img
+                        src={
+                          formik.values.image && formik.values.image.preview
+                            ? formik.values.image.preview
+                            : anonymous
+                        }
+                        alt="avatar"
+                        className="image-preview"
+                        onClick={() =>
+                          formik.values.image && formik.values.image.preview
+                            ? setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            : ""
+                        }
+                      />
+                      <Modal
+                        isOpen={toggle.imagePreview}
+                        toggle={() =>
+                          setToggle({
+                            ...toggle,
+                            imagePreview: !toggle.imagePreview,
+                          })
+                        }
+                        centered={true}
+                        keyboard={true}
+                        size={"md"}
+                        contentClassName="modal-preview-image modal-add-scholar"
+                      >
+                        <ModalHeader
+                          toggle={() =>
+                            setToggle({
+                              ...toggle,
+                              imagePreview: !toggle.imagePreview,
+                            })
+                          }
+                        >
+                          <IoMdClose
+                            onClick={() =>
+                              setToggle({
+                                ...toggle,
+                                imagePreview: !toggle.imagePreview,
+                              })
+                            }
+                          />
+                        </ModalHeader>
+                        <ModalBody className="d-flex flex-wrap justify-content-center align-items-center">
+                          <img
+                            src={
+                              formik.values.image && formik.values.image.preview
+                                ? formik.values.image.preview
+                                : anonymous
+                            }
+                            alt="avatar"
+                            className="image-preview"
+                          />
+                        </ModalBody>
+                        <ModalFooter className="p-md-4 p-2">
+                          <div className="form-group-container d-flex justify-content-center align-items-center">
+                            <button
+                              className="delete-btn cancel-btn"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  imagePreview: !toggle.imagePreview,
+                                });
+                                formik.setFieldValue("image", {
+                                  file: "",
+                                  preview: "",
+                                });
+                              }}
+                            >
+                              {t("delete")}
+                            </button>
+                          </div>
+                        </ModalFooter>
+                      </Modal>
+                    </label>
+                  </div>
+                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
+                    <label htmlFor="image" className="form-label">
+                      <ImUpload /> {t("chooseImage")}
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="form-input form-img-input"
+                      id="image"
+                      onChange={handleImageChange}
+                    />
+                  </div>
+                  {formik.errors.image && formik.touched.image ? (
+                    <span className="error text-center">
+                      {formik.errors.image}
+                    </span>
+                  ) : null}
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center align-items-center ps-3 pe-3">
+                <Col lg={6}>
+                  <div
+                    className="form-group-container d-flex flex-column align-items-end mb-3"
+                    style={{ marginTop: "-4px" }}
+                  >
+                    <label htmlFor="titleEn" className="form-label">
+                      {t("settings.introductionPage.columns.title.en")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input w-100"
+                      id="titleEn"
+                      placeholder={t(
+                        "settings.introductionPage.columns.title.en"
+                      )}
+                      name="titleEn"
+                      disabled={toggle.view}
+                      value={formik.values.titleEn}
+                      onChange={formik.handleChange}
+                    />
+                    {formik.errors.titleEn && formik.touched.titleEn ? (
+                      <span className="error">{formik.errors.titleEn}</span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={6}>
+                  <div
+                    className="form-group-container d-flex flex-column align-items-end mb-3"
+                    style={{ marginTop: "-4px" }}
+                  >
+                    <label htmlFor="title" className="form-label">
+                      {t("settings.introductionPage.columns.title.ar")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input w-100"
+                      id="title"
+                      placeholder={t(
+                        "settings.introductionPage.columns.title.ar"
+                      )}
+                      name="title"
+                      disabled={toggle.view}
+                      value={formik.values.title}
+                      onChange={formik.handleChange}
+                    />
+                    {formik.errors.title && formik.touched.title ? (
+                      <span className="error">{formik.errors.title}</span>
+                    ) : null}
+                  </div>
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
+                <Col lg={6}>
+                  <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                    <label htmlFor="descriptionEn" className="form-label">
+                      {t("settings.introductionPage.columns.description.en")}
+                    </label>
+                    <textarea
+                      className="form-input"
+                      id="descriptionEn"
+                      placeholder={t(
+                        "settings.introductionPage.columns.description.en"
+                      )}
+                      name="descriptionEn"
+                      disabled={toggle.view}
+                      value={formik.values.descriptionEn}
+                      onChange={formik.handleChange}
+                    ></textarea>
+                    {formik.errors.descriptionEn &&
+                    formik.touched.descriptionEn ? (
+                      <span className="error">
+                        {formik.errors.descriptionEn}
+                      </span>
+                    ) : null}
+                  </div>
+                </Col>
+                <Col lg={6}>
+                  <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                    <label htmlFor="description" className="form-label">
+                      {t("settings.introductionPage.columns.description.ar")}
+                    </label>
+                    <textarea
+                      className="form-input"
+                      id="description"
+                      placeholder={t(
+                        "settings.introductionPage.columns.description.ar"
+                      )}
+                      name="description"
+                      disabled={toggle.view}
+                      value={formik.values.description}
+                      onChange={formik.handleChange}
+                    ></textarea>
+                    {formik.errors.description && formik.touched.description ? (
+                      <span className="error">{formik.errors.description}</span>
+                    ) : null}
+                  </div>
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
+                    {!toggle.view && (
+                      <button
+                        type="submit"
+                        className={`add-btn${loading ? " loading-btn" : ""}`}
+                      >
+                        {/* loading */}
+                        {loading ? (
+                          <span
+                            className="spinner-border spinner-border-sm"
+                            role="status"
+                            aria-hidden="true"
+                          ></span>
+                        ) : formik.values.id ? (
+                          t("edit")
+                        ) : (
+                          t("add")
+                        )}
+                      </button>
+                    )}
+                    <button
+                      type="button"
+                      className="cancel-btn"
+                      onClick={() => {
+                        setToggle({
+                          ...toggle,
+                          add: !toggle.add,
+                          view: false,
+                        });
+                        formik.handleReset();
+                      }}
+                    >
+                      {t("cancel")}
+                    </button>
+                  </div>
+                </Col>
+              </Row>
+            </form>
+          </ModalBody>
+        </Modal>
+      )}
+      {/* View introductionPage */}
       <Modal
-        isOpen={toggle.add}
+        isOpen={toggle.view}
         toggle={() => {
           setToggle({
             ...toggle,
-            add: !toggle.add,
             view: false,
           });
           formik.handleReset();
@@ -524,24 +869,20 @@ const IntroductionPage = () => {
           toggle={() => {
             setToggle({
               ...toggle,
-              add: !toggle.add,
               view: false,
             });
             formik.handleReset();
           }}
         >
-          {formik.values.id && !toggle.view
-            ? t("settings.introductionPage.editTitle")
-            : !toggle.view
-            ? t("settings.introductionPage.addTitle")
-            : lng === "ar" && toggle.view && formik.values.id
-            ? formik.values.title
-            : formik.values.titleEn}
+          {toggle.view && formik.values.id
+            ? lng === "ar"
+              ? formik.values.title
+              : formik.values.titleEn
+            : null}
           <IoMdClose
             onClick={() => {
               setToggle({
                 ...toggle,
-                add: !toggle.add,
                 view: false,
               });
               formik.handleReset();
@@ -618,49 +959,9 @@ const IntroductionPage = () => {
                           className="image-preview"
                         />
                       </ModalBody>
-                      {!toggle.view && (
-                        <ModalFooter className="p-md-4 p-2">
-                          <div className="form-group-container d-flex justify-content-center align-items-center">
-                            <button
-                              className="delete-btn cancel-btn"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  imagePreview: !toggle.imagePreview,
-                                });
-                                formik.setFieldValue("image", {
-                                  file: "",
-                                  preview: "",
-                                });
-                              }}
-                            >
-                              {t("delete")}
-                            </button>
-                          </div>
-                        </ModalFooter>
-                      )}
                     </Modal>
                   </label>
                 </div>
-                {!toggle.view && (
-                  <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse">
-                    <label htmlFor="image" className="form-label">
-                      <ImUpload /> {t("chooseImage")}
-                    </label>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="form-input form-img-input"
-                      id="image"
-                      onChange={handleImageChange}
-                    />
-                  </div>
-                )}
-                {formik.errors.image && formik.touched.image ? (
-                  <span className="error text-center">
-                    {formik.errors.image}
-                  </span>
-                ) : null}
               </Col>
             </Row>
             <Row className="d-flex justify-content-center align-items-center ps-3 pe-3">
@@ -763,25 +1064,6 @@ const IntroductionPage = () => {
             <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
               <Col lg={12}>
                 <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3">
-                  {!toggle.view && (
-                    <button
-                      type="submit"
-                      className={`add-btn${loading ? " loading-btn" : ""}`}
-                    >
-                      {/* loading */}
-                      {loading ? (
-                        <span
-                          className="spinner-border spinner-border-sm"
-                          role="status"
-                          aria-hidden="true"
-                        ></span>
-                      ) : formik.values.id ? (
-                        t("edit")
-                      ) : (
-                        t("add")
-                      )}
-                    </button>
-                  )}
                   <button
                     type="button"
                     className="cancel-btn"
