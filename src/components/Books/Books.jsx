@@ -20,9 +20,7 @@ import {
   addBookApi,
   updateBookApi,
   deleteBookApi,
-  getBooksSubSubCategoriesApi,
-  getBooksCategoriesApi,
-  getBooksSubCategoriesApi,
+  getAllCategoriesApi,
 } from "../../store/slices/bookSlice";
 import { useFormik } from "formik";
 import Swal from "sweetalert2";
@@ -70,14 +68,13 @@ const Books = () => {
   const { validationSchema } = useSchema();
   const fileRef = useRef();
   const role = Cookies.get("_role");
-  const {
-    books,
-    bookCategories,
-    bookSubCategories,
-    bookSubSubCategories,
-    loading,
-    error,
-  } = useSelector((state) => state.book);
+  const getBooksCookies = Cookies.get("GetBook");
+  const addBooksCookies = Cookies.get("addBook");
+  const editBooksCookies = Cookies.get("editBook");
+  const deleteBooksCookies = Cookies.get("deleteBook");
+  const { books, bookCategories, allCategories, loading, error } = useSelector(
+    (state) => state.book
+  );
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
@@ -122,17 +119,9 @@ const Books = () => {
   const allDataWithCategoriesObj = books?.map((book) => {
     return {
       ...book,
-      categories: book?.Sup_Sup_categories[0],
-      sub_categories: {
-        id: 1,
-        title: "Sub Category",
-      },
-      main_categories: {
-        id: 1,
-        title: "Main Category",
-      },
-      // sub_categories: book?.Sup_Main_categories[0],
-      // main_categories: book?.Main_categories[0],
+      categories: book?.MainCategory,
+      subCategories: book?.BooksCategories,
+      subSubCategories: book?.Sup_Sup_categories[0],
       status: book?.status === "public" ? t("public") : t("private"),
       is_active: book?.is_active === 1 ? t("active") : t("inactive"),
       number_pages: book?.number_pages === null ? 0 : book?.number_pages,
@@ -157,8 +146,16 @@ const Books = () => {
     { id: 0, name: "id", label: t("index") },
     { id: 1, name: "image", label: t("books.columns.book.image") },
     { id: 2, name: "title", label: t("books.columns.book.title") },
-    { id: 3, name: "category", label: t("books.columns.book.category") },
-    { id: 4, name: "subCategory", label: t("books.columns.book.subCategory") },
+    {
+      id: 3,
+      name: "category",
+      label: t("books.columns.book.category"),
+    },
+    {
+      id: 4,
+      name: "subCategory",
+      label: t("books.columns.book.subCategory"),
+    },
     {
       id: 5,
       name: "subSubCategory",
@@ -175,8 +172,11 @@ const Books = () => {
   ];
 
   const onSubmit = (values) => {
-    console.log(values);
-    if (role === "admin") {
+    if (
+      role === "admin" ||
+      (addBooksCookies === "1" && getBooksCookies === "1") ||
+      (editBooksCookies === "1" && getBooksCookies === "1")
+    ) {
       if (!values.id) {
         // Add Book
         dispatch(
@@ -196,8 +196,12 @@ const Books = () => {
               ...toggle,
               add: !toggle.add,
               edit: false,
+              bookMainCategory: false,
+              bookSubCategory: false,
+              bookCategory: false,
               is_active: false,
               status: false,
+              pdf: null,
             });
             formik.handleReset();
             toast.success(t("toast.book.addedSuccess"));
@@ -230,10 +234,14 @@ const Books = () => {
             dispatch(getBooksApi());
             setToggle({
               ...toggle,
-              edit: !toggle.edit,
               add: !toggle.add,
+              edit: false,
+              bookMainCategory: false,
+              bookSubCategory: false,
+              bookCategory: false,
               is_active: false,
               status: false,
+              pdf: null,
             });
             formik.handleReset();
             toast.success(t("toast.book.updatedSuccess"));
@@ -326,6 +334,7 @@ const Books = () => {
 
   // handle Edit
   const handleEdit = (book) => {
+    console.log(book);
     formik.setValues(book);
     formik.setFieldValue("title", book?.name);
     formik.setFieldValue(
@@ -335,8 +344,16 @@ const Books = () => {
     formik.setFieldValue("number_pages", book?.number_pages);
     formik.setFieldValue("is_active", book?.is_active === t("active") ? 1 : 0);
     formik.setFieldValue("bookCategory", {
+      title: book?.subSubCategories?.title,
+      id: book?.subSubCategories?.id,
+    });
+    formik.setFieldValue("bookMainCategory", {
       title: book?.categories?.title,
-      id: book?.category?.id,
+      id: book?.categories?.id,
+    });
+    formik.setFieldValue("bookSubCategory", {
+      title: book?.subCategories?.title,
+      id: book?.subCategories?.id,
     });
     formik.setFieldValue("image", {
       file: "",
@@ -354,7 +371,7 @@ const Books = () => {
 
   // Delete Book
   const handleDelete = (book) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteBooksCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + book?.name + "?",
         text: t("textDeleteAlert"),
@@ -400,27 +417,62 @@ const Books = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksApi());
-      if (role === "admin") {
-        dispatch(getBooksCategoriesApi());
-        dispatch(getBooksSubCategoriesApi());
-        dispatch(getBooksSubSubCategoriesApi());
+      if (role === "admin" || getBooksCookies === "1") {
+        dispatch(getBooksApi());
+      }
+      if (
+        role === "admin" ||
+        addBooksCookies === "1" ||
+        editBooksCookies === "1"
+      ) {
+        dispatch(getAllCategoriesApi());
+      }
+      if (getBooksCookies === "0") {
+        Cookies.set("addBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteBook", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
       }
     } catch (error) {
       console.log(error);
     }
-  }, [dispatch, role]);
+  }, [dispatch, role, getBooksCookies, addBooksCookies, editBooksCookies]);
 
   // Formik
   const formik = useFormik({
     initialValues,
-    // validationSchema: validationSchema.book,
+    validationSchema: validationSchema.book,
     onSubmit,
   });
 
+  // Get Sub Categories from allCategories by id main category
+  const subCategories = allCategories?.filter(
+    (item) => item.random_id === formik.values?.bookMainCategory?.id
+  );
+  const subCategoriesData = subCategories[0];
+  const subData = subCategoriesData?.sub_categories;
+  const subSubData = subData?.filter(
+    (item) => item.random_id === formik.values?.bookSubCategory?.id
+  );
+
   return (
     <div className="book-container scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addBooksCookies === "1" && getBooksCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -479,8 +531,8 @@ const Books = () => {
                 toggle.activeColumn ? "active" : ""
               }`}
               style={{
-                width: "180px",
-                maxHeight: "160px",
+                width: "220px",
+                maxHeight: "200px",
               }}
             >
               {columns.map((column) => (
@@ -762,12 +814,12 @@ const Books = () => {
                     )}
                     {toggle.toggleColumns.subCategory && (
                       <td className="table-td">
-                        {result?.sub_categories?.title}
+                        {result?.subCategories?.title}
                       </td>
                     )}
                     {toggle.toggleColumns.subSubCategory && (
                       <td className="table-td">
-                        {result?.main_categories?.title}
+                        {result?.subSubCategories?.title}
                       </td>
                     )}
                     {toggle.toggleColumns.pages && (
@@ -791,15 +843,20 @@ const Books = () => {
                           className="table-status badge"
                           style={{
                             backgroundColor:
-                              result?.status === t("public")
-                                ? "green"
-                                : result?.status === t("private")
-                                ? "red"
-                                : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                              result?.status === t("public") ? "green" : "red",
+                            cursor:
+                              role === "admin" ||
+                              (editBooksCookies === "1" &&
+                                getBooksCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editBooksCookies === "1" &&
+                                getBooksCookies === "1")
+                            ) {
                               const data = {
                                 id: result.id,
                                 name: result.name,
@@ -824,11 +881,7 @@ const Books = () => {
                             }
                           }}
                         >
-                          {result?.status === t("public")
-                            ? t("public")
-                            : result?.status === t("private")
-                            ? t("private")
-                            : t("private")}
+                          {result?.status}
                         </span>
                       </td>
                     )}
@@ -840,13 +893,20 @@ const Books = () => {
                             backgroundColor:
                               result?.is_active === t("active")
                                 ? "green"
-                                : result?.is_active === t("inactive")
-                                ? "red"
                                 : "red",
-                            cursor: role === "admin" ? "pointer" : "default",
+                            cursor:
+                              role === "admin" ||
+                              (editBooksCookies === "1" &&
+                                getBooksCookies === "1")
+                                ? "pointer"
+                                : "default",
                           }}
                           onClick={() => {
-                            if (role === "admin") {
+                            if (
+                              role === "admin" ||
+                              (editBooksCookies === "1" &&
+                                getBooksCookies === "1")
+                            ) {
                               const data = {
                                 id: result.id,
                                 name: result.name,
@@ -871,11 +931,7 @@ const Books = () => {
                             }
                           }}
                         >
-                          {result?.is_active === t("active")
-                            ? t("active")
-                            : result?.is_active === t("inactive")
-                            ? t("inactive")
-                            : t("inactive")}
+                          {result?.is_active}
                         </span>
                       </td>
                     )}
@@ -893,17 +949,17 @@ const Books = () => {
                           >
                             <IoMdEye className="view-btn" />
                           </a>
-                          {role === "admin" && (
-                            <>
-                              <FaEdit
-                                className="edit-btn"
-                                onClick={() => handleEdit(result)}
-                              />
-                              <MdDeleteOutline
-                                className="delete-btn"
-                                onClick={() => handleDelete(result)}
-                              />
-                            </>
+                          {(role === "admin" || editBooksCookies === "1") && (
+                            <FaEdit
+                              className="edit-btn"
+                              onClick={() => handleEdit(result)}
+                            />
+                          )}
+                          {(role === "admin" || deleteBooksCookies === "1") && (
+                            <MdDeleteOutline
+                              className="delete-btn"
+                              onClick={() => handleDelete(result)}
+                            />
                           )}
                         </span>
                       </td>
@@ -915,7 +971,9 @@ const Books = () => {
         </table>
       </div>
       {/* Add/Edit Book */}
-      {role === "admin" && (
+      {(role === "admin" ||
+        (getBooksCookies === "1" && editBooksCookies === "1") ||
+        (addBooksCookies === "1" && getBooksCookies === "1")) && (
         <Modal
           isOpen={toggle.add}
           toggle={() => {
@@ -923,6 +981,9 @@ const Books = () => {
               ...toggle,
               add: !toggle.add,
               edit: false,
+              bookMainCategory: false,
+              bookSubCategory: false,
+              bookCategory: false,
               is_active: false,
               status: false,
               pdf: null,
@@ -940,6 +1001,9 @@ const Books = () => {
                 ...toggle,
                 add: !toggle.add,
                 edit: false,
+                bookMainCategory: false,
+                bookSubCategory: false,
+                bookCategory: false,
                 is_active: false,
                 status: false,
                 pdf: null,
@@ -956,6 +1020,9 @@ const Books = () => {
                   ...toggle,
                   add: !toggle.add,
                   edit: false,
+                  bookMainCategory: false,
+                  bookSubCategory: false,
+                  bookCategory: false,
                   is_active: false,
                   status: false,
                   pdf: null,
@@ -1245,8 +1312,11 @@ const Books = () => {
                           }}
                           className="dropdown-btn dropdown-btn-book-category d-flex justify-content-between align-items-center"
                         >
-                          {formik.values.bookSubCategory?.title
+                          {formik.values.bookSubCategory?.title &&
+                          subCategoriesData?.sub_categories?.length !== 0
                             ? formik.values.bookSubCategory?.title
+                            : subCategoriesData?.sub_categories?.length === 0
+                            ? t("noData")
                             : t("chooseCategory")}
                           <TiArrowSortedUp
                             className={`dropdown-icon ${
@@ -1259,17 +1329,17 @@ const Books = () => {
                             toggle.bookSubCategory ? "active" : ""
                           }`}
                         >
-                          {bookSubCategories?.map((category) => (
+                          {subData?.map((category) => (
                             <button
                               type="button"
-                              key={category?.id}
+                              key={category?.random_id}
                               className={`item ${
                                 formik.values.bookSubCategory?.id ===
-                                category?.id
+                                category?.random_id
                                   ? "active"
                                   : ""
                               }`}
-                              value={category?.id}
+                              value={category?.random_id}
                               name="bookSubCategory"
                               onClick={() => {
                                 setToggle({
@@ -1278,7 +1348,7 @@ const Books = () => {
                                 });
                                 formik.setFieldValue("bookSubCategory", {
                                   title: category.title,
-                                  id: category?.id,
+                                  id: category?.random_id,
                                 });
                               }}
                             >
@@ -1317,6 +1387,8 @@ const Books = () => {
                         >
                           {formik.values.bookCategory?.title
                             ? formik.values.bookCategory?.title
+                            : subSubData[0]?.sub_books_categories?.length === 0
+                            ? t("noData")
                             : t("chooseCategory")}
                           <TiArrowSortedUp
                             className={`dropdown-icon ${
@@ -1329,31 +1401,34 @@ const Books = () => {
                             toggle.bookCategory ? "active" : ""
                           }`}
                         >
-                          {bookSubSubCategories?.map((category) => (
-                            <button
-                              type="button"
-                              key={category?.id}
-                              className={`item ${
-                                formik.values.bookCategory?.id === category?.id
-                                  ? "active"
-                                  : ""
-                              }`}
-                              value={category?.id}
-                              name="bookCategory"
-                              onClick={() => {
-                                setToggle({
-                                  ...toggle,
-                                  bookCategory: !toggle.bookCategory,
-                                });
-                                formik.setFieldValue("bookCategory", {
-                                  title: category.title,
-                                  id: category?.id,
-                                });
-                              }}
-                            >
-                              {category.title}
-                            </button>
-                          ))}
+                          {subSubData[0]?.sub_books_categories?.map(
+                            (category) => (
+                              <button
+                                type="button"
+                                key={category?.random_id}
+                                className={`item ${
+                                  formik.values.bookCategory?.id ===
+                                  category?.random_id
+                                    ? "active"
+                                    : ""
+                                }`}
+                                value={category?.random_id}
+                                name="bookCategory"
+                                onClick={() => {
+                                  setToggle({
+                                    ...toggle,
+                                    bookCategory: !toggle.bookCategory,
+                                  });
+                                  formik.setFieldValue("bookCategory", {
+                                    title: category.title,
+                                    id: category?.random_id,
+                                  });
+                                }}
+                              >
+                                {category.title}
+                              </button>
+                            )
+                          )}
                         </div>
                       </div>
                       {formik.errors.bookCategory?.title &&
@@ -1542,6 +1617,9 @@ const Books = () => {
                           ...toggle,
                           add: !toggle.add,
                           edit: false,
+                          bookMainCategory: false,
+                          bookSubCategory: false,
+                          bookCategory: false,
                           is_active: false,
                           status: false,
                           pdf: null,
