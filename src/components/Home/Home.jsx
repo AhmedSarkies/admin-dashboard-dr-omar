@@ -15,33 +15,61 @@ import logo from "../../assets/images/logo.jpg";
 import { HiUsers } from "react-icons/hi2";
 import { IoPerson } from "react-icons/io5";
 import { FaBell } from "react-icons/fa";
+import Cookies from "js-cookie";
 
 const Home = () => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
+  const getUserCookies = Cookies.get("GetUser");
+  const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
+  const getSpecialContentCookies = Cookies.get("GetSpecialContent");
+  const getSettingsCookies = Cookies.get("GetSettings");
+  const getIntroductionPageBookCookies = Cookies.get("GetIntroductionPage");
+  const getSubBooksCategoriesCookies = Cookies.get("GetSubBooksCategories");
+  const getMainCategoriesBookCookies = Cookies.get("GetMainCategoriesBook");
+  const getImageCategoriesCookies = Cookies.get("GetImageCategories");
+  const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
+  const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
+  const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
+  const getImageCookies = Cookies.get("GetImage");
+  const getElderCookies = Cookies.get("GetElder");
+  const getBookCookies = Cookies.get("GetBook");
+  const getAudioCookies = Cookies.get("GetAudio");
+  const getArticlesCookies = Cookies.get("GetArticles");
+  const getAdminCookies = Cookies.get("GetAdmin");
+  const getMessageCookies = Cookies.get("GetMessage");
+  const getNotificationCookies = Cookies.get("GetNotification");
+  const [menu, setMenu] = useState(false);
+  const location = useLocation();
   const linkItems = [
     {
       title: t("linkItems.home"),
       path: "/dr-omar/dashboard",
       icon: <IoMdHome />,
+      display: true,
     },
     {
       title: t("linkItems.profile"),
       path: "/dr-omar/profile",
       icon: <IoPerson />,
+      display: true,
     },
     {
       title: t("linkItems.subAdmins"),
       path: "/dr-omar/sub-admins",
       icon: <MdAdminPanelSettings />,
+      display: role === "admin" || (getAdminCookies === "1" && true),
     },
     {
       title: t("linkItems.users"),
       path: "/dr-omar/users",
       icon: <HiUsers />,
+      display: role === "admin" || (getUserCookies === "1" && true),
     },
     {
       title: t("linkItems.settingsApp"),
       path: "/dr-omar/settings",
+      display: role === "admin" || (getSettingsCookies === "1" && true),
     },
     // {
     //   title: t("linkItems.prayerTime"),
@@ -50,14 +78,18 @@ const Home = () => {
     {
       title: t("linkItems.codeContent"),
       path: "/dr-omar/code-content",
+      display: role === "admin" || (getSpecialContentCookies === "1" && true),
     },
     {
       title: t("linkItems.introductionPage"),
       path: "/dr-omar/introduction-page",
+      display:
+        role === "admin" || (getIntroductionPageBookCookies === "1" && true),
     },
     {
       title: t("linkItems.termsAndConditions"),
       path: "/dr-omar/terms&conditions",
+      display: role === "admin" || (getTermsConditionsCookies === "1" && true),
     },
     // {
     //   title: t("linkItems.links"),
@@ -66,61 +98,77 @@ const Home = () => {
     {
       title: t("linkItems.mainCategoriesBooks"),
       path: "/dr-omar/main-categories-book",
+      display:
+        role === "admin" || (getMainCategoriesBookCookies === "1" && true),
     },
     {
       title: t("linkItems.subCategoriesBooks"),
       path: "/dr-omar/sub-main-categories-book",
+      display:
+        role === "admin" || (getSubBooksCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.subSubCategoriesBooks"),
       path: "/dr-omar/sub-sub-categories-book",
+      display: role === "admin" || (getBooksCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesAudio"),
       path: "/dr-omar/categories-audio",
+      display: role === "admin" || (getAudiosCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesImage"),
       path: "/dr-omar/categories-image",
+      display: role === "admin" || (getImageCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesArticle"),
       path: "/dr-omar/categories-article",
+      display:
+        role === "admin" || (getArticlesCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.elder"),
       path: "/dr-omar/elders",
       icon: <SiGooglescholar />,
+      display: role === "admin" || (getElderCookies === "1" && true),
     },
     {
       title: t("linkItems.books"),
       path: "/dr-omar/books",
       icon: <GiBookshelf />,
+      display: role === "admin" || (getBookCookies === "1" && true),
     },
     {
       title: t("linkItems.audios"),
       path: "/dr-omar/audios",
       icon: <GiSoundWaves />,
+      display: role === "admin" || (getAudioCookies === "1" && true),
     },
     {
       title: t("linkItems.images"),
       path: "/dr-omar/images",
       icon: <SlPicture />,
+      display: role === "admin" || (getImageCookies === "1" && true),
     },
     {
       title: t("linkItems.articles"),
       path: "/dr-omar/articles",
       icon: <MdArticle />,
+      display: role === "admin" || (getArticlesCookies === "1" && true),
     },
     {
       title: t("linkItems.notifications"),
       path: "/dr-omar/notifications",
       icon: <FaBell />,
+      display: role === "admin" || (getNotificationCookies === "1" && true),
     },
     {
       title: t("linkItems.messages"),
       path: "/dr-omar/messages",
       icon: <MdOutlineMarkunread />,
+      display: role === "admin" || (getMessageCookies === "1" && true),
     },
     // {
     //   title: t("linkItems.mostListening"),
@@ -128,8 +176,7 @@ const Home = () => {
     //   icon: <FaAssistiveListeningSystems />,
     // },
   ];
-  const [menu, setMenu] = useState(false);
-  const location = useLocation();
+
   const toggleMenu = () => {
     setMenu(!menu);
   };
