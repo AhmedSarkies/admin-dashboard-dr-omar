@@ -7,6 +7,305 @@ import Http from "../../Http";
 import { useSchema } from "../../hooks";
 import logo from "../../assets/images/logo.jpg";
 
+const permissions = [
+  {
+    id: 15,
+    name: "addAdmin",
+  },
+  {
+    id: 32,
+    name: "addArticles",
+  },
+  {
+    id: 28,
+    name: "addArticlesCategories",
+  },
+  {
+    id: 4,
+    name: "addAudio",
+  },
+  {
+    id: 72,
+    name: "addAudiosCategories",
+  },
+  {
+    id: 52,
+    name: "addBook",
+  },
+  {
+    id: 44,
+    name: "addBooksCategories",
+  },
+  {
+    id: 11,
+    name: "addElder",
+  },
+  {
+    id: 24,
+    name: "addImage",
+  },
+  {
+    id: 20,
+    name: "addImageCategories",
+  },
+  {
+    id: 64,
+    name: "addIntroductionPage",
+  },
+  {
+    id: 40,
+    name: "addMainCategoriesBook",
+  },
+  {
+    id: 36,
+    name: "addMessage",
+  },
+  {
+    id: 68,
+    name: "addNotification",
+  },
+  {
+    id: 60,
+    name: "addSettings",
+  },
+  {
+    id: 8,
+    name: "addSpecialContent",
+  },
+  {
+    id: 48,
+    name: "addSubBooksCategories",
+  },
+  {
+    id: 56,
+    name: "addTermsConditions",
+  },
+  {
+    id: 17,
+    name: "deleteAdmin",
+  },
+  {
+    id: 34,
+    name: "deleteArticles",
+  },
+  {
+    id: 30,
+    name: "deleteArticlesCategories",
+  },
+  {
+    id: 6,
+    name: "deleteAudio",
+  },
+  {
+    id: 74,
+    name: "deleteAudiosCategories",
+  },
+  {
+    id: 54,
+    name: "deleteBook",
+  },
+  {
+    id: 46,
+    name: "deleteBooksCategories",
+  },
+  {
+    id: 13,
+    name: "deleteElder",
+  },
+  {
+    id: 26,
+    name: "deleteImage",
+  },
+  {
+    id: 22,
+    name: "deleteImageCategories",
+  },
+  {
+    id: 66,
+    name: "deleteIntroductionPage",
+  },
+  {
+    id: 42,
+    name: "deleteMainCategoriesBook",
+  },
+  {
+    id: 38,
+    name: "deleteMessage",
+  },
+  {
+    id: 70,
+    name: "deleteNotification",
+  },
+  {
+    id: 62,
+    name: "deleteSettings",
+  },
+  {
+    id: 50,
+    name: "deleteSubBooksCategories",
+  },
+  {
+    id: 58,
+    name: "deleteTermsConditions",
+  },
+  {
+    id: 2,
+    name: "deleteUser",
+  },
+  {
+    id: 16,
+    name: "editAdmin",
+  },
+  {
+    id: 33,
+    name: "editArticles",
+  },
+  {
+    id: 29,
+    name: "editArticlesCategories",
+  },
+  {
+    id: 5,
+    name: "editAudio",
+  },
+  {
+    id: 73,
+    name: "editAudiosCategories",
+  },
+  {
+    id: 53,
+    name: "editBook",
+  },
+  {
+    id: 45,
+    name: "editBooksCategories",
+  },
+  {
+    id: 12,
+    name: "editElder",
+  },
+  {
+    id: 25,
+    name: "editImage",
+  },
+  {
+    id: 21,
+    name: "editImageCategories",
+  },
+  {
+    id: 65,
+    name: "editIntroductionPage",
+  },
+  {
+    id: 41,
+    name: "editMainCategoriesBook",
+  },
+  {
+    id: 37,
+    name: "editMessage",
+  },
+  {
+    id: 69,
+    name: "editNotification",
+  },
+  {
+    id: 61,
+    name: "editSettings",
+  },
+  {
+    id: 9,
+    name: "editSpecialContent",
+  },
+  {
+    id: 49,
+    name: "editSubBooksCategories",
+  },
+  {
+    id: 57,
+    name: "editTermsConditions",
+  },
+  {
+    id: 1,
+    name: "editUser",
+  },
+  {
+    id: 18,
+    name: "GetAdmin",
+  },
+  {
+    id: 31,
+    name: "GetArticles",
+  },
+  {
+    id: 27,
+    name: "GetArticlesCategories",
+  },
+  {
+    id: 7,
+    name: "GetAudio",
+  },
+  {
+    id: 71,
+    name: "GetAudiosCategories",
+  },
+  {
+    id: 51,
+    name: "GetBook",
+  },
+  {
+    id: 43,
+    name: "GetBooksCategories",
+  },
+  {
+    id: 14,
+    name: "GetElder",
+  },
+  {
+    id: 23,
+    name: "GetImage",
+  },
+  {
+    id: 19,
+    name: "GetImageCategories",
+  },
+  {
+    id: 63,
+    name: "GetIntroductionPage",
+  },
+  {
+    id: 39,
+    name: "GetMainCategoriesBook",
+  },
+  {
+    id: 35,
+    name: "GetMessage",
+  },
+  {
+    id: 67,
+    name: "GetNotification",
+  },
+  {
+    id: 59,
+    name: "GetSettings",
+  },
+  {
+    id: 10,
+    name: "GetSpecialContent",
+  },
+  {
+    id: 47,
+    name: "GetSubBooksCategories",
+  },
+  {
+    id: 55,
+    name: "GetTermsConditions",
+  },
+  {
+    id: 3,
+    name: "GetUser",
+  },
+];
+
 const Login = () => {
   const { t } = useTranslation();
   const { validationSchema } = useSchema();
@@ -20,7 +319,23 @@ const Login = () => {
         data: values,
       });
       if (response.status === 200) {
-        Cookies.remove("_auth");
+        // Remove all Cookies using js-cookie and permissions
+        Object.keys(Cookies.get()).map((cookie) => {
+          if (
+            permissions.map((permission) => permission.name).includes(cookie) ||
+            cookie === "_auth" ||
+            cookie === "_user" ||
+            cookie === "_role" ||
+            cookie === "_email" ||
+            cookie === "_phone" ||
+            cookie === "_image" ||
+            cookie === "_active" ||
+            cookie === "_id"
+          ) {
+            Cookies.remove(cookie);
+          }
+          return null;
+        });
         // Set Token in Cookies
         Cookies.set("_auth", response.data.data.token, {
           expires: 30,
@@ -71,6 +386,14 @@ const Login = () => {
           sameSite: "strict",
           path: "/",
         });
+        response.data.data.permissions.map((permission) =>
+          Cookies.set(permission, 1, {
+            expires: 30,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+          })
+        );
         setLoading(false);
         window.location.href = "/dr-omar/dashboard";
       }
