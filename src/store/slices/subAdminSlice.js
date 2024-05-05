@@ -4,6 +4,8 @@ import Http from "../../Http";
 // Initial State
 const initialState = {
   subAdmins: [],
+  permissions: [],
+  adminData: [],
   loading: false,
   error: null,
 };
@@ -104,6 +106,38 @@ export const changePassword = createAsyncThunk(
   }
 );
 
+// Get Permissions using Axios and Redux Thunk
+export const getPermissions = createAsyncThunk(
+  "subAdmin/getPermissions",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "GET",
+        url: "/admin/GetPermission",
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Get Admin Data using Axios and Redux Thunk
+export const getAdminData = createAsyncThunk(
+  "subAdmin/getAdminData",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "GET",
+        url: "/admin/getAdminData",
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 // SubAdmins Slice
 const subAdminSlice = createSlice({
   name: "subAdmin",
@@ -179,6 +213,38 @@ const subAdminSlice = createSlice({
     });
     // Rejected
     builder.addCase(changePassword.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Get Permissions======
+    // Pending
+    builder.addCase(getPermissions.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getPermissions.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = null;
+      state.permissions = action.payload;
+    });
+    // Rejected
+    builder.addCase(getPermissions.rejected, (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Get Admin Data======
+    // Pending
+    builder.addCase(getAdminData.pending, (state, action) => {
+      state.loading = true;
+    });
+    // Fulfilled
+    builder.addCase(getAdminData.fulfilled, (state, action) => {
+      state.loading = false;
+      state.error = null;
+      state.adminData = action.payload.data;
+    });
+    // Rejected
+    builder.addCase(getAdminData.rejected, (state, action) => {
       state.loading = false;
       state.error = action.payload;
     });
