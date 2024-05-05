@@ -22,6 +22,12 @@ import Cookies from "js-cookie";
 const SubSubCategoriesBook = () => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
+  const getSubSubCategoriesBooksCookies = Cookies.get("GetBooksCategories");
+  const addSubSubCategoriesBooksCookies = Cookies.get("addBooksCategories");
+  const editSubSubCategoriesBooksCookies = Cookies.get("editBooksCategories");
+  const deleteSubSubCategoriesBooksCookies = Cookies.get(
+    "deleteBooksCategories"
+  );
   const dispatch = useDispatch();
   const { validationSchema } = useSchema();
   const { bookSubSubCategories, bookSubCategories, loading, error } =
@@ -86,12 +92,19 @@ const SubSubCategoriesBook = () => {
       ? validationSchema.editBookSubCategory
       : validationSchema.bookSubCategory,
     onSubmit: (values) => {
-      if (role === "admin") {
+      if (
+        role === "admin" ||
+        (addSubSubCategoriesBooksCookies === "1" &&
+          getSubSubCategoriesBooksCookies === "1") ||
+        (editSubSubCategoriesBooksCookies === "1" &&
+          getSubSubCategoriesBooksCookies === "1")
+      ) {
         if (values.isEditing) {
           dispatch(
             updateBookSubSubCategoryApi({
               title: values.title,
               sub_category_id: values.id,
+              sub_main_category_id: values.BooksCategories.id,
             })
           ).then((res) => {
             if (!res.error) {
@@ -143,7 +156,7 @@ const SubSubCategoriesBook = () => {
 
   // Delete Book Category
   const handleDelete = (bookSubCategory) => {
-    if (role === "admin") {
+    if (role === "admin" || deleteSubSubCategoriesBooksCookies === "1") {
       Swal.fire({
         title: t("titleDeleteAlert") + bookSubCategory?.title + "?",
         text: t("textDeleteAlert"),
@@ -194,11 +207,42 @@ const SubSubCategoriesBook = () => {
   // get data from api
   useEffect(() => {
     try {
-      dispatch(getBooksSubSubCategoriesApi());
-      if (role === "admin") {
+      if (role === "admin" || getSubSubCategoriesBooksCookies === "1") {
+        dispatch(getBooksSubSubCategoriesApi());
+      }
+      if (
+        role === "admin" ||
+        addSubSubCategoriesBooksCookies === "1" ||
+        editSubSubCategoriesBooksCookies === "1"
+      ) {
         dispatch(getBooksSubCategoriesApi());
       }
-      if (role !== "admin") {
+      if (getSubSubCategoriesBooksCookies === "0") {
+        Cookies.set("addBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("editBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("deleteBooksCategories", 0, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+      }
+      if (
+        role !== "admin" &&
+        addSubSubCategoriesBooksCookies === "0" &&
+        editSubSubCategoriesBooksCookies === "0" &&
+        deleteSubSubCategoriesBooksCookies === "0"
+      ) {
         setToggle({
           ...toggle,
           toggleColumns: {
@@ -211,11 +255,20 @@ const SubSubCategoriesBook = () => {
       console.log(error);
     }
     // eslint-disable-next-line
-  }, [dispatch, role]);
+  }, [
+    dispatch,
+    role,
+    getSubSubCategoriesBooksCookies,
+    addSubSubCategoriesBooksCookies,
+    editSubSubCategoriesBooksCookies,
+    deleteSubSubCategoriesBooksCookies,
+  ]);
 
   return (
     <div className="scholar-container mt-4 m-sm-3 m-0">
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addSubSubCategoriesBooksCookies === "1" &&
+          getSubSubCategoriesBooksCookies === "1")) && (
         <div className="table-header">
           <button
             className="add-btn"
@@ -331,25 +384,43 @@ const SubSubCategoriesBook = () => {
                   ) : null}
                 </th>
               )}
-              {role === "admin" && toggle.toggleColumns.control && (
-                <th className="table-th" onClick={() => handleSort(columns[3])}>
-                  {t("action")}
-                  {toggle.sortColumn === columns[3].name ? (
-                    toggle.sortOrder === "asc" ? (
-                      <TiArrowSortedUp />
-                    ) : (
-                      <TiArrowSortedDown />
-                    )
-                  ) : null}
-                </th>
-              )}
+              {(role === "admin" ||
+                (addSubSubCategoriesBooksCookies === "1" &&
+                  getSubSubCategoriesBooksCookies === "1") ||
+                role === "admin" ||
+                (editSubSubCategoriesBooksCookies === "1" &&
+                  getSubSubCategoriesBooksCookies === "1")) &&
+                toggle.toggleColumns.control && (
+                  <th
+                    className="table-th"
+                    onClick={() => handleSort(columns[3])}
+                  >
+                    {t("action")}
+                    {toggle.sortColumn === columns[3].name ? (
+                      toggle.sortOrder === "asc" ? (
+                        <TiArrowSortedUp />
+                      ) : (
+                        <TiArrowSortedDown />
+                      )
+                    ) : null}
+                  </th>
+                )}
             </tr>
           </thead>
           {/* Error */}
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubSubCategoriesBooksCookies === "0" &&
+                    editSubSubCategoriesBooksCookies === "0" &&
+                    deleteSubSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -367,7 +438,16 @@ const SubSubCategoriesBook = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubSubCategoriesBooksCookies === "0" &&
+                    editSubSubCategoriesBooksCookies === "0" &&
+                    deleteSubSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -389,7 +469,16 @@ const SubSubCategoriesBook = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="4">
+                  <td
+                    className="table-td"
+                    colSpan={
+                      addSubSubCategoriesBooksCookies === "0" &&
+                      editSubSubCategoriesBooksCookies === "0" &&
+                      deleteSubSubCategoriesBooksCookies === "0"
+                        ? 3
+                        : 4
+                    }
+                  >
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -401,7 +490,16 @@ const SubSubCategoriesBook = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="4">
+                <td
+                  className="table-td"
+                  colSpan={
+                    addSubSubCategoriesBooksCookies === "0" &&
+                    editSubSubCategoriesBooksCookies === "0" &&
+                    deleteSubSubCategoriesBooksCookies === "0"
+                      ? 3
+                      : 4
+                  }
+                >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
@@ -425,29 +523,43 @@ const SubSubCategoriesBook = () => {
                         {result?.BooksCategories?.title}
                       </td>
                     )}
-                    {role === "admin" && toggle.toggleColumns?.control && (
-                      <td className="table-td">
-                        <span className="table-btn-container">
-                          <FaEdit
-                            className="edit-btn"
-                            onClick={() => {
-                              handleEdit(result);
-                            }}
-                          />
-                          <MdDeleteOutline
-                            className="delete-btn"
-                            onClick={() => handleDelete(result)}
-                          />
-                        </span>
-                      </td>
-                    )}
+                    {(role === "admin" ||
+                      (addSubSubCategoriesBooksCookies === "1" &&
+                        getSubSubCategoriesBooksCookies === "1") ||
+                      role === "admin" ||
+                      (editSubSubCategoriesBooksCookies === "1" &&
+                        getSubSubCategoriesBooksCookies === "1")) &&
+                      toggle.toggleColumns?.control && (
+                        <td className="table-td">
+                          <span className="table-btn-container">
+                            {(role === "admin" ||
+                              editSubSubCategoriesBooksCookies === "1") && (
+                              <FaEdit
+                                className="edit-btn"
+                                onClick={() => {
+                                  handleEdit(result);
+                                }}
+                              />
+                            )}
+                            {(role === "admin" ||
+                              deleteSubSubCategoriesBooksCookies === "1") && (
+                              <MdDeleteOutline
+                                className="delete-btn"
+                                onClick={() => handleDelete(result)}
+                              />
+                            )}
+                          </span>
+                        </td>
+                      )}
                   </tr>
                 ))}
               </tbody>
             )}
         </table>
       </div>
-      {role === "admin" && (
+      {(role === "admin" ||
+        (addSubSubCategoriesBooksCookies === "1" &&
+          getSubSubCategoriesBooksCookies === "1")) && (
         <>
           {/* Add Book Sub Category */}
           <Modal
@@ -617,6 +729,12 @@ const SubSubCategoriesBook = () => {
               </form>
             </ModalBody>
           </Modal>
+        </>
+      )}
+      {(role === "admin" ||
+        (editSubSubCategoriesBooksCookies === "1" &&
+          getSubSubCategoriesBooksCookies === "1")) && (
+        <>
           {/* Edit Book Sub Category */}
           <Modal
             isOpen={toggle.edit}
@@ -678,6 +796,76 @@ const SubSubCategoriesBook = () => {
                       />
                       {formik.errors.title && formik.touched.title ? (
                         <span className="error">{formik.errors.title}</span>
+                      ) : null}
+                    </div>
+                  </Col>
+                  <Col lg={12}>
+                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                      <label htmlFor="bookCategories" className="form-label">
+                        {t("subSubCategoriesBooks.columns.mainCategory")}
+                      </label>
+                      <div
+                        className={`dropdown form-input ${
+                          toggle.isBookCategories ? "active" : ""
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              isBookCategories: !toggle.isBookCategories,
+                            });
+                          }}
+                          className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
+                        >
+                          {formik.values.BooksCategories?.title
+                            ? formik.values.BooksCategories?.title
+                            : t("chooseCategory")}
+                          <TiArrowSortedUp
+                            className={`dropdown-icon ${
+                              toggle.isBookCategories ? "active" : ""
+                            }`}
+                          />
+                        </button>
+                        <div
+                          className={`dropdown-content ${
+                            toggle.isBookCategories ? "active" : ""
+                          }`}
+                        >
+                          {bookSubCategories?.map((category) => (
+                            <button
+                              type="button"
+                              key={category?.id}
+                              className={`item ${
+                                formik.values.BooksCategories?.id ===
+                                category?.id
+                                  ? "active"
+                                  : ""
+                              }`}
+                              value={category?.id}
+                              name="BooksCategories"
+                              onClick={() => {
+                                setToggle({
+                                  ...toggle,
+                                  isBookCategories: !toggle.isBookCategories,
+                                });
+                                formik.setFieldValue("BooksCategories", {
+                                  title: category.title,
+                                  id: category?.id,
+                                });
+                              }}
+                            >
+                              {category.title}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      {formik.errors.bookCategory?.title &&
+                      formik.touched.bookCategory?.title ? (
+                        <span className="error">
+                          {formik.errors.bookCategory?.title}
+                        </span>
                       ) : null}
                     </div>
                   </Col>
