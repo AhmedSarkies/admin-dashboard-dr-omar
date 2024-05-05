@@ -56,12 +56,12 @@ const useSchema = () => {
       title_en: string()
         .max(40, t("validation.maxCharacters"))
         .required(t("validation.title")),
-      country: string()
-        .max(40, t("validation.maxCharacters"))
-        .required(t("validation.title")),
-      country_en: string()
-        .max(40, t("validation.maxCharacters"))
-        .required(t("validation.title")),
+      // country: string()
+      //   .max(40, t("validation.maxCharacters"))
+      //   .required(t("validation.title")),
+      // country_en: string()
+      //   .max(40, t("validation.maxCharacters"))
+      //   .required(t("validation.title")),
       text: string().required(t("validation.description")),
       text_en: string().required(t("validation.description")),
     }),
