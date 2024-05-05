@@ -9,9 +9,21 @@ import {
 } from "reactstrap";
 import { IoMdSettings } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
+import Cookies from "js-cookie";
 
 const Sidebar = ({ menu, linkItems, logo }) => {
   const { t } = useTranslation();
+  const role = Cookies.get("_role");
+  const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
+  const getSpecialContentCookies = Cookies.get("GetSpecialContent");
+  const getSettingsCookies = Cookies.get("GetSettings");
+  const getIntroductionPageBookCookies = Cookies.get("GetIntroductionPage");
+  const getSubBooksCategoriesCookies = Cookies.get("GetSubBooksCategories");
+  const getMainCategoriesBookCookies = Cookies.get("GetMainCategoriesBook");
+  const getImageCategoriesCookies = Cookies.get("GetImageCategories");
+  const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
+  const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
+  const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
 
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
@@ -29,7 +41,11 @@ const Sidebar = ({ menu, linkItems, logo }) => {
       <div className="sidebar-body">
         <ul className="sidebar-list">
           {linkItems.slice(0, 4).map((item, index) => (
-            <li className="sidebar-item" key={index}>
+            <li
+              className="sidebar-item"
+              key={index}
+              style={{ display: item.display ? "block" : "none" }}
+            >
               <NavLink
                 className={({ isActive }) =>
                   isActive ? "sidebar-link active" : "sidebar-link"
@@ -41,60 +57,86 @@ const Sidebar = ({ menu, linkItems, logo }) => {
               </NavLink>
             </li>
           ))}
-          <div className="sidebar-item dropdown">
-            <UncontrolledAccordion stayOpen>
-              <AccordionItem>
-                <AccordionHeader targetId="1">
-                  <span className="icon d-flex justify-content-between align-items-center gap-2">
-                    <IoMdSettings size={28} />
-                    <span className="title">{t("linkItems.settings")}</span>
-                  </span>
-                </AccordionHeader>
-                <AccordionBody accordionId="1">
-                  {linkItems.slice(4, 8).map((item, index) => (
-                    <li key={index} className="ps-0 pe-0 mb-3">
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? "sidebar-link active" : "sidebar-link"
-                        }
-                        to={item.path}
+          {(role === "admin" ||
+            (getSettingsCookies === "1" &&
+              getTermsConditionsCookies === "1" &&
+              getSpecialContentCookies === "1" &&
+              getIntroductionPageBookCookies === "1")) && (
+            <div className="sidebar-item dropdown">
+              <UncontrolledAccordion stayOpen>
+                <AccordionItem>
+                  <AccordionHeader targetId="1">
+                    <span className="icon d-flex justify-content-between align-items-center gap-2">
+                      <IoMdSettings size={28} />
+                      <span className="title">{t("linkItems.settings")}</span>
+                    </span>
+                  </AccordionHeader>
+                  <AccordionBody accordionId="1">
+                    {linkItems.slice(4, 8).map((item, index) => (
+                      <li
+                        key={index}
+                        className="ps-0 pe-0 mb-3"
+                        style={{ display: item.display ? "block" : "none" }}
                       >
-                        <span className="title">{item.title}</span>
-                      </NavLink>
-                    </li>
-                  ))}
-                </AccordionBody>
-              </AccordionItem>
-            </UncontrolledAccordion>
-          </div>
-          <div className="sidebar-item dropdown">
-            <UncontrolledAccordion stayOpen>
-              <AccordionItem>
-                <AccordionHeader targetId="1">
-                  <span className="icon d-flex justify-content-between align-items-center gap-2">
-                    <BiCategory size={28} />
-                    <span className="title">{t("linkItems.categories")}</span>
-                  </span>
-                </AccordionHeader>
-                <AccordionBody accordionId="1">
-                  {linkItems.slice(8, 14).map((item, index) => (
-                    <li key={index} className="ps-0 pe-0 mb-3">
-                      <NavLink
-                        className={({ isActive }) =>
-                          isActive ? "sidebar-link active" : "sidebar-link"
-                        }
-                        to={item.path}
+                        <NavLink
+                          className={({ isActive }) =>
+                            isActive ? "sidebar-link active" : "sidebar-link"
+                          }
+                          to={item.path}
+                        >
+                          <span className="title">{item.title}</span>
+                        </NavLink>
+                      </li>
+                    ))}
+                  </AccordionBody>
+                </AccordionItem>
+              </UncontrolledAccordion>
+            </div>
+          )}
+          {(role === "admin" ||
+            (getMainCategoriesBookCookies === "1" &&
+              getSubBooksCategoriesCookies === "1" &&
+              getBooksCategoriesCookies === "1" &&
+              getImageCategoriesCookies === "1" &&
+              getAudiosCategoriesCookies === "1" &&
+              getArticlesCategoriesCookies === "1")) && (
+            <div className="sidebar-item dropdown">
+              <UncontrolledAccordion stayOpen>
+                <AccordionItem>
+                  <AccordionHeader targetId="1">
+                    <span className="icon d-flex justify-content-between align-items-center gap-2">
+                      <BiCategory size={28} />
+                      <span className="title">{t("linkItems.categories")}</span>
+                    </span>
+                  </AccordionHeader>
+                  <AccordionBody accordionId="1">
+                    {linkItems.slice(8, 14).map((item, index) => (
+                      <li
+                        key={index}
+                        className="ps-0 pe-0 mb-3"
+                        style={{ display: item.display ? "block" : "none" }}
                       >
-                        <span className="title">{item.title}</span>
-                      </NavLink>
-                    </li>
-                  ))}
-                </AccordionBody>
-              </AccordionItem>
-            </UncontrolledAccordion>
-          </div>
+                        <NavLink
+                          className={({ isActive }) =>
+                            isActive ? "sidebar-link active" : "sidebar-link"
+                          }
+                          to={item.path}
+                        >
+                          <span className="title">{item.title}</span>
+                        </NavLink>
+                      </li>
+                    ))}
+                  </AccordionBody>
+                </AccordionItem>
+              </UncontrolledAccordion>
+            </div>
+          )}
           {linkItems.slice(14).map((item, index) => (
-            <li className="sidebar-item" key={index}>
+            <li
+              className="sidebar-item"
+              key={index}
+              style={{ display: item.display ? "block" : "none" }}
+            >
               <NavLink
                 className={({ isActive }) =>
                   isActive ? "sidebar-link active" : "sidebar-link"
