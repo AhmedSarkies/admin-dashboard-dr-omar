@@ -194,10 +194,10 @@ const SubAdmins = () => {
             values.editAudios === true && 5,
             values.deleteAudios === true && 6,
             values.audios === true && 7,
+            values.articles === true && 31,
             values.addArticles === true && 32,
             values.editArticles === true && 33,
             values.deleteArticles === true && 34,
-            values.articles === true && 34,
             values.books === true && 51,
             values.addBooks === true && 52,
             values.editBooks === true && 53,
@@ -377,103 +377,214 @@ const SubAdmins = () => {
       phone: subAdmin?.phone,
       powers: subAdmin?.powers === t("admin") ? "admin" : "supAdmin",
       status: subAdmin?.active === t("active") ? "active" : "inactive",
-      subAdmins: subAdmin?.subAdmins === 1 ? true : false,
-      addSubAdmins: subAdmin?.addSubAdmins === 1 ? true : false,
-      editSubAdmins: subAdmin?.editSubAdmins === 1 ? true : false,
-      deleteSubAdmins: subAdmin?.deleteSubAdmins === 1 ? true : false,
-      users: subAdmin?.users === 1 ? true : false,
-      editUser: subAdmin?.editUser === 1 ? true : false,
-      deleteUser: subAdmin?.deleteUser === 1 ? true : false,
-      elders: subAdmin?.elders === 1 ? true : false,
-      addElders: subAdmin?.addElders === 1 ? true : false,
-      editElders: subAdmin?.editElders === 1 ? true : false,
-      deleteElders: subAdmin?.deleteElders === 1 ? true : false,
-      audios: subAdmin?.audios === 1 ? true : false,
-      addAudios: subAdmin?.addAudios === 1 ? true : false,
-      editAudios: subAdmin?.editAudios === 1 ? true : false,
-      deleteAudios: subAdmin?.deleteAudios === 1 ? true : false,
-      articles: subAdmin?.articles === 1 ? true : false,
-      addArticles: subAdmin?.addArticles === 1 ? true : false,
-      editArticles: subAdmin?.editArticles === 1 ? true : false,
-      deleteArticles: subAdmin?.deleteArticles === 1 ? true : false,
-      books: subAdmin?.books === 1 ? true : false,
-      addBooks: subAdmin?.addBooks === 1 ? true : false,
-      editBooks: subAdmin?.editBooks === 1 ? true : false,
-      deleteBooks: subAdmin?.deleteBooks === 1 ? true : false,
-      images: subAdmin?.images === 1 ? true : false,
-      addImages: subAdmin?.addImages === 1 ? true : false,
-      editImages: subAdmin?.editImages === 1 ? true : false,
-      deleteImages: subAdmin?.deleteImages === 1 ? true : false,
-      notifications: subAdmin?.notifications === 1 ? true : false,
-      addNotifications: subAdmin?.addNotifications === 1 ? true : false,
-      deleteNotifications: subAdmin?.deleteNotifications === 1 ? true : false,
-      messages: subAdmin?.messages === 1 ? true : false,
-      settings: subAdmin?.settings === 1 ? true : false,
-      editSettings: subAdmin?.editSettings === 1 ? true : false,
-      codeContent: subAdmin?.codeContent === 1 ? true : false,
-      addCodeContent: subAdmin?.addCodeContent === 1 ? true : false,
-      editCodeContent: subAdmin?.editCodeContent === 1 ? true : false,
-      sendCodeContent: subAdmin?.sendCodeContent === 1 ? true : false,
-      introductionPages: subAdmin?.introductionPages === 1 ? true : false,
-      addIntroductionPages: subAdmin?.addIntroductionPages === 1 ? true : false,
-      editIntroductionPages:
-        subAdmin?.editIntroductionPages === 1 ? true : false,
-      deleteIntroductionPages:
-        subAdmin?.deleteIntroductionPages === 1 ? true : false,
-      termsAndConditions: subAdmin?.termsAndConditions === 1 ? true : false,
-      addTermsAndConditions:
-        subAdmin?.addTermsAndConditions === 1 ? true : false,
-      editTermsAndConditions:
-        subAdmin?.editTermsAndConditions === 1 ? true : false,
-      deleteTermsAndConditions:
-        subAdmin?.deleteTermsAndConditions === 1 ? true : false,
-      mainCategoriesBooks: subAdmin?.mainCategoriesBooks === 1 ? true : false,
-      addMainCategoriesBooks:
-        subAdmin?.addMainCategoriesBooks === 1 ? true : false,
-      editMainCategoriesBooks:
-        subAdmin?.editMainCategoriesBooks === 1 ? true : false,
-      deleteMainCategoriesBooks:
-        subAdmin?.deleteMainCategoriesBooks === 1 ? true : false,
-      subCategoriesBooks: subAdmin?.subCategoriesBooks === 1 ? true : false,
-      addSubCategoriesBooks:
-        subAdmin?.addSubCategoriesBooks === 1 ? true : false,
-      editSubCategoriesBooks:
-        subAdmin?.editSubCategoriesBooks === 1 ? true : false,
-      deleteSubCategoriesBooks:
-        subAdmin?.deleteSubCategoriesBooks === 1 ? true : false,
-      subSubCategoriesBooks:
-        subAdmin?.subSubCategoriesBooks === 1 ? true : false,
-      addSubSubCategoriesBooks:
-        subAdmin?.addSubSubCategoriesBooks === 1 ? true : false,
-      editSubSubCategoriesBooks:
-        subAdmin?.editSubSubCategoriesBooks === 1 ? true : false,
-      deleteSubSubCategoriesBooks:
-        subAdmin?.deleteSubSubCategoriesBooks === 1 ? true : false,
-      categoriesAudio: subAdmin?.categoriesAudio === 1 ? true : false,
-      addCategoriesAudio: subAdmin?.addCategoriesAudio === 1 ? true : false,
-      editCategoriesAudio: subAdmin?.editCategoriesAudio === 1 ? true : false,
-      deleteCategoriesAudio:
-        subAdmin?.deleteCategoriesAudio === 1 ? true : false,
-      categoriesImage: subAdmin?.categoriesImage === 1 ? true : false,
-      addCategoriesImage: subAdmin?.addCategoriesImage === 1 ? true : false,
-      editCategoriesImage: subAdmin?.editCategoriesImage === 1 ? true : false,
-      deleteCategoriesImage:
-        subAdmin?.deleteCategoriesImage === 1 ? true : false,
-      categoriesArticle: subAdmin?.categoriesArticle === 1 ? true : false,
-      addCategoriesArticle: subAdmin?.addCategoriesArticle === 1 ? true : false,
-      editCategoriesArticle:
-        subAdmin?.editCategoriesArticle === 1 ? true : false,
-      deleteCategoriesArticle:
-        subAdmin?.deleteCategoriesArticle === 1 ? true : false,
       image: {
         file: "",
         preview: subAdmin?.image,
       },
     });
-    setToggle({
-      ...toggle,
-      add: !toggle.add,
-      edit: true,
+    subAdmin?.permissions?.map(({ id }) => {
+      if (id === 15) {
+        formik.setFieldValue("addSubAdmins", true);
+      }
+      if (id === 16) {
+        formik.setFieldValue("editSubAdmins", true);
+      }
+      if (id === 17) {
+        formik.setFieldValue("deleteSubAdmins", true);
+      }
+      if (id === 18) {
+        formik.setFieldValue("subAdmins", true);
+      }
+      if (id === 1) {
+        formik.setFieldValue("editUser", true);
+      }
+      if (id === 2) {
+        formik.setFieldValue("deleteUser", true);
+      }
+      if (id === 11) {
+        formik.setFieldValue("addElders", true);
+      }
+      if (id === 12) {
+        formik.setFieldValue("editElders", true);
+      }
+      if (id === 13) {
+        formik.setFieldValue("deleteElders", true);
+      }
+      if (id === 14) {
+        formik.setFieldValue("elders", true);
+      }
+      if (id === 4) {
+        formik.setFieldValue("addAudios", true);
+      }
+      if (id === 5) {
+        formik.setFieldValue("editAudios", true);
+      }
+      if (id === 6) {
+        formik.setFieldValue("deleteAudios", true);
+      }
+      if (id === 7) {
+        formik.setFieldValue("audios", true);
+      }
+      if (id === 31) {
+        formik.setFieldValue("articles", true);
+      }
+      if (id === 32) {
+        formik.setFieldValue("addArticles", true);
+      }
+      if (id === 33) {
+        formik.setFieldValue("editArticles", true);
+      }
+      if (id === 34) {
+        formik.setFieldValue("deleteArticles", true);
+      }
+      if (id === 51) {
+        formik.setFieldValue("books", true);
+      }
+      if (id === 52) {
+        formik.setFieldValue("addBooks", true);
+      }
+      if (id === 53) {
+        formik.setFieldValue("editBooks", true);
+      }
+      if (id === 54) {
+        formik.setFieldValue("deleteBooks", true);
+      }
+      if (id === 23) {
+        formik.setFieldValue("images", true);
+      }
+      if (id === 24) {
+        formik.setFieldValue("addImages", true);
+      }
+      if (id === 25) {
+        formik.setFieldValue("editImages", true);
+      }
+      if (id === 26) {
+        formik.setFieldValue("deleteImages", true);
+      }
+      if (id === 67) {
+        formik.setFieldValue("notifications", true);
+      }
+      if (id === 68) {
+        formik.setFieldValue("addNotifications", true);
+      }
+      if (id === 70) {
+        formik.setFieldValue("deleteNotifications", true);
+      }
+      if (id === 35) {
+        formik.setFieldValue("messages", true);
+      }
+      if (id === 59) {
+        formik.setFieldValue("settings", true);
+      }
+      if (id === 61) {
+        formik.setFieldValue("editSettings", true);
+      }
+      if (id === 10) {
+        formik.setFieldValue("codeContent", true);
+      }
+      if (id === 8) {
+        formik.setFieldValue("addCodeContent", true);
+      }
+      if (id === 9) {
+        formik.setFieldValue("editCodeContent", true);
+      }
+      if (id === 63) {
+        formik.setFieldValue("introductionPages", true);
+      }
+      if (id === 64) {
+        formik.setFieldValue("addIntroductionPages", true);
+      }
+      if (id === 65) {
+        formik.setFieldValue("editIntroductionPages", true);
+      }
+      if (id === 66) {
+        formik.setFieldValue("deleteIntroductionPages", true);
+      }
+      if (id === 55) {
+        formik.setFieldValue("termsAndConditions", true);
+      }
+      if (id === 56) {
+        formik.setFieldValue("addTermsAndConditions", true);
+      }
+      if (id === 57) {
+        formik.setFieldValue("editTermsAndConditions", true);
+      }
+      if (id === 58) {
+        formik.setFieldValue("deleteTermsAndConditions", true);
+      }
+      if (id === 39) {
+        formik.setFieldValue("mainCategoriesBooks", true);
+      }
+      if (id === 40) {
+        formik.setFieldValue("addMainCategoriesBooks", true);
+      }
+      if (id === 41) {
+        formik.setFieldValue("editMainCategoriesBooks", true);
+      }
+      if (id === 42) {
+        formik.setFieldValue("deleteMainCategoriesBooks", true);
+      }
+      if (id === 47) {
+        formik.setFieldValue("subCategoriesBooks", true);
+      }
+      if (id === 48) {
+        formik.setFieldValue("addSubCategoriesBooks", true);
+      }
+      if (id === 49) {
+        formik.setFieldValue("editSubCategoriesBooks", true);
+      }
+      if (id === 50) {
+        formik.setFieldValue("deleteSubCategoriesBooks", true);
+      }
+      if (id === 43) {
+        formik.setFieldValue("subSubCategoriesBooks", true);
+      }
+      if (id === 44) {
+        formik.setFieldValue("addSubSubCategoriesBooks", true);
+      }
+      if (id === 45) {
+        formik.setFieldValue("editSubSubCategoriesBooks", true);
+      }
+      if (id === 46) {
+        formik.setFieldValue("deleteSubSubCategoriesBooks", true);
+      }
+      if (id === 71) {
+        formik.setFieldValue("categoriesAudio", true);
+      }
+      if (id === 72) {
+        formik.setFieldValue("addCategoriesAudio", true);
+      }
+      if (id === 73) {
+        formik.setFieldValue("editCategoriesAudio", true);
+      }
+      if (id === 74) {
+        formik.setFieldValue("deleteCategoriesAudio", true);
+      }
+      if (id === 19) {
+        formik.setFieldValue("categoriesImage", true);
+      }
+      if (id === 20) {
+        formik.setFieldValue("addCategoriesImage", true);
+      }
+      if (id === 21) {
+        formik.setFieldValue("editCategoriesImage", true);
+      }
+      if (id === 22) {
+        formik.setFieldValue("deleteCategoriesImage", true);
+      }
+      if (id === 27) {
+        formik.setFieldValue("categoriesArticle", true);
+      }
+      if (id === 28) {
+        formik.setFieldValue("addCategoriesArticle", true);
+      }
+      if (id === 29) {
+        formik.setFieldValue("editCategoriesArticle", true);
+      }
+      if (id === 30) {
+        formik.setFieldValue("deleteCategoriesArticle", true);
+      }
+      return null;
     });
   };
 
@@ -1113,19 +1224,7 @@ const SubAdmins = () => {
                         <IoMdEye
                           className="view-btn"
                           onClick={() => {
-                            formik.setValues({
-                              id: result?.id,
-                              name: result?.name,
-                              email: result?.email,
-                              password: result?.password,
-                              phone: result?.phone,
-                              powers: result?.powers,
-                              status: result?.active,
-                              image: {
-                                file: "",
-                                preview: result?.image,
-                              },
-                            });
+                              handleEdit(result);
                             setToggle({
                               ...toggle,
                               read: true,
@@ -1142,7 +1241,14 @@ const SubAdmins = () => {
                         {(role === "admin" || editSubAdminsCookies === "1") && (
                           <MdEdit
                             className="edit-btn"
-                            onClick={() => handleEdit(result)}
+                            onClick={() => {
+                              handleEdit(result);
+                              setToggle({
+                                ...toggle,
+                                add: !toggle.add,
+                                edit: true,
+                              });
+                            }}
                           />
                         )}
                       </span>
@@ -3652,7 +3758,7 @@ const SubAdmins = () => {
                       placeholder={t("subAdmin.columns.status")}
                       name="status"
                       disabled={toggle.read}
-                      value={formik.values.status}
+                      value={formik.values.status === "inactive" ? t("inactive") : t("active")}
                     />
                   ) : (
                     <div className="dropdown form-input">
@@ -3734,7 +3840,7 @@ const SubAdmins = () => {
                       placeholder={t("subAdmin.columns.powers")}
                       name="powers"
                       disabled={toggle.read}
-                      value={formik.values.powers}
+                      value={formik.values.powers === "admin" ? t("admin") : t("supAdmin")}
                     />
                   ) : (
                     <div className="dropdown form-input">
@@ -3807,7 +3913,7 @@ const SubAdmins = () => {
                 </div>
               </Col>
             </Row>
-            {formik.values.powers === t("supAdmin") && (
+            {formik.values.powers === "supAdmin" && (
               <Row className="d-flex flex-row-reverse justify-content-start align-items-center p-3 pt-2">
                 <Col
                   xs={6}
