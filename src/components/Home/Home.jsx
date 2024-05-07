@@ -16,6 +16,9 @@ import { HiUsers } from "react-icons/hi2";
 import { IoPerson } from "react-icons/io5";
 import { FaBell } from "react-icons/fa";
 import Cookies from "js-cookie";
+import { useDispatch, useSelector } from "react-redux";
+import { getAdminData } from "../../store/slices/subAdminSlice";
+import { Spinner } from "reactstrap";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -177,6 +180,74 @@ const Home = () => {
     // },
   ];
 
+  const dispatch = useDispatch();
+  const { adminData, loadingAdminData } = useSelector(
+    (state) => state.subAdmin
+  );
+
+  useEffect(() => {
+    try {
+      dispatch(getAdminData());
+    } catch (error) {
+      console.log("error", error);
+    }
+  }, [dispatch, location.pathname]);
+
+  //   Add adminData to cookies
+  useEffect(() => {
+    try {
+      if (adminData) {
+        // Set Token in Cookies
+        Cookies.set("_user", adminData?.name, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_role", adminData?.powers, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_email", adminData?.email, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_phone", adminData?.phone, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_image", adminData?.image, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        Cookies.set("_active", adminData?.active, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        });
+        adminData?.permissions?.map((permission) =>
+          Cookies.set(permission, 1, {
+            expires: 30,
+            secure: true,
+            sameSite: "strict",
+            path: "/",
+          })
+        );
+      }
+    } catch (error) {
+      console.log("error", error);
+    }
+  }, [adminData]);
+
   const toggleMenu = () => {
     setMenu(!menu);
   };
@@ -198,11 +269,26 @@ const Home = () => {
 
   return (
     <div className="dashboard-container">
-      <div className="dashboard">
-        <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
-        <Outlet />
-      </div>
-      <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
+      {loadingAdminData ? (
+        <Spinner
+          style={{
+            width: "5rem",
+            height: "5rem",
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+          }}
+          type="grow"
+        />
+      ) : (
+        <>
+          <div className="dashboard">
+            <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
+            <Outlet />
+          </div>
+          <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
+        </>
+      )}
     </div>
   );
 };
