@@ -7,6 +7,7 @@ const initialState = {
   permissions: [],
   adminData: [],
   loading: false,
+  loadingAdminData: false,
   error: null,
 };
 
@@ -235,17 +236,17 @@ const subAdminSlice = createSlice({
     // ======Get Admin Data======
     // Pending
     builder.addCase(getAdminData.pending, (state, action) => {
-      state.loading = true;
+      state.loadingAdminData = true;
     });
     // Fulfilled
     builder.addCase(getAdminData.fulfilled, (state, action) => {
-      state.loading = false;
+      state.loadingAdminData = false;
       state.error = null;
       state.adminData = action.payload.data;
     });
     // Rejected
     builder.addCase(getAdminData.rejected, (state, action) => {
-      state.loading = false;
+      state.loadingAdminData = false;
       state.error = action.payload;
     });
   },
