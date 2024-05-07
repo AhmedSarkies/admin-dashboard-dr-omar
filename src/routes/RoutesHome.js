@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import {
   Home,
@@ -28,9 +28,6 @@ import {
   Elder,
   SubSubCategoriesBook,
 } from "../components";
-import { useDispatch, useSelector } from "react-redux";
-import { getAdminData } from "../store/slices/subAdminSlice";
-import { useLocation } from "react-router-dom";
 import Cookies from "js-cookie";
 
 const RoutesHome = () => {
@@ -54,68 +51,6 @@ const RoutesHome = () => {
   const getAdminCookies = Cookies.get("GetAdmin");
   const getMessageCookies = Cookies.get("GetMessage");
   const getNotificationCookies = Cookies.get("GetNotification");
-  const location = useLocation();
-  const dispatch = useDispatch();
-  const { adminData } = useSelector((state) => state.subAdmin);
-
-  useEffect(() => {
-    try {
-      dispatch(getAdminData());
-    } catch (error) {
-      console.log("error", error);
-    }
-  }, [dispatch, location.pathname]);
-
-  //   Add adminData to cookies
-  useEffect(() => {
-    if (adminData) {
-      // Set Token in Cookies
-      Cookies.set("_user", adminData.name, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      Cookies.set("_role", adminData.powers, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      Cookies.set("_email", adminData.email, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      Cookies.set("_phone", adminData.phone, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      Cookies.set("_image", adminData.image, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      Cookies.set("_active", adminData.active, {
-        expires: 30,
-        secure: true,
-        sameSite: "strict",
-        path: "/",
-      });
-      adminData?.permissions?.map((permission) =>
-        Cookies.set(permission, 1, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        })
-      );
-    }
-  }, [adminData]);
 
   return (
     <Routes>
