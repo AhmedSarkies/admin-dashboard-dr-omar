@@ -295,7 +295,7 @@ const NewUsers = () => {
           {error !== null && loading === false && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <p className="no-data mb-0">
                     {error === "Network Error"
                       ? t("networkError")
@@ -313,7 +313,7 @@ const NewUsers = () => {
           {loading && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <div className="no-data mb-0">
                     <Spinner
                       color="primary"
@@ -335,7 +335,7 @@ const NewUsers = () => {
             !loading && (
               <tbody>
                 <tr className="no-data-container">
-                  <td className="table-td" colSpan="8">
+                  <td className="table-td" colSpan="10">
                     <p className="no-data mb-0">{t("noData")}</p>
                   </td>
                 </tr>
@@ -347,7 +347,7 @@ const NewUsers = () => {
           ) && (
             <tbody>
               <tr className="no-data-container">
-                <td className="table-td" colSpan="8">
+                <td className="table-td" colSpan="10">
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
                 </td>
               </tr>
