@@ -249,16 +249,22 @@ const Home = () => {
   }, [adminData]);
 
   useEffect(() => {
-    if (Cookies.get("_active") === "0") {
-      Cookies.remove("_auth");
-      Cookies.remove("_user");
-      Cookies.remove("_role");
-      Cookies.remove("_email");
-      Cookies.remove("_phone");
-      Cookies.remove("_image");
-      Cookies.remove("_active");
-      linkItems.map((item) => Cookies.remove(item.title));
-      window.location.href = "/login";
+    try{
+      if (Cookies.get("_active") === "0") {
+        Cookies.remove("_auth");
+        Cookies.remove("_user");
+        Cookies.remove("_role");
+        Cookies.remove("_email");
+        Cookies.remove("_phone");
+        Cookies.remove("_image");
+        Cookies.remove("_active");
+        linkItems.map((item) => Cookies.remove(item.title));
+      }
+      if (!Cookies.get("_auth")) {
+        window.location.href = "/login";
+      }
+    } catch (error) {
+      console.log("error", error);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
