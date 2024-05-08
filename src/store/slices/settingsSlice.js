@@ -16,7 +16,7 @@ export const getSettings = createAsyncThunk(
     try {
       const response = await axios({
         method: "GET",
-        url: "https://tsquarehost.info/public/api/Settings/Get-all",
+        url: `${process.env.REACT_APP_API_URL}/Settings/Get-all`,
       });
       return response.data;
     } catch (error) {
