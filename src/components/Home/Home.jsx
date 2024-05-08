@@ -259,7 +259,8 @@ const Home = () => {
       linkItems.map((item) => Cookies.remove(item.title));
       window.location.href = "/login";
     }
-  }, [linkItems]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const toggleMenu = () => {
     setMenu(!menu);
