@@ -250,6 +250,7 @@ const Home = () => {
 
   useEffect(() => {
     if (Cookies.get("_active") === "0") {
+      Cookies.remove("_auth");
       Cookies.remove("_user");
       Cookies.remove("_role");
       Cookies.remove("_email");
