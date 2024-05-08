@@ -708,32 +708,7 @@ const IntroductionPage = () => {
                   ) : null}
                 </Col>
               </Row>
-              <Row className="d-flex justify-content-center align-items-center ps-3 pe-3">
-                <Col lg={6}>
-                  <div
-                    className="form-group-container d-flex flex-column align-items-end mb-3"
-                    style={{ marginTop: "-4px" }}
-                  >
-                    <label htmlFor="titleEn" className="form-label">
-                      {t("settings.introductionPage.columns.title.en")}
-                    </label>
-                    <input
-                      type="text"
-                      className="form-input w-100"
-                      id="titleEn"
-                      placeholder={t(
-                        "settings.introductionPage.columns.title.en"
-                      )}
-                      name="titleEn"
-                      disabled={toggle.view}
-                      value={formik.values.titleEn}
-                      onChange={formik.handleChange}
-                    />
-                    {formik.errors.titleEn && formik.touched.titleEn ? (
-                      <span className="error">{formik.errors.titleEn}</span>
-                    ) : null}
-                  </div>
-                </Col>
+              <Row className="d-flex justify-content-center align-items-center flex-row-reverse ps-3 pe-3">
                 <Col lg={6}>
                   <div
                     className="form-group-container d-flex flex-column align-items-end mb-3"
@@ -759,9 +734,54 @@ const IntroductionPage = () => {
                     ) : null}
                   </div>
                 </Col>
-              </Row>
-              <Row className="d-flex justify-content-center align-items-center ps-3 pe-3 mb-3">
                 <Col lg={6}>
+                  <div
+                    className="form-group-container d-flex flex-column align-items-end mb-3"
+                    style={{ marginTop: "-4px" }}
+                  >
+                    <label htmlFor="titleEn" className="form-label">
+                      {t("settings.introductionPage.columns.title.en")}
+                    </label>
+                    <input
+                      type="text"
+                      className="form-input w-100"
+                      id="titleEn"
+                      placeholder={t(
+                        "settings.introductionPage.columns.title.en"
+                      )}
+                      name="titleEn"
+                      disabled={toggle.view}
+                      value={formik.values.titleEn}
+                      onChange={formik.handleChange}
+                    />
+                    {formik.errors.titleEn && formik.touched.titleEn ? (
+                      <span className="error">{formik.errors.titleEn}</span>
+                    ) : null}
+                  </div>
+                </Col>
+              </Row>
+              <Row className="d-flex justify-content-center align-items-center flex-row-reverse ps-3 pe-3 mb-3">
+                <Col lg={6}>
+                  <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
+                    <label htmlFor="description" className="form-label">
+                      {t("settings.introductionPage.columns.description.ar")}
+                    </label>
+                    <textarea
+                      className="form-input"
+                      id="description"
+                      placeholder={t(
+                        "settings.introductionPage.columns.description.ar"
+                      )}
+                      name="description"
+                      disabled={toggle.view}
+                      value={formik.values.description}
+                      onChange={formik.handleChange}
+                    ></textarea>
+                    {formik.errors.description && formik.touched.description ? (
+                      <span className="error">{formik.errors.description}</span>
+                    ) : null}
+                  </div>
+                </Col><Col lg={6}>
                   <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
                     <label htmlFor="descriptionEn" className="form-label">
                       {t("settings.introductionPage.columns.description.en")}
@@ -782,27 +802,6 @@ const IntroductionPage = () => {
                       <span className="error">
                         {formik.errors.descriptionEn}
                       </span>
-                    ) : null}
-                  </div>
-                </Col>
-                <Col lg={6}>
-                  <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
-                    <label htmlFor="description" className="form-label">
-                      {t("settings.introductionPage.columns.description.ar")}
-                    </label>
-                    <textarea
-                      className="form-input"
-                      id="description"
-                      placeholder={t(
-                        "settings.introductionPage.columns.description.ar"
-                      )}
-                      name="description"
-                      disabled={toggle.view}
-                      value={formik.values.description}
-                      onChange={formik.handleChange}
-                    ></textarea>
-                    {formik.errors.description && formik.touched.description ? (
-                      <span className="error">{formik.errors.description}</span>
                     ) : null}
                   </div>
                 </Col>
