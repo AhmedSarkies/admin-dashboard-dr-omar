@@ -258,7 +258,6 @@ const Notifications = () => {
       if (role === "admin" || addNotificationsCookies === "1") {
         dispatch(getUsers());
       }
-
       if (getNotificationsCookies === "0") {
         Cookies.set("addNotification", 0, {
           expires: 30,
@@ -841,144 +840,96 @@ const Notifications = () => {
                 </Col>
               </Row>
               <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0 pt-0">
-                {!toggle.showNotification && (
-                  <Col lg={12}>
-                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                      <label htmlFor="user" className="form-label">
-                        {t("user.title")}
-                      </label>
-                      <div
-                        className="dropdown dropdown-users form-input p-0"
-                        ref={ref}
+                <Col lg={12}>
+                  <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                    <label htmlFor="user" className="form-label">
+                      {t("user.title")}
+                    </label>
+                    <div
+                      className="dropdown dropdown-users form-input p-0"
+                      ref={ref}
+                    >
+                      <button
+                        type="button"
+                        className="dropdown-btn d-flex justify-content-between align-items-center"
                       >
-                        <button
-                          type="button"
-                          className="dropdown-btn d-flex justify-content-between align-items-center"
-                        >
-                          <input
-                            type="text"
-                            className="form-input border-0 search-dropdown"
-                            placeholder={t("searchUserDropDown")}
-                            dir="ltr"
-                            focused={toggle.is_user === true ? "true" : "false"}
-                            onClick={() =>
-                              setToggle({ ...toggle, is_user: true })
-                            }
-                            onChange={handleSearchUser}
-                          />
-                          <TiArrowSortedUp
-                            className={`dropdown-icon ${
-                              toggle.is_user ? "active" : ""
-                            }`}
-                            onClick={() =>
-                              setToggle({ ...toggle, is_user: !toggle.is_user })
-                            }
-                          />
-                        </button>
-                        <div
-                          className={`dropdown-content notifications ${
+                        <input
+                          type="text"
+                          className="form-input border-0 search-dropdown"
+                          placeholder={t("searchUserDropDown")}
+                          dir="ltr"
+                          focused={toggle.is_user === true ? "true" : "false"}
+                          onClick={() =>
+                            setToggle({ ...toggle, is_user: true })
+                          }
+                          onChange={handleSearchUser}
+                        />
+                        <TiArrowSortedUp
+                          className={`dropdown-icon ${
                             toggle.is_user ? "active" : ""
                           }`}
-                          style={{
-                            top: "102%",
-                          }}
-                        >
-                          {searchResultsUsers.length === 0 ? (
-                            <label className="item form-label d-flex justify-content-end align-items-center gap-2 m-0">
-                              {t("noData")}
+                          onClick={() =>
+                            setToggle({ ...toggle, is_user: !toggle.is_user })
+                          }
+                        />
+                      </button>
+                      <div
+                        className={`dropdown-content notifications ${
+                          toggle.is_user ? "active" : ""
+                        }`}
+                        style={{
+                          top: "102%",
+                        }}
+                      >
+                        {searchResultsUsers.length === 0 ? (
+                          <label className="item form-label d-flex justify-content-end align-items-center gap-2 m-0">
+                            {t("noData")}
+                          </label>
+                        ) : (
+                          <>
+                            <label
+                              htmlFor="users_all"
+                              className={`item ${
+                                ids.length === users.length ? "active" : ""
+                              } item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                            >
+                              {t("user.columns.selectAll")}
+                              <input
+                                type="checkbox"
+                                className="checkbox"
+                                id="users_all"
+                                checked={ids.length === users.length}
+                                onClick={handleAddAll}
+                                readOnly
+                              />
                             </label>
-                          ) : (
-                            <>
-                              <label
-                                htmlFor="users_all"
-                                className={`item ${
-                                  ids.length === users.length ? "active" : ""
-                                } item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
-                              >
-                                {t("user.columns.selectAll")}
-                                <input
-                                  type="checkbox"
-                                  className="checkbox"
-                                  id="users_all"
-                                  checked={ids.length === users.length}
-                                  onClick={handleAddAll}
-                                  readOnly
-                                />
-                              </label>
-                              {searchResultsUsers.map((user, idx) => {
-                                const match = ids.includes(+user.id);
-                                const active = match ? "active" : "";
-                                return (
-                                  <label
-                                    key={idx}
-                                    htmlFor={`user_${user?.id}`}
-                                    className={`${active} item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
-                                  >
-                                    {user.email}
-                                    <input
-                                      type="checkbox"
-                                      id={`user_${user?.id}`}
-                                      className={`checked-${user?.id} checked`}
-                                      value={user?.id}
-                                      onChange={handleAddSelected}
-                                      readOnly
-                                    />
-                                  </label>
-                                );
-                              })}
-                            </>
-                          )}
-                        </div>
+                            {searchResultsUsers.map((user, idx) => {
+                              const match = ids.includes(+user.id);
+                              const active = match ? "active" : "";
+                              return (
+                                <label
+                                  key={idx}
+                                  htmlFor={`user_${user?.id}`}
+                                  className={`${active} item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                                >
+                                  {user.email}
+                                  <input
+                                    type="checkbox"
+                                    id={`user_${user?.id}`}
+                                    className={`checked-${user?.id} checked`}
+                                    value={user?.id}
+                                    onChange={handleAddSelected}
+                                    readOnly
+                                  />
+                                </label>
+                              );
+                            })}
+                          </>
+                        )}
                       </div>
                     </div>
-                  </Col>
-                )}
-                {toggle.showNotification && (
-                  <Col lg={12}>
-                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                      <label htmlFor="name" className="form-label">
-                        {t("user.columns.name")}
-                      </label>
-                      <input
-                        type="text"
-                        className="form-input w-100"
-                        id="name"
-                        placeholder={t("user.columns.name")}
-                        name="name"
-                        value={formik.values.name}
-                        disabled={toggle.showNotification}
-                      />
-                    </div>
-                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                      <label htmlFor="email" className="form-label">
-                        {t("user.columns.email")}
-                      </label>
-                      <input
-                        type="text"
-                        className="form-input w-100"
-                        id="email"
-                        placeholder={t("notifications.columns.email")}
-                        name="email"
-                        value={formik.values.email}
-                        disabled={toggle.showNotification}
-                      />
-                    </div>
-                    <div className="form-group-container d-flex flex-column align-items-end mb-3">
-                      <label htmlFor="phone" className="form-label">
-                        {t("user.columns.phone")}
-                      </label>
-                      <input
-                        type="text"
-                        className="form-input w-100"
-                        id="phone"
-                        placeholder={t("user.columns.phone")}
-                        name="phone"
-                        value={formik.values.phone}
-                        disabled={toggle.showNotification}
-                      />
-                    </div>
-                  </Col>
-                )}
+                  </div>
+                </Col>
                 <Col lg={6}>
                   <div className="form-group-container d-flex flex-column align-items-end mb-3">
                     <label htmlFor="title" className="form-label">
@@ -1224,7 +1175,7 @@ const Notifications = () => {
               </Col>
             </Row>
             <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0 pt-0">
-              <Col lg={12}>
+              {/* <Col lg={12}>
                 <div className="form-group-container d-flex flex-column align-items-end mb-3">
                   <label htmlFor="name" className="form-label">
                     {t("user.columns.name")}
@@ -1267,7 +1218,7 @@ const Notifications = () => {
                     disabled={toggle.showNotification}
                   />
                 </div>
-              </Col>
+              </Col> */}
               <Col lg={6}>
                 <div className="form-group-container d-flex flex-column align-items-end mb-3">
                   <label htmlFor="title" className="form-label">
