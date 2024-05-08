@@ -18,7 +18,6 @@ import { FaBell } from "react-icons/fa";
 import Cookies from "js-cookie";
 import { useDispatch, useSelector } from "react-redux";
 import { getAdminData } from "../../store/slices/subAdminSlice";
-import { Spinner } from "reactstrap";
 
 const Home = () => {
   const { t } = useTranslation();
@@ -181,7 +180,7 @@ const Home = () => {
   ];
 
   const dispatch = useDispatch();
-  const { adminData, loadingAdminData } = useSelector(
+  const { adminData } = useSelector(
     (state) => state.subAdmin
   );
 
@@ -269,7 +268,7 @@ const Home = () => {
 
   return (
     <div className="dashboard-container">
-      {loadingAdminData ? (
+      {/* {loadingAdminData ? (
         <Spinner
           style={{
             width: "5rem",
@@ -281,14 +280,14 @@ const Home = () => {
           type="grow"
         />
       ) : (
-        <>
+        <> */}
           <div className="dashboard">
             <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
             <Outlet />
           </div>
           <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
-        </>
-      )}
+        {/* </>
+      )} */}
     </div>
   );
 };
