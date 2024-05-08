@@ -1,26 +1,26 @@
 import React, { useEffect, useState } from "react";
-
 import { useDispatch, useSelector } from "react-redux";
-
-import { Modal, ModalBody, ModalHeader, Spinner } from "reactstrap";
-
+import { Col, Modal, ModalBody, ModalHeader, Row, Spinner } from "reactstrap";
 import { MdRemoveRedEye, MdSend } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
-
-import { getMessagesApi } from "../../store/slices/messagesSlice";
-
 import { TiArrowSortedDown, TiArrowSortedUp } from "react-icons/ti";
+import { FaLock, FaLockOpen } from "react-icons/fa";
+import {
+  getMessagesApi,
+  toggleMessage,
+} from "../../store/slices/messagesSlice";
 import { useFiltration } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
 
 const Messages = () => {
   const { t } = useTranslation();
-  const lang = Cookies.get("i18next");
   const role = Cookies.get("_role");
   const getMessagesCookies = Cookies.get("GetMessage");
   const dispatch = useDispatch();
-  const { messages, loading, error } = useSelector((state) => state.messages);
+  const { messages, loading, error, loadingToggleMessage } = useSelector(
+    (state) => state.messages
+  );
   const [toggle, setToggle] = useState({
     add: false,
     readMessage: false,
@@ -68,6 +68,35 @@ const Messages = () => {
     toggle,
     setToggle,
   });
+
+  // Read Message
+  const handleReadMessage = (message) => {
+    setToggle({
+      ...toggle,
+      readMessage: !toggle.readMessage,
+      message: message,
+    });
+    if (message.status === 0) {
+      dispatch(toggleMessage(message.id)).then((res) => {
+        if (res.error) {
+          dispatch(getMessagesApi());
+          console.log("error", res.error);
+        }
+      });
+    }
+  };
+
+  // Toggle Message
+  const handleToggleMessage = (message) => {
+    dispatch(toggleMessage(message.id)).then((res) => {
+      if (!res.error) {
+        dispatch(getMessagesApi());
+      } else {
+        dispatch(getMessagesApi());
+        console.log("error", res.error);
+      }
+    });
+  };
 
   // get data from api
   useEffect(() => {
@@ -270,7 +299,12 @@ const Messages = () => {
           {searchResults?.length > 0 && error === null && loading === false && (
             <tbody>
               {searchResults?.map((result, idx) => (
-                <tr key={result?.id + new Date().getDate()}>
+                <tr
+                  key={result?.id + new Date().getDate()}
+                  className={`table-tr${
+                    result?.status === 0 ? " not-read" : ""
+                  }`}
+                >
                   {toggle.toggleColumns?.id && (
                     <td className="table-td">{idx + 1}#</td>
                   )}
@@ -304,14 +338,33 @@ const Messages = () => {
                           <MdSend className="text-success" />
                         </a>
                         <MdRemoveRedEye
-                          onClick={() =>
-                            setToggle({
-                              ...toggle,
-                              readMessage: !toggle.readMessage,
-                              message: result,
-                            })
-                          }
+                          onClick={() => handleReadMessage(result)}
                         />
+                        {result?.status === 1 ? (
+                          <FaLockOpen
+                            style={{
+                              cursor: loadingToggleMessage
+                                ? "not-allowed"
+                                : "pointer",
+                              pointerEvents: loadingToggleMessage
+                                ? "none"
+                                : "auto",
+                            }}
+                            onClick={() => handleToggleMessage(result)}
+                          />
+                        ) : (
+                          <FaLock
+                            style={{
+                              cursor: loadingToggleMessage
+                                ? "not-allowed"
+                                : "pointer",
+                              pointerEvents: loadingToggleMessage
+                                ? "none"
+                                : "auto",
+                            }}
+                            onClick={() => handleToggleMessage(result)}
+                          />
+                        )}
                       </span>
                     </td>
                   )}
@@ -320,73 +373,135 @@ const Messages = () => {
               {/* Read Message*/}
               <Modal
                 isOpen={toggle.readMessage}
-                toggle={() =>
+                toggle={() => {
                   setToggle({
                     ...toggle,
                     readMessage: !toggle.readMessage,
-                  })
-                }
+                  });
+                  if (toggle.message?.status === 0) {
+                    dispatch(getMessagesApi());
+                  }
+                }}
                 centered={true}
                 keyboard={true}
                 size={"md"}
                 contentClassName="modal-read-more modal-add-scholar"
               >
                 <ModalHeader
-                  toggle={() =>
+                  toggle={() => {
                     setToggle({
                       ...toggle,
                       readMessage: !toggle.readMessage,
-                    })
-                  }
+                    });
+                    if (toggle.message?.status === 0) {
+                      dispatch(getMessagesApi());
+                    }
+                  }}
                   dir="rtl"
                 >
                   {toggle.message?.first_name}
                   <IoMdClose
-                    onClick={() =>
+                    onClick={() => {
                       setToggle({
                         ...toggle,
                         readMessage: !toggle.readMessage,
-                      })
-                    }
+                      });
+                      if (toggle.message?.status === 0) {
+                        dispatch(getMessagesApi());
+                      }
+                    }}
                   />
                 </ModalHeader>
                 <ModalBody>
-                  <div className="read-more-container text-center">
-                    {/* <h3 className="text-center mb-3">
-                      {toggle.message?.first_name}
-                    </h3> */}
-                    <div
-                      className={`content ${
-                        lang === "ar" ? "text-end" : "text-start"
-                      }`}
-                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
-                    >
-                      {t("message.columns.phone")}
-                      {": "}
-                      {toggle.message?.phone}
-                    </div>
-                    <div
-                      className={`content ${
-                        lang === "ar" ? "text-end" : "text-start"
-                      }`}
-                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
-                    >
-                      {t("message.columns.email")}
-                      {": "}
-                      {toggle.message?.email}
-                    </div>
-                    <div
-                      className={`content ${
-                        lang === "ar" ? "text-end" : "text-start"
-                      }`}
-                      dir={`${lang === "ar" ? "rtl" : "ltr"}`}
-                    >
-                      {t("message.columns.content")}
-                      {": "}
-                      <br />
-                      <p className="text-center">{toggle.message?.subject}</p>
-                    </div>
-                  </div>
+                  <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pb-0 pt-0">
+                    <Col lg={12}>
+                      <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                        <label htmlFor="name" className="form-label">
+                          {t("message.columns.name")}
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input w-100"
+                          id="name"
+                          placeholder={t("message.columns.name")}
+                          name="name"
+                          value={toggle.message?.first_name}
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                        <label htmlFor="email" className="form-label">
+                          {t("message.columns.email")}
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input w-100"
+                          id="email"
+                          placeholder={t("notifications.columns.email")}
+                          name="email"
+                          value={toggle.message?.email}
+                          disabled
+                        />
+                      </div>
+                      <div className="form-group-container d-flex flex-column align-items-end mb-3">
+                        <label htmlFor="phone" className="form-label">
+                          {t("message.columns.phone")}
+                        </label>
+                        <input
+                          type="text"
+                          className="form-input w-100"
+                          id="phone"
+                          placeholder={t("message.columns.phone")}
+                          name="phone"
+                          value={toggle.message?.phone}
+                          disabled
+                        />
+                      </div>
+                    </Col>
+                    <Col lg={12}>
+                      <div className="form-group-container d-flex flex-column align-items-end">
+                        <label htmlFor="content" className="form-label">
+                          {t("message.columns.content")}
+                        </label>
+                        <textarea
+                          className="form-input"
+                          id="content"
+                          placeholder={t("message.columns.content")}
+                          name="content"
+                          value={toggle.message?.subject}
+                          disabled
+                        ></textarea>
+                      </div>
+                    </Col>
+                  </Row>
+                  <Row className="d-flex flex-row-reverse justify-content-center align-items-center p-3 pt-0">
+                    <Col lg={12}>
+                      <div className="form-group-container d-flex flex-row-reverse justify-content-lg-start justify-content-center gap-3 pt-3">
+                        <a
+                          className="add-btn"
+                          href={`mailto:${toggle.message?.email}`}
+                        >
+                          <MdSend />
+                          {t("send")}
+                        </a>
+                        <button
+                          type="button"
+                          className="cancel-btn"
+                          onClick={() => {
+                            setToggle({
+                              ...toggle,
+                              readMessage: !toggle.readMessage,
+                            });
+                            if (toggle.message?.status === 0) {
+                              dispatch(getMessagesApi());
+                            }
+                          }}
+                        >
+                          {t("cancel")}
+                        </button>
+                      </div>
+                    </Col>
+                  </Row>
                 </ModalBody>
               </Modal>
             </tbody>
