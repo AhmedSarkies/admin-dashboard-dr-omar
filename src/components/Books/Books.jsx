@@ -865,7 +865,7 @@ const Books = () => {
                                   result?.status === t("public")
                                     ? "Private"
                                     : "Public",
-                                sub_categories_id: result.categories.id,
+                                sub_categories_id: result.subSubCategories.id,
                                 is_active:
                                   result.is_active === t("active") ? 1 : 0,
                               };
@@ -915,7 +915,7 @@ const Books = () => {
                                   result?.status === t("public")
                                     ? "Public"
                                     : "Private",
-                                sub_categories_id: result.categories.id,
+                                sub_categories_id: result.subSubCategories.id,
                                 is_active:
                                   result.is_active === t("active") ? 0 : 1,
                               };
@@ -1262,7 +1262,7 @@ const Books = () => {
                             type="button"
                             key={category?.random_id}
                             className={`item ${
-                              formik.values.bookMainCategory?.random_id ===
+                              formik.values.bookMainCategory?.id ===
                               category?.random_id
                                 ? "active"
                                 : ""
