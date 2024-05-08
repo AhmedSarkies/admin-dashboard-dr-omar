@@ -72,7 +72,7 @@ const Books = () => {
   const addBooksCookies = Cookies.get("addBook");
   const editBooksCookies = Cookies.get("editBook");
   const deleteBooksCookies = Cookies.get("deleteBook");
-  const { books, bookCategories, allCategories, loading, error } = useSelector(
+  const { books, allCategories, loading, error } = useSelector(
     (state) => state.book
   );
   const [toggle, setToggle] = useState({
