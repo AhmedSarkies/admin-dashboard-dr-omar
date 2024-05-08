@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useFormik } from "formik";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
@@ -402,6 +402,29 @@ const Login = () => {
       toast.error(t("toast.login.error"));
     }
   };
+
+  useEffect(() => {
+    if (!Cookies.get("_auth")) {
+      // Remove all Cookies using js-cookie and permissions
+      Object.keys(Cookies.get()).map((cookie) => {
+        if (
+          permissions.map((permission) => permission.name).includes(cookie) ||
+          cookie === "_auth" ||
+          cookie === "_user" ||
+          cookie === "_role" ||
+          cookie === "_email" ||
+          cookie === "_phone" ||
+          cookie === "_image" ||
+          cookie === "_active" ||
+          cookie === "_id"
+        ) {
+          Cookies.remove(cookie);
+        }
+        return null;
+      });
+    }
+  }, []);
+
   const formik = useFormik({
     initialValues: {
       email: "",
