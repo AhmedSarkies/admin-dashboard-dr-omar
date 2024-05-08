@@ -553,7 +553,7 @@ const Elders = () => {
                   ) : null}
                 </th>
               )}
-              {(role === "admin" || getAudiosCookies === "1") &&
+              {(role === "admin" || editEldersCookies === "1") &&
                 toggle.toggleColumns.control && (
                   <th
                     className="table-th"
