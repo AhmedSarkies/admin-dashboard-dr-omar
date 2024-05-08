@@ -151,6 +151,8 @@ const SubCategoriesBook = () => {
     });
   };
 
+  console.log(formik.values);
+
   // Delete Book Category
   const handleDelete = (bookSubCategory) => {
     if (role === "admin" || deleteSubCategoriesBooksCookies === "1") {
@@ -804,8 +806,8 @@ const SubCategoriesBook = () => {
                           }}
                           className="dropdown-btn dropdown-btn-audio-category d-flex justify-content-between align-items-center"
                         >
-                          {formik.values.bookCategory?.title
-                            ? formik.values.bookCategory?.title
+                          {formik.values.MainCategory?.title
+                            ? formik.values.MainCategory?.title
                             : t("chooseCategory")}
                           <TiArrowSortedUp
                             className={`dropdown-icon ${
@@ -823,7 +825,7 @@ const SubCategoriesBook = () => {
                               type="button"
                               key={category?.id}
                               className={`item ${
-                                formik.values.bookCategory?.id === category?.id
+                                formik.values.MainCategory?.id === category?.id
                                   ? "active"
                                   : ""
                               }`}
@@ -834,7 +836,7 @@ const SubCategoriesBook = () => {
                                   ...toggle,
                                   isBookCategories: !toggle.isBookCategories,
                                 });
-                                formik.setFieldValue("bookCategory", {
+                                formik.setFieldValue("MainCategory", {
                                   title: category.title,
                                   id: category?.id,
                                 });
