@@ -236,7 +236,7 @@
       "content": "Message",
       "email": "Email",
       "phone": "Phone",
-      "read": "Read"
+      "read": "Actions"
     }
   },
   "notifications": {
