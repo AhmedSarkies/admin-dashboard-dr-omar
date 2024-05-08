@@ -1787,7 +1787,7 @@ const Audios = () => {
                       ) : null}
                     </Col>
                   </Col>
-                  <Col lg={7} className="mb-5">
+                  <Col lg={7}>
                     <div className="form-group-container d-flex flex-column align-items-end mb-3">
                       <label htmlFor="title" className="form-label">
                         {t("audios.columns.audio.title")}
