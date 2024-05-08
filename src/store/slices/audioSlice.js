@@ -128,7 +128,7 @@ export const updateAudioCategoryApi = createAsyncThunk(
     try {
       await Http({
         method: "POST",
-        url: `/ImagesCategories/Update`,
+        url: `/Audios-Categories/Update`,
         params: { ...data },
       }).then((response) => {
         return response.data;
