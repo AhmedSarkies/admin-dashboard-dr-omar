@@ -1396,6 +1396,9 @@ label {
 [lang="en"] label {
   direction: ltr;
 }
+.not-read {
+  font-weight: 900;
+}
 
 /* Media Screens */
 @media only screen and (max-width: 1200px) {
