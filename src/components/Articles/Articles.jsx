@@ -67,6 +67,7 @@ const Articles = () => {
     readMore: false,
     status: false,
     is_active: false,
+    article: {},
     showWriter: false,
     elders: false,
     articleCategories: false,
@@ -370,12 +371,13 @@ const Articles = () => {
         <div className="table-header">
           <button
             className="add-btn"
-            onClick={() =>
+            onClick={() => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
-              })
-            }
+              });
+              formik.handleReset();
+            }}
           >
             <MdAdd />
             {t("articles.addTitle")}
