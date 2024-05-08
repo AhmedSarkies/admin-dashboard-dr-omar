@@ -85,10 +85,12 @@ const CodeContent = () => {
               dispatch(getCodeContent());
               dispatch(getUsers());
               formik.handleReset();
+              setIds([]);
               toast.success(t("toast.codeContent.updatedSuccess"));
             } else {
               dispatch(getCodeContent());
               dispatch(getUsers());
+              setIds([]);
               toast.error(t("toast.codeContent.updatedError"));
             }
           });
@@ -102,10 +104,12 @@ const CodeContent = () => {
               dispatch(getCodeContent());
               dispatch(getUsers());
               formik.handleReset();
+              setIds([]);
               toast.success(t("toast.codeContent.addedSuccess"));
             } else {
               dispatch(getCodeContent());
               dispatch(getUsers());
+              setIds([]);
               toast.error(t("toast.codeContent.addedError"));
             }
           });
@@ -154,10 +158,15 @@ const CodeContent = () => {
           if (!res.error) {
             dispatch(getCodeContent());
             dispatch(getUsers());
+            setIds([]);
             Swal.fire({
               title: t("doneConfirm"),
               icon: "success",
             });
+          } else {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            setIds([]);
           }
         });
       }
@@ -182,10 +191,15 @@ const CodeContent = () => {
           if (!res.error) {
             dispatch(getCodeContent());
             dispatch(getUsers());
+            setIds([]);
             Swal.fire({
               title: t("doneConfirm"),
               icon: "success",
             });
+          } else {
+            dispatch(getCodeContent());
+            dispatch(getUsers());
+            setIds([]);
           }
         });
       }
