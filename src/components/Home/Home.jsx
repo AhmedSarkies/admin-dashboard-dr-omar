@@ -248,6 +248,19 @@ const Home = () => {
     }
   }, [adminData]);
 
+  useEffect(() => {
+    if (Cookies.get("_active") === "0") {
+      Cookies.remove("_user");
+      Cookies.remove("_role");
+      Cookies.remove("_email");
+      Cookies.remove("_phone");
+      Cookies.remove("_image");
+      Cookies.remove("_active");
+      linkItems.map((item) => Cookies.remove(item.title));
+      window.location.href = "/login";
+    }
+  }, [linkItems]);
+
   const toggleMenu = () => {
     setMenu(!menu);
   };
