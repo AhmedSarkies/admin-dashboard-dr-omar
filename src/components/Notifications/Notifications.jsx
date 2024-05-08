@@ -882,7 +882,7 @@ const Notifications = () => {
                         }}
                       >
                         {searchResultsUsers.length === 0 ? (
-                          <label className="item form-label d-flex justify-content-end align-items-center gap-2 m-0">
+                          <label className="item form-label d-flex flex-row-reverse justify-content-end align-items-center gap-2 m-0">
                             {t("noData")}
                           </label>
                         ) : (
@@ -891,7 +891,7 @@ const Notifications = () => {
                               htmlFor="users_all"
                               className={`item ${
                                 ids.length === users.length ? "active" : ""
-                              } item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                              } item form-label d-flex flex-row-reverse justify-content-end align-items-center gap-2 m-0`}
                             >
                               {t("user.columns.selectAll")}
                               <input
@@ -910,7 +910,7 @@ const Notifications = () => {
                                 <label
                                   key={idx}
                                   htmlFor={`user_${user?.id}`}
-                                  className={`${active} item form-label d-flex justify-content-end align-items-center gap-2 m-0`}
+                                  className={`${active} item form-label d-flex flex-row-reverse justify-content-end align-items-center gap-2 m-0`}
                                 >
                                   {user.email}
                                   <input
