@@ -865,7 +865,7 @@ const Books = () => {
                                   result?.status === t("public")
                                     ? "Private"
                                     : "Public",
-                                categories_id: result.categories.id,
+                                sub_categories_id: result.categories.id,
                                 is_active:
                                   result.is_active === t("active") ? 1 : 0,
                               };
@@ -915,7 +915,7 @@ const Books = () => {
                                   result?.status === t("public")
                                     ? "Public"
                                     : "Private",
-                                categories_id: result.categories.id,
+                                sub_categories_id: result.categories.id,
                                 is_active:
                                   result.is_active === t("active") ? 0 : 1,
                               };
