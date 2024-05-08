@@ -1186,7 +1186,7 @@ const Books = () => {
                     <span className="error">{formik.errors.book}</span>
                   ) : null}
                 </Col>
-                <Col lg={12} className="mb-5">
+                <Col lg={12} className="mb-3">
                   <div className="form-group-container d-flex flex-column align-items-end mb-3">
                     <label htmlFor="title" className="form-label">
                       {t("books.columns.book.title")}
@@ -1257,17 +1257,17 @@ const Books = () => {
                           toggle.bookMainCategory ? "active" : ""
                         }`}
                       >
-                        {bookCategories?.map((category) => (
+                        {allCategories?.map((category) => (
                           <button
                             type="button"
-                            key={category?.id}
+                            key={category?.random_id}
                             className={`item ${
-                              formik.values.bookMainCategory?.id ===
-                              category?.id
+                              formik.values.bookMainCategory?.random_id ===
+                              category?.random_id
                                 ? "active"
                                 : ""
                             }`}
-                            value={category?.id}
+                            value={category?.random_id}
                             name="bookMainCategory"
                             onClick={() => {
                               setToggle({
@@ -1276,7 +1276,7 @@ const Books = () => {
                               });
                               formik.setFieldValue("bookMainCategory", {
                                 title: category.title,
-                                id: category?.id,
+                                id: category?.random_id,
                               });
                             }}
                           >
@@ -1514,7 +1514,7 @@ const Books = () => {
                       <span className="error">{formik.errors.status}</span>
                     ) : null}
                   </div>
-                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end mb-3">
+                  <div className="form-group-container d-flex flex-column justify-content-center align-items-end">
                     <label htmlFor="is_active" className="form-label">
                       {t("activation")}
                     </label>
