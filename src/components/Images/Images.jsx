@@ -969,7 +969,7 @@ const Images = () => {
                       </span>
                     ) : null}
                   </Col>
-                  <Col lg={7} className="mb-5">
+                  <Col lg={7}>
                     <div className="form-group-container d-flex flex-column align-items-end mb-3">
                       <label htmlFor="pictureCategory" className="form-label">
                         {t("images.columns.category")}
@@ -1399,7 +1399,7 @@ const Images = () => {
                       </span>
                     ) : null}
                   </Col>
-                  <Col lg={7} className="mb-5">
+                  <Col lg={7}>
                     <div className="form-group-container d-flex flex-column align-items-end mb-3">
                       <label htmlFor="pictureCategory" className="form-label">
                         {t("images.columns.category")}
