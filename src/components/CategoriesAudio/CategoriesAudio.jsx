@@ -536,9 +536,9 @@ const CategoriesAudio = () => {
             <ModalBody>
               <form className="overlay-form" onSubmit={formik.handleSubmit}>
                 <Row className="d-flex justify-content-center align-items-center p-3">
-                  <Col lg={12} className="mb-5">
+                  <Col lg={12} className="mb-3">
                     <div
-                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      className="form-group-container d-flex flex-column align-items-end"
                       style={{ marginTop: "-4px" }}
                     >
                       <label htmlFor="title" className="form-label">
@@ -637,9 +637,9 @@ const CategoriesAudio = () => {
             <ModalBody>
               <form className="overlay-form" onSubmit={formik.handleSubmit}>
                 <Row className="d-flex justify-content-center align-items-center p-3">
-                  <Col lg={12} className="mb-5">
+                  <Col lg={12} className="mb-3">
                     <div
-                      className="form-group-container d-flex flex-column align-items-end mb-3"
+                      className="form-group-container d-flex flex-column align-items-end"
                       style={{ marginTop: "-4px" }}
                     >
                       <label htmlFor="title" className="form-label">
