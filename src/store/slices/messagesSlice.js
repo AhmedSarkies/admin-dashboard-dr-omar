@@ -5,6 +5,7 @@ import Http from "../../Http";
 const initialState = {
   messages: [],
   loading: false,
+  loadingToggleMessage: false,
   error: null,
 };
 
@@ -19,6 +20,25 @@ export const getMessagesApi = createAsyncThunk(
         headers: {
           "Content-Type": "application/json",
           Accept: "application/json",
+        },
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Toggle Messages using Axios and Redux Thunk
+export const toggleMessage = createAsyncThunk(
+  "messages/toggleMessage",
+  async (random_id, { rejectWithValue }) => {
+    try {
+      const response = await Http({
+        method: "POST",
+        url: "/Message/updateMessageStatus",
+        params: {
+          random_id,
         },
       });
       return response.data;
@@ -48,6 +68,21 @@ const messagesSlice = createSlice({
     // Rejected
     builder.addCase(getMessagesApi.rejected, (state, action) => {
       state.loading = false;
+      state.error = action.payload;
+    });
+    // ======Toggle Message======
+    // Pending
+    builder.addCase(toggleMessage.pending, (state, action) => {
+      state.loadingToggleMessage = true;
+    });
+    // Fulfilled
+    builder.addCase(toggleMessage.fulfilled, (state, action) => {
+      state.loadingToggleMessage = false;
+      state.error = null;
+    });
+    // Rejected
+    builder.addCase(toggleMessage.rejected, (state, action) => {
+      state.loadingToggleMessage = false;
       state.error = action.payload;
     });
   },
