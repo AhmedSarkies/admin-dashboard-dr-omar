@@ -134,7 +134,7 @@ const Settings = () => {
         data.append("instagram", values.instagram);
         data.append("play_store", values.playStore);
         data.append("app_store", values.appStore);
-        data.append("id", 2);
+        data.append("id", settings?.id);
         if (values.image.file) {
           data.append("image", values.image.file);
         }
@@ -297,6 +297,7 @@ const Settings = () => {
   useEffect(() => {
     if (settings) {
       formik.setValues({
+        id: settings?.id,
         image: {
           file: "",
           preview: settings?.image,
