@@ -644,6 +644,7 @@ const SubAdmins = () => {
     }
   }, [dispatch, role, getSubAdminsCookies]);
 
+
   useEffect(() => {
     if (formik.values.powers === "admin") {
       formik.setValues({
@@ -670,157 +671,103 @@ const SubAdmins = () => {
       });
     }
     if (formik.values.settings === false) {
-      formik.setValues({
-        ...formik.values,
-        editSettings: false,
-      });
+      formik.setFieldValue("editSettings", false);
     }
     if (formik.values.notifications === false) {
-      formik.setValues({
-        ...formik.values,
-        addNotifications: false,
-        deleteNotifications: false,
-      });
+      formik.setFieldValue("addNotifications", false);
+      formik.setFieldValue("deleteNotifications", false);
     }
     if (formik.values.introductionPages === false) {
-      formik.setValues({
-        ...formik.values,
-        addIntroductionPages: false,
-        editIntroductionPages: false,
-        deleteIntroductionPages: false,
-      });
+      formik.setFieldValue("addIntroductionPages", false);
+      formik.setFieldValue("editIntroductionPages", false);
+      formik.setFieldValue("deleteIntroductionPages", false);
     }
     if (formik.values.termsAndConditions === false) {
-      formik.setValues({
-        ...formik.values,
-        addTermsAndConditions: false,
-        editTermsAndConditions: false,
-        deleteTermsAndConditions: false,
-      });
+      formik.setFieldValue("addTermsAndConditions", false);
+      formik.setFieldValue("editTermsAndConditions", false);
+      formik.setFieldValue("deleteTermsAndConditions", false);
     }
     if (formik.values.mainCategoriesBooks === false) {
-      formik.setValues({
-        ...formik.values,
-        addMainCategoriesBooks: false,
-        editMainCategoriesBooks: false,
-        deleteMainCategoriesBooks: false,
-        subCategoriesBooks: false,
-        subSubCategoriesBooks: false,
-        books: false,
-      });
+      formik.setFieldValue("addMainCategoriesBooks", false);
+      formik.setFieldValue("editMainCategoriesBooks", false);
+      formik.setFieldValue("deleteMainCategoriesBooks", false);
+      formik.setFieldValue("subCategoriesBooks", false);
+      formik.setFieldValue("subSubCategoriesBooks", false);
+      formik.setFieldValue("books", false);
     }
     if (formik.values.subCategoriesBooks === false) {
-      formik.setValues({
-        ...formik.values,
-        addSubCategoriesBooks: false,
-        editSubCategoriesBooks: false,
-        deleteSubCategoriesBooks: false,
-        subSubCategoriesBooks: false,
-        books: false,
-      });
+      formik.setFieldValue("addSubCategoriesBooks", false);
+      formik.setFieldValue("editSubCategoriesBooks", false);
+      formik.setFieldValue("deleteSubCategoriesBooks", false);
+      formik.setFieldValue("subSubCategoriesBooks", false);
+      formik.setFieldValue("books", false);
     }
     if (formik.values.subSubCategoriesBooks === false) {
-      formik.setValues({
-        ...formik.values,
-        addSubSubCategoriesBooks: false,
-        editSubSubCategoriesBooks: false,
-        deleteSubSubCategoriesBooks: false,
-        books: false,
-      });
+      formik.setFieldValue("addSubSubCategoriesBooks", false);
+      formik.setFieldValue("editSubSubCategoriesBooks", false);
+      formik.setFieldValue("deleteSubSubCategoriesBooks", false);
+      formik.setFieldValue("books", false);
     }
     if (formik.values.categoriesAudio === false) {
-      formik.setValues({
-        ...formik.values,
-        addCategoriesAudio: false,
-        editCategoriesAudio: false,
-        deleteCategoriesAudio: false,
-        audios: false,
-      });
+      formik.setFieldValue("addCategoriesAudio", false);
+      formik.setFieldValue("editCategoriesAudio", false);
+      formik.setFieldValue("deleteCategoriesAudio", false);
+      formik.setFieldValue("audios", false);
     }
     if (formik.values.categoriesImage === false) {
-      formik.setValues({
-        ...formik.values,
-        addCategoriesImage: false,
-        editCategoriesImage: false,
-        deleteCategoriesImage: false,
-        images: false,
-      });
+      formik.setFieldValue("addCategoriesImage", false);
+      formik.setFieldValue("editCategoriesImage", false);
+      formik.setFieldValue("deleteCategoriesImage", false);
+      formik.setFieldValue("images", false);
     }
     if (formik.values.categoriesArticle === false) {
-      formik.setValues({
-        ...formik.values,
-        addCategoriesArticle: false,
-        editCategoriesArticle: false,
-        deleteCategoriesArticle: false,
-        articles: false,
-      });
+      formik.setFieldValue("addCategoriesArticle", false);
+      formik.setFieldValue("editCategoriesArticle", false);
+      formik.setFieldValue("deleteCategoriesArticle", false);
+      formik.setFieldValue("articles", false);
     }
     if (formik.values.users === false) {
-      formik.setValues({
-        ...formik.values,
-        editUser: false,
-        deleteUser: false,
-        codeContent: false,
-        notifications: false,
-      });
+      formik.setFieldValue("editUser", false);
+      formik.setFieldValue("deleteUser", false);
+      formik.setFieldValue("codeContent", false);
+      formik.setFieldValue("notifications", false);
     }
     if (formik.values.codeContent === false) {
-      formik.setValues({
-        ...formik.values,
-        addCodeContent: false,
-        editCodeContent: false,
-        sendCodeContent: false,
-      });
+      formik.setFieldValue("addCodeContent", false);
+      formik.setFieldValue("editCodeContent", false);
+      formik.setFieldValue("sendCodeContent", false);
     }
     if (formik.values.elders === false) {
-      formik.setValues({
-        ...formik.values,
-        addElders: false,
-        editElders: false,
-        deleteElders: false,
-        categoriesAudio: false,
-        audios: false,
-      });
+      formik.setFieldValue("addElders", false);
+      formik.setFieldValue("editElders", false);
+      formik.setFieldValue("deleteElders", false);
+      formik.setFieldValue("categoriesAudio", false);
+      formik.setFieldValue("audios", false);
     }
     if (formik.values.audios === false) {
-      formik.setValues({
-        ...formik.values,
-        addAudios: false,
-        editAudios: false,
-        deleteAudios: false,
-      });
+      formik.setFieldValue("addAudios", false);
+      formik.setFieldValue("editAudios", false);
+      formik.setFieldValue("deleteAudios", false);
     }
     if (formik.values.articles === false) {
-      formik.setValues({
-        ...formik.values,
-        addArticles: false,
-        editArticles: false,
-        deleteArticles: false,
-      });
+      formik.setFieldValue("addArticles", false);
+      formik.setFieldValue("editArticles", false);
+      formik.setFieldValue("deleteArticles", false);
     }
     if (formik.values.books === false) {
-      formik.setValues({
-        ...formik.values,
-        addBooks: false,
-        editBooks: false,
-        deleteBooks: false,
-      });
+      formik.setFieldValue("addBooks", false);
+      formik.setFieldValue("editBooks", false);
+      formik.setFieldValue("deleteBooks", false);
     }
     if (formik.values.images === false) {
-      formik.setValues({
-        ...formik.values,
-        addImages: false,
-        editImages: false,
-        deleteImages: false,
-      });
+      formik.setFieldValue("addImages", false);
+      formik.setFieldValue("editImages", false);
+      formik.setFieldValue("deleteImages", false);
     }
     if (formik.values.subAdmins === false) {
-      formik.setValues({
-        ...formik.values,
-        addSubAdmins: false,
-        editSubAdmins: false,
-        deleteSubAdmins: false,
-      });
+      formik.setFieldValue("addSubAdmins", false);
+      formik.setFieldValue("editSubAdmins", false);
+      formik.setFieldValue("deleteSubAdmins", false);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
@@ -1224,7 +1171,7 @@ const SubAdmins = () => {
                         <IoMdEye
                           className="view-btn"
                           onClick={() => {
-                              handleEdit(result);
+                            handleEdit(result);
                             setToggle({
                               ...toggle,
                               read: true,
@@ -3758,7 +3705,11 @@ const SubAdmins = () => {
                       placeholder={t("subAdmin.columns.status")}
                       name="status"
                       disabled={toggle.read}
-                      value={formik.values.status === "inactive" ? t("inactive") : t("active")}
+                      value={
+                        formik.values.status === "inactive"
+                          ? t("inactive")
+                          : t("active")
+                      }
                     />
                   ) : (
                     <div className="dropdown form-input">
@@ -3840,7 +3791,11 @@ const SubAdmins = () => {
                       placeholder={t("subAdmin.columns.powers")}
                       name="powers"
                       disabled={toggle.read}
-                      value={formik.values.powers === "admin" ? t("admin") : t("supAdmin")}
+                      value={
+                        formik.values.powers === "admin"
+                          ? t("admin")
+                          : t("supAdmin")
+                      }
                     />
                   ) : (
                     <div className="dropdown form-input">
