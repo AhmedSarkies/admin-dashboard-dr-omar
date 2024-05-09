@@ -5,17 +5,14 @@ import {
   AccordionBody,
   AccordionHeader,
   AccordionItem,
-  Spinner,
   UncontrolledAccordion,
 } from "reactstrap";
 import { IoMdSettings } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
 import Cookies from "js-cookie";
-import { useSelector } from "react-redux";
 
 const Sidebar = ({ menu, linkItems, logo }) => {
   const { t } = useTranslation();
-  const { loading } = useSelector((state) => state.subAdmin);
   const role = Cookies.get("_role");
   const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
   const getSpecialContentCookies = Cookies.get("GetSpecialContent");
@@ -47,7 +44,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
             <li
               className="sidebar-item"
               key={index}
-              style={{ display: item?.display ? "block" : "none" }}
+              style={{ display: item?.display === false ? "none" : "block" }}
             >
               <NavLink
                 className={({ isActive }) =>
@@ -87,7 +84,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                     <li
                       key={index}
                       className="ps-0 pe-0 mb-3"
-                      style={{ display: item?.display ? "block" : "none" }}
+                      style={{ display: item?.display === false ? "none" : "block" }}
                     >
                       <NavLink
                         className={({ isActive }) =>
@@ -114,7 +111,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                   getImageCategoriesCookies === "1" &&
                   getAudiosCategoriesCookies === "1" &&
                   getArticlesCategoriesCookies === "1") ||
-                false
+                true
                   ? "block"
                   : "none",
             }}
@@ -132,7 +129,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                     <li
                       key={index}
                       className="ps-0 pe-0 mb-3"
-                      style={{ display: item?.display ? "block" : "none" }}
+                      style={{ display: item?.display === false ? "none" : "block" }}
                     >
                       <NavLink
                         className={({ isActive }) =>
@@ -152,7 +149,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
             <li
               className="sidebar-item"
               key={index}
-              style={{ display: item?.display ? "block" : "none" }}
+              style={{ display: item?.display === false ? "none" : "block" }}
             >
               <NavLink
                 className={({ isActive }) =>
