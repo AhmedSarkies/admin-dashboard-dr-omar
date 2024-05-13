@@ -216,8 +216,9 @@ const Audios = () => {
           const formDate = {
             id: values.id,
             title: values.title,
+            elder_id: values.elder.id,
             status: values.status === "Public" ? "public" : "private",
-            Audio_category: values.audioCategory.id,
+            audios_categories_id: values.audioCategory.id,
             is_active: values.is_active,
             tag_name: ["tag 1", "tag 2"],
           };
@@ -910,11 +911,12 @@ const Audios = () => {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
+                                  elder_id: result.elder.id,
                                   status:
                                     result?.status === t("public")
                                       ? "private"
                                       : "public",
-                                  Audio_category: result.categories.id,
+                                      audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 1 : 0,
                                   tag_name: ["tag 1", "tag 2"],
@@ -962,11 +964,12 @@ const Audios = () => {
                                 const data = {
                                   id: result.id,
                                   title: result.title,
+                                  elder_id: result.elder.id,
                                   status:
                                     result?.status === t("public")
                                       ? "public"
                                       : "private",
-                                  Audio_category: result.categories.id,
+                                      audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 0 : 1,
                                   tag_name: ["tag 1", "tag 2"],
