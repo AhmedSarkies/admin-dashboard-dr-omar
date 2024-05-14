@@ -87,6 +87,7 @@ const Audios = () => {
       title: true,
       category: true,
       audio: true,
+      audios_time: true,
       visits: true,
       favorites: true,
       downloads: true,
@@ -133,13 +134,18 @@ const Audios = () => {
     { id: 4, name: "title", label: t("audios.columns.audio.title") },
     { id: 5, name: "category", label: t("audios.columns.audio.category") },
     { id: 6, name: "audio", label: t("audios.columns.audio.audio") },
-    { id: 7, name: "visits", label: t("listening") },
-    { id: 8, name: "favorites", label: t("favorites") },
-    { id: 9, name: "downloads", label: t("downloads") },
-    { id: 10, name: "shares", label: t("shares") },
-    { id: 11, name: "status", label: t("content") },
-    { id: 12, name: "activation", label: t("activation") },
-    { id: 13, name: "control", label: t("action") },
+    {
+      id: 7,
+      name: "audios_time",
+      label: t("audios.columns.audio.audios_time"),
+    },
+    { id: 8, name: "visits", label: t("listening") },
+    { id: 9, name: "favorites", label: t("favorites") },
+    { id: 10, name: "downloads", label: t("downloads") },
+    { id: 11, name: "shares", label: t("shares") },
+    { id: 12, name: "status", label: t("content") },
+    { id: 13, name: "activation", label: t("activation") },
+    { id: 14, name: "control", label: t("action") },
   ];
 
   // const [keyword, setKeyword] = useState([]);
@@ -192,6 +198,7 @@ const Audios = () => {
               title: values.title,
               image: values.image.file,
               audio: values.audio.file,
+              audios_time: toggle.duration.trim(),
               status: values.status,
               elder_id: values.elder.id,
               is_active: values.is_active,
@@ -204,6 +211,7 @@ const Audios = () => {
               setToggle({
                 ...toggle,
                 add: !toggle.add,
+                duration: "00:00",
               });
               toast.success(t("toast.audio.addedSuccess"));
             } else {
@@ -217,6 +225,7 @@ const Audios = () => {
             id: values.id,
             title: values.title,
             elder_id: values.elder.id,
+            audios_time: values.audios_time,
             status: values.status === "Public" ? "public" : "private",
             audios_categories_id: values.audioCategory.id,
             is_active: values.is_active,
@@ -227,6 +236,7 @@ const Audios = () => {
           }
           if (values.audio.file) {
             formDate.audio = values.audio.file;
+            formDate.audios_time = toggle.duration.trim();
           }
           dispatch(updateAudioApi(formDate)).then((res) => {
             if (!res.error) {
@@ -235,6 +245,7 @@ const Audios = () => {
               setToggle({
                 ...toggle,
                 edit: !toggle.edit,
+                duration: "00:00",
               });
               toast.success(t("toast.audio.updatedSuccess"));
             } else {
@@ -300,13 +311,13 @@ const Audios = () => {
             );
             setToggle({
               ...toggle,
-              duration: `
-              ${hours < 10 ? `0${hours}` : hours}:${
+              duration: `${hours < 10 ? `0${hours}` : hours}:${
                 minutes < 10 ? `0${minutes}` : minutes
               }:${seconds < 10 ? `0${seconds}` : seconds}`,
             });
           });
         };
+        fileReader.readAsArrayBuffer(file);
       }
     } catch (error) {
       console.log(error);
@@ -326,6 +337,7 @@ const Audios = () => {
       title: audio.title,
       image: audio.image,
       audio: audio.audio,
+      audios_time: audio.audios_time,
       status: audio.status === t("public") ? "Public" : "Private",
       is_active: audio.is_active === t("active") ? 1 : 0,
       elder: {
@@ -615,9 +627,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.audios_time && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("listening")}
+                  {t("audios.columns.audio.audios_time")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -627,9 +639,9 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("favorites")}
+                  {t("listening")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -639,10 +651,25 @@ const Audios = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.downloads && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("downloads")}
+                  {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -654,10 +681,10 @@ const Audios = () => {
               {toggle.toggleColumns.shares && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[11])}
                 >
                   {t("shares")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -669,10 +696,10 @@ const Audios = () => {
               {toggle.toggleColumns.status && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[11])}
+                  onClick={() => handleSort(columns[12])}
                 >
                   {t("content")}
-                  {toggle.sortColumn === columns[11].name ? (
+                  {toggle.sortColumn === columns[12].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -684,10 +711,10 @@ const Audios = () => {
               {toggle.toggleColumns.activation && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[12])}
+                  onClick={() => handleSort(columns[13])}
                 >
                   {t("activation")}
-                  {toggle.sortColumn === columns[12].name ? (
+                  {toggle.sortColumn === columns[13].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -701,19 +728,7 @@ const Audios = () => {
                 role === "admin" ||
                 (editAudiosCookies === "1" && getAudiosCookies === "1")) &&
                 toggle.toggleColumns.control && (
-                  <th
-                    className="table-th"
-                    onClick={() => handleSort(columns[13])}
-                  >
-                    {t("action")}
-                    {toggle.sortColumn === columns[13].name ? (
-                      toggle.sortOrder === "asc" ? (
-                        <TiArrowSortedUp />
-                      ) : (
-                        <TiArrowSortedDown />
-                      )
-                    ) : null}
-                  </th>
+                  <th className="table-th">{t("action")}</th>
                 )}
             </tr>
           </thead>
@@ -727,8 +742,8 @@ const Audios = () => {
                     addAudiosCookies === "0" &&
                     editAudiosCookies === "0" &&
                     deleteAudiosCookies === "0"
-                      ? 13
-                      : 14
+                      ? 14
+                      : 15
                   }
                 >
                   <p className="no-data mb-0">
@@ -754,8 +769,8 @@ const Audios = () => {
                     addAudiosCookies === "0" &&
                     editAudiosCookies === "0" &&
                     deleteAudiosCookies === "0"
-                      ? 13
-                      : 14
+                      ? 14
+                      : 15
                   }
                 >
                   <div className="no-data mb-0">
@@ -785,8 +800,8 @@ const Audios = () => {
                       addAudiosCookies === "0" &&
                       editAudiosCookies === "0" &&
                       deleteAudiosCookies === "0"
-                        ? 13
-                        : 14
+                        ? 14
+                        : 15
                     }
                   >
                     <p className="no-data mb-0">{t("noData")}</p>
@@ -806,8 +821,8 @@ const Audios = () => {
                     addAudiosCookies === "0" &&
                     editAudiosCookies === "0" &&
                     deleteAudiosCookies === "0"
-                      ? 13
-                      : 14
+                      ? 14
+                      : 15
                   }
                 >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
@@ -874,6 +889,9 @@ const Audios = () => {
                           />
                         </td>
                       )}
+                      {toggle.toggleColumns.audios_time && (
+                        <td className="table-td">{result?.audios_time}</td>
+                      )}
                       {toggle.toggleColumns.visits && (
                         <td className="table-td">{result?.visits_count}</td>
                       )}
@@ -912,11 +930,12 @@ const Audios = () => {
                                   id: result.id,
                                   title: result.title,
                                   elder_id: result.elder.id,
+                                  audios_time: result.audios_time,
                                   status:
                                     result?.status === t("public")
                                       ? "private"
                                       : "public",
-                                      audios_categories_id: result.categories.id,
+                                  audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 1 : 0,
                                   tag_name: ["tag 1", "tag 2"],
@@ -965,11 +984,12 @@ const Audios = () => {
                                   id: result.id,
                                   title: result.title,
                                   elder_id: result.elder.id,
+                                  audios_time: result.audios_time,
                                   status:
                                     result?.status === t("public")
                                       ? "public"
                                       : "private",
-                                      audios_categories_id: result.categories.id,
+                                  audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 0 : 1,
                                   tag_name: ["tag 1", "tag 2"],
@@ -2142,504 +2162,6 @@ const Audios = () => {
         loading === false && <PaginationUI />}
     </div>
   );
-
-  // return (
-  //   <section className="audios-container">
-  //     {/* Add Audio */}
-  //     <Overlay>
-  //       <div className="overlay-header mb-4">
-  //         <h3 className="overlay-title text-center">اضافة صوتية</h3>
-  //       </div>
-  //       <form className="overlay-form" onSubmit={handleSubmit}>
-  //         <Row className="justify-content-center">
-  //           <Col
-  //             lg={4}
-  //             className="d-flex justify-content-center align-items-center"
-  //           >
-  //             <div className="image-preview-container d-flex justify-content-center align-items-center">
-  //               <label
-  //                 htmlFor="image"
-  //                 className="form-label d-flex justify-content-center align-items-center"
-  //               >
-  //                 <img
-  //                   src={image && imagePreview ? imagePreview : anonymous}
-  //                   alt="avatar"
-  //                   className="image-preview"
-  //                 />
-  //               </label>
-  //             </div>
-  //           </Col>
-  //           <Col lg={4} className="mt-3">
-  //             <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse mb-3">
-  //               <label htmlFor="image" className="form-label">
-  //                 <ImUpload /> {image ? image.name : "اختر صورة"}
-  //               </label>
-  //               <input
-  //                 type="file"
-  //                 accept="image/*"
-  //                 className="form-input form-img-input"
-  //                 id="image"
-  //                 onChange={handleImageChange}
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <input
-  //                 type="file"
-  //                 name="audio"
-  //                 accept="audio/*"
-  //                 className="form-input"
-  //                 id="upload-audio"
-  //                 onChange={handleDurationAudio}
-  //               />
-  //               {/* Duration Audio */}
-  //               {loading ? (
-  //                 <span className="text-primary">جاري تحميل الصوتية</span>
-  //               ) : (
-  //                 <label
-  //                   htmlFor="upload-audio"
-  //                   className="form-label d-block mt-2"
-  //
-  //                 >
-  //                   <FaFileUpload />
-  //                   {audio ? audio.name.split(".")[0] : "اختر ملف"}
-  //                   {audio && (
-  //                     <Fragment>
-  //                       <br />
-  //                       <span>المدة: {duration}</span>
-  //                       <br />
-  //                       <audio controls className="mt-2">
-  //                         <source src={audioPreview} type="audio/ogg" />
-  //                       </audio>
-  //                     </Fragment>
-  //                   )}
-  //                 </label>
-  //               )}
-  //             </div>
-  //             <div
-  //               className="form-group-container d-flex flex-column align-items-end mb-3"
-  //               style={{ marginTop: "-4px" }}
-  //             >
-  //               <label htmlFor="name" className="form-label">
-  //                 اسم الصوتية
-  //               </label>
-  //               <input
-  //                 type="text"
-  //                 className="form-input"
-  //                 id="name"
-  //                 placeholder="اسم الصوتية"
-  //                 required
-  //                 value={name}
-  //                 onChange={(e) => setName(e.target.value)}
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="nameAuthor" className="form-label">
-  //                 العالم
-  //               </label>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={nameAuthorOptions[0]}
-  //                 name="status"
-  //                 options={nameAuthorOptions}
-  //                 onChange={(e) => setNameAuthor(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="nameAuthor"
-  //               />
-  //             </div>
-  //           </Col>
-  //           <Col lg={4}>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="status" className="form-label">
-  //                 الحالة
-  //               </label>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={statusOptions[0]}
-  //                 name="status"
-  //                 options={statusOptions}
-  //                 onChange={(e) => setStatus(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="status"
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="categories" className="form-label">
-  //                 التصنيفات
-  //               </label>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={categoriesOptions[0]}
-  //                 name="categories"
-  //                 options={categoriesOptions}
-  //                 onChange={(e) => setCategories(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="categories"
-  //               />
-  //             </div>
-  //             <div className="form-group-container form-group-container-keywords d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="keywords" className="form-label">
-  //                 الكلمات المفتاحية
-  //               </label>
-  //               <label
-  //                 htmlFor="keywords"
-  //                 className="form-label form-keywords-label p-3"
-  //               >
-  //                 <ul className="d-flex flex-row-reverse justify-content-start align-items-center flex-wrap w-100 p-0 mb-1">
-  //                   {keyword?.map((item) => (
-  //                     <li
-  //                       className="list-unstyled badge flex-wrap"
-  //                       key={item.id}
-  //                       onClick={() => handleRemoveKeyword(item.id)}
-  //                     >
-  //                       {item.keyword}
-  //                     </li>
-  //                   ))}
-  //                   <li className="list-unstyled badge flex-wrap">
-  //                     <input
-  //                       type="text"
-  //                       name="keywords"
-  //                       id="keywords"
-  //                       className="form-input form-keywords-input w-100"
-  //                       onKeyDown={handleAddKeyword}
-  //                       placeholder="اضف كلمة مفتاحية"
-  //                     />
-  //                   </li>
-  //                 </ul>
-  //               </label>
-  //             </div>
-  //           </Col>
-  //           <Col lg={12}>
-  //             <div className="form-group-container d-flex flex-row-reverse align-items-center justify-content-lg-start justify-content-center gap-3 mb-3 mt-3">
-  //               <button type="submit" className={`add-btn${loading ? " loading-btn" : ""}`}>
-  //                 اضافة
-  //               </button>
-  //               <button
-  //                 type="button"
-  //                 className="cancel-btn"
-  //                 onClick={() => {
-  //
-  //                   dispatch(toggleOverlay());
-  //                 }}
-  //               >
-  //                 الغاء
-  //               </button>
-  //             </div>
-  //           </Col>
-  //         </Row>
-  //       </form>
-  //     </Overlay>
-  //     {/* Edit Book */}
-  //     <EditOverlay>
-  //       <div className="overlay-header mb-4">
-  //         <h3 className="overlay-title text-center">تعديل كتاب</h3>
-  //       </div>
-  //       <form
-  //         className={`overlay-form overlay-edit ${edit ? "edit" : ""}`}
-  //         onSubmit={handleEditSubmit}
-  //         ref={formRef}
-  //       >
-  //         <Row className="justify-content-center">
-  //           <Col
-  //             lg={4}
-  //             className="d-flex justify-content-center align-items-center"
-  //           >
-  //             <div className="image-preview-container d-flex justify-content-center align-items-center">
-  //               <label
-  //                 htmlFor="editImage"
-  //                 className="form-label d-flex justify-content-center align-items-center"
-  //               >
-  //                 <img
-  //                   src={image && imagePreview ? editImagePreview : anonymous}
-  //                   alt="avatar"
-  //                   className="image-preview"
-  //                 />
-  //               </label>
-  //             </div>
-  //           </Col>
-  //           <Col lg={4} className="mt-3">
-  //             <div className="form-group-container d-flex justify-content-lg-start justify-content-center flex-row-reverse mb-3">
-  //               <label htmlFor="editImage" className="form-label">
-  //                 <ImUpload /> {image ? editImage.name : "اختر صورة"}
-  //               </label>
-  //               <input
-  //                 type="file"
-  //                 accept="image/*"
-  //                 className="form-input form-img-input"
-  //                 id="editImage"
-  //                 onChange={handleImageChange}
-  //                 disabled
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <input
-  //                 type="file"
-  //                 name="audio"
-  //                 accept="audio/*"
-  //                 className="form-input"
-  //                 id="upload-audio"
-  //                 onChange={handleDurationAudio}
-  //                 disabled
-  //               />
-  //               {/* Duration Audio */}
-  //               <label
-  //                 htmlFor="upload-audio"
-  //                 className="form-label d-block mt-2"
-  //
-  //               >
-  //                 <FaFileUpload />
-  //                 {audio ? editAudio.name.split(".")[0] : "اختر ملف"}
-  //                 {audio && (
-  //                   <Fragment>
-  //                     <br />
-  //                     <span>المدة: {duration}</span>
-  //                     <br />
-  //                     <audio controls className="mt-2">
-  //                       <source src={editAudioPreview} type="audio/ogg" />
-  //                     </audio>
-  //                   </Fragment>
-  //                 )}
-  //               </label>
-  //             </div>
-  //             <div
-  //               className="form-group-container d-flex flex-column align-items-end mb-3"
-  //               style={{ marginTop: "-4px" }}
-  //             >
-  //               <label htmlFor="editName" className="form-label">
-  //                 اسم الصوتية
-  //               </label>
-  //               <p
-  //                 className="form-input form-input-edit w-100 mb-0"
-  //                 onDoubleClick={editHandlerDoubleClick}
-  //               >
-  //                 اسم الصوتية
-  //               </p>
-  //               <input
-  //                 type="text"
-  //                 className="form-input form-input-edit w-100"
-  //                 id="editName"
-  //                 placeholder="اسم الصوتية"
-  //                 required
-  //                 value={editName}
-  //                 onChange={(e) => setEditName(e.target.value)}
-  //                 disabled
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="editNameAuthor" className="form-label">
-  //                 العالم
-  //               </label>
-  //               <p
-  //                 className="form-input form-input-edit w-100 mb-0"
-  //                 onDoubleClick={editHandlerDoubleClick}
-  //               >
-  //                 العالم
-  //               </p>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={nameAuthorOptions[0]}
-  //                 name="editNameAuthor"
-  //                 options={nameAuthorOptions}
-  //                 onChange={(e) => setEditNameAuthor(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="editNameAuthor"
-  //                 disabled
-  //               />
-  //             </div>
-  //           </Col>
-  //           <Col lg={4}>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="status" className="form-label">
-  //                 الحالة
-  //               </label>
-  //               <p
-  //                 className="form-input form-input-edit w-100 mb-0"
-  //                 onDoubleClick={editHandlerDoubleClick}
-  //               >
-  //                 الحالة
-  //               </p>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={statusOptions[0]}
-  //                 name="status"
-  //                 options={statusOptions}
-  //                 onChange={(e) => setEditStatus(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="status"
-  //               />
-  //             </div>
-  //             <div className="form-group-container d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="editCategories" className="form-label">
-  //                 التصنيفات
-  //               </label>
-  //               <p
-  //                 className="form-input form-input-edit w-100 mb-0"
-  //                 onDoubleClick={editHandlerDoubleClick}
-  //               >
-  //                 التصنيفات
-  //               </p>
-  //               <Select
-  //                 className="basic-single"
-  //                 classNamePrefix="select"
-  //                 defaultValue={categoriesOptions[0]}
-  //                 name="editCategories"
-  //                 options={categoriesOptions}
-  //                 onChange={(e) => setEditCategories(e.value)}
-  //                 isClearable={false}
-  //                 isRtl={true}
-  //                 isSearchable={false}
-  //                 id="editCategories"
-  //                 disabled
-  //               />
-  //             </div>
-  //             <div className="form-group-container form-group-container-keywords d-flex flex-column align-items-end mb-3">
-  //               <label htmlFor="editKeywords" className="form-label">
-  //                 الكلمات المفتاحية
-  //               </label>
-  //               <p
-  //                 className="form-input form-input-edit w-100 mb-0 mt-0"
-  //                 onDoubleClick={editHandlerDoubleClick}
-  //               >
-  //                 الكلمات المفتاحية
-  //               </p>
-  //               <label
-  //                 htmlFor="editKeywords"
-  //                 className="form-label form-keywords-label mb-0"
-  //                 id="keywords-label-edit"
-  //                 style={{
-  //                   display: "none",
-  //                 }}
-  //               >
-  //                 <ul className="d-flex flex-row-reverse justify-content-start align-items-center flex-wrap w-100 p-0 mb-1">
-  //                   {keyword?.map((item) => (
-  //                     <li
-  //                       className="list-unstyled badge flex-wrap"
-  //                       key={item.id}
-  //                       onClick={() => handleRemoveKeyword(item.id)}
-  //                     >
-  //                       {item.keyword}
-  //                     </li>
-  //                   ))}
-  //                   <li className="list-unstyled flex-wrap pt-1 pb-1">
-  //                     <input
-  //                       type="text"
-  //                       name="keywords"
-  //                       id="editKeywords"
-  //                       className="form-input form-keywords-input"
-  //                       onKeyDown={handleAddKeyword}
-  //                       placeholder="اضف كلمة مفتاحية"
-  //                       disabled={edit}
-  //                     />
-  //                   </li>
-  //                 </ul>
-  //               </label>
-  //             </div>
-  //           </Col>
-  //           <Col lg={12}>
-  //             <div className="form-group-container d-flex flex-row-reverse align-items-center justify-content-lg-start justify-content-center gap-3 mb-3 mt-3">
-  //               <button type="submit" className={`add-btn${loading ? " loading-btn" : ""}`}>
-  //                 حفظ
-  //               </button>
-  //               <button
-  //                 type="button"
-  //                 className="edit-btn"
-  //                 onClick={() => {
-  //                   editHandlerBtn();
-  //                   setEdit(false);
-  //                 }}
-  //                 style={{ display: edit ? "block" : "none" }}
-  //               >
-  //                 تعديل
-  //               </button>
-  //               <button
-  //                 type="button"
-  //                 className="cancel-btn"
-  //                 onClick={() => {
-  //
-  //                   editCancelHandler();
-  //                   setEdit(true);
-  //                   if (formRef.current.classList.contains("edit")) {
-  //                     dispatch(toggleEditOverlay());
-  //                   }
-  //                 }}
-  //               >
-  //                 الغاء
-  //               </button>
-  //             </div>
-  //           </Col>
-  //         </Row>
-  //       </form>
-  //     </EditOverlay>
-  //     <Table Icon={MdAdd} title="الصوتيات">
-  //       <thead>
-  //         <tr>
-  //           <th className="table-th">الصورة</th>
-  //           <th className="table-th">اسم الصوتية</th>
-  //           <th className="table-th">اسم العالم</th>
-  //           <th className="table-th">التصنيف</th>
-  //           <th className="table-th">المدة</th>
-  //           <th className="table-th">المفضلة</th>
-  //           <th className="table-th">المشاركة</th>
-  //           <th className="table-th">الحالة</th>
-  //           <th className="table-th">الافعال</th>
-  //         </tr>
-  //       </thead>
-  //       <tbody>
-  //         {
-  //           // audios ?
-  //           // audios.map((article) => (
-  //           <tr key={1}>
-  //             <td className="table-td">
-  //               <img
-  //                 src="https://i.pravatar.cc/150?img=0"
-  //                 alt="avatar"
-  //                 className="table-avatar"
-  //               />
-  //             </td>
-  //             <td className="table-td name">اسم</td>
-  //             <td className="table-td name">اسم</td>
-  //             <td className="table-td name">اسم</td>
-  //             <td className="table-td">0</td>
-  //             <td className="table-td">0</td>
-  //             <td className="table-td">0</td>
-  //             <td className="table-td">
-  //               <span
-  //                 className="table-status badge"
-  //                 style={{
-  //                   backgroundColor: "عام" ? "green" : "red",
-  //                 }}
-  //               >
-  //                 عام
-  //               </span>
-  //             </td>
-  //             <td className="table-td">
-  //               <span className="table-btn-container">
-  //                 <FaEdit onClick={() => dispatch(toggleEditOverlay())} />
-  //                 <MdDeleteOutline />
-  //               </span>
-  //             </td>
-  //           </tr>
-  //           // ))
-  //           // : <h3 className="no-data">لا يوجد بيانات</h3>
-  //         }
-  //       </tbody>
-  //     </Table>
-  //   </section>
-  // );
 };
 
 export default Audios;
