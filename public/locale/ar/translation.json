@@ -264,6 +264,8 @@
       "logo": "الشعار",
       "background": "الخلفية",
       "elder": "الشيخ",
+      "image_elder": "صورة الشيخ",
+      "image_active_private_content": "صورة النشاط الخاص",
       "activationCode": "رمز التفعيل",
       "code": {
         "email": "البريد الإلكتروني",
@@ -434,6 +436,7 @@
         "image": "صورة الصوتية",
         "title": "عنوان الصوتية",
         "audio": "الصوتية",
+        "audios_time": "مدة الصوتية",
         "category": "التصنيف"
       }
     }

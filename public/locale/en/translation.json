@@ -264,6 +264,8 @@
       "logo": "Logo",
       "background": "Background",
       "elder": "Elder",
+      "image_elder": "Image Elder",
+      "image_active_private_content": "Image Active Private Content",
       "activationCode": "Activation Code",
       "code": {
         "email": "Email",
@@ -435,6 +437,7 @@
         "image": "Image Audio",
         "title": "Title Audio",
         "audio": "Audio",
+        "audios_time": "Audio Duration",
         "category": "Category"
       }
     }
