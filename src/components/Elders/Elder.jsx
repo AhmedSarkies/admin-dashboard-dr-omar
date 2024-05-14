@@ -81,6 +81,7 @@ const Elder = () => {
       image: true,
       title: true,
       audio: true,
+      audios_time: true,
       category: true,
       visits: true,
       favorites: true,
@@ -122,6 +123,7 @@ const Elder = () => {
               title: values.title,
               image: values.image.file,
               audio: values.audio.file,
+              audios_time: toggle.duration.trim(),
               status: values.status,
               elder_id: id,
               is_active: values.is_active,
@@ -136,6 +138,7 @@ const Elder = () => {
                 elders: false,
                 audioCategory: false,
                 status: false,
+                duration: "00:00",
               });
               dispatch(getScholarByIdApi(id));
               toast.success(t("toast.audio.addedSuccess"));
@@ -149,6 +152,7 @@ const Elder = () => {
           const formDate = {
             id: values.id,
             title: values.title,
+            audios_time: values.audios_time,
             elder_id: id,
             status: values.status === "Public" ? "public" : "private",
             audios_categories_id: values.audioCategory.id,
@@ -160,6 +164,7 @@ const Elder = () => {
           }
           if (values.audio.file) {
             formDate.audio = values.audio.file;
+            formDate.audios_time = toggle.duration.trim();
           }
           dispatch(updateAudioApi(formDate)).then((res) => {
             if (!res.error) {
@@ -170,6 +175,7 @@ const Elder = () => {
                 audioCategory: false,
                 status: false,
                 elders: false,
+                duration: "00:00",
               });
               dispatch(getScholarByIdApi(id));
               toast.success(t("toast.audio.updatedSuccess"));
@@ -203,13 +209,18 @@ const Elder = () => {
     { id: 2, name: "title", label: t("audios.columns.audio.title") },
     { id: 3, name: "category", label: t("audios.columns.audio.category") },
     { id: 4, name: "audio", label: t("audios.columns.audio.audio") },
-    { id: 5, name: "visits", label: t("listening") },
-    { id: 6, name: "favorites", label: t("favorites") },
-    { id: 7, name: "downloads", label: t("downloads") },
-    { id: 8, name: "shares", label: t("shares") },
-    { id: 9, name: "status", label: t("content") },
-    { id: 10, name: "activation", label: t("activation") },
-    { id: 11, name: "control", label: t("action") },
+    {
+      id: 5,
+      name: "audios_time",
+      label: t("audios.columns.audio.audios_time"),
+    },
+    { id: 6, name: "visits", label: t("listening") },
+    { id: 7, name: "favorites", label: t("favorites") },
+    { id: 8, name: "downloads", label: t("downloads") },
+    { id: 9, name: "shares", label: t("shares") },
+    { id: 10, name: "status", label: t("content") },
+    { id: 11, name: "activation", label: t("activation") },
+    { id: 12, name: "control", label: t("action") },
   ];
 
   // Handle Image Change
@@ -272,6 +283,7 @@ const Elder = () => {
             });
           });
         };
+        fileReader.readAsArrayBuffer(file);
       }
     } catch (error) {
       console.log(error);
@@ -291,6 +303,7 @@ const Elder = () => {
       title: audio.title,
       image: audio.image,
       audio: audio.audio,
+      audios_time: audio.audios_time,
       status: audio.status === t("public") ? "Public" : "Private",
       is_active: audio.is_active === t("active") ? 1 : 0,
       elder: {
@@ -561,9 +574,9 @@ const Elder = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.visits && (
+              {toggle.toggleColumns.audios_time && (
                 <th className="table-th" onClick={() => handleSort(columns[5])}>
-                  {t("listening")}
+                  {t("audios.columns.audio.audios_time")}
                   {toggle.sortColumn === columns[5].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -573,9 +586,9 @@ const Elder = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.favorites && (
+              {toggle.toggleColumns.visits && (
                 <th className="table-th" onClick={() => handleSort(columns[6])}>
-                  {t("favorites")}
+                  {t("listening")}
                   {toggle.sortColumn === columns[6].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -585,9 +598,9 @@ const Elder = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.downloads && (
+              {toggle.toggleColumns.favorites && (
                 <th className="table-th" onClick={() => handleSort(columns[7])}>
-                  {t("downloads")}
+                  {t("favorites")}
                   {toggle.sortColumn === columns[7].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -597,9 +610,9 @@ const Elder = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.shares && (
+              {toggle.toggleColumns.downloads && (
                 <th className="table-th" onClick={() => handleSort(columns[8])}>
-                  {t("shares")}
+                  {t("downloads")}
                   {toggle.sortColumn === columns[8].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
@@ -609,10 +622,25 @@ const Elder = () => {
                   ) : null}
                 </th>
               )}
-              {toggle.toggleColumns.status && (
+              {toggle.toggleColumns.shares && (
                 <th className="table-th" onClick={() => handleSort(columns[9])}>
-                  {t("content")}
+                  {t("shares")}
                   {toggle.sortColumn === columns[9].name ? (
+                    toggle.sortOrder === "asc" ? (
+                      <TiArrowSortedUp />
+                    ) : (
+                      <TiArrowSortedDown />
+                    )
+                  ) : null}
+                </th>
+              )}
+              {toggle.toggleColumns.status && (
+                <th
+                  className="table-th"
+                  onClick={() => handleSort(columns[10])}
+                >
+                  {t("content")}
+                  {toggle.sortColumn === columns[10].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -624,10 +652,10 @@ const Elder = () => {
               {toggle.toggleColumns.activation && (
                 <th
                   className="table-th"
-                  onClick={() => handleSort(columns[10])}
+                  onClick={() => handleSort(columns[11])}
                 >
                   {t("activation")}
-                  {toggle.sortColumn === columns[10].name ? (
+                  {toggle.sortColumn === columns[11].name ? (
                     toggle.sortOrder === "asc" ? (
                       <TiArrowSortedUp />
                     ) : (
@@ -641,19 +669,7 @@ const Elder = () => {
                 role === "admin" ||
                 (editAudiosCookies === "1" && getAudiosCookies === "1")) &&
                 toggle.toggleColumns.control && (
-                  <th
-                    className="table-th"
-                    onClick={() => handleSort(columns[11])}
-                  >
-                    {t("action")}
-                    {toggle.sortColumn === columns[11].name ? (
-                      toggle.sortOrder === "asc" ? (
-                        <TiArrowSortedUp />
-                      ) : (
-                        <TiArrowSortedDown />
-                      )
-                    ) : null}
-                  </th>
+                  <th className="table-th">{t("action")}</th>
                 )}
             </tr>
           </thead>
@@ -665,8 +681,8 @@ const Elder = () => {
                   className="table-td"
                   colSpan={
                     editAudiosCookies === "0" && deleteAudiosCookies === "0"
-                      ? 11
-                      : 12
+                      ? 12
+                      : 13
                   }
                 >
                   <p className="no-data mb-0">
@@ -690,8 +706,8 @@ const Elder = () => {
                   className="table-td"
                   colSpan={
                     editAudiosCookies === "0" && deleteAudiosCookies === "0"
-                      ? 11
-                      : 12
+                      ? 12
+                      : 13
                   }
                 >
                   <div className="no-data mb-0">
@@ -719,8 +735,8 @@ const Elder = () => {
                     className="table-td"
                     colSpan={
                       editAudiosCookies === "0" && deleteAudiosCookies === "0"
-                        ? 11
-                        : 12
+                        ? 12
+                        : 13
                     }
                   >
                     <p className="no-data mb-0">{t("noData")}</p>
@@ -738,8 +754,8 @@ const Elder = () => {
                   className="table-td"
                   colSpan={
                     editAudiosCookies === "0" && deleteAudiosCookies === "0"
-                      ? 11
-                      : 12
+                      ? 12
+                      : 13
                   }
                 >
                   <p className="no-data no-columns mb-0">{t("noColumns")}</p>
@@ -789,6 +805,9 @@ const Elder = () => {
                           />
                         </td>
                       )}
+                      {toggle.toggleColumns.audios_time && (
+                        <td className="table-td">{result?.audios_time}</td>
+                      )}
                       {toggle.toggleColumns.visits && (
                         <td className="table-td">{result?.visits_count}</td>
                       )}
@@ -818,11 +837,12 @@ const Elder = () => {
                                   id: result.id,
                                   title: result.title,
                                   elder_id: id,
+                                  audios_time: result.audios_time,
                                   status:
                                     result?.status === t("public")
                                       ? "private"
                                       : "public",
-                                      audios_categories_id: result.categories.id,
+                                  audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 1 : 0,
                                   tag_name: ["tag 1", "tag 2"],
@@ -862,11 +882,12 @@ const Elder = () => {
                                   id: result.id,
                                   title: result.title,
                                   elder_id: id,
+                                  audios_time: result.audios_time,
                                   status:
                                     result?.status === t("public")
                                       ? "public"
                                       : "private",
-                                      audios_categories_id: result.categories.id,
+                                  audios_categories_id: result.categories.id,
                                   is_active:
                                     result.is_active === t("active") ? 0 : 1,
                                   tag_name: ["tag 1", "tag 2"],
