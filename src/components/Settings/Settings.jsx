@@ -128,6 +128,8 @@ const Settings = () => {
         data.append("prayer_timings", values.prayer_timings === true ? 1 : 0);
         data.append("code_phone", values.code_phone === true ? 1 : 0);
         data.append("code_email", values.code_email === true ? 1 : 0);
+        data.append("image_active_private_content", values.image_active_private_content === true ? 1 : 0);
+        data.append("image_active_elder", values.image_active_elder === true ? 1 : 0);
         data.append("facebook", values.facebook);
         data.append("whatsapp", values.whatsapp);
         data.append("messenger", values.messenger);
@@ -161,6 +163,8 @@ const Settings = () => {
               prayer_timings: values.prayer_timings === true ? 1 : 0,
               code_phone: values.code_phone === true ? 1 : 0,
               code_email: values.code_email === true ? 1 : 0,
+              image_active_elder: values.image_active_elder === true ? 1 : 0,
+              image_active_private_content: values.image_active_private_content === true ? 1 : 0,
               facebook: values.facebook,
               whatsapp: values.whatsapp,
               messenger: values.messenger,
@@ -313,6 +317,8 @@ const Settings = () => {
         prayer_timings: settings?.prayer_timings === "true" ? true : false,
         code_phone: settings?.code_phone ? true : false,
         code_email: settings?.code_email ? true : false,
+        image_active_elder: settings?.image_active_elder === 1 ? true : false,
+        image_active_private_content: settings?.image_active_private_content === 1 ? true : false,
         facebook: settings?.facebook,
         whatsapp: settings?.whatsapp,
         messenger: settings?.messenger,
@@ -582,6 +588,49 @@ const Settings = () => {
               ) : null}
             </Col>
           </Row>
+          <div className="table-header justify-content-end mt-4">
+            <h3
+              className="title"
+              style={{
+                color: "var(--main-color)",
+                marginBottom: "0 !important",
+              }}
+            >
+              {t("settings.settingsApp.image_elder")}
+            </h3>
+          </div>
+          <Row>
+            <Col sm={12}>
+              <div className="form-group d-flex justify-content-end mb-4">
+                <label htmlFor="image_active_elder" className="form-label">
+                  {t("settings.settingsApp.image_elder")}
+                </label>
+                <input
+                  type="checkbox"
+                  className="prayer-time-input me-3 ms-3"
+                  id="image_active_elder"
+                  name="image_active_elder"
+                  disabled={
+                    role === "admin" ||
+                    (editSettingsCookies === "1" && getSettingsCookies === "1")
+                      ? false
+                      : true
+                  }
+                  value={formik.values.image_active_elder}
+                  checked={formik.values.image_active_elder}
+                  onChange={handleInputChange}
+                  style={{
+                    cursor:
+                      role !== "admin" ||
+                      (editSettingsCookies === "0" &&
+                        getSettingsCookies === "0")
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                />
+              </div>
+            </Col>
+          </Row>
           <hr
             style={{
               margin: "3rem 0.75rem 0 0.75rem",
@@ -727,6 +776,55 @@ const Settings = () => {
                   {formik.errors.background}
                 </span>
               ) : null}
+            </Col>
+          </Row>
+          <hr
+            style={{
+              margin: "3rem 0.75rem 0 0.75rem",
+            }}
+          />
+          {/* Image Active Private Content */}
+          <div className="table-header justify-content-end mt-4">
+            <h3
+              className="title"
+              style={{
+                color: "var(--main-color)",
+                marginBottom: "0 !important",
+              }}
+            >
+              {t("settings.settingsApp.image_active_private_content")}
+            </h3>
+          </div>
+          <Row>
+            <Col sm={12}>
+              <div className="form-group d-flex justify-content-end mb-4">
+                <label htmlFor="image_active_private_content" className="form-label">
+                  {t("settings.settingsApp.image_active_private_content")}
+                </label>
+                <input
+                  type="checkbox"
+                  className="prayer-time-input me-3 ms-3"
+                  id="image_active_private_content"
+                  name="image_active_private_content"
+                  disabled={
+                    role === "admin" ||
+                    (editSettingsCookies === "1" && getSettingsCookies === "1")
+                      ? false
+                      : true
+                  }
+                  value={formik.values.image_active_private_content}
+                  checked={formik.values.image_active_private_content}
+                  onChange={handleInputChange}
+                  style={{
+                    cursor:
+                      role !== "admin" ||
+                      (editSettingsCookies === "0" &&
+                        getSettingsCookies === "0")
+                        ? "not-allowed"
+                        : "pointer",
+                  }}
+                />
+              </div>
             </Col>
           </Row>
           <hr
