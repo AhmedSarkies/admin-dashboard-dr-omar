@@ -37,8 +37,10 @@ const Sidebar = ({ menu, linkItems, logo }) => {
   useEffect(() => {
     if (role === "admin") {
       linkItems.map((item) => {
-        item.display = true;
-        return item;
+        return {
+          ...item,
+          display: true,
+        };
       });
     }
     if (getAdminCookies === "1") {
