@@ -781,7 +781,8 @@ const IntroductionPage = () => {
                       <span className="error">{formik.errors.description}</span>
                     ) : null}
                   </div>
-                </Col><Col lg={6}>
+                </Col>
+                <Col lg={6}>
                   <div className="form-group-container d-flex flex-column align-items-end gap-3 mt-3">
                     <label htmlFor="descriptionEn" className="form-label">
                       {t("settings.introductionPage.columns.description.en")}
