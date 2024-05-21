@@ -34,6 +34,8 @@ const Sidebar = ({ menu, linkItems, logo }) => {
     }
   }, [role, linkItems]);
 
+  console.log(linkItems);
+
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
       <div className="sidebar-header d-flex justify-content-center align-items-center pt-4 pb-4">
