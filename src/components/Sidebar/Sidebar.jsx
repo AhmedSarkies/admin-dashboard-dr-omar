@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { NavLink } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import {
@@ -24,6 +24,15 @@ const Sidebar = ({ menu, linkItems, logo }) => {
   const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
   const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
   const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
+
+  useEffect(() => {
+    if (role === "admin") {
+      linkItems.map((item) => {
+        item.display = true;
+        return item;
+      });
+    }
+  }, [role, linkItems]);
 
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
