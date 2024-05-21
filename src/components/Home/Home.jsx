@@ -61,19 +61,27 @@ const Home = () => {
       title: t("linkItems.subAdmins"),
       path: "/dr-omar/sub-admins",
       icon: <MdAdminPanelSettings />,
-      display: (role === "admin" && true) || (getAdminCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getAdminCookies === "1" && true),
     },
     {
       title: t("linkItems.users"),
       path: "/dr-omar/users",
       icon: <HiUsers />,
-      display: (role === "admin" && true) || (getUserCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getUserCookies === "1" && true),
     },
     {
       title: t("linkItems.settingsApp"),
       path: "/dr-omar/settings",
       display:
-        (role === "admin" && true) || (getSettingsCookies === "1" && true),
+        role === "admin" ||
+        role === undefined ||
+        (getSettingsCookies === "1" && true),
     },
     // {
     //   title: t("linkItems.prayerTime"),
@@ -83,21 +91,24 @@ const Home = () => {
       title: t("linkItems.codeContent"),
       path: "/dr-omar/code-content",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getSpecialContentCookies === "1" && true),
     },
     {
       title: t("linkItems.introductionPage"),
       path: "/dr-omar/introduction-page",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getIntroductionPageBookCookies === "1" && true),
     },
     {
       title: t("linkItems.termsAndConditions"),
       path: "/dr-omar/terms&conditions",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getTermsConditionsCookies === "1" && true),
     },
     // {
@@ -108,88 +119,112 @@ const Home = () => {
       title: t("linkItems.mainCategoriesBooks"),
       path: "/dr-omar/main-categories-book",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getMainCategoriesBookCookies === "1" && true),
     },
     {
       title: t("linkItems.subCategoriesBooks"),
       path: "/dr-omar/sub-main-categories-book",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getSubBooksCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.subSubCategoriesBooks"),
       path: "/dr-omar/sub-sub-categories-book",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getBooksCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesAudio"),
       path: "/dr-omar/categories-audio",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getAudiosCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesImage"),
       path: "/dr-omar/categories-image",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getImageCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.categoriesArticle"),
       path: "/dr-omar/categories-article",
       display:
-        (role === "admin" && true) ||
+        role === "admin" ||
+        role === undefined ||
         (getArticlesCategoriesCookies === "1" && true),
     },
     {
       title: t("linkItems.elder"),
       path: "/dr-omar/elders",
       icon: <SiGooglescholar />,
-      display: (role === "admin" && true) || (getElderCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getElderCookies === "1" && true),
     },
     {
       title: t("linkItems.books"),
       path: "/dr-omar/books",
       icon: <GiBookshelf />,
-      display: (role === "admin" && true) || (getBookCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getBookCookies === "1" && true),
     },
     {
       title: t("linkItems.audios"),
       path: "/dr-omar/audios",
       icon: <GiSoundWaves />,
-      display: (role === "admin" && true) || (getAudioCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getAudioCookies === "1" && true),
     },
     {
       title: t("linkItems.images"),
       path: "/dr-omar/images",
       icon: <SlPicture />,
-      display: (role === "admin" && true) || (getImageCookies === "1" && true),
+      display:
+        role === "admin" ||
+        role === undefined ||
+        (getImageCookies === "1" && true),
     },
     {
       title: t("linkItems.articles"),
       path: "/dr-omar/articles",
       icon: <MdArticle />,
       display:
-        (role === "admin" && true) || (getArticlesCookies === "1" && true),
+        role === "admin" ||
+        role === undefined ||
+        (getArticlesCookies === "1" && true),
     },
     {
       title: t("linkItems.notifications"),
       path: "/dr-omar/notifications",
       icon: <FaBell />,
       display:
-        (role === "admin" && true) || (getNotificationCookies === "1" && true),
+        role === "admin" ||
+        role === undefined ||
+        (getNotificationCookies === "1" && true),
     },
     {
       title: t("linkItems.messages"),
       path: "/dr-omar/messages",
       icon: <MdOutlineMarkunread />,
       display:
-        (role === "admin" && true) || (getMessageCookies === "1" && true),
+        role === "admin" ||
+        role === undefined ||
+        (getMessageCookies === "1" && true),
     },
     // {
     //   title: t("linkItems.mostListening"),
