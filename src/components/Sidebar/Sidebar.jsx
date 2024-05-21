@@ -53,7 +53,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
             <li
               className="sidebar-item"
               key={index}
-              style={{ display: item.display ? "block" : "none" }}
+              style={{
+                display:
+                  role === "admin"
+                    ? "block"
+                    : item.display === true
+                    ? "block"
+                    : "none",
+              }}
             >
               <NavLink
                 className={({ isActive }) =>
@@ -85,7 +92,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                       <li
                         key={index}
                         className="ps-0 pe-0 mb-3"
-                        style={{ display: item.display ? "block" : "none" }}
+                        style={{
+                          display:
+                            role === "admin"
+                              ? "block"
+                              : item.display === true
+                              ? "block"
+                              : "none",
+                        }}
                       >
                         <NavLink
                           className={({ isActive }) =>
@@ -123,7 +137,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                       <li
                         key={index}
                         className="ps-0 pe-0 mb-3"
-                        style={{ display: item.display ? "block" : "none" }}
+                        style={{
+                          display:
+                            role === "admin"
+                              ? "block"
+                              : item.display === true
+                              ? "block"
+                              : "none",
+                        }}
                       >
                         <NavLink
                           className={({ isActive }) =>
@@ -144,7 +165,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
             <li
               className="sidebar-item"
               key={index}
-              style={{ display: item.display ? "block" : "none" }}
+              style={{
+                display:
+                  role === "admin"
+                    ? "block"
+                    : item.display === true
+                    ? "block"
+                    : "none",
+              }}
             >
               <NavLink
                 className={({ isActive }) =>
