@@ -196,52 +196,52 @@ const Home = () => {
   //   Add adminData to cookies
   useEffect(() => {
     try {
+      // Set Token in Cookies
+      Cookies.set("_user", adminData?.name, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      Cookies.set("_role", adminData?.powers, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      Cookies.set("_email", adminData?.email, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      Cookies.set("_phone", adminData?.phone, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      Cookies.set("_image", adminData?.image, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      Cookies.set("_active", adminData?.active, {
+        expires: 30,
+        secure: true,
+        sameSite: "strict",
+        path: "/",
+      });
+      adminData?.permissions?.map((permission) =>
+        Cookies.set(permission, 1, {
+          expires: 30,
+          secure: true,
+          sameSite: "strict",
+          path: "/",
+        })
+      );
       if (adminData) {
-        // Set Token in Cookies
-        Cookies.set("_user", adminData?.name, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        Cookies.set("_role", adminData?.powers, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        Cookies.set("_email", adminData?.email, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        Cookies.set("_phone", adminData?.phone, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        Cookies.set("_image", adminData?.image, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        Cookies.set("_active", adminData?.active, {
-          expires: 30,
-          secure: true,
-          sameSite: "strict",
-          path: "/",
-        });
-        adminData?.permissions?.map((permission) =>
-          Cookies.set(permission, 1, {
-            expires: 30,
-            secure: true,
-            sameSite: "strict",
-            path: "/",
-          })
-        );
       }
     } catch (error) {
       console.log("error", error);
@@ -249,7 +249,7 @@ const Home = () => {
   }, [adminData]);
 
   useEffect(() => {
-    try{
+    try {
       if (Cookies.get("_active") === "0") {
         Cookies.remove("_auth");
         Cookies.remove("_user");
@@ -266,7 +266,7 @@ const Home = () => {
     } catch (error) {
       console.log("error", error);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const toggleMenu = () => {
@@ -290,7 +290,7 @@ const Home = () => {
 
   return (
     <div className="dashboard-container">
-      {loadingAdminData ? (
+      {/* {loadingAdminData ? (
         <Spinner
           style={{
             width: "5rem",
@@ -302,14 +302,14 @@ const Home = () => {
           type="grow"
         />
       ) : (
-        <>
-          <div className="dashboard">
-            <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
-            <Outlet />
-          </div>
-          <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
-        </>
-      )}
+        <> */}
+      <div className="dashboard">
+        <Header menu={menu} toggleMenu={toggleMenu} linkItems={linkItems} />
+        <Outlet />
+      </div>
+      <Sidebar menu={menu} linkItems={linkItems} logo={logo} />
+      {/* </>
+      )} */}
     </div>
   );
 };
