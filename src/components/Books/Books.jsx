@@ -858,16 +858,16 @@ const Books = () => {
                                 getBooksCookies === "1")
                             ) {
                               const data = {
-                                id: result.id,
-                                name: result.name,
-                                pages: result.number_pages,
+                                id: result?.id,
+                                name: result?.name,
+                                number_pages: result?.number_pages,
                                 status:
                                   result?.status === t("public")
                                     ? "Private"
                                     : "Public",
-                                sub_categories_id: result.subSubCategories.id,
+                                sub_categories_id: result?.subSubCategories?.id,
                                 is_active:
-                                  result.is_active === t("active") ? 1 : 0,
+                                  result?.is_active === t("active") ? 1 : 0,
                               };
                               dispatch(updateBookApi(data)).then((res) => {
                                 if (!res.error) {
@@ -908,16 +908,16 @@ const Books = () => {
                                 getBooksCookies === "1")
                             ) {
                               const data = {
-                                id: result.id,
-                                name: result.name,
-                                pages: result.number_pages,
+                                id: result?.id,
+                                name: result?.name,
+                                number_pages: result?.number_pages ,
                                 status:
                                   result?.status === t("public")
                                     ? "Public"
                                     : "Private",
-                                sub_categories_id: result.subSubCategories.id,
+                                sub_categories_id: result?.subSubCategories?.id,
                                 is_active:
-                                  result.is_active === t("active") ? 0 : 1,
+                                  result?.is_active === t("active") ? 0 : 1,
                               };
                               dispatch(updateBookApi(data)).then((res) => {
                                 if (!res.error) {
