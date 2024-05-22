@@ -14,7 +14,6 @@ import Cookies from "js-cookie";
 const Sidebar = ({ menu, linkItems, logo }) => {
   const { t } = useTranslation();
   const role = Cookies.get("_role");
-  const getUserCookies = Cookies.get("GetUser");
   const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
   const getSpecialContentCookies = Cookies.get("GetSpecialContent");
   const getSettingsCookies = Cookies.get("GetSettings");
@@ -25,89 +24,7 @@ const Sidebar = ({ menu, linkItems, logo }) => {
   const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
   const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
   const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
-  const getImageCookies = Cookies.get("GetImage");
-  const getElderCookies = Cookies.get("GetElder");
-  const getBookCookies = Cookies.get("GetBook");
-  const getAudioCookies = Cookies.get("GetAudio");
-  const getArticlesCookies = Cookies.get("GetArticles");
-  const getAdminCookies = Cookies.get("GetAdmin");
-  const getMessageCookies = Cookies.get("GetMessage");
-  const getNotificationCookies = Cookies.get("GetNotification");
   
-  if (getAdminCookies === "1") {
-    linkItems[2].display = true;
-  }
-  if (getUserCookies === "1") {
-    linkItems[3].display = true;
-  }
-  if (getSettingsCookies === "1") {
-    linkItems[4].display = true;
-  }
-  if (getSpecialContentCookies === "1") {
-    linkItems[5].display = true;
-  }
-  if (getIntroductionPageBookCookies === "1") {
-    linkItems[6].display = true;
-  }
-  if (getTermsConditionsCookies === "1") {
-    linkItems[7].display = true;
-  }
-  if (getMainCategoriesBookCookies === "1") {
-    linkItems[8].display = true;
-  }
-  if (getSubBooksCategoriesCookies === "1") {
-    linkItems[9].display = true;
-  }
-  if (getBooksCategoriesCookies === "1") {
-    linkItems[10].display = true;
-  }
-  if (getAudiosCategoriesCookies === "1") {
-    linkItems[11].display = true;
-  }
-  if (getImageCategoriesCookies === "1") {
-    linkItems[12].display = true;
-  }
-  if (getArticlesCategoriesCookies === "1") {
-    linkItems[13].display = true;
-  }
-  if (getElderCookies === "1") {
-    linkItems[14].display = true;
-  }
-  if (getBookCookies === "1") {
-    linkItems[15].display = true;
-  }
-  if (getAudioCookies === "1") {
-    linkItems[16].display = true;
-  }
-  if (getImageCookies === "1") {
-    linkItems[17].display = true;
-  }
-  if (getArticlesCookies === "1") {
-    linkItems[18].display = true;
-  }
-  if (getNotificationCookies === "1") {
-    linkItems[19].display = true;
-  }
-  if (getMessageCookies === "1") {
-    linkItems[20].display = true;
-  }
-
-  useEffect(() => {
-    if (role === "admin") {
-      linkItems.map((item) => {
-        return {
-          ...item,
-          display: true,
-        };
-      });
-    }
-  }, [
-    role,
-    linkItems,
-  ]);
-
-  console.log(linkItems);
-
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
       <div className="sidebar-header d-flex justify-content-center align-items-center pt-4 pb-4">
