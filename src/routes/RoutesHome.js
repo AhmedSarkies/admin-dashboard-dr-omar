@@ -27,6 +27,7 @@ import {
   User,
   Elder,
   SubSubCategoriesBook,
+  NotAllow,
 } from "../components";
 import Cookies from "js-cookie";
 
@@ -57,6 +58,59 @@ const RoutesHome = () => {
       <Route path="/" element={<Navigate to="/dr-omar" />} />
       <Route path="/*" element={<Navigate to="/dr-omar" />} />
       <Route path="*" element={<Navigate to="/dr-omar" />} />
+      {/* Not Allow */}
+      {getTermsConditionsCookies === "0" && (
+        <Route path="terms&conditions" element={<NotAllow />} />
+      )}
+      {getSpecialContentCookies === "0" && (
+        <Route path="code-content" element={<NotAllow />} />
+      )}
+      {getSettingsCookies === "0" && (
+        <Route path="settings" element={<NotAllow />} />
+      )}
+      {getIntroductionPageBookCookies === "0" && (
+        <Route path="introduction-page" element={<NotAllow />} />
+      )}
+      {getSubBooksCategoriesCookies === "0" && (
+        <Route path="sub-main-categories-book" element={<NotAllow />} />
+      )}
+      {getMainCategoriesBookCookies === "0" && (
+        <Route path="main-categories-book" element={<NotAllow />} />
+      )}
+      {getImageCategoriesCookies === "0" && (
+        <Route path="categories-image" element={<NotAllow />} />
+      )}
+      {getBooksCategoriesCookies === "0" && (
+        <Route path="sub-sub-categories-book" element={<NotAllow />} />
+      )}
+      {getAudiosCategoriesCookies === "0" && (
+        <Route path="categories-audio" element={<NotAllow />} />
+      )}
+      {getArticlesCategoriesCookies === "0" && (
+        <Route path="categories-article" element={<NotAllow />} />
+      )}
+      {getElderCookies === "0" && (
+        <Route path="elders" element={<NotAllow />} />
+      )}
+      {getBookCookies === "0" && <Route path="books" element={<NotAllow />} />}
+      {getAudioCookies === "0" && (
+        <Route path="audios" element={<NotAllow />} />
+      )}
+      {getArticlesCookies === "0" && (
+        <Route path="articles" element={<NotAllow />} />
+      )}
+      {getAdminCookies === "0" && (
+        <Route path="sub-admins" element={<NotAllow />} />
+      )}
+      {getMessageCookies === "0" && (
+        <Route path="messages" element={<NotAllow />} />
+      )}
+      {getNotificationCookies === "0" && (
+        <Route path="notifications" element={<NotAllow />} />
+      )}
+      {getImageCookies === "0" && (
+        <Route path="images" element={<NotAllow />} />
+      )}
       <Route path="/dr-omar" element={<Home />}>
         <Route path="" element={<Navigate to="/dr-omar/dashboard" />} />
         <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />
