@@ -27,7 +27,7 @@ import {
   User,
   Elder,
   SubSubCategoriesBook,
-  NotAllow,
+  NotAllowed,
 } from "../components";
 import Cookies from "js-cookie";
 
@@ -58,59 +58,6 @@ const RoutesHome = () => {
       <Route path="/" element={<Navigate to="/dr-omar" />} />
       <Route path="/*" element={<Navigate to="/dr-omar" />} />
       <Route path="*" element={<Navigate to="/dr-omar" />} />
-      {/* Not Allow */}
-      {getTermsConditionsCookies === "0" && (
-        <Route path="terms&conditions" element={<NotAllow />} />
-      )}
-      {getSpecialContentCookies === "0" && (
-        <Route path="code-content" element={<NotAllow />} />
-      )}
-      {getSettingsCookies === "0" && (
-        <Route path="settings" element={<NotAllow />} />
-      )}
-      {getIntroductionPageBookCookies === "0" && (
-        <Route path="introduction-page" element={<NotAllow />} />
-      )}
-      {getSubBooksCategoriesCookies === "0" && (
-        <Route path="sub-main-categories-book" element={<NotAllow />} />
-      )}
-      {getMainCategoriesBookCookies === "0" && (
-        <Route path="main-categories-book" element={<NotAllow />} />
-      )}
-      {getImageCategoriesCookies === "0" && (
-        <Route path="categories-image" element={<NotAllow />} />
-      )}
-      {getBooksCategoriesCookies === "0" && (
-        <Route path="sub-sub-categories-book" element={<NotAllow />} />
-      )}
-      {getAudiosCategoriesCookies === "0" && (
-        <Route path="categories-audio" element={<NotAllow />} />
-      )}
-      {getArticlesCategoriesCookies === "0" && (
-        <Route path="categories-article" element={<NotAllow />} />
-      )}
-      {getElderCookies === "0" && (
-        <Route path="elders" element={<NotAllow />} />
-      )}
-      {getBookCookies === "0" && <Route path="books" element={<NotAllow />} />}
-      {getAudioCookies === "0" && (
-        <Route path="audios" element={<NotAllow />} />
-      )}
-      {getArticlesCookies === "0" && (
-        <Route path="articles" element={<NotAllow />} />
-      )}
-      {getAdminCookies === "0" && (
-        <Route path="sub-admins" element={<NotAllow />} />
-      )}
-      {getMessageCookies === "0" && (
-        <Route path="messages" element={<NotAllow />} />
-      )}
-      {getNotificationCookies === "0" && (
-        <Route path="notifications" element={<NotAllow />} />
-      )}
-      {getImageCookies === "0" && (
-        <Route path="images" element={<NotAllow />} />
-      )}
       <Route path="/dr-omar" element={<Home />}>
         <Route path="" element={<Navigate to="/dr-omar/dashboard" />} />
         <Route path="login" element={<Navigate to="/dr-omar/dashboard" />} />
@@ -119,80 +66,157 @@ const RoutesHome = () => {
         <Route path="profile" element={<Profile />} />
         <Route path="profile/change-password" element={<ChangePassword />} />
         <Route path="profile/edit-profile" element={<EditProfile />} />
-        {(role === "admin" || (getAdminCookies === "1" && true)) && (
+        {role === "admin" || (getAdminCookies === "1" && true) ? (
           <Route path="sub-admins" element={<SubAdmins />} />
+        ) : (
+          <Route
+            path="sub-admins"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getUserCookies === "1" && true)) && (
+        {role === "admin" || (getUserCookies === "1" && true) ? (
           <>
             <Route path="users" element={<Users />} />
             <Route path="users/:id" element={<User />} />
-            {(role === "admin" || (getNotificationCookies === "1" && true)) && (
+            {role === "admin" || (getNotificationCookies === "1" && true) ? (
               <Route path="notifications" element={<Notifications />} />
+            ) : (
+              <Route
+                path="notifications"
+                element={<Navigate to="/dr-omar/not-allowed" />}
+              />
             )}
-            {(role === "admin" ||
-              (getSpecialContentCookies === "1" && true)) && (
+            {role === "admin" || (getSpecialContentCookies === "1" && true) ? (
               <Route path="code-content" element={<CodeContent />} />
+            ) : (
+              <Route
+                path="code-content"
+                element={<Navigate to="/dr-omar/not-allowed" />}
+              />
             )}
           </>
+        ) : (
+          <Route path="users" element={<Navigate to="/dr-omar/not-allowed" />} />
         )}
-        {(role === "admin" || (getMessageCookies === "1" && true)) && (
+        {role === "admin" || (getMessageCookies === "1" && true) ? (
           <Route path="messages" element={<Messages />} />
+        ) : (
+          <Route
+            path="messages"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getSettingsCookies === "1" && true)) && (
+        {role === "admin" || (getSettingsCookies === "1" && true) ? (
           <Route path="settings" element={<Settings />} />
+        ) : (
+          <Route
+            path="settings"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" ||
-          (getIntroductionPageBookCookies === "1" && true)) && (
+        {role === "admin" ||
+        (getIntroductionPageBookCookies === "1" && true) ? (
           <Route path="introduction-page" element={<IntroductionPage />} />
+        ) : (
+          <Route
+            path="introduction-page"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getTermsConditionsCookies === "1" && true)) && (
+        {role === "admin" || (getTermsConditionsCookies === "1" && true) ? (
           <Route path="terms&conditions" element={<TermsAndConditions />} />
+        ) : (
+          <Route
+            path="terms&conditions"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" ||
-          (getArticlesCategoriesCookies === "1" && true)) && (
+        {role === "admin" || (getArticlesCategoriesCookies === "1" && true) ? (
           <Route path="categories-article" element={<CategoriesArticle />} />
+        ) : (
+          <Route
+            path="categories-article"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getImageCategoriesCookies === "1" && true)) && (
+        {role === "admin" || (getImageCategoriesCookies === "1" && true) ? (
           <Route path="categories-image" element={<CategoriesImage />} />
+        ) : (
+          <Route
+            path="categories-image"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getAudiosCategoriesCookies === "1" && true)) && (
+        {role === "admin" || (getAudiosCategoriesCookies === "1" && true) ? (
           <Route path="categories-audio" element={<CategoriesAudio />} />
+        ) : (
+          <Route
+            path="categories-audio"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" ||
-          (getMainCategoriesBookCookies === "1" && true)) && (
+        {role === "admin" || (getMainCategoriesBookCookies === "1" && true) ? (
           <Route path="main-categories-book" element={<CategoriesBook />} />
+        ) : (
+          <Route
+            path="main-categories-book"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" ||
-          (getSubBooksCategoriesCookies === "1" && true)) && (
+        {role === "admin" || (getSubBooksCategoriesCookies === "1" && true) ? (
           <Route
             path="sub-main-categories-book"
             element={<SubCategoriesBook />}
           />
+        ) : (
+          <Route
+            path="sub-main-categories-book"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getBooksCategoriesCookies === "1" && true)) && (
+        {role === "admin" || (getBooksCategoriesCookies === "1" && true) ? (
           <Route
             path="sub-sub-categories-book"
             element={<SubSubCategoriesBook />}
           />
+        ) : (
+          <Route
+            path="sub-sub-categories-book"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getElderCookies === "1" && true)) && (
+        {role === "admin" || (getElderCookies === "1" && true) ? (
           <>
             <Route path="elders" element={<Elders />} />
             <Route path="elders/:id" element={<Elder />} />
           </>
+        ) : (
+          <Route path="elders" element={<Navigate to="/dr-omar/not-allowed" />} />
         )}
-        {(role === "admin" || (getArticlesCookies === "1" && true)) && (
+        {role === "admin" || (getArticlesCookies === "1" && true) ? (
           <Route path="articles" element={<Articles />} />
+        ) : (
+          <Route
+            path="articles"
+            element={<Navigate to="/dr-omar/not-allowed" />}
+          />
         )}
-        {(role === "admin" || (getAudioCookies === "1" && true)) && (
+        {role === "admin" || (getAudioCookies === "1" && true) ? (
           <Route path="audios" element={<Audios />} />
+        ) : (
+          <Route path="audios" element={<Navigate to="/dr-omar/not-allowed" />} />
         )}
-        {(role === "admin" || (getBookCookies === "1" && true)) && (
+        {role === "admin" || (getBookCookies === "1" && true) ? (
           <Route path="books" element={<Books />} />
+        ) : (
+          <Route path="books" element={<Navigate to="/dr-omar/not-allowed" />} />
         )}
-        {(role === "admin" || (getImageCookies === "1" && true)) && (
+        {role === "admin" || (getImageCookies === "1" && true) ? (
           <Route path="images" element={<Images />} />
+        ) : (
+          <Route path="images" element={<Navigate to="/dr-omar/not-allowed" />} />
         )}
+        <Route path="not-allowed" element={<NotAllowed />} />
         {/* <Route path="most-listening" element={<MostListening />} /> */}
       </Route>
     </Routes>
