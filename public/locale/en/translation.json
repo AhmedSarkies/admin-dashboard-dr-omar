@@ -90,6 +90,8 @@
   "checkboxes": "Checkboxes",
   "searchAudioElder": "Audio by Title, Category, Content or Activation",
   "listening": "Listening Count",
+  "notAllowed": "You are not allowed to access this page",
+  "goBack": "Go Back to Home Page",
   "auth": {
     "login": {
       "title": "Login to Dr.Omar Kamel",
