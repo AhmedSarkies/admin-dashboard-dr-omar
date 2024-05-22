@@ -9,21 +9,21 @@ import {
 } from "reactstrap";
 import { IoMdSettings } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 const Sidebar = ({ menu, linkItems, logo }) => {
   const { t } = useTranslation();
-  const role = Cookies.get("_role");
-  const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
-  const getSpecialContentCookies = Cookies.get("GetSpecialContent");
-  const getSettingsCookies = Cookies.get("GetSettings");
-  const getIntroductionPageBookCookies = Cookies.get("GetIntroductionPage");
-  const getSubBooksCategoriesCookies = Cookies.get("GetSubBooksCategories");
-  const getMainCategoriesBookCookies = Cookies.get("GetMainCategoriesBook");
-  const getImageCategoriesCookies = Cookies.get("GetImageCategories");
-  const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
-  const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
-  const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
+  // const role = Cookies.get("_role");
+  // const getTermsConditionsCookies = Cookies.get("GetTermsConditions");
+  // const getSpecialContentCookies = Cookies.get("GetSpecialContent");
+  // const getSettingsCookies = Cookies.get("GetSettings");
+  // const getIntroductionPageBookCookies = Cookies.get("GetIntroductionPage");
+  // const getSubBooksCategoriesCookies = Cookies.get("GetSubBooksCategories");
+  // const getMainCategoriesBookCookies = Cookies.get("GetMainCategoriesBook");
+  // const getImageCategoriesCookies = Cookies.get("GetImageCategories");
+  // const getBooksCategoriesCookies = Cookies.get("GetBooksCategories");
+  // const getAudiosCategoriesCookies = Cookies.get("GetAudiosCategories");
+  // const getArticlesCategoriesCookies = Cookies.get("GetArticlesCategories");
   
   return (
     <div className={`sidebar${menu ? " active" : ""}`}>
@@ -44,9 +44,9 @@ const Sidebar = ({ menu, linkItems, logo }) => {
             <li
               className="sidebar-item"
               key={index}
-              style={{
-                display: item.display ? "block" : "none",
-              }}
+              // style={{
+              //   display: item.display ? "block" : "none",
+              // }}
             >
               <NavLink
                 className={({ isActive }) =>
@@ -59,11 +59,12 @@ const Sidebar = ({ menu, linkItems, logo }) => {
               </NavLink>
             </li>
           ))}
-          {(role === "admin" ||
+          {/* {(role === "admin" ||
             (getSettingsCookies === "1" &&
               getTermsConditionsCookies === "1" &&
               getSpecialContentCookies === "1" &&
               getIntroductionPageBookCookies === "1")) && (
+          )} */}
             <div className="sidebar-item dropdown">
               <UncontrolledAccordion stayOpen>
                 <AccordionItem>
@@ -78,9 +79,9 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                       <li
                         key={index}
                         className="ps-0 pe-0 mb-3"
-                        style={{
-                          display: item.display ? "block" : "none",
-                        }}
+                        // style={{
+                        //   display: item.display ? "block" : "none",
+                        // }}
                       >
                         <NavLink
                           className={({ isActive }) =>
@@ -96,14 +97,14 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                 </AccordionItem>
               </UncontrolledAccordion>
             </div>
-          )}
-          {(role === "admin" ||
+          {/* {(role === "admin" ||
             (getMainCategoriesBookCookies === "1" &&
               getSubBooksCategoriesCookies === "1" &&
               getBooksCategoriesCookies === "1" &&
               getImageCategoriesCookies === "1" &&
               getAudiosCategoriesCookies === "1" &&
               getArticlesCategoriesCookies === "1")) && (
+          )} */}
             <div className="sidebar-item dropdown">
               <UncontrolledAccordion stayOpen>
                 <AccordionItem>
@@ -118,9 +119,9 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                       <li
                         key={index}
                         className="ps-0 pe-0 mb-3"
-                        style={{
-                          display: item.display ? "block" : "none",
-                        }}
+                        // style={{
+                        //   display: item.display ? "block" : "none",
+                        // }}
                       >
                         <NavLink
                           className={({ isActive }) =>
@@ -136,14 +137,13 @@ const Sidebar = ({ menu, linkItems, logo }) => {
                 </AccordionItem>
               </UncontrolledAccordion>
             </div>
-          )}
           {linkItems.slice(14).map((item, index) => (
             <li
               className="sidebar-item"
               key={index}
-              style={{
-                display: item.display ? "block" : "none",
-              }}
+              // style={{
+              //   display: item.display ? "block" : "none",
+              // }}
             >
               <NavLink
                 className={({ isActive }) =>
