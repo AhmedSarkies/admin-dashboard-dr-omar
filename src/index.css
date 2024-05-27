@@ -1399,8 +1399,45 @@ label {
 .not-read {
   font-weight: 900;
 }
-
+.ql-container.ql-snow {
+  min-height: 25vh;
+}
+.ql-editor.ql-blank {
+  height: 25vh;
+}
+.ql-editor.ql-blank *,
+[lang="en"] .ql-toolbar.ql-snow {
+  direction: ltr;
+}
+.ql-editor.ql-blank *,
+.ql-toolbar.ql-snow {
+  direction: rtl;
+}
+.ql-editor.ql-blank::before {
+  right: 15px;
+  left: auto;
+}
+[lang="en"] .ql-editor.ql-blank::before {
+  left: 15px;
+  right: auto;
+}
+[lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+  right: 0;
+}
+.ql-toolbar.ql-snow .ql-picker-options {
+  left: 0;
+}
 /* Media Screens */
+@media only screen and (max-width: 1400px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -265%;
+  }
+}
+@media only screen and (max-width: 1160px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -140%;
+  }
+}
 @media only screen and (max-width: 1200px) {
   .dashboard-container {
     display: block;
@@ -1480,6 +1517,9 @@ label {
   }
 }
 @media only screen and (max-width: 768px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -240%;
+  }
   .table-header {
     margin: 0.2rem;
     margin-bottom: 1.5rem;
@@ -1554,6 +1594,21 @@ label {
   .accordion {
     --bs-accordion-btn-icon-width: 1rem !important;
     --bs-accordion-btn-icon-height: 1rem !important;
+  }
+}
+@media only screen and (max-width: 664px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -140%;
+  }
+}
+@media only screen and (max-width: 349px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -240%;
+  }
+}
+@media only screen and (max-width: 318px) {
+  [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
+    left: -140%;
   }
 }
 @media only screen and (max-width: 576px) {
