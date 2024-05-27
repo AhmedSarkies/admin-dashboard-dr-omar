@@ -16,6 +16,7 @@ import App from "./App";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-toastify/dist/ReactToastify.css";
 import "sweetalert2";
+import "react-quill/dist/quill.snow.css";
 import "./index.css";
 
 const root = createRoot(document.getElementById("root"));
