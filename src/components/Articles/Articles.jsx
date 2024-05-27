@@ -28,6 +28,7 @@ import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
+import ReactQuill from "react-quill";
 
 const initialValues = {
   image: {
@@ -48,6 +49,44 @@ const initialValues = {
 
 const Articles = () => {
   const { t } = useTranslation();
+  const module = {
+    toolbar: [
+      [{ header: "1" }, { header: "2" }, { font: [] }],
+      [{ size: ["small", false, "large", "huge"] }],
+      ["bold", "italic", "underline", "strike", "blockquote"],
+      [
+        { list: "ordered" },
+        { list: "bullet" },
+        { indent: "-1" },
+        { indent: "+1" },
+      ],
+      ["link", "image", "video"],
+      ["clean"],
+      ["code-block"],
+      [
+        {
+          list: "bullet",
+        },
+        {
+          list: "ordered",
+        },
+        {
+          list: "check",
+        },
+        {
+          align: ["", "center", "right", "justify"],
+        },
+      ],
+      [
+        {
+          color: [],
+        },
+        {
+          background: [],
+        },
+      ],
+    ],
+  };
   const role = Cookies.get("_role");
   const getArticlesCookies = Cookies.get("GetArticles");
   const addArticlesCookies = Cookies.get("addArticles");
@@ -1544,14 +1583,20 @@ const Articles = () => {
                       <label htmlFor="content" className="form-label">
                         {t("articles.columns.article")}
                       </label>
-                      <textarea
+                      <ReactQuill
                         className="form-input"
                         id="content"
-                        placeholder={t("articles.columns.article")}
                         name="content"
+                        placeholder={t("articles.columns.article")}
+                        theme="snow"
                         value={formik.values.content}
                         onChange={handleInput}
-                      ></textarea>
+                        style={{
+                          borderBottom: 0,
+                          padding: "0.375rem 0",
+                        }}
+                        modules={module}
+                      />
                       {formik.errors.content && formik.touched.content ? (
                         <span className="error">{formik.errors.content}</span>
                       ) : null}
