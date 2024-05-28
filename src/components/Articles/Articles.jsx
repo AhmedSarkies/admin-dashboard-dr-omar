@@ -98,6 +98,7 @@ const Articles = () => {
   const { articles, articleCategories, loading, error } = useSelector(
     (state) => state.article
   );
+  const [content, setContent] = useState("");
   const [toggle, setToggle] = useState({
     add: false,
     edit: false,
@@ -223,6 +224,7 @@ const Articles = () => {
                   edit: !toggle.edit,
                   add: !toggle.add,
                 });
+                setContent("");
                 toast.success(t("toast.article.updatedSuccess"));
               } else {
                 toast.error(t("toast.article.updatedError"));
@@ -239,6 +241,7 @@ const Articles = () => {
                 ...toggle,
                 add: !toggle.add,
               });
+              setContent("");
               toast.success(t("toast.article.addedSuccess"));
             } else {
               toast.error(t("toast.article.addedError"));
@@ -280,6 +283,12 @@ const Articles = () => {
   // handle Input Using Formik
   const handleInput = (e) => {
     formik.handleChange(e);
+  };
+
+  // Handle Content Using React-Quill
+  const handleContent = (value) => {
+    setContent(value);
+    formik.setFieldValue("content", value);
   };
 
   // Handle Edit article
@@ -746,11 +755,15 @@ const Articles = () => {
                         <td className="table-td title">{result?.writer}</td>
                       )}
                       {toggle.toggleColumns.content && (
-                        <td className="table-td article">
-                          {result?.content?.length >= 50
-                            ? result?.content?.slice(0, 50) + "..."
-                            : result?.content}
-                        </td>
+                        <td
+                          className="table-td"
+                          dangerouslySetInnerHTML={{
+                            __html:
+                              result?.content?.length >= 50
+                                ? result?.content?.slice(0, 50) + "..."
+                                : result?.content,
+                          }}
+                        ></td>
                       )}
                       {toggle.toggleColumns.category && (
                         <td className="table-td title">
@@ -987,6 +1000,7 @@ const Articles = () => {
                 add: !toggle.add,
                 edit: !toggle.edit,
               });
+              setContent("");
             }}
             centered={true}
             keyboard={true}
@@ -1001,6 +1015,7 @@ const Articles = () => {
                   add: !toggle.add,
                   edit: false,
                 });
+                setContent("");
               }}
             >
               {formik.values.id
@@ -1014,6 +1029,7 @@ const Articles = () => {
                     add: !toggle.add,
                     edit: false,
                   });
+                  setContent("");
                 }}
               />
             </ModalHeader>
@@ -1589,8 +1605,8 @@ const Articles = () => {
                         name="content"
                         placeholder={t("articles.columns.article")}
                         theme="snow"
-                        value={formik.values.content}
-                        onChange={handleInput}
+                        value={content}
+                        onChange={handleContent}
                         style={{
                           borderBottom: 0,
                           padding: "0.375rem 0",
@@ -1729,7 +1745,12 @@ const Articles = () => {
                 <span>{formik.values?.created_at}</span>
               </span>
             </div>
-            <div className="content text-end">{formik.values?.content}</div>
+            <div
+              className="content text-end"
+              dangerouslySetInnerHTML={{
+                __html: formik.values?.content,
+              }}
+            />
             <div className="form-group-container d-flex justify-content-center align-items-center mt-3">
               <button
                 className="cancel-btn"
