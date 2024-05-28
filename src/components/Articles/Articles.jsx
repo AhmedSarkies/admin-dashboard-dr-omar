@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Col,
@@ -28,7 +28,8 @@ import { toast } from "react-toastify";
 import { useFiltration, useSchema } from "../../hooks";
 import { useTranslation } from "react-i18next";
 import Cookies from "js-cookie";
-import ReactQuill from "react-quill";
+// import ReactQuill from "react-quill";
+import JoditEditor from "jodit-react";
 
 const initialValues = {
   image: {
@@ -47,46 +48,37 @@ const initialValues = {
   showWriter: "",
 };
 
+// const module = {
+//   toolbar: [
+//     [
+//       {
+//         header: [1, 2, 3, 4, 5, 6, false],
+//       },
+//     ],
+//     [{ font: [] }],
+//     [{ size: [] }],
+//     ["bold", "italic", "underline", "strike", "blockquote"],
+//     [
+//       { list: "ordered" },
+//       { list: "bullet" },
+//       { indent: "-1" },
+//       { indent: "+1" },
+//     ],
+//     ["link", "image", "video"],
+//     ["clean"],
+//   ],
+// };
+
 const Articles = () => {
   const { t } = useTranslation();
-  const module = {
-    toolbar: [
-      [{ header: "1" }, { header: "2" }, { font: [] }],
-      [{ size: ["small", false, "large", "huge"] }],
-      ["bold", "italic", "underline", "strike", "blockquote"],
-      [
-        { list: "ordered" },
-        { list: "bullet" },
-        { indent: "-1" },
-        { indent: "+1" },
-      ],
-      ["link", "image", "video"],
-      ["clean"],
-      ["code-block"],
-      [
-        {
-          list: "bullet",
-        },
-        {
-          list: "ordered",
-        },
-        {
-          list: "check",
-        },
-        {
-          align: ["", "center", "right", "justify"],
-        },
-      ],
-      [
-        {
-          color: [],
-        },
-        {
-          background: [],
-        },
-      ],
-    ],
-  };
+  const editor = useRef(null);
+  const config = useMemo(
+    () => ({
+      readonly: false,
+      placeholder: t("articles.columns.article"),
+    }),
+    [t]
+  );
   const role = Cookies.get("_role");
   const getArticlesCookies = Cookies.get("GetArticles");
   const addArticlesCookies = Cookies.get("addArticles");
@@ -966,7 +958,10 @@ const Articles = () => {
                               editArticlesCookies === "1") && (
                               <FaEdit
                                 className="edit-btn"
-                                onClick={() => handleEdit(result)}
+                                onClick={() => {
+                                  setContent(result.content);
+                                  handleEdit(result);
+                                }}
                               />
                             )}
                             {(role === "admin" ||
@@ -1599,7 +1594,7 @@ const Articles = () => {
                       <label htmlFor="content" className="form-label">
                         {t("articles.columns.article")}
                       </label>
-                      <ReactQuill
+                      {/* <ReactQuill
                         className="form-input"
                         id="content"
                         name="content"
@@ -1612,6 +1607,17 @@ const Articles = () => {
                           padding: "0.375rem 0",
                         }}
                         modules={module}
+                      /> */}
+                      <JoditEditor
+                        className="form-input"
+                        id="content"
+                        name="content"
+                        ref={editor}
+                        value={content}
+                        config={config}
+                        tabIndex={1} // tabIndex of textarea
+                        onBlur={(newContent) => setContent(newContent)} // preferred to use only this option to update the content for performance reasons
+                        onChange={handleContent}
                       />
                       {formik.errors.content && formik.touched.content ? (
                         <span className="error">{formik.errors.content}</span>
