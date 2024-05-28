@@ -1427,6 +1427,24 @@ label {
 .ql-toolbar.ql-snow .ql-picker-options {
   left: 0;
 }
+.jodit-react-container {
+  width: 100%;
+  height: 50vh;
+}
+.jodit-workplace {
+  height: 30vh !important;
+}
+.jodit-container.jodit.jodit_theme_default.jodit-wysiwyg_mode.form-input {
+  height: 50vh;
+}
+.jodit-ui-spacer,
+.jodit-status-bar__item.jodit-status-bar__item-right a,
+.jodit-toolbar-button.jodit-toolbar-button_size_middle.jodit-toolbar-button_variant_initial.jodit-toolbar-button_fullsize,
+.jodit-ui-group.jodit-ui-group_separated_true.jodit-ui-group_group_info.jodit-ui-group_size_middle,
+.jodit-ui-group.jodit-ui-group_separated_true.jodit-ui-group_group_state.jodit-ui-group_size_middle {
+  display: none;
+}
+
 /* Media Screens */
 @media only screen and (max-width: 1400px) {
   [lang="en"] .ql-toolbar.ql-snow .ql-picker-options {
